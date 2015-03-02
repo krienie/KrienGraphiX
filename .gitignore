@@ -1,8 +1,9 @@
 [Dd]ebug*/
 [Rr]elease*/
 x64/
+libKrienGraphiX/old
+GeneratedFiles/
+ParserTests/
 *.nvuser
 *.user
-libKrienGraphiX/old
-GeneratedFiles
-ParserTests/
+*.opensdf
