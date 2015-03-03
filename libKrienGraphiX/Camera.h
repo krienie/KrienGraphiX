@@ -20,10 +20,10 @@ namespace kgx
 
 			Camera& operator=( const Camera &rhs );
 
-			DirectX::XMFLOAT4X4 getProjMatrix() const;
-			DirectX::XMFLOAT4X4 getViewMatrix() const;
-			DirectX::XMFLOAT3 getPosition() const;
-			DirectX::XMFLOAT3 getTarget() const;
+			const DirectX::XMFLOAT4X4& getProjMatrix() const;
+			const DirectX::XMFLOAT4X4& getViewMatrix() const;
+			const DirectX::XMFLOAT3& getPosition() const;
+			const DirectX::XMFLOAT3& getTarget() const;
 			float getFOV() const;
 			float getAspectRatio() const;
 			float getNearZ() const;
@@ -48,21 +48,20 @@ namespace kgx
 			void rotateRight( float degrees );*/
 
 		private:
-			//TODO: add copy-constructor and assignment-operator
 			//TODO: add something that can manipulate the rasterizer
 
-			Scene *parentScene;
+			Scene *m_parentScene;
 
-			DirectX::XMFLOAT4X4 projMatrix;
-			DirectX::XMFLOAT4X4 viewMatrix;
+			DirectX::XMFLOAT4X4 m_projMatrix;
+			DirectX::XMFLOAT4X4 m_viewMatrix;
 
-			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT3 target;
-			DirectX::XMFLOAT3 camUp;
+			DirectX::XMFLOAT3 m_position;
+			DirectX::XMFLOAT3 m_target;
+			DirectX::XMFLOAT3 m_camUp;
 
-			float fov;
-			float aspectRatio;
-			float nearZ;
-			float farZ;
+			float m_fov;
+			float m_aspectRatio;
+			float m_nearZ;
+			float m_farZ;
 	};
 }

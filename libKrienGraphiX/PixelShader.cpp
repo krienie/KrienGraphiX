@@ -1,20 +1,21 @@
 
 #include <iostream>
 
+#include "ConstantBuffer.h"
 #include "PixelShader.h"
 
 namespace kgx
 {
 	PixelShader::PixelShader( _In_ ID3D11Device *dxDev )
-		: Shader( dxDev ), pixelShader(0)//, structBuffers(), bufferUAVs()
+		: Shader(dxDev), m_pixelShader(0)//, structBuffers(), bufferUAVs()
 	{
 	}
 
 
 	PixelShader::~PixelShader()
 	{
-		if ( pixelShader )
-			pixelShader->Release();
+		if (m_pixelShader)
+			m_pixelShader->Release();
 
 		/*std::vector<ID3D11Buffer*>::iterator buffIt;
 		for ( buffIt = structBuffers.begin(); buffIt != structBuffers.end(); buffIt++ )
@@ -28,23 +29,23 @@ namespace kgx
 
 	void PixelShader::activate()
 	{
-		dxDevCont->PSSetShader( pixelShader, 0, 0 );
+		m_dxDevCont->PSSetShader(m_pixelShader, 0, 0);
 
 		UINT buffCounter = 0U;
 		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = constBuffers.begin(); it != constBuffers.end(); ++it, ++buffCounter )
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it, ++buffCounter )
 		{
 			//TODO: iets verzinnen zodat alle buffers in 1x aangezet kunnen worden..
 			(*it)->commit();
-			ID3D11Buffer *buff = (*it)->getDxBuffer();
-			dxDevCont->PSSetConstantBuffers( buffCounter, 1U, &buff );
+			ID3D11Buffer *buff = (*it)->getDxBufferPtr();
+			m_dxDevCont->PSSetConstantBuffers(buffCounter, 1U, &buff);
 		}
 	}
 
 
 	HRESULT PixelShader::build( _In_ ID3DBlob *shaderSource )
 	{
-		return dxDev->CreatePixelShader( shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), NULL, &pixelShader );
+		return m_dxDev->CreatePixelShader(shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), NULL, &m_pixelShader);
 	}
 
 

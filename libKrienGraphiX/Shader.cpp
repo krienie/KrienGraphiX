@@ -7,26 +7,27 @@
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
 
+#include "ConstantBuffer.h"
 #include "Shader.h"
 
 
 namespace kgx
 {
 	Shader::Shader( _In_ ID3D11Device *dxDevice )
-		: dxDev(dxDevice), dxDevCont(nullptr), constBuffers()
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers()
 	{
-		dxDev->GetImmediateContext( &dxDevCont );
+		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
 
 	Shader::~Shader()
 	{
 		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = constBuffers.begin(); it != constBuffers.end(); ++it )
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
 			delete *it;
 
-		if ( dxDevCont )
-			dxDevCont->Release();
+		if ( m_dxDevCont )
+			m_dxDevCont->Release();
 	}
 
 
@@ -66,7 +67,7 @@ namespace kgx
 
 			std::cout << "Buffer " << shaderBuffDesc.Name << " has " << shaderBuffDesc.Variables << " member variables." << std::endl;
 
-			ConstantBuffer *cBuff = new ConstantBuffer(dxDev);
+			ConstantBuffer *cBuff = new ConstantBuffer(m_dxDev);
 			cBuff->create( shaderBuffDesc.Size );
 			for ( UINT j = 0U; j < shaderBuffDesc.Variables; ++j )
 			{
@@ -79,7 +80,7 @@ namespace kgx
 				std::cout << "Variable " << shaderVarDesc.Name << std::endl;
 			}
 
-			constBuffers.push_back( cBuff );
+			m_constBuffers.push_back( cBuff );
 		}
 
 		reflector->Release();
@@ -92,7 +93,7 @@ namespace kgx
 	void Shader::updateConstantVariable( const std::string &name, _In_ void *dataPtr )
 	{
 		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = constBuffers.begin(); it != constBuffers.end(); ++it )
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
 		{
 			if ( (*it)->updateVariable(name, dataPtr) )
 				return;

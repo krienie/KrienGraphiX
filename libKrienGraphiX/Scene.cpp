@@ -6,7 +6,7 @@
 namespace kgx
 {
 	Scene::Scene()
-		: renderObjects()
+		: m_renderObjects()
 	{
 
 	}
@@ -14,14 +14,14 @@ namespace kgx
 	Scene::~Scene()
 	{
 		std::vector<RenderableObject*>::iterator it;
-		for ( it = renderObjects.begin(); it != renderObjects.end(); ++it )
+		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
 			delete *it;
 	}
 
 
 	void Scene::claimRenderableObject( _In_ RenderableObject *obj )
 	{
-		renderObjects.push_back(obj);
+		m_renderObjects.push_back(obj);
 	}
 
 
@@ -33,7 +33,7 @@ namespace kgx
 		//		draw RenderableObject
 
 		std::vector<RenderableObject*>::iterator it;
-		for ( it = renderObjects.begin(); it != renderObjects.end(); ++it )
+		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
 			(*it)->draw( renderCam );
 	}
 }

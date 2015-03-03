@@ -1,44 +1,45 @@
 
+#include "ConstantBuffer.h"
 #include "VertexShader.h"
 
 namespace kgx
 {
 	VertexShader::VertexShader( _In_ ID3D11Device *dxDev, const VertexInputLayout &layout )
-		: Shader( dxDev ), shaderSource(nullptr), vertShader(nullptr), inputLayout(layout)
+		: Shader( dxDev ), m_shaderSource(nullptr), m_vertShader(nullptr), m_inputLayout(layout)
 	{
 	}
 
 
 	VertexShader::~VertexShader()
 	{
-		if ( vertShader )
-			vertShader->Release();
-		if ( shaderSource )
-			shaderSource->Release();
+		if ( m_vertShader )
+			m_vertShader->Release();
+		if ( m_shaderSource )
+			m_shaderSource->Release();
 	}
 
 
 	void VertexShader::activate()
 	{
-		dxDevCont->VSSetShader( vertShader, 0, 0 );
-		dxDevCont->IASetInputLayout( inputLayout.getDxInputLayout(dxDev, shaderSource) );
+		m_dxDevCont->VSSetShader( m_vertShader, 0, 0 );
+		m_dxDevCont->IASetInputLayout(m_inputLayout.getDxInputLayout(m_dxDev, m_shaderSource));
 
 		UINT buffCounter = 0U;
 		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = constBuffers.begin(); it != constBuffers.end(); ++it, ++buffCounter )
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it, ++buffCounter )
 		{
 			//TODO: iets verzinnen zodat alle buffers in 1x aangezet kunnen worden..
 			(*it)->commit();
-			ID3D11Buffer *buff = (*it)->getDxBuffer();
-			dxDevCont->VSSetConstantBuffers( buffCounter, 1U, &buff );
+			ID3D11Buffer *buff = (*it)->getDxBufferPtr();
+			m_dxDevCont->VSSetConstantBuffers(buffCounter, 1U, &buff);
 		}
 	}
 
 
 	HRESULT VertexShader::build( _In_ ID3DBlob *source )
 	{
-		shaderSource = source;
-		shaderSource->AddRef();
-		return dxDev->CreateVertexShader( shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), NULL, &vertShader );
+		m_shaderSource = source;
+		m_shaderSource->AddRef();
+		return m_dxDev->CreateVertexShader( m_shaderSource->GetBufferPointer(), m_shaderSource->GetBufferSize(), NULL, &m_vertShader );
 	}
 }

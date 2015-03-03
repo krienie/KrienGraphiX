@@ -1,5 +1,9 @@
 
 #include "KGXCore.h"
+#include "Camera.h"
+#include "Material.h"
+#include "VertexShader.h"
+#include "PixelShader.h"
 #include "VertexInputLayout.h"
 #include "ResourceManager.h"
 #include "RenderableObject.h"
@@ -65,7 +69,7 @@ void KrienGraphiXToolbox::setupTestScene()
 	kgx::MeshBuffer mBuff = kgx::ResourceManager::getInst()->getBuffer(buffID);
 
 	// setup material
-	kgx::Material *material       = new kgx::Material( kgx::KGXCore::getInst()->getDxDevice() );
+	kgx::Material *material       = new kgx::Material( kgx::KGXCore::getInst()->getDxDevicePtr() );
 	kgx::VertexShader *vertShader = material->createVertexShader( L"DefaultVertexShaderVS.cso", layout );
 	kgx::PixelShader *pixShader   = material->createPixelShader( L"DefaultPixelShaderPS.cso" );
 	material->addAutoShaderVar( vertShader, "viewMatrix", kgx::Material::CameraViewMatrix );
@@ -82,7 +86,7 @@ void KrienGraphiXToolbox::setupTestScene()
 	objContainer.meshes.push_back( mesh );
 	std::vector<kgx::RenderableObject::ObjectContainer> objs;
 	objs.push_back( objContainer );
-	kgx::RenderableObject *renObj = new kgx::RenderableObject( kgx::KGXCore::getInst()->getDxDevice(), mBuff, objs, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	kgx::RenderableObject *renObj = new kgx::RenderableObject( kgx::KGXCore::getInst()->getDxDevicePtr(), mBuff, objs, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 	// add RenderableObject to scene
 	defaultScene->claimRenderableObject( renObj );

@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 
-#include "ConstantBuffer.h"
+//#include "ConstantBuffer.h"
 
 namespace kgx
 {
+	class ConstantBuffer;
+
 	class Shader
 	{
 		public:
@@ -25,15 +27,15 @@ namespace kgx
 			virtual void activate() = 0;
 
 		protected:
-			Shader( _In_ ID3D11Device *dxDevice );
+			explicit Shader( _In_ ID3D11Device *dxDevice );
 			virtual ~Shader();
 
 			virtual HRESULT build( _In_ ID3DBlob *shaderSource ) = 0;
 
-			ID3D11Device *dxDev;
-			ID3D11DeviceContext *dxDevCont;
+			ID3D11Device *m_dxDev;
+			ID3D11DeviceContext *m_dxDevCont;
 
-			std::vector<ConstantBuffer*> constBuffers;
+			std::vector<ConstantBuffer*> m_constBuffers;
 
 		private:
 			// no copying allowed

@@ -5,44 +5,77 @@
 
 namespace kgx
 {
-	ConstantBuffer::ConstantBuffer( _In_ ID3D11Device *dxDevice )
-		: dxDev(dxDevice), dxDevCont(nullptr), dxBuffer(nullptr),
-			bufferElementSize(0U), dataChanged(false), variables(), rawData(nullptr)
+	ConstantBuffer::ConstantBuffer( _In_ ID3D11Device *m_dxDevice )
+		: m_dxDev(m_dxDevice), m_dxDevCont(nullptr), m_dxBuffer(nullptr),
+			m_bufferElementSize(0U), m_dataChanged(false), m_variables(), m_rawData(nullptr)
 	{
-		dxDev->GetImmediateContext( &dxDevCont );
+		m_dxDev->GetImmediateContext( &m_dxDevCont );
+	}
+
+	ConstantBuffer::ConstantBuffer( const ConstantBuffer &other )
+		: m_dxDev(other.m_dxDev), m_dxDevCont(other.m_dxDevCont), m_dxBuffer(other.m_dxBuffer),
+		m_bufferElementSize(other.m_bufferElementSize), m_dataChanged(other.m_dataChanged),
+		m_variables(other.m_variables)
+	{
+		if ( m_dxBuffer )
+			m_dxBuffer->AddRef();
+		if ( m_dxDevCont )
+			m_dxDevCont->AddRef();
+		if ( m_rawData )
+			memcpy( m_rawData, other.m_rawData, sizeof(UCHAR) * m_bufferElementSize );
 	}
 
 	ConstantBuffer::~ConstantBuffer()
 	{
-		if ( rawData )
-			delete[] rawData;
-		if ( dxBuffer )
-			dxBuffer->Release();
-		if ( dxDevCont )
-			dxDevCont->Release();
+		if ( m_rawData )
+			delete[] m_rawData;
+		if ( m_dxBuffer )
+			m_dxBuffer->Release();
+		if ( m_dxDevCont )
+			m_dxDevCont->Release();
 	}
 
 
-	ID3D11Buffer* ConstantBuffer::getDxBuffer() const
+	ConstantBuffer& ConstantBuffer::operator= ( const ConstantBuffer &rhs )
 	{
-		return dxBuffer;
+		m_dxDev             = rhs.m_dxDev;
+		m_dxDevCont         = rhs.m_dxDevCont;
+		m_dxBuffer          = rhs.m_dxBuffer;
+		m_bufferElementSize = rhs.m_bufferElementSize;
+		m_dataChanged       = rhs.m_dataChanged;
+		m_variables         = rhs.m_variables;
+
+		if ( m_dxBuffer )
+			m_dxBuffer->AddRef();
+		if ( m_dxDevCont )
+			m_dxDevCont->AddRef();
+		if ( m_rawData )
+			memcpy(m_rawData, rhs.m_rawData, sizeof(UCHAR) * m_bufferElementSize);
+
+		return *this;
+	}
+
+
+	ID3D11Buffer* ConstantBuffer::getDxBufferPtr() const
+	{
+		return m_dxBuffer;
 	}
 
 
 	HRESULT ConstantBuffer::create( UINT sizeInBytes )
 	{
 		// release resources if a buffer has already been created
-		if ( dxBuffer )
+		if ( m_dxBuffer )
 		{
-			dxBuffer->Release();
-			dxBuffer = nullptr;
+			m_dxBuffer->Release();
+			m_dxBuffer = nullptr;
 		}
-		if ( rawData )
+		if ( m_rawData )
 		{
-			delete[] rawData;
-			rawData = nullptr;
+			delete[] m_rawData;
+			m_rawData = nullptr;
 		}
-		//rawData.clear();
+		//m_rawData.clear();
 
 		// create buffer descriptor
 		D3D11_BUFFER_DESC buffDesc;
@@ -53,17 +86,17 @@ namespace kgx
 		buffDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
 		buffDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		HRESULT res = dxDev->CreateBuffer( &buffDesc, NULL, &dxBuffer );
+		HRESULT res = m_dxDev->CreateBuffer( &buffDesc, NULL, &m_dxBuffer );
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (ConstantBuffer::create): Error creating buffer" << std::endl;
-			dxBuffer = nullptr;
+			m_dxBuffer = nullptr;
 		}
 
-		bufferElementSize = sizeInBytes;
-		rawData = new UCHAR[sizeInBytes];
-		//rawData.reserve(sizeInBytes);
-		//std::cout << "capacity: " << rawData.capacity() << std::endl;
+		m_bufferElementSize = sizeInBytes;
+		m_rawData = new UCHAR[sizeInBytes];
+		//m_rawData.reserve(sizeInBytes);
+		//std::cout << "capacity: " << m_rawData.capacity() << std::endl;
 
 		return res;
 	}
@@ -73,26 +106,26 @@ namespace kgx
 
 	void ConstantBuffer::commit()
 	{
-		if ( !dataChanged || !rawData )
+		if ( !m_dataChanged || !m_rawData )
 			return;
 
 		D3D11_MAPPED_SUBRESOURCE mapRes;
-		dxDevCont->Map(dxBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapRes);
-		memcpy( mapRes.pData, rawData, bufferElementSize );
-		dxDevCont->Unmap(dxBuffer, NULL);
+		m_dxDevCont->Map(m_dxBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapRes);
+		memcpy( mapRes.pData, m_rawData, m_bufferElementSize );
+		m_dxDevCont->Unmap(m_dxBuffer, NULL);
 
-		dataChanged = false;
+		m_dataChanged = false;
 	}
 
 
 	bool ConstantBuffer::hasVariable( const std::string &name ) const
 	{
-		return variables.find(name) != variables.end();
+		return m_variables.find(name) != m_variables.end();
 	}
 
 	void ConstantBuffer::addVariableDefinition( const std::string &name, UINT offset, UINT size )
 	{
-		variables.insert( std::pair<std::string, VarPosition>(name, VarPosition(offset,size)) );
+		m_variables.insert( std::pair<std::string, VarPosition>(name, VarPosition(offset,size)) );
 	}
 
 
@@ -102,12 +135,12 @@ namespace kgx
 	 */
 	bool ConstantBuffer::updateVariable( const std::string &name, const void *var )
 	{
-		std::map< std::string, VarPosition >::iterator it = variables.find(name);
+		std::map< std::string, VarPosition >::iterator it = m_variables.find(name);
 
-		if ( it != variables.end() )
+		if ( it != m_variables.end() )
 		{
-			memcpy( rawData + it->second.offset, var, it->second.size );
-			dataChanged = true;
+			memcpy( m_rawData + it->second.offset, var, it->second.size );
+			m_dataChanged = true;
 			return true;
 		} else
 		{

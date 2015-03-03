@@ -3,9 +3,6 @@
 
 #include <vector>
 
-//#include "RenderableObject.h"
-
-
 namespace kgx
 {
 	class Camera;
@@ -22,7 +19,11 @@ namespace kgx
 			void render( _In_ Camera *renderCam );
 
 		private:
-			std::vector<RenderableObject*> renderObjects;
+			// no copying allowed
+			Scene( const Scene& );
+			Scene& operator=( const Scene& );
+
+			std::vector<RenderableObject*> m_renderObjects;
 
 	};
 }

@@ -2,77 +2,80 @@
 #include <iostream>
 
 #include "Camera.h"
+#include "VertexInputLayout.h"
+#include "VertexShader.h"
+#include "PixelShader.h"
 #include "RenderableObject.h"
 #include "Material.h"
 
 namespace kgx
 {
 	Material::Material( _In_ ID3D11Device *dxDevice )
-		: dxDev(dxDevice), dxDevCont(nullptr), vertShader(nullptr),
-			pixShader(nullptr), texViews(), texData(), sampler(nullptr), constVarLinks()
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_vertShader(nullptr),
+			m_pixShader(nullptr), m_texViews(), m_texData(), m_sampler(nullptr), m_constVarLinks()
 	{
-		dxDev->GetImmediateContext( &dxDevCont );
+		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
 	Material::~Material()
 	{
-		if ( vertShader )
-			delete vertShader;
-		if ( pixShader )
-			delete pixShader;
-		if ( dxDevCont )
-			dxDevCont->Release();
+		if ( m_vertShader )
+			delete m_vertShader;
+		if ( m_pixShader )
+			delete m_pixShader;
+		if ( m_dxDevCont )
+			m_dxDevCont->Release();
 	}
 
 
 	VertexShader* Material::createVertexShader( const std::wstring &filename, const VertexInputLayout &layout )
 	{
-		vertShader = new VertexShader( dxDev, layout );
+		m_vertShader = new VertexShader( m_dxDev, layout );
 
-		if ( !vertShader->load(filename) )
+		if ( !m_vertShader->load(filename) )
 		{
 			// shader loading failed
-			delete vertShader;
-			vertShader = nullptr;
+			delete m_vertShader;
+			m_vertShader = nullptr;
 		}
 
-		return vertShader;
+		return m_vertShader;
 	}
 
 	PixelShader* Material::createPixelShader( const std::wstring &filename )
 	{
-		pixShader = new PixelShader( dxDev );
+		m_pixShader = new PixelShader( m_dxDev );
 
-		if ( !pixShader->load(filename) )
+		if ( !m_pixShader->load(filename) )
 		{
 			// shader loading failed
-			delete pixShader;
-			pixShader = nullptr;
+			delete m_pixShader;
+			m_pixShader = nullptr;
 		}
 
-		return pixShader;
+		return m_pixShader;
 	}
 
 	VertexShader* Material::getVertexShader() const
 	{
-		return vertShader;
+		return m_vertShader;
 	}
 
 	PixelShader* Material::getPixelShader() const
 	{
-		return pixShader;
+		return m_pixShader;
 	}
 
 
 	void Material::addTexture( _In_ ID3D11ShaderResourceView* texView, _In_ ID3D11Resource* texture )
 	{
-		texViews.push_back(texView);
-		texData.push_back(texture);
+		m_texViews.push_back(texView);
+		m_texData.push_back(texture);
 	}
 
 	void Material::setSampler( _In_ ID3D11SamplerState *samp )
 	{
-		sampler = samp;
+		m_sampler = samp;
 	}
 
 
@@ -80,7 +83,7 @@ namespace kgx
 	{
 		// get auto variable list or create one if not already present
 		std::pair< std::map< Shader*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars; 
-		shaderVars = constVarLinks.insert( std::pair< Shader*, std::vector<AutoShaderVar> >(shader, std::vector<AutoShaderVar>()) );
+		shaderVars = m_constVarLinks.insert( std::pair< Shader*, std::vector<AutoShaderVar> >(shader, std::vector<AutoShaderVar>()) );
 
 		// add shader var to list
 		shaderVars.first->second.push_back( AutoShaderVar(varName, varType) );
@@ -93,23 +96,23 @@ namespace kgx
 		std::vector<AutoShaderVar>::iterator varIt;
 
 		// bind shaders to pipeline
-		if ( vertShader )
+		if ( m_vertShader )
 		{
-			shaderIt = constVarLinks.find(vertShader);
-			if ( shaderIt != constVarLinks.end() )
+			shaderIt = m_constVarLinks.find(m_vertShader);
+			if ( shaderIt != m_constVarLinks.end() )
 				for ( varIt = shaderIt->second.begin(); varIt != shaderIt->second.end(); ++varIt )
-					updateAutoShaderVar( renderCam, renderObj, vertShader, *varIt );
+					updateAutoShaderVar( renderCam, renderObj, m_vertShader, *varIt );
 
-			vertShader->activate();
+			m_vertShader->activate();
 		}
-		if ( pixShader )
+		if ( m_pixShader )
 		{
-			shaderIt = constVarLinks.find(pixShader);
-			if ( shaderIt != constVarLinks.end() )
+			shaderIt = m_constVarLinks.find(m_pixShader);
+			if ( shaderIt != m_constVarLinks.end() )
 				for ( varIt = shaderIt->second.begin(); varIt != shaderIt->second.end(); ++varIt )
-					updateAutoShaderVar( renderCam, renderObj, pixShader, *varIt );
+					updateAutoShaderVar( renderCam, renderObj, m_pixShader, *varIt );
 
-			pixShader->activate();
+			m_pixShader->activate();
 		}
 
 		//TODO: activate buffers/textures/other resources
@@ -121,6 +124,7 @@ namespace kgx
 	{
 		float tempFloat = 0.0f;
 		DirectX::XMFLOAT4X4 tempFloat4x4;
+		DirectX::XMFLOAT3 tempFloat3;
 		switch ( shaderVar.type )
 		{
 			case ShaderVarType::CameraProjectionMatrix:
@@ -132,10 +136,12 @@ namespace kgx
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
 			case ShaderVarType::CameraPosition:
-				shader->updateConstantVariable( shaderVar.name, &renderCam->getPosition() );
+				tempFloat3 = renderCam->getPosition();
+				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
 			case ShaderVarType::CameraTarget:
-				shader->updateConstantVariable( shaderVar.name, &renderCam->getTarget() );
+				tempFloat3 = renderCam->getTarget();
+				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
 			case ShaderVarType::CameraFieldOfView:
 				tempFloat = renderCam->getFOV();

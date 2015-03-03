@@ -1,31 +1,33 @@
 
 #define _CRT_SECURE_NO_DEPRECATE		//to disable deprecation warnings about freopen()
 
+#include <DirectXMath.h>
 #include <iostream>
 
+#include "RenderWindow.h"
 #include "ResourceManager.h"
 #include "KGXCore.h"
 
 namespace kgx
 {
-	KGXCore* KGXCore::inst = 0;
+	KGXCore* KGXCore::m_inst = 0;
 
 	KGXCore* KGXCore::getInst()
 	{
-		if ( !KGXCore::inst )
-			inst = new KGXCore();
+		if ( !KGXCore::m_inst )
+			m_inst = new KGXCore();
 
-		return inst;
+		return m_inst;
 	}
 
 	void KGXCore::destroy()
 	{
-		if ( KGXCore::inst )
-			delete KGXCore::inst;
+		if ( KGXCore::m_inst )
+			delete KGXCore::m_inst;
 	}
 
 	KGXCore::KGXCore()
-		: dxDev(nullptr), dxDevCont(nullptr), dxgiFactory(nullptr), renderWindows()
+		: m_dxDev(nullptr), m_dxDevCont(nullptr), m_dxgiFactory(nullptr), m_renderWindows()
 	{
 		// open console when compiling for debugging
 #ifdef _DEBUG
@@ -60,7 +62,7 @@ namespace kgx
 
 		HRESULT res = D3D11CreateDevice( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL,
 											creationFlags, featureLevels, ARRAYSIZE(featureLevels),
-											D3D11_SDK_VERSION, &dxDev, NULL, &dxDevCont );
+											D3D11_SDK_VERSION, &m_dxDev, NULL, &m_dxDevCont );
 
 		if ( FAILED(res) )
 		{
@@ -70,7 +72,7 @@ namespace kgx
 
 		// retrieve default DXGIAdaptor
 		IDXGIDevice2 *dxgiDevice = NULL;
-		res = dxDev->QueryInterface(__uuidof(IDXGIDevice2), (void **)&dxgiDevice);
+		res = m_dxDev->QueryInterface(__uuidof(IDXGIDevice2), (void **)&dxgiDevice);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error retrieving DXGIDevice2." << std::endl;
@@ -86,7 +88,7 @@ namespace kgx
 		}
 		dxgiDevice->Release();
 
-		res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&dxgiFactory);
+		res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&m_dxgiFactory);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error retrieving DXGIFactory2." << std::endl;
@@ -96,28 +98,28 @@ namespace kgx
 
 
 		// init ResourceManager
-		ResourceManager::construct(dxDev);
+		ResourceManager::construct(m_dxDev);
 	}
 
 	KGXCore::~KGXCore()
 	{
-		//renderWindows.clear();
+		//m_renderWindows.clear();
 		std::map<HWND, RenderWindow*>::iterator it;
-		for ( it = renderWindows.begin(); it != renderWindows.end(); ++it )
+		for ( it = m_renderWindows.begin(); it != m_renderWindows.end(); ++it )
 			delete it->second;
 
 		ResourceManager::destroy();
 
-		if ( dxgiFactory )
-			dxgiFactory->Release();
-		if ( dxDevCont )
-			dxDevCont->Release();
+		if ( m_dxgiFactory )
+			m_dxgiFactory->Release();
+		if ( m_dxDevCont )
+			m_dxDevCont->Release();
 
 		//ID3D11Debug *d3dDebug = nullptr;
-		//dxDev->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
+		//m_dxDev->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
 
-		if ( dxDev )
-			dxDev->Release();
+		if ( m_dxDev )
+			m_dxDev->Release();
 
 		//d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 		//d3dDebug->Release();
@@ -125,26 +127,26 @@ namespace kgx
 
 
 	/** Utility function that returns a direct pointer to the DirectX device */
-	ID3D11Device* KGXCore::getDxDevice() const
+	ID3D11Device* KGXCore::getDxDevicePtr() const
 	{
-		return dxDev;
+		return m_dxDev;
 	}
 
 
 	RenderWindow* KGXCore::createRenderWindow( HWND windowHandle )
 	{
-		std::map<HWND, RenderWindow*>::iterator it = renderWindows.find(windowHandle);
-		if ( it != renderWindows.end() )
+		std::map<HWND, RenderWindow*>::iterator it = m_renderWindows.find(windowHandle);
+		if ( it != m_renderWindows.end() )
 		{
 			std::cout << "Aborted (Environment::createRenderWindow): Window handle " << windowHandle << " already has a RenderWindow bound." << std::endl;
 			//TODO: insert assert(false)
 			return NULL;
 		}
 
-		RenderWindow *renWin = new RenderWindow( dxDev, dxgiFactory );
+		RenderWindow *renWin = new RenderWindow( m_dxDev, m_dxgiFactory );
 		renWin->create(windowHandle);
 
-		renderWindows.insert( std::pair<HWND, RenderWindow*>(windowHandle, renWin) );
+		m_renderWindows.insert( std::pair<HWND, RenderWindow*>(windowHandle, renWin) );
 
 		return renWin;
 	}
@@ -153,7 +155,7 @@ namespace kgx
 	void KGXCore::renderFrame()
 	{
 		std::map<HWND, RenderWindow*>::iterator it;
-		for ( it = renderWindows.begin(); it != renderWindows.end(); ++it )
+		for ( it = m_renderWindows.begin(); it != m_renderWindows.end(); ++it )
 			it->second->update();
 	}
 }

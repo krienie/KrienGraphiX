@@ -6,46 +6,43 @@
 
 namespace kgx
 {
-	Camera::Camera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up )
-		//: Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, target, up )
+	Camera::Camera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up )
+		: Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, m_target, up )
 	{
-		//TODO: fix this obvious error... => use delegating constructors
-		//Camera::Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, target, up );
 	}
 
 
-	Camera::Camera( float fovY, float aspect, float nearZ, float farZ,
+	Camera::Camera( float fovY, float aspect, float m_nearZ, float m_farZ,
 						const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
-		: parentScene(nullptr), projMatrix(), viewMatrix(), position(eye), target(target_), camUp(up),
-			fov(fovY), aspectRatio(aspect), nearZ(nearZ), farZ(farZ)
+		: m_parentScene(nullptr), m_projMatrix(), m_viewMatrix(), m_position(eye), m_target(target_), m_camUp(up),
+			m_fov(fovY), m_aspectRatio(aspect), m_nearZ(m_nearZ), m_farZ(m_farZ)
 	{
 		// create perspective matrix
-		DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovLH( fovY, aspect, nearZ, farZ );
-		DirectX::XMStoreFloat4x4( &projMatrix, tempPersp );
+		DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovLH( fovY, aspect, m_nearZ, m_farZ );
+		DirectX::XMStoreFloat4x4( &m_projMatrix, tempPersp );
 
 		std::cout << "--- Perspective Matrix ---" << std::endl
-			<< projMatrix._11 << ", " << projMatrix._12 << ", " << projMatrix._13 << ", " << projMatrix._14 << std::endl
-			<< projMatrix._21 << ", " << projMatrix._22 << ", " << projMatrix._23 << ", " << projMatrix._24 << std::endl
-			<< projMatrix._31 << ", " << projMatrix._32 << ", " << projMatrix._33 << ", " << projMatrix._34 << std::endl
-			<< projMatrix._41 << ", " << projMatrix._42 << ", " << projMatrix._43 << ", " << projMatrix._44 << std::endl;
+			<< m_projMatrix._11 << ", " << m_projMatrix._12 << ", " << m_projMatrix._13 << ", " << m_projMatrix._14 << std::endl
+			<< m_projMatrix._21 << ", " << m_projMatrix._22 << ", " << m_projMatrix._23 << ", " << m_projMatrix._24 << std::endl
+			<< m_projMatrix._31 << ", " << m_projMatrix._32 << ", " << m_projMatrix._33 << ", " << m_projMatrix._34 << std::endl
+			<< m_projMatrix._41 << ", " << m_projMatrix._42 << ", " << m_projMatrix._43 << ", " << m_projMatrix._44 << std::endl;
 
 		
 		// set camera mPosition and direction
-		lookAt( eye, target, up );
+		lookAt( eye, m_target, up );
 
 		std::cout << "--- View Matrix ---" << std::endl
-			<< viewMatrix._11 << ", " << viewMatrix._12 << ", " << viewMatrix._13 << ", " << viewMatrix._14 << std::endl
-			<< viewMatrix._21 << ", " << viewMatrix._22 << ", " << viewMatrix._23 << ", " << viewMatrix._24 << std::endl
-			<< viewMatrix._31 << ", " << viewMatrix._32 << ", " << viewMatrix._33 << ", " << viewMatrix._34 << std::endl
-			<< viewMatrix._41 << ", " << viewMatrix._42 << ", " << viewMatrix._43 << ", " << viewMatrix._44 << std::endl;
+			<< m_viewMatrix._11 << ", " << m_viewMatrix._12 << ", " << m_viewMatrix._13 << ", " << m_viewMatrix._14 << std::endl
+			<< m_viewMatrix._21 << ", " << m_viewMatrix._22 << ", " << m_viewMatrix._23 << ", " << m_viewMatrix._24 << std::endl
+			<< m_viewMatrix._31 << ", " << m_viewMatrix._32 << ", " << m_viewMatrix._33 << ", " << m_viewMatrix._34 << std::endl
+			<< m_viewMatrix._41 << ", " << m_viewMatrix._42 << ", " << m_viewMatrix._43 << ", " << m_viewMatrix._44 << std::endl;
 	}
 
 
 	Camera::Camera( const Camera &other )
-		: parentScene(other.parentScene), projMatrix(other.projMatrix), viewMatrix(other.viewMatrix), position(other.position),
-		target(other.target), camUp(other.camUp), fov(other.fov), aspectRatio(other.aspectRatio), nearZ(other.nearZ), farZ(other.farZ)
+		: m_parentScene(other.m_parentScene), m_projMatrix(other.m_projMatrix), m_viewMatrix(other.m_viewMatrix), m_position(other.m_position),
+		m_target(other.m_target), m_camUp(other.m_camUp), m_fov(other.m_fov), m_aspectRatio(other.m_aspectRatio), m_nearZ(other.m_nearZ), m_farZ(other.m_farZ)
 	{
-
 	}
 
 	/*Camera::~Camera()
@@ -54,65 +51,65 @@ namespace kgx
 
 	Camera& Camera::operator=( const Camera &rhs )
 	{
-		parentScene = rhs.parentScene;
-		projMatrix  = rhs.projMatrix;
-		viewMatrix  = rhs.viewMatrix;
-		position    = rhs.position;
-		target      = rhs.target;
-		camUp       = rhs.camUp;
-		fov         = rhs.fov;
-		aspectRatio = rhs.aspectRatio;
-		nearZ       = rhs.nearZ;
-		farZ        = rhs.farZ;
+		m_parentScene = rhs.m_parentScene;
+		m_projMatrix  = rhs.m_projMatrix;
+		m_viewMatrix  = rhs.m_viewMatrix;
+		m_position    = rhs.m_position;
+		m_target      = rhs.m_target;
+		m_camUp       = rhs.m_camUp;
+		m_fov         = rhs.m_fov;
+		m_aspectRatio = rhs.m_aspectRatio;
+		m_nearZ       = rhs.m_nearZ;
+		m_farZ        = rhs.m_farZ;
 
 		return *this;
 	}
 
 
-	DirectX::XMFLOAT4X4 Camera::getProjMatrix() const
+	const DirectX::XMFLOAT4X4& Camera::getProjMatrix() const
 	{
-		return projMatrix;
+		return m_projMatrix;
 	}
 
-	DirectX::XMFLOAT4X4 Camera::getViewMatrix() const
+	const DirectX::XMFLOAT4X4& Camera::getViewMatrix() const
 	{
-		return viewMatrix;
+		return m_viewMatrix;
 	}
 
-	DirectX::XMFLOAT3 Camera::getPosition() const
+	const DirectX::XMFLOAT3& Camera::getPosition() const
 	{
-		return position;
+		return m_position;
 	}
 
-	DirectX::XMFLOAT3 Camera::getTarget() const
+	const DirectX::XMFLOAT3& Camera::getTarget() const
 	{
-		return target;
+		return m_target;
 	}
 
 	float Camera::getFOV() const
 	{
-		return fov;
+		return m_fov;
 	}
 
 	float Camera::getAspectRatio() const
 	{
-		return aspectRatio;
+		return m_aspectRatio;
 	}
 
 	float Camera::getNearZ() const
 	{
-		return nearZ;
+		return m_nearZ;
 	}
 
 	float Camera::getFarZ() const
 	{
-		return farZ;
+		return m_farZ;
 	}
 
 
 	void Camera::setParentScene( _In_ Scene *scene )
 	{
-		parentScene = scene;
+		m_parentScene = scene;
 	}
 
 	/**
@@ -120,8 +117,8 @@ namespace kgx
 	 */
 	void Camera::renderCurrentView()
 	{
-		if ( parentScene )
-			parentScene->render(this);
+		if ( m_parentScene )
+			m_parentScene->render(this);
 	}
 
 
@@ -132,12 +129,12 @@ namespace kgx
 		DirectX::XMVECTORF32 xmTarget = { target_.x, target_.y, target_.z, 0.0f };
 		DirectX::XMVECTORF32 xmUp     = { up.x, up.y, up.z, 0.0f };
 		DirectX::XMMATRIX tempView    =  DirectX::XMMatrixLookAtLH(xmEye, xmTarget, xmUp);
-		DirectX::XMStoreFloat4x4( &viewMatrix, tempView );
+		DirectX::XMStoreFloat4x4( &m_viewMatrix, tempView );
 
-		// save eye-, target- and up-vectors
-		this->position = eye;
-		this->target   = target_;
-		this->camUp    = up;
+		// save eye-, m_target- and up-vectors
+		this->m_position = eye;
+		this->m_target   = target_;
+		this->m_camUp    = up;
 	}
 
 	/*void Camera::moveForward( float dist )

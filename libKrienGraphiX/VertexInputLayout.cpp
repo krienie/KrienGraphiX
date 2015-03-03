@@ -3,13 +3,8 @@
 
 namespace kgx
 {
-	VertexInputLayout::VertexInputLayout()
-		: inputDescriptor(), dxLayout(nullptr), bufferStride(0U)
-	{
-	}
-
 	VertexInputLayout::VertexInputLayout( const std::vector<Type> &inputTypes )
-		: inputDescriptor(), dxLayout(nullptr), bufferStride(0U)
+		: m_inputDescriptor(), m_dxLayout(nullptr), m_bufferStride(0U)
 	{
 		std::vector<Type>::const_iterator it;
 		for ( it = inputTypes.begin(); it != inputTypes.end(); ++it )
@@ -17,27 +12,27 @@ namespace kgx
 	}
 
 	VertexInputLayout::VertexInputLayout( const VertexInputLayout &other )
-		: inputDescriptor(other.inputDescriptor), dxLayout(other.dxLayout), bufferStride(other.bufferStride)
+		: m_inputDescriptor(other.m_inputDescriptor), m_dxLayout(other.m_dxLayout), m_bufferStride(other.m_bufferStride)
 	{
-		if ( dxLayout )
-			dxLayout->AddRef();
+		if ( m_dxLayout )
+			m_dxLayout->AddRef();
 	}
 
 	VertexInputLayout::~VertexInputLayout()
 	{
-		if ( dxLayout )
-			dxLayout->Release();
+		if ( m_dxLayout )
+			m_dxLayout->Release();
 	}
 
 
 	VertexInputLayout& VertexInputLayout::operator=( const VertexInputLayout &other )
 	{
-		this->inputDescriptor = other.inputDescriptor;
-		this->dxLayout        = other.dxLayout;
-		this->bufferStride    = other.bufferStride;
+		this->m_inputDescriptor = other.m_inputDescriptor;
+		this->m_dxLayout        = other.m_dxLayout;
+		this->m_bufferStride    = other.m_bufferStride;
 
-		if ( this->dxLayout )
-			this->dxLayout->AddRef();
+		if ( this->m_dxLayout )
+			this->m_dxLayout->AddRef();
 
 		return *this;
 	}
@@ -72,38 +67,38 @@ namespace kgx
 		desc.SemanticIndex        = 0U;
 		desc.Format               = DXGI_FORMAT_R32G32B32_FLOAT;
 		desc.InputSlot            = 0U;
-		desc.AlignedByteOffset    = sizeof(float) * 3U * static_cast<UINT>(inputDescriptor.size());
+		desc.AlignedByteOffset    = sizeof(float) * 3U * static_cast<UINT>(m_inputDescriptor.size());
 		desc.InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
 		desc.InstanceDataStepRate = 0U;
 
-		inputDescriptor.push_back(desc);
+		m_inputDescriptor.push_back(desc);
 
-		bufferStride += sizeof(float) * 3U;
+		m_bufferStride += sizeof(float) * 3U;
 	}
 
 
 	ID3D11InputLayout* VertexInputLayout::getDxInputLayout( _In_ ID3D11Device *dxDevice, _In_ ID3DBlob *shaderSource, bool forceRebuild )
 	{
-		if ( dxLayout )
+		if ( m_dxLayout )
 		{
 			if ( !forceRebuild )
-				return dxLayout;
+				return m_dxLayout;
 			
-			dxLayout->Release();
-			dxLayout = nullptr;
+			m_dxLayout->Release();
+			m_dxLayout = nullptr;
 		}
 
-		HRESULT res = dxDevice->CreateInputLayout( inputDescriptor.data(), static_cast<UINT>(inputDescriptor.size()), shaderSource->GetBufferPointer(),
-													shaderSource->GetBufferSize(), &dxLayout );
+		HRESULT res = dxDevice->CreateInputLayout( m_inputDescriptor.data(), static_cast<UINT>(m_inputDescriptor.size()), shaderSource->GetBufferPointer(),
+													shaderSource->GetBufferSize(), &m_dxLayout );
 
 		if ( FAILED(res) )
 			return nullptr;
-		else return dxLayout;
+		else return m_dxLayout;
 	}
 
 
 	UINT VertexInputLayout::getBufferStride() const
 	{
-		return bufferStride;
+		return m_bufferStride;
 	}
 }

@@ -2,35 +2,36 @@
 #include <comdef.h>
 #include <iostream>
 
+#include "Material.h"
 #include "ResourceManager.h"
 
 namespace kgx
 {
-	ResourceManager* ResourceManager::inst = 0;
+	ResourceManager* ResourceManager::m_inst = 0;
 
 	ResourceManager* ResourceManager::getInst()
 	{
-		return inst;
+		return m_inst;
 	}
 
-	void ResourceManager::construct( _In_ ID3D11Device *dxDevice )
+	void ResourceManager::construct( _In_ ID3D11Device *m_dxDev )
 	{
-		if ( ResourceManager::inst )
-			delete ResourceManager::inst;
+		if ( ResourceManager::m_inst )
+			delete ResourceManager::m_inst;
 
-		inst = new ResourceManager( dxDevice );
+		m_inst = new ResourceManager( m_dxDev );
 	}
 
 
 	void ResourceManager::destroy()
 	{
-		if ( ResourceManager::inst )
-			delete ResourceManager::inst;
+		if ( ResourceManager::m_inst )
+			delete ResourceManager::m_inst;
 	}
 
 
-	ResourceManager::ResourceManager( _In_ ID3D11Device *dxDev )
-		: dxDevice(dxDev), nextBufferID(1), meshBuffers(), nextMaterialID(1), materials()
+	ResourceManager::ResourceManager( _In_ ID3D11Device *dxDevice )
+		: m_dxDev(dxDevice), m_nextBufferID(1), m_meshBuffers(), m_nextMaterialID(1), m_materials()
 	{
 	}
 
@@ -38,7 +39,7 @@ namespace kgx
 	{
 		// release all vertex- and index buffers
 		std::map<MeshBufferID, MeshBuffer>::iterator bIt;
-		for ( bIt = meshBuffers.begin(); bIt != meshBuffers.end(); ++bIt )
+		for ( bIt = m_meshBuffers.begin(); bIt != m_meshBuffers.end(); ++bIt )
 		{
 			if ( bIt->second.vertBuff )
 				bIt->second.vertBuff->Release();
@@ -48,7 +49,7 @@ namespace kgx
 
 		// release all material
 		std::map<MaterialID, Material*>::iterator mIt;
-		for ( mIt = materials.begin(); mIt != materials.end(); ++mIt )
+		for ( mIt = m_materials.begin(); mIt != m_materials.end(); ++mIt )
 			delete mIt->second;
 	}
 
@@ -56,9 +57,9 @@ namespace kgx
 	MeshBuffer ResourceManager::getBuffer( MeshBufferID id ) const
 	{
 		std::map<MeshBufferID, MeshBuffer>::const_iterator it;
-		it = meshBuffers.find(id);
+		it = m_meshBuffers.find(id);
 
-		if ( it != meshBuffers.cend() )
+		if ( it != m_meshBuffers.cend() )
 			return it->second;
 
 		std::cout << "Warning (ResourceManager::getBuffer): buffer with id " << id << " was not found." << std::endl;
@@ -88,7 +89,7 @@ namespace kgx
 		buffDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		ID3D11Buffer *vertBuff;
-		result = dxDevice->CreateBuffer( &buffDesc, &vertResource, &vertBuff );
+		result = m_dxDev->CreateBuffer( &buffDesc, &vertResource, &vertBuff );
 
 		if ( FAILED(result) )
 		{
@@ -107,7 +108,7 @@ namespace kgx
 		indexResource.SysMemSlicePitch = 0;
 
 		ID3D11Buffer *indexBuff;
-		result = dxDevice->CreateBuffer( &buffDesc, &indexResource, &indexBuff );
+		result = m_dxDev->CreateBuffer( &buffDesc, &indexResource, &indexBuff );
 
 		if ( FAILED(result) )
 		{
@@ -126,27 +127,27 @@ namespace kgx
 		mBuff.indexBuff       = indexBuff;
 		mBuff.inputDescriptor = inputDescriptor;
 
-		meshBuffers.insert( std::pair<MeshBufferID, MeshBuffer>(nextBufferID, mBuff) );
-		nextBufferID++;
+		m_meshBuffers.insert( std::pair<MeshBufferID, MeshBuffer>(m_nextBufferID, mBuff) );
+		m_nextBufferID++;
 
 		result = S_OK;
 
-		return nextBufferID - 1;
+		return m_nextBufferID - 1;
 	}
 
 	void ResourceManager::releaseBuffer( MeshBufferID id )
 	{
 		std::map<MeshBufferID, MeshBuffer>::iterator it;
-		it = meshBuffers.find(id);
+		it = m_meshBuffers.find(id);
 
-		if ( it != meshBuffers.end() )
+		if ( it != m_meshBuffers.end() )
 		{
 			if ( it->second.vertBuff )
 				it->second.vertBuff->Release();
 			if ( it->second.indexBuff )
 				it->second.indexBuff->Release();
 
-			meshBuffers.erase(id);
+			m_meshBuffers.erase(id);
 		}
 	}
 
@@ -155,9 +156,9 @@ namespace kgx
 	Material* ResourceManager::getMaterial( MaterialID id ) const
 	{
 		std::map<MaterialID, Material*>::const_iterator it;
-		it = materials.find(id);
+		it = m_materials.find(id);
 
-		if ( it != materials.cend() )
+		if ( it != m_materials.cend() )
 			return it->second;
 
 		std::cout << "Warning (ResourceManager::getMaterial): Material with id " << id << " was not found." << std::endl;
@@ -166,18 +167,18 @@ namespace kgx
 
 	ResourceManager::MaterialID ResourceManager::claimMaterial( _In_ Material *mat )
 	{
-		materials.insert( std::pair<MaterialID, Material*>(nextMaterialID, mat) );
-		nextMaterialID++;
+		m_materials.insert( std::pair<MaterialID, Material*>(m_nextMaterialID, mat) );
+		m_nextMaterialID++;
 
-		return nextMaterialID - 1;
+		return m_nextMaterialID - 1;
 	}
 
 	void ResourceManager::releaseMaterial( MaterialID id )
 	{
 		std::map<MaterialID, Material*>::iterator it;
-		it = materials.find(id);
+		it = m_materials.find(id);
 
-		if ( it != materials.end() )
+		if ( it != m_materials.end() )
 			delete it->second;
 	}
 }

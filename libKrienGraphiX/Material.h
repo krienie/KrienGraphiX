@@ -3,15 +3,17 @@
 
 #include <d3d11.h>
 #include <vector>
+#include <map>
 
-#include "VertexInputLayout.h"
-#include "VertexShader.h"
-#include "PixelShader.h"
 
 namespace kgx
 {
 	class Camera;
 	class RenderableObject;
+	class VertexInputLayout;
+	class Shader;
+	class VertexShader;
+	class PixelShader;
 
 	class Material
 	{
@@ -29,7 +31,7 @@ namespace kgx
 				ObjectModelMatrix
 			};
 
-			Material( _In_ ID3D11Device *dxDevice );
+			explicit Material( _In_ ID3D11Device *dxDevice );
 			~Material();
 
 			VertexShader* createVertexShader( const std::wstring &filename, const VertexInputLayout &layout );
@@ -51,6 +53,10 @@ namespace kgx
 			void activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj );
 
 		private:
+			// no copying allowed
+			Material( const Material& );
+			Material& operator=( const Material& );
+
 			struct AutoShaderVar
 			{
 				AutoShaderVar( std::string n, ShaderVarType t ) : name(n), type(t) { }
@@ -62,18 +68,18 @@ namespace kgx
 			void updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
 										_In_ Shader *shader, AutoShaderVar shaderVar );
 
-			ID3D11Device *dxDev;
-			ID3D11DeviceContext *dxDevCont;
+			ID3D11Device *m_dxDev;
+			ID3D11DeviceContext *m_dxDevCont;
 
 			// shaders
-			VertexShader *vertShader;
-			PixelShader *pixShader;
+			VertexShader *m_vertShader;
+			PixelShader *m_pixShader;
 
 			// texture resources
-			std::vector<ID3D11ShaderResourceView*> texViews;
-			std::vector<ID3D11Resource*> texData;
-			ID3D11SamplerState *sampler;
+			std::vector<ID3D11ShaderResourceView*> m_texViews;
+			std::vector<ID3D11Resource*> m_texData;
+			ID3D11SamplerState *m_sampler;
 
-			std::map< Shader*, std::vector<AutoShaderVar> > constVarLinks;
+			std::map< Shader*, std::vector<AutoShaderVar> > m_constVarLinks;
 	};
 }

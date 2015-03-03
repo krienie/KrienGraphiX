@@ -18,9 +18,8 @@ namespace kgx
 				Tangent
 			};
 
-			VertexInputLayout();
-			VertexInputLayout( const std::vector<Type> &inputTypes );
-			VertexInputLayout( const VertexInputLayout &other );
+			explicit VertexInputLayout( const std::vector<Type> &inputTypes = std::vector<Type>() );
+			explicit VertexInputLayout( const VertexInputLayout &other );
 			~VertexInputLayout();
 
 			VertexInputLayout& operator=( const VertexInputLayout &other );
@@ -31,9 +30,9 @@ namespace kgx
 
 
 		private:
-			std::vector<D3D11_INPUT_ELEMENT_DESC> inputDescriptor;
-			ID3D11InputLayout *dxLayout;
-			UINT bufferStride;
+			std::vector<D3D11_INPUT_ELEMENT_DESC> m_inputDescriptor;
+			ID3D11InputLayout *m_dxLayout;
+			UINT m_bufferStride;
 
 	};
 }

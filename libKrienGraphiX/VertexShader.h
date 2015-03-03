@@ -24,8 +24,8 @@ namespace kgx
 			VertexShader( const VertexShader& );
 			VertexShader& operator=( const VertexShader& );
 
-			ID3DBlob *shaderSource;
-			ID3D11VertexShader *vertShader;
-			VertexInputLayout inputLayout;
+			ID3DBlob *m_shaderSource;
+			ID3D11VertexShader *m_vertShader;
+			VertexInputLayout m_inputLayout;
 	};
 }

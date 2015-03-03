@@ -1,39 +1,40 @@
 
 #include <iostream>
 
+#include "Camera.h"
 #include "RenderWindow.h"
 
 namespace kgx
 {
-	RenderWindow::RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory_ )
-		: dxDev(dxDevice), dxDevCont(0), dxgiFactory(dxgiFactory_), swapChain(0), depthStencilView(0),
-			renderTargetView(0), rasterizer(0), curViewport(), backBuffWidth(0U), backBuffHeight(0U), isInit(false)
+	RenderWindow::RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory )
+		: m_dxDev(dxDevice), m_dxDevCont(0), m_dxgiFactory(dxgiFactory), m_swapChain(0), m_depthStencilView(0),
+			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U), m_isInit(false)
 	{
-		dxDev->GetImmediateContext( &dxDevCont );
+		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
 	RenderWindow::~RenderWindow()
 	{
-		if ( rasterizer )
-			rasterizer->Release();
+		if ( m_rasterizer )
+			m_rasterizer->Release();
 
-		if ( renderTargetView )
-			renderTargetView->Release();
+		if ( m_renderTargetView )
+			m_renderTargetView->Release();
 
-		if ( depthStencilView )
-			depthStencilView->Release();
+		if ( m_depthStencilView )
+			m_depthStencilView->Release();
 
-		if ( swapChain )
-			swapChain->Release();
+		if ( m_swapChain )
+			m_swapChain->Release();
 
-		if ( dxDevCont )
-			dxDevCont->Release();
+		if ( m_dxDevCont )
+			m_dxDevCont->Release();
 	}
 
 
 	bool RenderWindow::create( HWND windowHandle )
 	{
-		// create swapChain descriptor
+		// create m_swapChain descriptor
 		DXGI_SWAP_CHAIN_DESC1 swapDesc;
 		ZeroMemory(&swapDesc, sizeof(DXGI_SWAP_CHAIN_DESC1));
 		swapDesc.Width  = 0;
@@ -50,24 +51,24 @@ namespace kgx
 		swapDesc.SwapEffect         = DXGI_SWAP_EFFECT_DISCARD;
 		swapDesc.AlphaMode          = DXGI_ALPHA_MODE_UNSPECIFIED;
 		swapDesc.Flags              = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		HRESULT res = dxgiFactory->CreateSwapChainForHwnd( dxDev, windowHandle, &swapDesc, NULL, NULL, &swapChain );
+		HRESULT res = m_dxgiFactory->CreateSwapChainForHwnd( m_dxDev, windowHandle, &swapDesc, NULL, NULL, &m_swapChain );
 
 		if ( FAILED(res) )
 		{
 			//TODO: add better error description here
-			std::cout << "Error (RenderWindow::create): Error creating swapChain." << std::endl;
+			std::cout << "Error (RenderWindow::create): Error creating m_swapChain." << std::endl;
 			return false;
 		}
 
 
 		// create and initialize backbuffer
 		ID3D11Texture2D *backBuff;
-		swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuff));
+		m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuff));
 		D3D11_TEXTURE2D_DESC backBufferDesc;
 		backBuff->GetDesc(&backBufferDesc);
 
-		backBuffWidth  = backBufferDesc.Width;
-		backBuffHeight = backBufferDesc.Height;
+		m_backBuffWidth  = backBufferDesc.Width;
+		m_backBuffHeight = backBufferDesc.Height;
 
 		// create and initialize depth-stencil buffer
 		ID3D11Texture2D *depthBuff = NULL;
@@ -84,8 +85,8 @@ namespace kgx
 		depthBuffDesc.SampleDesc.Quality = swapDesc.SampleDesc.Quality;
 		depthBuffDesc.MiscFlags          = 0;
 
-		dxDev->CreateTexture2D( &depthBuffDesc, NULL, &depthBuff );
-		res = dxDev->CreateDepthStencilView( depthBuff, NULL, &depthStencilView );
+		m_dxDev->CreateTexture2D( &depthBuffDesc, NULL, &depthBuff );
+		res = m_dxDev->CreateDepthStencilView( depthBuff, NULL, &m_depthStencilView );
 		depthBuff->Release();
 
 		if ( FAILED(res) )
@@ -97,7 +98,7 @@ namespace kgx
 		
 
 		// create renderTarget from the backBuffer and depth stencil view
-		res = dxDev->CreateRenderTargetView(backBuff, NULL, &renderTargetView);
+		res = m_dxDev->CreateRenderTargetView(backBuff, NULL, &m_renderTargetView);
 		backBuff->Release();
 
 		if ( FAILED(res) )
@@ -106,7 +107,7 @@ namespace kgx
 			return false;
 		}
 
-		// Setup the rasterizer
+		// Setup the m_rasterizer
 		D3D11_RASTERIZER_DESC rasterDesc;
 		rasterDesc.AntialiasedLineEnable = false;
 		rasterDesc.CullMode				 = D3D11_CULL_BACK;			//D3D11_CULL_FRONT, D3D11_CULL_BACK or D3D11_CULL_NONE
@@ -119,14 +120,14 @@ namespace kgx
 		rasterDesc.ScissorEnable		 = false;
 		rasterDesc.SlopeScaledDepthBias  = 0.0f;
 
-		res = dxDev->CreateRasterizerState(&rasterDesc, &rasterizer);
+		res = m_dxDev->CreateRasterizerState(&rasterDesc, &m_rasterizer);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (RenderWindow::create): Error creating Rasterizer state." << std::endl;
 			return false;
 		}
 
-		isInit = true;
+		m_isInit = true;
 		return true;
 	}
 
@@ -144,7 +145,7 @@ namespace kgx
 			dxViewport.TopLeftX = topLeftX;
 
 			if ( width < 0.0f )
-				dxViewport.Width = static_cast<float>(backBuffWidth);
+				dxViewport.Width = static_cast<float>(m_backBuffWidth);
 			else dxViewport.Width = width;
 			
 		} else
@@ -159,7 +160,7 @@ namespace kgx
 			dxViewport.TopLeftY = topLeftY;
 
 			if ( height < 0.0f )
-				dxViewport.Height = static_cast<float>(backBuffHeight);
+				dxViewport.Height = static_cast<float>(m_backBuffHeight);
 			else dxViewport.Height = height;
 			
 		} else
@@ -173,28 +174,28 @@ namespace kgx
 		dxViewport.MaxDepth = D3D11_MAX_DEPTH;
 
 		//viewports.push_back( Viewport(dxViewport, cam) );
-		curViewport = Viewport(dxViewport, cam);
+		m_curViewport = Viewport(dxViewport, cam);
 	}
 
 
 	void RenderWindow::update()
 	{
-		if ( !isInit || !curViewport.cam )
+		if ( !m_isInit || !m_curViewport.cam )
 			return;
 
 		//static float lastTime = (float)timeGetTime();
 
-		dxDevCont->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		m_dxDevCont->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 		//TODO: make sure RSSetState and RSSetViewports are only called when they are really needed to be called
-		dxDevCont->RSSetState(rasterizer);
+		m_dxDevCont->RSSetState(m_rasterizer);
 		//TODO: add support for multiple viewports
-		dxDevCont->RSSetViewports( 1, &curViewport.dxViewport );
+		m_dxDevCont->RSSetViewports( 1, &m_curViewport.dxViewport );
 
 		// clear the back buffer to grey
 		//TODO: create something so that the user can change the clearcolor
 		const float clearColor[4] = { 0.4f, 0.4f, 0.4f, 1.0f };
-		dxDevCont->ClearRenderTargetView( renderTargetView, clearColor );
-		dxDevCont->ClearDepthStencilView( depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
+		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, clearColor );
+		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
 
 		//float currTime  = (float)timeGetTime();
@@ -202,14 +203,14 @@ namespace kgx
 		//update( deltaTime );
 
 
-		curViewport.cam->renderCurrentView();
+		m_curViewport.cam->renderCurrentView();
 
 		//mActiveCam->renderCurrentView();
 
 
 
 		// flip the back buffer and the front buffer
-		swapChain->Present(1, 0);
+		m_swapChain->Present(1, 0);
 		//lastTime = currTime;
 	}
 }

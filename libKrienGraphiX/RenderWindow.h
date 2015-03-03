@@ -5,15 +5,17 @@
 #include <dxgi1_2.h>
 #include <vector>
 
-#include "Camera.h"
+//#include "Camera.h"
 
 namespace kgx
 {
+	class Camera;
+
 	//TODO: voorlopig een renderWindow => later kan dit nog een renderTexture of wat dan ook worden
 	class RenderWindow
 	{
 		public:
-			RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory_ );
+			RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory );
 			~RenderWindow();
 
 			bool create( HWND windowHandle );
@@ -21,6 +23,10 @@ namespace kgx
 			void update();
 
 		private:
+			// no copying allowed
+			RenderWindow( const RenderWindow& );
+			RenderWindow& operator=( const RenderWindow& );
+
 			struct Viewport
 			{
 				Viewport() : dxViewport(), cam(0) {}
@@ -30,21 +36,21 @@ namespace kgx
 				Camera *cam;
 			};
 
-			ID3D11Device *dxDev;
-			ID3D11DeviceContext *dxDevCont;
-			IDXGIFactory2 *dxgiFactory;
+			ID3D11Device *m_dxDev;
+			ID3D11DeviceContext *m_dxDevCont;
+			IDXGIFactory2 *m_dxgiFactory;
 
-			IDXGISwapChain1 *swapChain;
-			ID3D11DepthStencilView *depthStencilView;
-			ID3D11RenderTargetView *renderTargetView;
-			ID3D11RasterizerState *rasterizer;
+			IDXGISwapChain1 *m_swapChain;
+			ID3D11DepthStencilView *m_depthStencilView;
+			ID3D11RenderTargetView *m_renderTargetView;
+			ID3D11RasterizerState *m_rasterizer;
 
-			//std::vector<Viewport> viewports;
-			Viewport curViewport;
+			//std::vector<Viewport> m_viewports;
+			Viewport m_curViewport;
 
-			UINT backBuffWidth;
-			UINT backBuffHeight;
+			UINT m_backBuffWidth;
+			UINT m_backBuffHeight;
 
-			bool isInit;
+			bool m_isInit;
 	};
 }

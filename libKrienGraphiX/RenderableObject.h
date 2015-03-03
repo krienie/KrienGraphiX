@@ -2,20 +2,16 @@
 #pragma once
 
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include <vector>
 
 #include "Defines.h"
-
-#include "Camera.h"
-#include "Material.h"
-#include "ResourceManager.h"
 
 
 namespace kgx
 {
 	class Camera;
 	class Material;
-	struct MeshBuffer;
 
 	class RenderableObject
 	{
@@ -45,15 +41,15 @@ namespace kgx
 			RenderableObject( const RenderableObject& );
 			RenderableObject& operator=( const RenderableObject& );
 
-			ID3D11Device *dxDev;
-			ID3D11DeviceContext *dxDevCont;
+			ID3D11Device *m_dxDev;
+			ID3D11DeviceContext *m_dxDevCont;
 
-			MeshBuffer meshBuff;
-			std::vector<ObjectContainer> matContainers;
+			MeshBuffer m_meshBuff;
+			std::vector<ObjectContainer> m_matContainers;
 
 			//TODO: voorlopig heeft deze even een modelMatrix, maar later een aparte parentclass maken voor een movableObject oid
-			DirectX::XMFLOAT4X4 modelMatrix;
+			DirectX::XMFLOAT4X4 m_modelMatrix;
 
-			D3D11_PRIMITIVE_TOPOLOGY topology;
+			D3D11_PRIMITIVE_TOPOLOGY m_topology;
 	};
 }

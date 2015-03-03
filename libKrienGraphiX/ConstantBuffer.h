@@ -13,10 +13,15 @@ namespace kgx
 	class ConstantBuffer
 	{
 		public:
-			ConstantBuffer( _In_ ID3D11Device *dxDevice );
+			explicit ConstantBuffer( _In_ ID3D11Device *dxDevice );
+			explicit ConstantBuffer(const ConstantBuffer &other);
 			~ConstantBuffer();
 
-			ID3D11Buffer* getDxBuffer() const;
+			//TODO: test copy-constructor and assignment-operator
+			ConstantBuffer& operator=( const ConstantBuffer &rhs );
+
+
+			ID3D11Buffer* getDxBufferPtr() const;
 			HRESULT create( UINT sizeInBytes );
 			void commit();
 			bool hasVariable( const std::string &name ) const;
@@ -25,24 +30,24 @@ namespace kgx
 			bool updateVariable( const std::string &name, const void *var );
 
 		private:
+
 			struct VarPosition
 			{
 				VarPosition( UINT o, UINT s ) : offset(o), size(s) { }
 
 				UINT offset;
 				UINT size;
-				//T Value;
 			};
 
-			ID3D11Device *dxDev;
-			ID3D11DeviceContext *dxDevCont;
-			ID3D11Buffer *dxBuffer;
-			UINT bufferElementSize;
+			ID3D11Device *m_dxDev;
+			ID3D11DeviceContext *m_dxDevCont;
+			ID3D11Buffer *m_dxBuffer;
+			UINT m_bufferElementSize;
 
-			bool dataChanged;
-			std::map<std::string, VarPosition> variables;
-			//std::vector<void*> rawData;
-			UCHAR *rawData;
+			bool m_dataChanged;
+			std::map<std::string, VarPosition> m_variables;
+			//std::vector<void*> m_rawData;
+			UCHAR *m_rawData;
 
 	};
 }
