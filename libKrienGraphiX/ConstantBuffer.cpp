@@ -21,8 +21,11 @@ namespace kgx
 			m_dxBuffer->AddRef();
 		if ( m_dxDevCont )
 			m_dxDevCont->AddRef();
-		if ( m_rawData )
+		if ( other.m_rawData )
+		{
+			m_rawData = new UCHAR[m_bufferElementSize];
 			memcpy( m_rawData, other.m_rawData, sizeof(UCHAR) * m_bufferElementSize );
+		}
 	}
 
 	ConstantBuffer::~ConstantBuffer()
@@ -49,8 +52,11 @@ namespace kgx
 			m_dxBuffer->AddRef();
 		if ( m_dxDevCont )
 			m_dxDevCont->AddRef();
-		if ( m_rawData )
+		if ( rhs.m_rawData )
+		{
+			m_rawData = new UCHAR[m_bufferElementSize];
 			memcpy(m_rawData, rhs.m_rawData, sizeof(UCHAR) * m_bufferElementSize);
+		}
 
 		return *this;
 	}

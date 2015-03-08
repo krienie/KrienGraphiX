@@ -164,7 +164,7 @@ namespace kgx
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
 			default:
-				std::cout << "Warning (Material::updateAutoShaderVar): Unknown shader variable type. No update done." << std::endl;
+				std::cout << "(Material::updateAutoShaderVar) Warning: Unknown shader variable type:" << shaderVar.type << " No update done." << std::endl;
 				break;
 		}
 	}

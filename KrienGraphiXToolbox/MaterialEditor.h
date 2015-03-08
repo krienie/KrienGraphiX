@@ -11,7 +11,7 @@ class MaterialEditor : public QMainWindow
 	Q_OBJECT
 
 	public:
-		MaterialEditor( QWidget *parent = nullptr );
+		explicit MaterialEditor( QWidget *parent = nullptr );
 		~MaterialEditor();
 
 	private:

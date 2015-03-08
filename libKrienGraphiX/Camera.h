@@ -12,9 +12,9 @@ namespace kgx
 		public:
 			Camera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			Camera( float fovY, float aspect, float nearZ, float farZ,
-				const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
-				const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f),
-				const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3(0.0f, 1.0f,  0.0f) );
+					const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+					const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f),
+					const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3(0.0f, 1.0f,  0.0f) );
 			explicit Camera( const Camera &other );
 			//~Camera();
 
