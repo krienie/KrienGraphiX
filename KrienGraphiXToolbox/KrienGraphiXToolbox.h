@@ -16,7 +16,7 @@ class KrienGraphiXToolbox : public QMainWindow
 		void openMaterialEditor();
 
 	public:
-		KrienGraphiXToolbox( QWidget *parent = nullptr );
+		explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
 		~KrienGraphiXToolbox();
 
 	private:

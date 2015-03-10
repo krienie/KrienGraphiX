@@ -18,8 +18,9 @@ namespace kgx
 	class Material
 	{
 		public:
-			enum ShaderVarType
+			enum ShaderAutoBindType
 			{
+				NoAutoBind,					// mainly used for parsing purposes
 				CameraProjectionMatrix,
 				CameraViewMatrix,
 				CameraPosition,
@@ -48,7 +49,7 @@ namespace kgx
 			void addTexture( _In_ ID3D11ShaderResourceView* texView, _In_ ID3D11Resource* texture );
 			void setSampler( _In_ ID3D11SamplerState *samp );
 
-			void addAutoShaderVar( _In_ Shader *shader, const std::string &varName, ShaderVarType varType );
+			void addAutoShaderVar(_In_ Shader *shader, const std::string &varName, ShaderAutoBindType varType);
 
 			void activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj );
 
@@ -59,10 +60,10 @@ namespace kgx
 
 			struct AutoShaderVar
 			{
-				AutoShaderVar( std::string n, ShaderVarType t ) : name(n), type(t) { }
+				AutoShaderVar(std::string n, ShaderAutoBindType t) : name(n), type(t) {}
 
 				std::string name;
-				ShaderVarType type;
+				ShaderAutoBindType type;
 			};
 
 			void updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,

@@ -13,52 +13,10 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\old">
-      <UniqueIdentifier>{bcd25ef6-dbd4-4aec-9066-d2817c410b30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\old">
-      <UniqueIdentifier>{c8a27311-26c9-43d3-8853-dd93d9607c2a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceManager.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Camera.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\KGMParser.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Scene.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\EffectManager.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\BufferManager.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Effect.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\PixelShader.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\VertexShader.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Shader.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\RenderableObject.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\RenderWindow.h">
-      <Filter>Header Files\old</Filter>
-    </ClInclude>
-    <ClInclude Include="old\Environment.h">
-      <Filter>Header Files\old</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
@@ -100,42 +58,6 @@
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="old\KGMParser.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\Scene.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\EffectManager.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\BufferManager.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\Camera.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\Environment.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\Effect.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\PixelShader.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\VertexShader.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\Shader.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\RenderWindow.cpp">
-      <Filter>Source Files\old</Filter>
-    </ClCompile>
-    <ClCompile Include="old\RenderableObject.cpp">
-      <Filter>Source Files\old</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>

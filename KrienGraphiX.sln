@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libKrienGraphiX", "libKrienGraphiX\libKrienGraphiX.vcxproj", "{2C3410EE-9E65-44F0-A6D8-9ACE7134D68C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KrienGraphiXToolbox", "KrienGraphiXToolbox\KrienGraphiXToolbox.vcxproj", "{B12702AD-ABFB-343A-A199-8E24837244A3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParserTests", "ParserTests\ParserTests.vcxproj", "{A0347B59-6F7B-4624-96A2-57DE4063773D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KGConverter", "KGConverter\KGConverter.vcxproj", "{0580F80D-E338-40C9-8EC5-5FF3F407D7CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Debug|x64.Build.0 = Debug|x64
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|x64.ActiveCfg = Release|x64
 		{B12702AD-ABFB-343A-A199-8E24837244A3}.Release|x64.Build.0 = Release|x64
-		{A0347B59-6F7B-4624-96A2-57DE4063773D}.Debug|x64.ActiveCfg = Debug|x64
-		{A0347B59-6F7B-4624-96A2-57DE4063773D}.Debug|x64.Build.0 = Debug|x64
-		{A0347B59-6F7B-4624-96A2-57DE4063773D}.Release|x64.ActiveCfg = Release|x64
-		{A0347B59-6F7B-4624-96A2-57DE4063773D}.Release|x64.Build.0 = Release|x64
+		{0580F80D-E338-40C9-8EC5-5FF3F407D7CB}.Debug|x64.ActiveCfg = Debug|x64
+		{0580F80D-E338-40C9-8EC5-5FF3F407D7CB}.Debug|x64.Build.0 = Debug|x64
+		{0580F80D-E338-40C9-8EC5-5FF3F407D7CB}.Release|x64.ActiveCfg = Release|x64
+		{0580F80D-E338-40C9-8EC5-5FF3F407D7CB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
