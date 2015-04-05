@@ -1,18 +1,16 @@
 
 #pragma once
 
-#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-#endif
-
-#include <Windows.h>
 #include <vector>
 
 #include "Material.h"
 #include "VertexInputLayout.h"
 
+typedef unsigned int UINT;
+
 namespace kgx
 {
+	//TODO: Rename ModelData and MatData to something like KgModelData and KgMatData
 	struct ModelData
 	{
 		ModelData( const std::string &mName, const std::string &usemtl, int start, int count )
@@ -27,7 +25,6 @@ namespace kgx
 
 	struct MatData
 	{
-		//TODO: add support for non-auto update variables
 		struct ShaderVar
 		{
 			ShaderVar() : name(), type(), defaultValue(), autoBindType(Material::ShaderAutoBindType::NoAutoBind) {}
@@ -38,27 +35,33 @@ namespace kgx
 			Material::ShaderAutoBindType autoBindType;
 		};
 
-		MatData() : name(), vertexShader(), pixelShader(), vertexAutoVars(), pixelAutoVars() {}
+		struct ShaderDef
+		{
+			ShaderDef() : name(), variables() {}
+
+			std::string name;
+			std::vector<ShaderVar> variables;
+		};
+
+		MatData() : name(), vertexShader(), pixelShader() {}
 
 		std::string name;
 		//TODO: add support for geometry, hull and domain shaders
-		std::string vertexShader;
-		std::string pixelShader;
-		std::vector<ShaderVar> vertexAutoVars;
-		std::vector<ShaderVar> pixelAutoVars;
+		ShaderDef vertexShader;
+		ShaderDef pixelShader;
 
 		//TODO: add support for textures + automatic texture binding
 		//std::vector<std::string> textures;
 	};
 
 
-	struct KgmData
+	struct KgoData
 	{
-		KgmData() : vertices(), indices(), inputLayout(), models(), mats() {}
+		KgoData() : inputLayout(), vertices(), indices(), models(), mats() {}
 
+		std::vector<VertexInputLayout::Type> inputLayout;
 		std::vector<float> vertices;
 		std::vector<UINT> indices;
-		std::vector<VertexInputLayout::Type> inputLayout;
 		std::vector<ModelData> models;
 		std::vector<MatData> mats;
 	};

@@ -1,41 +1,41 @@
 
-#define Version 0.3
+//#define Version 0.3
 
 #include <sstream>
 #include <iostream>
 
 //#define FUSION_MAX_VECTOR_SIZE 20
 //#define BOOST_SPIRIT_USE_PHOENIX_V3
-//#include "boost/fusion/include/adapt_struct.hpp"
-//#include "boost/spirit/include/qi.hpp"
-//#include "boost/spirit/include/karma.hpp"
-//#include "boost/spirit/include/phoenix.hpp"
-#include "boost/filesystem.hpp"
+//#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/spirit/include/qi.hpp>
+//#include <boost/spirit/include/karma.hpp>
+//#include <boost/spirit/include/phoenix.hpp>
+#include <boost/filesystem.hpp>
+
+#include "KGObjectGenerator.h"
+#include "OBJParser.h"
 
 namespace fs = boost::filesystem;
-//namespace qi = boost::spirit::qi;
+namespace qi = boost::spirit::qi;
 
 
+bool convertFile( _In_ const std::string &filename, _In_ const std::string &fileDir, _In_ const std::string &outDir );
 void printHelp();
 
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
-	std::cout << "-= KrienGraphiX Parser v" << Version << " - (c)2015 Krien Linnenbank =-" << std::endl << std::endl;
+	std::cout << "-= KrienGraphiX Parser v0.3 - (c)2015 Krien Linnenbank =-" << std::endl << std::endl;
 
-	bool relative = false;
-	std::string inDir;
-	std::string outDir;
+	std::string inDir  = "/";
+	std::string outDir = "/";
 
+	// parse input arguments
 	if ( argc > 1 )
 	{
 		for ( int i = 1; i < argc; ++i )
 		{
-			if ( std::string( argv[i] ) == "/relative" )
-			{
-				relative = true;
-				continue;
-			} else if ( std::string( argv[i] ) == "/indir" && i < (argc - 1) )
+			if ( std::string( argv[i] ) == "/indir" && i < (argc - 1) )
 			{
 				i++;
 				inDir = argv[i];
@@ -48,55 +48,98 @@ int main(int argc, char* argv[])
 			} else
 			{
 				printHelp();
-
-				//if ( std::string( argv[i] ) != "/?" )
-					return 0;
+				return 0;
 			}
 		}
 	}
 
-	if ( relative )
+	// create input directory if needed
+	if ( !fs::exists( inDir )
+		 && !fs::create_directories( fs::path( inDir ) ) )
 	{
-		std::string curDir = fs::current_path().generic_string() + "/";
-		inDir  = curDir + inDir;
-		outDir = curDir + outDir;
+		std::cout << "Error creating input directory: " << inDir << std::endl;
+		std::cout << "Aborting conversion... Press enter to exit" << std::endl;
+	}
+
+	// create output directory if needed
+	if ( !fs::exists( outDir )
+		 && !fs::create_directories( fs::path(outDir) ) )
+	{
+		std::cout << "Error creating output directory: " << outDir << std::endl;
+		std::cout << "Aborting conversion... Press enter to exit" << std::endl;
 	}
 	
 
-	std::cout << "relative: " << relative << std::endl
-		<< "inDir: " << inDir << std::endl
-		<< "outDir: " << outDir << std::endl;
+	std::cout << "inDir: " << inDir << std::endl
+			  << "outDir: " << outDir << std::endl;
 
 
-	
-
-
-	//std::cout << ssHelp.str() << std::endl;
-
-
-
-	/*std::string file = "blabla.obj";
-	std::string name;
-	bool parseSuccess = qi::parse( file.cbegin(), file.cend(),
-		*~qi::char_('.') >> ".obj" >> qi::eoi, // qi::skip[  >> *qi::print ],
-		name );
-
-	if ( !parseSuccess )
+	// start converting files in the input directory
+	fs::directory_iterator dir( inDir );
+	for ( dir; dir != fs::directory_iterator(); ++dir )
 	{
-		std::cout << "Error: Unknown file format. Unable to parse." << std::endl
-			<< "Aborting conversion... Press enter to exit." << std::endl;
-		return 0;
+		std::string file = dir->path().filename().string();
+		std::string name;
+		bool parseSuccess = qi::parse( file.cbegin(), file.cend(),
+									   *~qi::char_( '.' ) >> ".obj" >> qi::eoi,
+									   name );
+
+		if ( parseSuccess )
+		{
+			// parse found obj file
+			std::cout << "Processing " << file << "... ";
+			clock_t tStart = clock();
+
+			if ( !convertFile( name, inDir, outDir ) )
+				std::cout << std::endl << "Error: converting " << file << " aborted" << std::endl;
+
+			double time = double( clock() - tStart ) / (double)CLOCKS_PER_SEC;
+			std::cout << "done in: " << time << " seconds" << std::endl;
+		}
 	}
 
-
-
-
-
-	std::cout << "parseSuccess: " << parseSuccess << " | name: " << name << std::endl;*/
-
-	//std::cin.get();
+	std::cin.get();
 
 	return 0;
+}
+
+
+bool convertFile( _In_ const std::string &filename, _In_ const std::string &fileDir, _In_ const std::string &outDir )
+{
+	kgx::KgoData parserOutput;
+	kgx::OBJParser objP;
+
+	if ( !objP.parseFile( filename + ".obj", fileDir, parserOutput ) )
+		return false;
+
+	//TODO: vertex layout and mats(maybe)
+	std::cout << "Successfully parsed file " << filename << ".obj" << std::endl;
+
+
+
+
+	// create texture path string
+	/*std::stringstream tPathSS;
+	tPathSS << "textures/" << filename << "/";*/
+
+	kgx::KGObjectGenerator gen;
+	std::string kgoDataStr;
+	gen.generate( parserOutput, kgoDataStr );
+
+	std::stringstream ss;
+	ss << outDir << "/" << filename << ".kgobj";
+	std::string outputFile = ss.str();
+	std::cout << "Writing data to " << outputFile << "... ";
+	if ( fs::exists( outputFile ) )
+		std::cout << "file already exists! Overwriting... ";
+
+	//write sink to file
+	std::ofstream fileOut( outputFile );
+	fileOut << kgoDataStr;
+	fileOut.close();
+	std::cout << "done" << std::endl;
+
+	return true;
 }
 
 

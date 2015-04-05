@@ -12,6 +12,8 @@ namespace kgx
 		public:
 			struct FaceData
 			{
+				FaceData() : groupName(), usemtl(), posIdx(), normIdx(), texIdx() {}
+
 				std::string groupName;
 				std::string usemtl;
 				std::vector<UINT> posIdx;
@@ -21,6 +23,8 @@ namespace kgx
 
 			struct ObjParseData
 			{
+				ObjParseData() : mtllib(), posCoords(), normCoords(), texCoords(), faces() {}
+
 				std::string mtllib;
 				std::vector<float> posCoords;
 				std::vector<float> normCoords;
@@ -56,12 +60,12 @@ namespace kgx
 			OBJParser();
 			//~OBJParser();
 
-			HRESULT parseFile( _In_ const std::string &fileName, _In_ const std::string &fileDir, _Inout_ KgmData &outputData );
+			bool parseFile( _In_ const std::string &file, _In_ const std::string &fileDir, _Inout_ KgoData &outputData );
 
 		private:
 			struct VertexData
 			{
-				VertexData(UINT pos, UINT norm, UINT tex)
+				VertexData( UINT pos, UINT norm, UINT tex )
 					: posIdx(pos), normIdx(norm), texIdx(tex) {}
 
 				UINT posIdx;
@@ -83,6 +87,7 @@ namespace kgx
 			bool parseMtl( const std::string &input, std::vector<ObjMatData> &mtlData );
 			void storeModelData( std::string modelName, ModelData &data,
 				std::map< std::string, std::vector<ModelData> > *sortedModels, std::vector<ModelData*> *tempModels );
-			int findIndex( const std::vector<VertexData> &vec, const VertexData &val ) const;
+			void processModelData( const ObjParseData &objData, KgoData &kgData );
+			void convertToMatData( const ObjMatData &objMat, MatData &kgMat );
 	};
 }

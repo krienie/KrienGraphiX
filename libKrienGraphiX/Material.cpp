@@ -79,7 +79,7 @@ namespace kgx
 	}
 
 
-	void Material::addAutoShaderVar( _In_ Shader *shader, const std::string &varName, ShaderVarType varType )
+	void Material::addAutoShaderVar( _In_ Shader *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
 		// get auto variable list or create one if not already present
 		std::pair< std::map< Shader*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars; 
@@ -127,39 +127,39 @@ namespace kgx
 		DirectX::XMFLOAT3 tempFloat3;
 		switch ( shaderVar.type )
 		{
-			case ShaderVarType::CameraProjectionMatrix:
+			case ShaderAutoBindType::CameraProjectionMatrix:
 				tempFloat4x4 = renderCam->getProjMatrix();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
-			case ShaderVarType::CameraViewMatrix:
+			case ShaderAutoBindType::CameraViewMatrix:
 				tempFloat4x4 = renderCam->getViewMatrix();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
-			case ShaderVarType::CameraPosition:
+			case ShaderAutoBindType::CameraPosition:
 				tempFloat3 = renderCam->getPosition();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::CameraTarget:
+			case ShaderAutoBindType::CameraTarget:
 				tempFloat3 = renderCam->getTarget();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::CameraFieldOfView:
+			case ShaderAutoBindType::CameraFieldOfView:
 				tempFloat = renderCam->getFOV();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::CameraAspectRatio:
+			case ShaderAutoBindType::CameraAspectRatio:
 				tempFloat = renderCam->getAspectRatio();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::CameraNearZ:
+			case ShaderAutoBindType::CameraNearZ:
 				tempFloat = renderCam->getNearZ();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::CameraFarZ:
+			case ShaderAutoBindType::CameraFarZ:
 				tempFloat = renderCam->getFarZ();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
 				break;
-			case ShaderVarType::ObjectModelMatrix:
+			case ShaderAutoBindType::ObjectModelMatrix:
 				tempFloat4x4 = renderObj->getModelMatrix();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;

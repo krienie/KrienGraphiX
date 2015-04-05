@@ -83,6 +83,9 @@ namespace kgx
 		{
 			if ( !forceRebuild )
 				return m_dxLayout;
+
+			if ( !shaderSource )
+				return nullptr;
 			
 			m_dxLayout->Release();
 			m_dxLayout = nullptr;
@@ -91,9 +94,14 @@ namespace kgx
 		HRESULT res = dxDevice->CreateInputLayout( m_inputDescriptor.data(), static_cast<UINT>(m_inputDescriptor.size()), shaderSource->GetBufferPointer(),
 													shaderSource->GetBufferSize(), &m_dxLayout );
 
-		if ( FAILED(res) )
+		if ( FAILED( res ) )
+		{
+			m_dxLayout = nullptr;
 			return nullptr;
-		else return m_dxLayout;
+		} else
+		{
+			return m_dxLayout;
+		}
 	}
 
 

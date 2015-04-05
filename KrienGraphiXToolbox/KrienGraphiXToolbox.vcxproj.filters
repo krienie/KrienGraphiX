@@ -33,12 +33,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Header Files\Parsers">
-      <UniqueIdentifier>{760a052c-0b88-408a-acbc-6db9cb5f7b1e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Parsers">
-      <UniqueIdentifier>{fdfdadd1-5a8e-4fa2-970f-a0300c5db949}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{9debadb5-6945-439e-8c49-b8faa8ef90f1}</UniqueIdentifier>
     </Filter>
@@ -67,9 +61,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_KgxRenderWidget.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="OBJParser.cpp">
-      <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="MaterialEditor.cpp">
       <Filter>Source Files</Filter>
@@ -104,12 +95,6 @@
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_KrienGraphiXToolbox.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Parser.h">
-      <Filter>Header Files\Parsers</Filter>
-    </ClInclude>
-    <ClInclude Include="OBJParser.h">
-      <Filter>Header Files\Parsers</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_MaterialEditor.h">
       <Filter>Generated Files</Filter>
