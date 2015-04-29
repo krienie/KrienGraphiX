@@ -16,7 +16,7 @@
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-	kgx::ModelData,
+	kgx::KgModelData,
 	(std::string, modelName)
 	(int, startIndex)
 	(int, indexCount)
@@ -24,7 +24,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
-	kgx::MatData::ShaderVar,
+	kgx::KgMatData::ShaderVar,
 	(kgx::Material::ShaderAutoBindType, autoBindType)
 	(std::string, type)
 	(std::string, name)
@@ -32,16 +32,16 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
-	kgx::MatData::ShaderDef,
+	kgx::KgMatData::ShaderDef,
 	(std::string, name)
-	(std::vector<kgx::MatData::ShaderVar>, variables)
-	);
+	(std::vector<kgx::KgMatData::ShaderVar>, variables)
+);
 
 BOOST_FUSION_ADAPT_STRUCT(
-	kgx::MatData,
+	kgx::KgMatData,
 	(std::string, name)
-	(kgx::MatData::ShaderDef, vertexShader)
-	(kgx::MatData::ShaderDef, pixelShader)
+	(kgx::KgMatData::ShaderDef, vertexShader)
+	(kgx::KgMatData::ShaderDef, pixelShader)
 );
 
 
@@ -74,7 +74,7 @@ namespace kgx
 		{
 			KgoGram( const std::string &header, const std::vector<VertexInputLayout::Type> &inLayout,
 					 const std::vector<float> &inVerts, const std::vector<UINT> &inIndices,
-					 const std::vector<ModelData> &inModels, const std::vector<MatData> &inMatData )
+					 const std::vector<KgModelData> &inModels, const std::vector<KgMatData> &inMatData )
 					 : KgoGram::base_type( output )
 			{
 				using namespace karma;
@@ -89,7 +89,7 @@ namespace kgx
 
 				indices = "Indices()" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
-					<< lit( '\t' ) << no_delimit[(uint_ % karma::space)[karma::_1 = phx::ref( inIndices )]] << ";" << no_delimit[eol]
+					<< lit('\t') << no_delimit[(uint_ % karma::space)[karma::_1 = phx::ref( inIndices )]] << ";" << no_delimit[eol]
 					<< "}" << no_delimit[eol];
 
 				model = "Model(" << karma::string << ")" << no_delimit[eol]
@@ -99,15 +99,10 @@ namespace kgx
 					<< "}" << no_delimit[eol];
 
 				shaderAutoBindType = karma::stream;
-				shaderVariable     = "\t\t" << shaderAutoBindType << karma::string << no_delimit[karma::string] << "(" << karma::string << ");" << no_delimit[eol];
+				shaderVariable     = no_delimit[eol] << "\t\t" << shaderAutoBindType << karma::string << no_delimit[karma::string] << "(" << karma::string << ");" << no_delimit[eol << "\t"];
 
-				//phx::bind( &std::vector<float>::size, _val )
-				auto shaderVarBind = phx::bind( &MatData::ShaderDef::variables, _val );
-				auto shaderBody = ("\t{" << no_delimit[eol]
-									<< eps( phx::bind( &std::vector<MatData::ShaderVar>::size, shaderVarBind ) > 0 ) << (*shaderVariable)
-									<< "\t}") | ";";
-				vertexShader = "\tVertexShader(" << karma::string << no_delimit[")"] << no_delimit[eol] << shaderBody << no_delimit[eol];
-				pixelShader = "\tPixelShader(" << karma::string << no_delimit[")"] << shaderBody << no_delimit[eol];
+				vertexShader = "\tVertexShader(" << karma::string << no_delimit[")"] << no_delimit[eol] << "\t{" << *shaderVariable << "}" << no_delimit[eol];
+				pixelShader  = "\tPixelShader(" << karma::string << no_delimit[")"] << no_delimit[eol] << "\t{" << *shaderVariable << "}" << no_delimit[eol];
 
 				material = "Material(" << karma::string << ")" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
@@ -125,19 +120,19 @@ namespace kgx
 			karma::rule<BackInsertIt, float()> vertex;
 			karma::rule<BackInsertIt, karma::space_type> vertices;
 			karma::rule<BackInsertIt, karma::space_type> indices;
-			karma::rule<BackInsertIt, ModelData(), karma::space_type> model;
+			karma::rule<BackInsertIt, KgModelData(), karma::space_type> model;
 			karma::rule<BackInsertIt, Material::ShaderAutoBindType()> shaderAutoBindType;
-			karma::rule<BackInsertIt, MatData::ShaderVar(), karma::space_type> shaderVariable;
-			karma::rule<BackInsertIt, MatData::ShaderDef(), karma::space_type> vertexShader;
-			karma::rule<BackInsertIt, MatData::ShaderDef(), karma::space_type> pixelShader;
-			karma::rule<BackInsertIt, MatData(), karma::space_type> material;
+			karma::rule<BackInsertIt, KgMatData::ShaderVar(), karma::space_type> shaderVariable;
+			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> vertexShader;
+			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> pixelShader;
+			karma::rule<BackInsertIt, KgMatData(), karma::space_type> material;
 		} kgoGram( headerStr.str(), inputData.inputLayout, inputData.vertices, inputData.indices, inputData.models, inputData.mats );
 
 
 		BackInsertIt sink( outputString );
 		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
-		std::cout << "kgoFile: " << std::endl << outputString << std::endl;
-		std::cout << std::endl;
+		//std::cout << "kgoFile: " << std::endl << outputString << std::endl;
+		//std::cout << std::endl;
 	}
 
 	/*bool generateKGM( _Inout_ BackInsertIt &sink, _In_ KgmData &input, _In_ const std::string &texturePath )
@@ -191,8 +186,8 @@ namespace kgx
 			karma::rule<BackInsertIt, KgmData(), karma::space_type> output;
 			karma::rule<BackInsertIt, std::vector<float>(), karma::space_type> vertices;
 			karma::rule<BackInsertIt, std::vector<UINT>(), karma::space_type> indices;
-			karma::rule<BackInsertIt, std::vector<ModelData>(), karma::space_type> models;
-			karma::rule<BackInsertIt, std::vector<MatData>(), karma::space_type> materials;
+			karma::rule<BackInsertIt, std::vector<KgModelData>(), karma::space_type> models;
+			karma::rule<BackInsertIt, std::vector<KgMatData>(), karma::space_type> materials;
 			karma::rule<BackInsertIt, std::vector<float>(), karma::space_type> vector;
 			karma::rule<BackInsertIt, std::string(), karma::space_type> texMap;
 			karma::rule<BackInsertIt, karma::space_type> headerComment, vertComment, idxComment, matComment, modComment;

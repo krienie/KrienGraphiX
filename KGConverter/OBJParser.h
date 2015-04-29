@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <DirectXMath.h>
 #include <map>
 
 #include "parser_defines.h"
@@ -35,7 +36,8 @@ namespace kgx
 			struct ObjMatData
 			{
 				ObjMatData() : name(), specPwr(0.0f), optDens(0.0f), trans(1.0f),
-					transFilter(), ambClr(), diffClr(), specClr(), emmisClr(),
+					transFilter(0.0f, 0.0f, 0.0f), ambClr(0.0f, 0.0f, 0.0f), diffClr(0.0f, 0.0f, 0.0f),
+					specClr(0.0f, 0.0f, 0.0f), emmisClr(0.0f, 0.0f, 0.0f),
 					ambMap(), diffMap(), specMap(), transMap(), bumpMap()
 				{
 				}
@@ -44,11 +46,11 @@ namespace kgx
 				float specPwr;
 				float optDens;
 				float trans;
-				std::vector<float> transFilter;
-				std::vector<float> ambClr;
-				std::vector<float> diffClr;
-				std::vector<float> specClr;
-				std::vector<float> emmisClr;
+				DirectX::XMFLOAT3 transFilter;
+				DirectX::XMFLOAT3 ambClr;
+				DirectX::XMFLOAT3 diffClr;
+				DirectX::XMFLOAT3 specClr;
+				DirectX::XMFLOAT3 emmisClr;
 				std::string ambMap;
 				std::string diffMap;
 				std::string specMap;
@@ -85,9 +87,9 @@ namespace kgx
 
 			bool parseObj( const std::string &input, ObjParseData &objData );
 			bool parseMtl( const std::string &input, std::vector<ObjMatData> &mtlData );
-			void storeModelData( std::string modelName, ModelData &data,
-				std::map< std::string, std::vector<ModelData> > *sortedModels, std::vector<ModelData*> *tempModels );
+			void storeModelData( std::string modelName, KgModelData &data,
+				std::map< std::string, std::vector<KgModelData> > *sortedModels, std::vector<KgModelData*> *tempModels );
 			void processModelData( const ObjParseData &objData, KgoData &kgData );
-			void convertToMatData( const ObjMatData &objMat, MatData &kgMat );
+			void convertToMatData( const ObjMatData &objMat, KgMatData &kgMat );
 	};
 }

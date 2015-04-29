@@ -16,6 +16,14 @@
 #include "OBJParser.h"
 
 
+BOOST_FUSION_ADAPT_STRUCT(
+	DirectX::XMFLOAT3,
+	(float, x)
+	(float, y)
+	(float, z)
+);
+
+
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
 namespace iso8859 = boost::spirit::iso8859_1;
@@ -56,6 +64,7 @@ namespace kgx
 		}
 
 		// only attempt to load a MTL file when one is mentioned in the OBJ file
+		std::vector<ObjMatData> objMats;
 		if ( objData.mtllib.size() > 0 )
 		{
 			std::stringstream mtlFile;
@@ -72,23 +81,35 @@ namespace kgx
 				return false;
 			}
 
-			//TODO: format parseOutput to MatData
-			std::vector<ObjMatData> objMats;
+			//TODO: format parseOutput to KgMatData
 			if ( !parseMtl(ssMtl.str(), objMats) )
 			{
 				std::cout << "Error: MTL parsing failed." << std::endl;
 				return false;
 			}
+		} else
+		{
+			// add default material
+			objMats.push_back( ObjMatData() );
+			ObjMatData &objMatData = objMats[objMats.size() - 1u];
+			objMatData.name = "DefaultMaterial";
+			//TODO: generate random color to set as default value
+			objMatData.diffClr = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f );
 
-			// Convert ObjMatData to MatData
-			std::vector<ObjMatData>::iterator it;
-			for ( it = objMats.begin(); it != objMats.end(); ++it )
-			{
-				outputData.mats.push_back( MatData() );
-				MatData &mData = outputData.mats[ outputData.mats.size() - 1u ];
-				convertToMatData( *it, mData );
-			}
+			// set default material
+			objData.faces[0].usemtl = objMatData.name;
 		}
+
+
+		// Convert ObjMatData to KgMatData
+		std::vector<ObjMatData>::iterator it;
+		for ( it = objMats.begin(); it != objMats.end(); ++it )
+		{
+			outputData.mats.push_back( KgMatData() );
+			KgMatData &mData = outputData.mats[outputData.mats.size() - 1u];
+			convertToMatData( *it, mData );
+		}
+
 
 		if (objData.normCoords.size() == 0)
 		{
@@ -110,8 +131,8 @@ namespace kgx
 
 		// register Vertex layout
 		outputData.inputLayout.push_back( kgx::VertexInputLayout::Position );
-		outputData.inputLayout.push_back( kgx::VertexInputLayout::Normal );
 		outputData.inputLayout.push_back( kgx::VertexInputLayout::TextureCoordinate );
+		outputData.inputLayout.push_back( kgx::VertexInputLayout::Normal );
 
 		return true;
 	}
@@ -208,11 +229,12 @@ namespace kgx
 				bumpMap  = (lit("map_bump") | lit("bump")) >> eps[phx::resize(phx::bind(&ObjMatData::bumpMap, _r1), 0)]
 					>> lexeme[*(print - iso8859::space)[addBumpMap]] >> qi::skip(qi::blank)[*qi::print];
 
-				transFilter = "Tf" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjMatData::transFilter, _r1), qi::_1)]];
-				ambClr      = "Ka" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjMatData::ambClr, _r1), qi::_1)]];
-				diffClr     = "Kd" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjMatData::diffClr, _r1), qi::_1)]];
-				specClr     = "Ks" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjMatData::specClr, _r1), qi::_1)]];
-				emmisClr    = "Ke" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjMatData::emmisClr, _r1), qi::_1)]];
+				xmFloat3 = float_ >> float_ >> float_;
+				transFilter = "Tf" >> xmFloat3[phx::bind(&ObjMatData::transFilter, _r1) = qi::_1];
+				ambClr      = "Ka" >> xmFloat3[phx::bind( &ObjMatData::ambClr, _r1 ) = qi::_1];
+				diffClr     = "Kd" >> xmFloat3[phx::bind( &ObjMatData::diffClr, _r1 ) = qi::_1];
+				specClr     = "Ks" >> xmFloat3[phx::bind( &ObjMatData::specClr, _r1 ) = qi::_1];
+				emmisClr    = "Ke" >> xmFloat3[phx::bind( &ObjMatData::emmisClr, _r1 ) = qi::_1];
 
 				material = newmtl(_val) >> *(specPwr(_val) | optDens(_val) | transD(_val) | transTr(_val)
 											 | transFilter(_val) | ambClr(_val) | diffClr(_val) | specClr(_val) | emmisClr(_val)
@@ -223,6 +245,7 @@ namespace kgx
 
 			qi::rule<std::string::const_iterator, std::vector<ObjMatData>(), Skipper> start;
 			qi::rule<std::string::const_iterator, ObjMatData(), Skipper> material;
+			qi::rule<std::string::const_iterator, DirectX::XMFLOAT3(), Skipper> xmFloat3;
 			qi::rule<std::string::const_iterator, void(ObjMatData&), Skipper> specPwr, optDens, transD, transTr;
 			qi::rule<std::string::const_iterator, void(ObjMatData&), Skipper> transFilter, ambClr, diffClr, specClr, emmisClr;
 			qi::rule<std::string::const_iterator, void(ObjMatData&), Skipper> newmtl, ambMap, diffMap, specMap, transMap;
@@ -250,10 +273,10 @@ namespace kgx
 	/**
 	* utility function used for OBJ parsing
 	*/
-	void OBJParser::storeModelData( std::string modelName, ModelData &data,
-										std::map< std::string, std::vector<ModelData> > *sortedModels, std::vector<ModelData*> *tempModels )
+	void OBJParser::storeModelData( std::string modelName, KgModelData &data,
+										std::map< std::string, std::vector<KgModelData> > *sortedModels, std::vector<KgModelData*> *tempModels )
 	{
-		typedef std::map< std::string, std::vector<ModelData> >::iterator modelIt;
+		typedef std::map< std::string, std::vector<KgModelData> >::iterator modelIt;
 		modelIt mIt = sortedModels->find(modelName);
 
 		if ( mIt != sortedModels->end() )
@@ -261,7 +284,7 @@ namespace kgx
 			mIt->second.push_back(data);
 		} else
 		{
-			std::pair<modelIt, bool> res = sortedModels->insert( std::pair< std::string, std::vector<ModelData> >(modelName, std::vector<ModelData>(1, data)) );
+			std::pair<modelIt, bool> res = sortedModels->insert( std::pair< std::string, std::vector<KgModelData> >(modelName, std::vector<KgModelData>(1, data)) );
 			mIt = res.first;
 		}
 
@@ -275,8 +298,8 @@ namespace kgx
 		std::map<UINT, VertexData> vertIdices;
 
 		// these two below are needed to handle duplicate object names
-		std::map< std::string, std::vector<ModelData> > sortedModels;
-		std::vector<ModelData*> tempModels;
+		std::map< std::string, std::vector<KgModelData> > sortedModels;
+		std::vector<KgModelData*> tempModels;
 
 		UINT maxIdx = 0;
 		std::vector<FaceData>::const_iterator i;
@@ -291,7 +314,7 @@ namespace kgx
 					tempModels[tempModels.size() - 1]->indexCount =
 					int( kgData.indices.size() ) - tempModels[tempModels.size() - 1]->startIndex;
 
-				ModelData newModel( i->groupName, i->usemtl, int( kgData.indices.size() ), 0 );
+				KgModelData newModel( i->groupName, i->usemtl, int( kgData.indices.size() ), 0 );
 				storeModelData( i->groupName, newModel, &sortedModels, &tempModels );
 			}
 
@@ -345,14 +368,14 @@ namespace kgx
 			}
 		}
 
-		//calculate index count for the last added ModelData
+		//calculate index count for the last added KgModelData
 		if ( tempModels.size() > 0 )
 		{
 			tempModels[tempModels.size() - 1]->indexCount =
 				int( kgData.indices.size() ) - tempModels[tempModels.size() - 1]->startIndex;
 		} else
 		{
-			ModelData newModel( "", "", 0, int( kgData.indices.size() ) );
+			KgModelData newModel( "", "", 0, int( kgData.indices.size() ) );
 			storeModelData( "", newModel, &sortedModels, &tempModels );
 		}
 
@@ -379,10 +402,10 @@ namespace kgx
 		}
 
 		// assign correct name to each object
-		std::map< std::string, std::vector<ModelData> >::iterator mIt;
+		std::map< std::string, std::vector<KgModelData> >::iterator mIt;
 		for ( mIt = sortedModels.begin(); mIt != sortedModels.end(); ++mIt )
 		{
-			std::vector<ModelData>::iterator i;
+			std::vector<KgModelData>::iterator i;
 			if ( mIt->first.size() > 0 )
 			{
 				if ( mIt->second.size() == 1 )
@@ -418,17 +441,17 @@ namespace kgx
 	}
 
 
-	void OBJParser::convertToMatData( const ObjMatData &objMat, MatData &kgMat )
+	void OBJParser::convertToMatData( const ObjMatData &objMat, KgMatData &kgMat )
 	{
-		kgMat.name         = objMat.name;
+		kgMat.name = objMat.name;
 
 		
 		//TODO: change to Default OBJ shaders
 		kgMat.vertexShader.name = "DefaultVertexShaderVS.cso";
-		kgMat.pixelShader.name  = "DefaultPixelShaderVS.cso";
+		kgMat.pixelShader.name  = "DefaultPixelShaderPS.cso";
 
 		//vertex shader auto variables
-		MatData::ShaderVar var;
+		KgMatData::ShaderVar var;
 		var.name         = "viewMatrix";
 		var.type         = "mat4x4";
 		var.autoBindType = Material::ShaderAutoBindType::CameraViewMatrix;

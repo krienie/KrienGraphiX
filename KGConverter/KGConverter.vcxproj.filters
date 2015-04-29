@@ -32,8 +32,5 @@
     <ClInclude Include="OBJParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser_defines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

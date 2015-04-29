@@ -115,9 +115,6 @@ bool convertFile( _In_ const std::string &filename, _In_ const std::string &file
 	//TODO: vertex layout and mats(maybe)
 	std::cout << "Successfully parsed file " << filename << ".obj" << std::endl;
 
-
-
-
 	// create texture path string
 	/*std::stringstream tPathSS;
 	tPathSS << "textures/" << filename << "/";*/
@@ -127,7 +124,7 @@ bool convertFile( _In_ const std::string &filename, _In_ const std::string &file
 	gen.generate( parserOutput, kgoDataStr );
 
 	std::stringstream ss;
-	ss << outDir << "/" << filename << ".kgobj";
+	ss << outDir << "/" << filename << ".kgo";
 	std::string outputFile = ss.str();
 	std::cout << "Writing data to " << outputFile << "... ";
 	if ( fs::exists( outputFile ) )
