@@ -35,10 +35,12 @@ namespace kgx
 			explicit Material( _In_ ID3D11Device *dxDevice );
 			~Material();
 
+			VertexShader* createVertexShader( const std::string &filename, const VertexInputLayout &layout );
 			VertexShader* createVertexShader( const std::wstring &filename, const VertexInputLayout &layout );
 			//void setHullShader( _In_ HullShader *shader );
 			//void setDomainShader( _In_ DomainShader *shader );
 			//void setGeometryShader( _In_ GeometryShader *shader );
+			PixelShader* createPixelShader( const std::string &filename );
 			PixelShader* createPixelShader( const std::wstring &filename );
 			//TODO: compute shader krijgt een eigen ding, los van een Material
 

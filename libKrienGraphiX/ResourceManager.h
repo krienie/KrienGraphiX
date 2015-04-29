@@ -20,11 +20,10 @@ namespace kgx
 			static void construct( _In_ ID3D11Device *dxDevice );
 			static void destroy();
 
-
 			typedef UINT MeshBufferID;
 			MeshBuffer getBuffer( MeshBufferID id ) const;
 			MeshBufferID addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
-								const VertexInputLayout &inputDescriptor, HRESULT result );
+								const VertexInputLayout &inputDescriptor, HRESULT &result );
 			void releaseBuffer( MeshBufferID id );
 
 			//TODO: probably create a function like createMaterial, so the ResourceManager creates the materials and doesn't claim them

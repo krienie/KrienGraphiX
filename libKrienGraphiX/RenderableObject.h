@@ -19,18 +19,25 @@ namespace kgx
 		public:
 			struct Mesh
 			{
+				Mesh( std::string n = "", UINT sIdx = 0U, UINT idxC = 0U ) : name(n), startIndex(sIdx), indexCount(idxC) {}
+
 				std::string name;
 				UINT startIndex;
 				UINT indexCount;
+
+				inline bool operator< (const Mesh& rhs) const { return startIndex < rhs.startIndex; }
+				inline bool operator==(const Mesh& rhs) const { return startIndex == rhs.startIndex; }
 			};
 
 			struct ObjectContainer
 			{
+				ObjectContainer( const std::vector<Mesh> &me, Material *ma ) : meshes(me), mat(ma) {}
+
 				std::vector<Mesh> meshes;
 				Material *mat;
 			};
 
-			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &materialContainers,
+			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
 			~RenderableObject();
 
@@ -48,7 +55,7 @@ namespace kgx
 			MeshBuffer m_meshBuff;
 			std::vector<ObjectContainer> m_matContainers;
 
-			//TODO: voorlopig heeft deze even een modelMatrix, maar later een aparte parentclass maken voor een movableObject oid
+			//TODO: voorlopig heeft deze even een modelMatrix, maar later een aparte parentclass maken voor een movableObject oid => alleen als dit echt nodig is...
 			DirectX::XMFLOAT4X4 m_modelMatrix;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;

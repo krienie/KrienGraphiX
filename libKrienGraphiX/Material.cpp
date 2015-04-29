@@ -42,6 +42,12 @@ namespace kgx
 		return m_vertShader;
 	}
 
+	VertexShader* Material::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
+	{
+		std::wstring wFilename( filename.begin(), filename.end() );
+		return createVertexShader( wFilename, layout );
+	}
+
 	PixelShader* Material::createPixelShader( const std::wstring &filename )
 	{
 		m_pixShader = new PixelShader( m_dxDev );
@@ -55,6 +61,13 @@ namespace kgx
 
 		return m_pixShader;
 	}
+
+	PixelShader* Material::createPixelShader( const std::string &filename )
+	{
+		std::wstring wFilename( filename.begin(), filename.end() );
+		return createPixelShader( wFilename );
+	}
+
 
 	VertexShader* Material::getVertexShader() const
 	{

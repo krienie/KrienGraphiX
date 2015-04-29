@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-//#include "ConstantBuffer.h"
-
 namespace kgx
 {
 	class ConstantBuffer;
@@ -14,13 +12,6 @@ namespace kgx
 	class Shader
 	{
 		public:
-			/*enum BufferType
-			{
-				CameraBuffer,
-				ObjectBuffer,
-				NumBufferTypes
-			};*/
-
 			bool load( const std::wstring &filename );
 
 			void updateConstantVariable( const std::string &name, _In_ void *dataPtr );

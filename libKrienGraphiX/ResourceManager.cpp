@@ -67,7 +67,7 @@ namespace kgx
 	}
 
 	ResourceManager::MeshBufferID ResourceManager::addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
-																const VertexInputLayout &inputDescriptor, HRESULT result )
+																const VertexInputLayout &inputDescriptor, HRESULT &result )
 	{
 		if ( vertices.size() <= 0 || indices.size() <= 0 )
 		{
@@ -150,7 +150,6 @@ namespace kgx
 			m_meshBuffers.erase(id);
 		}
 	}
-
 
 
 	Material* ResourceManager::getMaterial( MaterialID id ) const

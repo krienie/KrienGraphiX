@@ -39,12 +39,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>..\libKrienGraphiX;$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>..\libKrienGraphiX;$(BOOST_DIR);$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

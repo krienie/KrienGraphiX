@@ -14,8 +14,10 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Defines.h" />
+    <ClInclude Include="KgParser.h" />
     <ClInclude Include="KGXCore.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="parser_defines.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderableObject.h" />
     <ClInclude Include="RenderWindow.h" />
@@ -28,6 +30,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="KgParser.cpp" />
     <ClCompile Include="KGXCore.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="PixelShader.cpp" />
@@ -69,12 +72,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

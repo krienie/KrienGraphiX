@@ -6,9 +6,9 @@
 
 namespace kgx
 {
-	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &materialContainers,
+	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
-		: m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_matContainers(materialContainers), m_topology(meshTopology), m_modelMatrix()
+										: m_dxDev( dxDevice ), m_dxDevCont( 0 ), m_meshBuff( buff ), m_matContainers( objectContainers ), m_topology( meshTopology ), m_modelMatrix()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 
