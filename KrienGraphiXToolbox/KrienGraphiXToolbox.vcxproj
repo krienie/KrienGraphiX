@@ -134,8 +134,11 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FrameListener.h" />
     <ClInclude Include="GeneratedFiles\ui_KrienGraphiXToolbox.h" />
     <ClInclude Include="GeneratedFiles\ui_MaterialEditor.h" />
+    <ClInclude Include="KeyboardListener.h" />
+    <ClInclude Include="MouseListener.h" />
     <CustomBuild Include="MaterialEditor.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing MaterialEditor.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>

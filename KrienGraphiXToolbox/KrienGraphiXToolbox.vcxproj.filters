@@ -99,6 +99,15 @@
     <ClInclude Include="GeneratedFiles\ui_MaterialEditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="MouseListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KrienGraphiXToolbox.rc" />

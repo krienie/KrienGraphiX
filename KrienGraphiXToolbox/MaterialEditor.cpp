@@ -2,13 +2,15 @@
 #include "KGXCore.h"
 #include "MaterialEditor.h"
 
-
-MaterialEditor::MaterialEditor(QWidget *parent)
-	: QMainWindow(parent)
+namespace kgxt
 {
-	ui.setupUi(this);
-}
+	MaterialEditor::MaterialEditor( QWidget *parent )
+		: QMainWindow( parent )
+	{
+		m_ui.setupUi( this );
+	}
 
-MaterialEditor::~MaterialEditor()
-{
+	MaterialEditor::~MaterialEditor()
+	{
+	}
 }

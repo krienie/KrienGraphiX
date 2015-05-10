@@ -1,15 +1,21 @@
 
 #pragma once
 
+#include "MouseListener.h"
 #include "RenderWindow.h"
 
 #include <QWidget>
 
-class KgxRenderWidget : public QWidget
+namespace kgxt
 {
-	Q_OBJECT
-	
-	public slots:
+	class FrameListener;
+	class KeyboardListener;
+
+	class KgxRenderWidget : public QWidget
+	{
+		Q_OBJECT
+
+			public slots:
 		void startRendering();
 
 	public:
@@ -19,19 +25,35 @@ class KgxRenderWidget : public QWidget
 		void initialize();
 		kgx::RenderWindow* getRenderWindow() const;
 
+		void addFrameListener( _In_ FrameListener *listener );
+		void addMouseListener( _In_ MouseListener *listener );
+		void addKeyboardListener( _In_ KeyboardListener *listener );
+
 	protected:
-		QPaintEngine *paintEngine() const;
-		void paintEvent( _In_ QPaintEvent *evt ) { }
-		void resizeEvent( _In_ QResizeEvent *evt );
-		void focusInEvent( _In_ QFocusEvent *evt );
-		/*void mouseMoveEvent( _In_ QMouseEvent *evt );
+		QPaintEngine* paintEngine() const;
+		void paintEvent( _In_ QPaintEvent *evt ) {}
+		void resizeEvent( _In_ QResizeEvent *evt ) {}
+		void focusInEvent( _In_ QFocusEvent *evt ) {}
+		void mouseMoveEvent( _In_ QMouseEvent *evt );
 		void mousePressEvent( _In_ QMouseEvent *evt );
 		void mouseReleaseEvent( _In_ QMouseEvent *evt );
 		void wheelEvent( _In_ QWheelEvent *evt );
 		void keyPressEvent( _In_ QKeyEvent *evt );
-		void keyReleaseEvent( _In_ QKeyEvent *evt );*/
+		void keyReleaseEvent( _In_ QKeyEvent *evt );
 
 	private:
-		bool isInit;
-		kgx::RenderWindow *renderWin;
-};
+		MouseEvent createMouseEvent( _In_ QWheelEvent *qtEvt ) const;
+		MouseEvent createMouseEvent( _In_ QMouseEvent *qtEvt, MouseEvent::ButtonState state ) const;
+
+		bool m_isInit;
+		kgx::RenderWindow *m_renderWin;
+		double m_lastFrameTime;
+		//TODO: change these two below in one vector2
+		float m_prevMousePosX;
+		float m_prevMousePosY;
+
+		std::vector<FrameListener*> m_frameListeners;
+		std::vector<MouseListener*> m_mouseListeners;
+		std::vector<KeyboardListener*> m_keyboardListeners;
+	};
+}

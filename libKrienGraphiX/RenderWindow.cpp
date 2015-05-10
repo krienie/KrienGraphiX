@@ -32,6 +32,7 @@ namespace kgx
 	}
 
 
+	//TODO: maybe merge the create function into the constructor
 	bool RenderWindow::create( HWND windowHandle )
 	{
 		// create m_swapChain descriptor
@@ -114,7 +115,7 @@ namespace kgx
 		rasterDesc.DepthBias			 = 0;
 		rasterDesc.DepthBiasClamp		 = 0.0f;
 		rasterDesc.DepthClipEnable		 = true;
-		rasterDesc.FillMode				 = D3D11_FILL_SOLID;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
+		rasterDesc.FillMode				 = D3D11_FILL_WIREFRAME;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
 		rasterDesc.FrontCounterClockwise = false;
 		rasterDesc.MultisampleEnable	 = false;
 		rasterDesc.ScissorEnable		 = false;

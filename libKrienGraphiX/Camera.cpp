@@ -18,7 +18,7 @@ namespace kgx
 			m_fov(fovY), m_aspectRatio(aspect), m_nearZ(m_nearZ), m_farZ(m_farZ)
 	{
 		// create perspective matrix
-		DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovLH( fovY, aspect, m_nearZ, m_farZ );
+		DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovRH( fovY, aspect, m_nearZ, m_farZ );
 		DirectX::XMStoreFloat4x4( &m_projMatrix, tempPersp );
 
 		std::cout << "--- Perspective Matrix ---" << std::endl
@@ -128,7 +128,7 @@ namespace kgx
 		DirectX::XMVECTORF32 xmEye    = { eye.x, eye.y, eye.z, 0.0f };
 		DirectX::XMVECTORF32 xmTarget = { target_.x, target_.y, target_.z, 0.0f };
 		DirectX::XMVECTORF32 xmUp     = { up.x, up.y, up.z, 0.0f };
-		DirectX::XMMATRIX tempView    =  DirectX::XMMatrixLookAtLH(xmEye, xmTarget, xmUp);
+		DirectX::XMMATRIX tempView    =  DirectX::XMMatrixLookAtRH(xmEye, xmTarget, xmUp);
 		DirectX::XMStoreFloat4x4( &m_viewMatrix, tempView );
 
 		// save eye-, m_target- and up-vectors
@@ -137,11 +137,11 @@ namespace kgx
 		this->m_camUp    = up;
 	}
 
-	/*void Camera::moveForward( float dist )
+	void Camera::moveForward( float dist )
 	{
-		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &mPosition );
-		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &mTarget );
-		DirectX::XMVECTOR dirVect = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
+		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_position );
+		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
+		DirectX::XMVECTOR dirVect    = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
 		dirVect = DirectX::XMVectorScale(dirVect, dist);
 
 		DirectX::XMFLOAT3 dirFloat3;
@@ -162,13 +162,13 @@ namespace kgx
 
 	void Camera::moveRight( float dist )
 	{
-		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &mPosition );
-		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &mTarget );
-		DirectX::XMVECTOR dirVect    = DirectX::XMVectorSubtract(targetVect, eyeVect);
+		DirectX::XMVECTOR eyeVect = DirectX::XMLoadFloat3( &m_position );
+		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
+		DirectX::XMVECTOR dirVect = DirectX::XMVectorSubtract( targetVect, eyeVect );
 
-		DirectX::XMVECTOR upVect   = DirectX::XMLoadFloat3( &mCamUp );
+		DirectX::XMVECTOR upVect    = DirectX::XMLoadFloat3( &m_camUp );
 		DirectX::XMVECTOR rightVect = DirectX::XMVector3Normalize( DirectX::XMVector3Cross( dirVect, upVect ) );
-		rightVect = DirectX::XMVectorScale(rightVect, dist);
+		rightVect = DirectX::XMVectorScale( rightVect, dist );
 
 		DirectX::XMFLOAT3 rightFloat3;
 		DirectX::XMStoreFloat3( &rightFloat3, rightVect );
@@ -179,30 +179,30 @@ namespace kgx
 	void Camera::translate( const DirectX::XMFLOAT3 &deltaPos )
 	{
 
-		DirectX::XMFLOAT3 newPos = DirectX::XMFLOAT3( mPosition.x + deltaPos.x,
-													  mPosition.y + deltaPos.y,
-													  mPosition.z + deltaPos.z );
-		DirectX::XMFLOAT3 newTarget = DirectX::XMFLOAT3( mTarget.x + deltaPos.x,
-													     mTarget.y + deltaPos.y,
-													     mTarget.z + deltaPos.z );
-		lookAt( newPos, newTarget, mCamUp );
+		DirectX::XMFLOAT3 newPos = DirectX::XMFLOAT3( m_position.x + deltaPos.x,
+													  m_position.y + deltaPos.y,
+													  m_position.z + deltaPos.z );
+		DirectX::XMFLOAT3 newTarget = DirectX::XMFLOAT3( m_target.x + deltaPos.x,
+														 m_target.y + deltaPos.y,
+														 m_target.z + deltaPos.z );
+		lookAt( newPos, newTarget, m_camUp );
 	}
 
 	void Camera::rotateUp( float degrees )
 	{
-		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &mCamUp );
-		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &mTarget );
-		DirectX::XMVECTOR eyeVect    =  DirectX::XMLoadFloat3( &mPosition );
+		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
+		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
+		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_position );
 		DirectX::XMVECTOR dirVect    = DirectX::XMVectorSubtract(targetVect, eyeVect);
 
 		DirectX::XMVECTOR rotAxis = DirectX::XMVector3Cross( dirVect, upVect );
 		DirectX::XMMATRIX rotMat  = DirectX::XMMatrixRotationAxis( rotAxis, DirectX::XMConvertToRadians(degrees) );
 
 		DirectX::XMVECTOR newTarget = DirectX::XMVectorAdd( DirectX::XMVector3Transform( dirVect, rotMat ), eyeVect );
-		DirectX::XMStoreFloat3( &mTarget, newTarget );
+		DirectX::XMStoreFloat3( &m_target, newTarget );
 
 
-		lookAt( mPosition, mTarget, mCamUp );
+		lookAt( m_position, m_target, m_camUp );
 	}
 
 	void Camera::rotateDown( float degrees )
@@ -212,9 +212,9 @@ namespace kgx
 
 	void Camera::rotateLeft( float degrees )
 	{
-		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &mCamUp );
-		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &mTarget );
-		DirectX::XMVECTOR eyeVect    =  DirectX::XMLoadFloat3( &mPosition );
+		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
+		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
+		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_position );
 		DirectX::XMVECTOR dirVect    = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
 
 		DirectX::XMVECTOR rightVect = DirectX::XMVector3Cross( dirVect, upVect );
@@ -222,14 +222,14 @@ namespace kgx
 		DirectX::XMMATRIX rotMat    = DirectX::XMMatrixRotationAxis( rotAxis, DirectX::XMConvertToRadians(degrees) );
 
 		DirectX::XMVECTOR newTarget = DirectX::XMVectorAdd( DirectX::XMVector3Transform( dirVect, rotMat ), eyeVect );
-		DirectX::XMStoreFloat3( &mTarget, newTarget );
+		DirectX::XMStoreFloat3( &m_target, newTarget );
 
 
-		lookAt( mPosition, mTarget, mCamUp );
+		lookAt( m_position, m_target, m_camUp );
 	}
 
 	void Camera::rotateRight( float degrees )
 	{
 		rotateLeft(-degrees);
-	}*/
+	}
 }

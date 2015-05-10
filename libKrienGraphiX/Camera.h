@@ -36,16 +36,17 @@ namespace kgx
 
 			void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			//TODO: reactivate these functions
-			/*void moveForward( float dist );
+			void moveForward( float dist );
 			void moveBackward( float dist );
 			void moveLeft( float dist );
 			void moveRight( float dist );
 			void translate( const DirectX::XMFLOAT3 &deltaPos );
 			//TODO: add support for radians and quaternions
+			//void rotate( float degreesX, float degreesY, float degreesZ );
 			void rotateUp( float degrees );
 			void rotateDown( float degrees );
 			void rotateLeft( float degrees );
-			void rotateRight( float degrees );*/
+			void rotateRight( float degrees );
 
 		private:
 			//TODO: add something that can manipulate the rasterizer

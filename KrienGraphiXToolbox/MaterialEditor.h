@@ -5,10 +5,11 @@
 
 #include "ui_MaterialEditor.h"
 
-
-class MaterialEditor : public QMainWindow
+namespace kgxt
 {
-	Q_OBJECT
+	class MaterialEditor : public QMainWindow
+	{
+		Q_OBJECT
 
 	public:
 		explicit MaterialEditor( QWidget *parent = nullptr );
@@ -17,5 +18,6 @@ class MaterialEditor : public QMainWindow
 	private:
 		void setupTestScene();
 
-		Ui::MaterialEditorWindow ui;
-};
+		Ui::MaterialEditorWindow m_ui;
+	};
+}

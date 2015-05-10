@@ -1,69 +1,158 @@
 
+#include <iostream>
+
 #include "KgParser.h"
 
 #include "KGXCore.h"
 #include "Camera.h"
-#include "Material.h"
-#include "VertexShader.h"
-#include "PixelShader.h"
-#include "VertexInputLayout.h"
-#include "ResourceManager.h"
 #include "RenderableObject.h"
 #include "KrienGraphiXToolbox.h"
 
 
-KrienGraphiXToolbox::KrienGraphiXToolbox(QWidget *parent)
-	: QMainWindow(parent), materialEditorWin(nullptr), mainCam(nullptr), defaultScene(nullptr)
+namespace kgxt
 {
-	ui.setupUi(this);
-
-
-	ui.renderWidget1->initialize();
-
-	mainCam      = new kgx::Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, 
-										DirectX::XMFLOAT3(50.0f, 50.0f, 50.0f), DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f) );
-	defaultScene = new kgx::Scene();
-	mainCam->setParentScene(defaultScene);
-
-	ui.renderWidget1->getRenderWindow()->setViewport(mainCam);
-
-	setupTestScene();
-
-	ui.renderWidget1->startRendering();
-
-	QObject::connect( ui.actionMaterial_Editor, &QAction::triggered, this, &KrienGraphiXToolbox::openMaterialEditor );
-}
-
-KrienGraphiXToolbox::~KrienGraphiXToolbox()
-{
-	if ( materialEditorWin )
+	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
+		: QMainWindow(parent), m_materialEditorWin(nullptr), m_mainCam(nullptr), m_defaultScene(nullptr),
+		m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
 	{
-		materialEditorWin->close();
-		delete materialEditorWin;
+		m_ui.setupUi( this );
+
+
+		m_ui.renderWidget1->initialize();
+		m_ui.renderWidget1->addFrameListener( this );
+		m_ui.renderWidget1->addMouseListener( this );
+		m_ui.renderWidget1->addKeyboardListener( this );
+
+		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 3000.0f,
+								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
+		m_defaultScene = new kgx::Scene();
+		m_mainCam->setParentScene( m_defaultScene );
+
+		m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
+
+		setupTestScene();
+
+		m_ui.renderWidget1->startRendering();
+
+		QObject::connect( m_ui.actionMaterial_Editor, &QAction::triggered, this, &KrienGraphiXToolbox::openMaterialEditor );
 	}
 
-	if ( mainCam )
-		delete mainCam;
-	if ( defaultScene )
-		delete defaultScene;
+	KrienGraphiXToolbox::~KrienGraphiXToolbox()
+	{
+		if ( m_materialEditorWin )
+		{
+			m_materialEditorWin->close();
+			delete m_materialEditorWin;
+		}
 
-	kgx::KGXCore::destroy();
-}
+		if ( m_mainCam )
+			delete m_mainCam;
+		if ( m_defaultScene )
+			delete m_defaultScene;
+
+		kgx::KGXCore::destroy();
+	}
 
 
-void KrienGraphiXToolbox::setupTestScene()
-{
-	kgx::RenderableObject *renObj = kgx::KgParser::loadKGO("..\\..\\Assets\\box.kgo");
+	void KrienGraphiXToolbox::setupTestScene()
+	{
+		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\sponzaNoBanner.kgo" );
 
-	// add RenderableObject to scene
-	defaultScene->claimRenderableObject( renObj );
-}
+		// add RenderableObject to scene
+		m_defaultScene->claimRenderableObject( renObj );
+	}
 
 
-void KrienGraphiXToolbox::openMaterialEditor()
-{
-	if ( !materialEditorWin )
-		materialEditorWin = new MaterialEditor(this);
+	void KrienGraphiXToolbox::openMaterialEditor()
+	{
+		if ( !m_materialEditorWin )
+			m_materialEditorWin = new MaterialEditor( this );
 
-	materialEditorWin->show();
+		m_materialEditorWin->show();
+	}
+
+
+	void KrienGraphiXToolbox::frameUpdate( double deltaTime )
+	{
+		float speed = static_cast<float>(500.0 * deltaTime);
+		
+		if ( m_wKeyDown )
+			m_mainCam->moveForward( speed );
+		if ( m_sKeyDown )
+			m_mainCam->moveBackward( speed );
+		if ( m_aKeyDown )
+			m_mainCam->moveLeft( speed );
+		if ( m_dKeyDown )
+			m_mainCam->moveRight( speed );
+	}
+
+
+	//TODO: migrate these input methods to a separate ToolboxScene class or something like that
+	void KrienGraphiXToolbox::mouseMoved( const MouseEvent &evt )
+	{
+		if ( m_leftMouseBtnDown )
+		{
+			m_mainCam->rotateRight( float(-evt.X().rel()) * 0.5f );
+			m_mainCam->rotateUp( float(evt.Y().rel()) * 0.5f );
+		}
+	}
+
+	void KrienGraphiXToolbox::mousePressed( const MouseEvent &evt )
+	{
+		if ( evt.button() == MouseEvent::Button::LeftButton )
+			m_leftMouseBtnDown = true;
+	}
+
+	void KrienGraphiXToolbox::mouseReleased( const MouseEvent &evt )
+	{
+		if ( evt.button() == MouseEvent::Button::LeftButton )
+			m_leftMouseBtnDown = false;
+	}
+
+	void KrienGraphiXToolbox::wheelEvent( const MouseEvent &evt )
+	{
+
+	}
+
+	void KrienGraphiXToolbox::keyPressed( const KeyEvent &evt )
+	{
+		switch ( evt.keyCode() )
+		{
+			case KeyEvent::Key::Key_W:
+				m_wKeyDown = true;
+				break;
+			case KeyEvent::Key::Key_S:
+				m_sKeyDown = true;
+				break;
+			case KeyEvent::Key::Key_A:
+				m_aKeyDown = true;
+				break;
+			case KeyEvent::Key::Key_D:
+				m_dKeyDown = true;
+				break;
+			default:
+				break;
+		}
+	}
+
+	void KrienGraphiXToolbox::keyReleased( const KeyEvent &evt )
+	{
+		switch ( evt.keyCode() )
+		{
+			case KeyEvent::Key::Key_W:
+				m_wKeyDown = false;
+				break;
+			case KeyEvent::Key::Key_S:
+				m_sKeyDown = false;
+				break;
+			case KeyEvent::Key::Key_A:
+				m_aKeyDown = false;
+				break;
+			case KeyEvent::Key::Key_D:
+				m_dKeyDown = false;
+				break;
+			default:
+				break;
+		}
+	}
 }
