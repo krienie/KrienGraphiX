@@ -97,7 +97,10 @@ namespace kgx
 			objMatData.diffClr = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f );
 
 			// set default material
-			objData.faces[0].usemtl = objMatData.name;
+			std::vector<FaceData>::iterator it;
+			for ( it = objData.faces.begin(); it != objData.faces.end(); ++it )
+				if ( it->groupName.size() > 0 )
+					it->usemtl = objMatData.name;
 		}
 
 
