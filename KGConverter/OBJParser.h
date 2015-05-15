@@ -17,9 +17,9 @@ namespace kgx
 
 				std::string groupName;
 				std::string usemtl;
-				std::vector<UINT> posIdx;
-				std::vector<UINT> normIdx;
-				std::vector<UINT> texIdx;
+				std::vector<long int> posIdx;
+				std::vector<long int> normIdx;
+				std::vector<long int> texIdx;
 			};
 
 			struct ObjParseData

@@ -96,7 +96,10 @@ namespace kgx
 			//TODO: generate random color to set as default value
 			objMatData.diffClr = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f );
 
-			// set default material
+			// set default material for the first object
+			if ( objData.faces.size() > 0 )
+				objData.faces[0].usemtl = objMatData.name;
+			// set default material for the other objects, if there are some
 			std::vector<FaceData>::iterator it;
 			for ( it = objData.faces.begin(); it != objData.faces.end(); ++it )
 				if ( it->groupName.size() > 0 )
@@ -161,9 +164,9 @@ namespace kgx
 				texture = "vt" >> repeat(3)[double_[phx::push_back(phx::bind(&ObjParseData::texCoords, _r1), qi::_1)]
 					| eps[phx::push_back(phx::bind(&ObjParseData::texCoords, _r1), 0.0f)]];
 
-				auto addPosIdx  = phx::push_back(phx::bind(&FaceData::posIdx, _r1), qi::_1 - 1);		//OBJ indices start at 1 and we need to start at 0, so idx - 1
-				auto addTexIdx  = phx::push_back(phx::bind(&FaceData::texIdx, _r1), qi::_1 - 1);
-				auto addNormIdx = phx::push_back(phx::bind(&FaceData::normIdx, _r1), qi::_1 - 1);
+				auto addPosIdx  = phx::push_back(phx::bind(&FaceData::posIdx, _r1), qi::_1);
+				auto addTexIdx  = phx::push_back(phx::bind(&FaceData::texIdx, _r1), qi::_1);
+				auto addNormIdx = phx::push_back(phx::bind(&FaceData::normIdx, _r1), qi::_1);
 
 				auto setGroupName = phx::push_back(phx::bind(&FaceData::groupName, _r1), qi::_1);
 				auto setUsemtl    = phx::push_back(phx::bind(&FaceData::usemtl, _r1), qi::_1);
@@ -215,7 +218,7 @@ namespace kgx
 				specPwr = "Ns" >> double_[phx::bind(&ObjMatData::specPwr, _r1) = qi::_1];
 				optDens = "Ni" >> double_[phx::bind(&ObjMatData::optDens, _r1) = qi::_1];
 				transD  = 'd'  >> double_[phx::bind(&ObjMatData::trans, _r1) = qi::_1];
-				transTr = "Tr" >> double_[phx::bind(&ObjMatData::trans, _r1) = 1.0f - qi::_1];
+				transTr = "Tr" >> *double_[phx::bind(&ObjMatData::trans, _r1) = 1.0f - qi::_1];
 
 				auto addNewmtl   = phx::push_back(phx::bind(&ObjMatData::name, _r1), qi::_1);
 				auto addAmbMap   = phx::push_back(phx::bind(&ObjMatData::ambMap, _r1), qi::_1);
@@ -321,11 +324,11 @@ namespace kgx
 				storeModelData( i->groupName, newModel, &sortedModels, &tempModels );
 			}
 
-			std::vector<UINT>::const_iterator posIt = i->posIdx.cbegin();
-			std::vector<UINT>::const_iterator texIt = i->texIdx.cbegin();
-			std::vector<UINT>::const_iterator normIt = i->normIdx.cbegin();
+			std::vector<long int>::const_iterator posIt = i->posIdx.cbegin();
+			std::vector<long int>::const_iterator texIt = i->texIdx.cbegin();
+			std::vector<long int>::const_iterator normIt = i->normIdx.cbegin();
 
-			VertexData firstVert( *posIt, *normIt, *texIt );
+			VertexData firstVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );				//OBJ indices start at 1 and we need to start at 0, so idx - 1
 			UINT firstIdx = maxIdx++;
 			verts.insert( verts.end(), std::pair<VertexData, UINT>( firstVert, firstIdx ) );
 			vertIdices.insert( vertIdices.end(), std::pair<UINT, VertexData>( firstIdx, firstVert ) );
@@ -337,7 +340,7 @@ namespace kgx
 			{
 				// add triangle vertices to unique-vertex list
 				UINT endVertIdx = 0;
-				VertexData endVert( *posIt, *normIt, *texIt );
+				VertexData endVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );
 				std::map<VertexData, UINT>::iterator vertIt;
 				vertIt = verts.find( endVert );
 				if ( vertIt == verts.end() )
@@ -352,7 +355,7 @@ namespace kgx
 
 				UINT midVertIdx = 0;
 				posIt++; normIt++; texIt++;
-				VertexData midVert( *posIt, *normIt, *texIt );
+				VertexData midVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );
 				vertIt = verts.find( midVert );
 				if ( vertIt == verts.end() )
 				{
