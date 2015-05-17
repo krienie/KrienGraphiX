@@ -4,12 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-//#define FUSION_MAX_VECTOR_SIZE 20
-//#define BOOST_SPIRIT_USE_PHOENIX_V3
-//#include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/qi.hpp>
-//#include <boost/spirit/include/karma.hpp>
-//#include <boost/spirit/include/phoenix.hpp>
 #include <boost/filesystem.hpp>
 
 #include "KGObjectGenerator.h"

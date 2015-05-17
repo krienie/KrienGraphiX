@@ -3,11 +3,13 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include "MaterialEditor.h"
-#include "Scene.h"
+
+#include <Scene.h>
+
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"
+#include "MaterialEditor.h"
 #include "ui_KrienGraphiXToolbox.h"
 
 namespace kgxt

@@ -4,7 +4,7 @@
 #include <DirectXMath.h>
 #include <map>
 
-#include "parser_defines.h"
+#include <parser_defines.h>
 
 namespace kgx
 {

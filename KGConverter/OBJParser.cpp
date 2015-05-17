@@ -230,7 +230,7 @@ namespace kgx
 				newmtl   = "newmtl" >> qi::skip(qi::blank)[*qi::print[addNewmtl]];
 				ambMap   = "map_Ka" >> qi::skip(qi::blank)[*qi::print[addAmbMap]];
 				diffMap  = "map_Kd" >> qi::skip(qi::blank)[*qi::print[addDiffMap]];
-				specMap  = "map_Ks" >> qi::skip(qi::blank)[*qi::print[addSpecMap]];
+				specMap  = (lit("map_Ks") | lit("map_refl")) >> qi::skip(qi::blank)[*qi::print[addSpecMap]];
 				transMap = "map_d" >> qi::skip(qi::blank)[*qi::print[addTransMap]];
 				bumpMap  = (lit("map_bump") | lit("bump")) >> eps[phx::resize(phx::bind(&ObjMatData::bumpMap, _r1), 0)]
 					>> lexeme[*(print - iso8859::space)[addBumpMap]] >> qi::skip(qi::blank)[*qi::print];

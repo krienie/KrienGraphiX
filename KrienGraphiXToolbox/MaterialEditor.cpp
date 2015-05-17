@@ -1,5 +1,6 @@
 
-#include "KGXCore.h"
+#include <KGXCore.h>
+
 #include "MaterialEditor.h"
 
 namespace kgxt

@@ -1,6 +1,7 @@
 
-#include "KrienGraphiXToolbox.h"
 #include <QtWidgets/QApplication>
+
+#include "KrienGraphiXToolbox.h"
 
 int main(int argc, char *argv[])
 {

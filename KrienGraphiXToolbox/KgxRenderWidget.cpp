@@ -1,9 +1,9 @@
 
 #include <Windows.h>
-
 #include <QTimer>
 
-#include "KGXCore.h"
+#include <KGXCore.h>
+
 #include "FrameListener.h"
 #include "KeyboardListener.h"
 #include "KgxRenderWidget.h"

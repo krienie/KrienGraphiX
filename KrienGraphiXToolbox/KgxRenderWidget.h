@@ -1,10 +1,11 @@
 
 #pragma once
 
-#include "MouseListener.h"
-#include "RenderWindow.h"
-
 #include <QWidget>
+
+#include <RenderWindow.h>
+
+#include "MouseListener.h"
 
 namespace kgxt
 {

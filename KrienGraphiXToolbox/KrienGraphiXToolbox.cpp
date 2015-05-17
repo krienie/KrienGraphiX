@@ -1,11 +1,11 @@
 
 #include <iostream>
 
-#include "KgParser.h"
+#include <KgParser.h>
+#include <KGXCore.h>
+#include <Camera.h>
+#include <RenderableObject.h>
 
-#include "KGXCore.h"
-#include "Camera.h"
-#include "RenderableObject.h"
 #include "KrienGraphiXToolbox.h"
 
 
@@ -24,7 +24,7 @@ namespace kgxt
 		m_ui.renderWidget1->addKeyboardListener( this );
 
 		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 3000.0f,
-								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
+								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 50.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 		m_defaultScene = new kgx::Scene();
 		m_mainCam->setParentScene( m_defaultScene );
 
@@ -56,7 +56,7 @@ namespace kgxt
 
 	void KrienGraphiXToolbox::setupTestScene()
 	{
-		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\sponzaNoBanner.kgo" );
+		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\dragon.kgo" );
 
 		// add RenderableObject to scene
 		m_defaultScene->claimRenderableObject( renObj );

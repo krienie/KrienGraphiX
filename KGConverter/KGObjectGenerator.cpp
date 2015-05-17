@@ -11,7 +11,8 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <sstream>
 
-#include "Material.h"
+#include <Material.h>
+
 #include "KGObjectGenerator.h"
 
 
