@@ -2,10 +2,10 @@
 #pragma once
 
 #include <d3d11.h>
-#include <DirectXMath.h>
 #include <vector>
 
 #include "Defines.h"
+#include "MovableObject.h"
 
 
 namespace kgx
@@ -14,7 +14,7 @@ namespace kgx
 	class Material;
 
 	//TODO: maybe rename this class to something more suitable => One RenderableObject can contain more than one object to render..
-	class RenderableObject
+	class RenderableObject : public MovableObject
 	{
 		public:
 			struct Mesh
@@ -41,7 +41,6 @@ namespace kgx
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
 			~RenderableObject();
 
-			DirectX::XMFLOAT4X4 getModelMatrix() const;
 			void draw( _In_ Camera *renderCam );
 
 		private:
@@ -54,9 +53,6 @@ namespace kgx
 
 			MeshBuffer m_meshBuff;
 			std::vector<ObjectContainer> m_matContainers;
-
-			//TODO: voorlopig heeft deze even een modelMatrix, maar later een aparte parentclass maken voor een movableObject oid => alleen als dit echt nodig is...
-			DirectX::XMFLOAT4X4 m_modelMatrix;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;
 	};
