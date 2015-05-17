@@ -1,6 +1,4 @@
 
-//#define Version 0.3
-
 #include <sstream>
 #include <iostream>
 
