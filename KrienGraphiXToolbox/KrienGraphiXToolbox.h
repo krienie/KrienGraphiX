@@ -22,7 +22,7 @@ namespace kgxt
 		void openMaterialEditor();
 
 	public:
-		explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
+		explicit KrienGraphiXToolbox( const std::string &kgoScene = "", QWidget *parent = nullptr );
 		~KrienGraphiXToolbox();
 
 		void frameUpdate( double deltaTime );

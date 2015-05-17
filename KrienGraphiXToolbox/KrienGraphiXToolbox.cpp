@@ -11,7 +11,7 @@
 
 namespace kgxt
 {
-	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
+	KrienGraphiXToolbox::KrienGraphiXToolbox( const std::string &kgoScene, QWidget *parent )
 		: QMainWindow(parent), m_materialEditorWin(nullptr), m_mainCam(nullptr), m_defaultScene(nullptr),
 		m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
 	{
@@ -30,7 +30,15 @@ namespace kgxt
 
 		m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
 
-		setupTestScene();
+
+		if ( kgoScene.size() > 0 )
+		{
+			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
+			//renObj->scale( 50.0f );
+
+			// add RenderableObject to scene
+			m_defaultScene->claimRenderableObject( renObj );
+		}
 
 		m_ui.renderWidget1->startRendering();
 
@@ -56,11 +64,7 @@ namespace kgxt
 
 	void KrienGraphiXToolbox::setupTestScene()
 	{
-		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\sponzaNoBanner.kgo" );
-		//renObj->scale( 50.0f );
 
-		// add RenderableObject to scene
-		m_defaultScene->claimRenderableObject( renObj );
 	}
 
 
