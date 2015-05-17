@@ -17,6 +17,7 @@
     <ClInclude Include="KgParser.h" />
     <ClInclude Include="KGXCore.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MovableObject.h" />
     <ClInclude Include="parser_defines.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderableObject.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="KgParser.cpp" />
     <ClCompile Include="KGXCore.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
     <ClCompile Include="RenderWindow.cpp" />

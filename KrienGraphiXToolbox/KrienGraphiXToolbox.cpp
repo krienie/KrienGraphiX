@@ -56,7 +56,8 @@ namespace kgxt
 
 	void KrienGraphiXToolbox::setupTestScene()
 	{
-		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\dragon.kgo" );
+		kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( "..\\..\\Assets\\sponzaNoBanner.kgo" );
+		//renObj->scale( 50.0f );
 
 		// add RenderableObject to scene
 		m_defaultScene->claimRenderableObject( renObj );

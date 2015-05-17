@@ -66,6 +66,9 @@
     <ClInclude Include="parser_defines.h">
       <Filter>Header Files\Parsers</Filter>
     </ClInclude>
+    <ClInclude Include="MovableObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="KgParser.cpp">
       <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="MovableObject.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
