@@ -23,7 +23,11 @@ namespace kgxt
 		m_ui.renderWidget1->addMouseListener( this );
 		m_ui.renderWidget1->addKeyboardListener( this );
 
-		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 3000.0f,
+
+		QRect widgetGeom = m_ui.renderWidget1->geometry();
+		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
+
+		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.001f, 3000.0f,
 								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 50.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 		m_defaultScene = new kgx::Scene();
 		m_mainCam->setParentScene( m_defaultScene );
@@ -34,7 +38,6 @@ namespace kgxt
 		if ( kgoScene.size() > 0 )
 		{
 			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
-			//renObj->scale( 50.0f );
 
 			// add RenderableObject to scene
 			m_defaultScene->claimRenderableObject( renObj );
