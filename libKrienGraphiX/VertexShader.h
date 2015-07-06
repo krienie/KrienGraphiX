@@ -4,11 +4,11 @@
 #include <DirectXMath.h>
 
 #include "VertexInputLayout.h"
-#include "Shader.h"
+#include "ShaderBase.h"
 
 namespace kgx
 {
-	class VertexShader : public Shader
+	class VertexShader : public ShaderBase
 	{
 		public:
 			VertexShader( _In_ ID3D11Device *dxDev, const VertexInputLayout &layout );

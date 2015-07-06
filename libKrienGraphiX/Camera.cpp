@@ -51,16 +51,19 @@ namespace kgx
 
 	Camera& Camera::operator=( const Camera &rhs )
 	{
-		m_parentScene = rhs.m_parentScene;
-		m_projMatrix  = rhs.m_projMatrix;
-		m_viewMatrix  = rhs.m_viewMatrix;
-		m_position    = rhs.m_position;
-		m_target      = rhs.m_target;
-		m_camUp       = rhs.m_camUp;
-		m_fov         = rhs.m_fov;
-		m_aspectRatio = rhs.m_aspectRatio;
-		m_nearZ       = rhs.m_nearZ;
-		m_farZ        = rhs.m_farZ;
+		if ( this != &rhs )
+		{
+			m_parentScene = rhs.m_parentScene;
+			m_projMatrix  = rhs.m_projMatrix;
+			m_viewMatrix  = rhs.m_viewMatrix;
+			m_position    = rhs.m_position;
+			m_target      = rhs.m_target;
+			m_camUp       = rhs.m_camUp;
+			m_fov         = rhs.m_fov;
+			m_aspectRatio = rhs.m_aspectRatio;
+			m_nearZ       = rhs.m_nearZ;
+			m_farZ        = rhs.m_farZ;
+		}
 
 		return *this;
 	}

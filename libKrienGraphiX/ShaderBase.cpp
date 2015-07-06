@@ -8,19 +8,19 @@
 #include <d3dcompiler.h>
 
 #include "ConstantBuffer.h"
-#include "Shader.h"
+#include "ShaderBase.h"
 
 
 namespace kgx
 {
-	Shader::Shader( _In_ ID3D11Device *dxDevice )
+	ShaderBase::ShaderBase( _In_ ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
 
-	Shader::~Shader()
+	ShaderBase::~ShaderBase()
 	{
 		std::vector<ConstantBuffer*>::iterator it;
 		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
@@ -31,7 +31,7 @@ namespace kgx
 	}
 
 
-	bool Shader::load( const std::wstring &filename )
+	bool ShaderBase::load( const std::wstring &filename )
 	{
 		//load shader source
 		ID3DBlob *shaderSource;
@@ -65,8 +65,6 @@ namespace kgx
 			D3D11_SHADER_BUFFER_DESC shaderBuffDesc;
 			constBuffReflection->GetDesc( &shaderBuffDesc );
 
-			std::cout << "Buffer " << shaderBuffDesc.Name << " has " << shaderBuffDesc.Variables << " member variables." << std::endl;
-
 			ConstantBuffer *cBuff = new ConstantBuffer(m_dxDev);
 			cBuff->create( shaderBuffDesc.Size );
 			for ( UINT j = 0U; j < shaderBuffDesc.Variables; ++j )
@@ -76,8 +74,6 @@ namespace kgx
 				variableRefl->GetDesc( &shaderVarDesc );
 
 				cBuff->addVariableDefinition( shaderVarDesc.Name, shaderVarDesc.StartOffset, shaderVarDesc.Size );
-
-				std::cout << "Variable " << shaderVarDesc.Name << std::endl;
 			}
 
 			m_constBuffers.push_back( cBuff );
@@ -90,7 +86,7 @@ namespace kgx
 	}
 
 
-	void Shader::updateConstantVariable( const std::string &name, _In_ void *dataPtr )
+	void ShaderBase::updateConstantVariable( const std::string &name, _In_ void *dataPtr )
 	{
 		std::vector<ConstantBuffer*>::iterator it;
 		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
@@ -99,6 +95,6 @@ namespace kgx
 				return;
 		}
 
-		std::cout << "Warning (Shader::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
+		std::cout << "Warning (ShaderBase::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
 	}
 }

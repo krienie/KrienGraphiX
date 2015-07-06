@@ -9,7 +9,7 @@ namespace kgx
 {
 	class ConstantBuffer;
 
-	class Shader
+	class ShaderBase
 	{
 		public:
 			bool load( const std::wstring &filename );
@@ -18,8 +18,8 @@ namespace kgx
 			virtual void activate() = 0;
 
 		protected:
-			explicit Shader( _In_ ID3D11Device *dxDevice );
-			virtual ~Shader();
+			explicit ShaderBase( _In_ ID3D11Device *dxDevice );
+			virtual ~ShaderBase();
 
 			virtual HRESULT build( _In_ ID3DBlob *shaderSource ) = 0;
 
@@ -30,7 +30,7 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			Shader( const Shader& );
-			Shader& operator=( const Shader& );
+			ShaderBase( const ShaderBase& );
+			ShaderBase& operator=(const ShaderBase&);
 	};
 }

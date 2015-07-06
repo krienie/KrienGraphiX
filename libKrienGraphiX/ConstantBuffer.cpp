@@ -38,24 +38,26 @@ namespace kgx
 			m_dxDevCont->Release();
 	}
 
-
 	ConstantBuffer& ConstantBuffer::operator= ( const ConstantBuffer &rhs )
 	{
-		m_dxDev             = rhs.m_dxDev;
-		m_dxDevCont         = rhs.m_dxDevCont;
-		m_dxBuffer          = rhs.m_dxBuffer;
-		m_bufferElementSize = rhs.m_bufferElementSize;
-		m_dataChanged       = rhs.m_dataChanged;
-		m_variables         = rhs.m_variables;
-
-		if ( m_dxBuffer )
-			m_dxBuffer->AddRef();
-		if ( m_dxDevCont )
-			m_dxDevCont->AddRef();
-		if ( rhs.m_rawData )
+		if ( this != &rhs )
 		{
-			m_rawData = new UCHAR[m_bufferElementSize];
-			memcpy(m_rawData, rhs.m_rawData, sizeof(UCHAR) * m_bufferElementSize);
+			m_dxDev             = rhs.m_dxDev;
+			m_dxDevCont         = rhs.m_dxDevCont;
+			m_dxBuffer          = rhs.m_dxBuffer;
+			m_bufferElementSize = rhs.m_bufferElementSize;
+			m_dataChanged       = rhs.m_dataChanged;
+			m_variables         = rhs.m_variables;
+
+			if ( m_dxBuffer )
+				m_dxBuffer->AddRef();
+			if ( m_dxDevCont )
+				m_dxDevCont->AddRef();
+			if ( rhs.m_rawData )
+			{
+				m_rawData = new UCHAR[m_bufferElementSize];
+				memcpy( m_rawData, rhs.m_rawData, sizeof( UCHAR ) * m_bufferElementSize );
+			}
 		}
 
 		return *this;

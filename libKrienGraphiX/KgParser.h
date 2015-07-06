@@ -30,6 +30,6 @@ namespace kgx
 																	std::vector<KgModelData> &models,
 																	std::map<std::string, KgMatData> &materials );
 
-			static void setShaderVariables( Material *material, Shader *sh, const KgMatData::ShaderDef &shDef );
+			static void setShaderVariables( Material *material, ShaderBase *sh, const KgMatData::ShaderDef &shDef );
 	};
 }

@@ -24,7 +24,7 @@
     <ClInclude Include="RenderWindow.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderBase.h" />
     <ClInclude Include="VertexInputLayout.h" />
     <ClInclude Include="VertexShader.h" />
   </ItemGroup>
@@ -40,7 +40,7 @@
     <ClCompile Include="RenderWindow.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderBase.cpp" />
     <ClCompile Include="VertexInputLayout.cpp" />
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>

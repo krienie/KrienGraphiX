@@ -92,11 +92,11 @@ namespace kgx
 	}
 
 
-	void Material::addAutoShaderVar( _In_ Shader *shader, const std::string &varName, ShaderAutoBindType varType )
+	void Material::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
 		// get auto variable list or create one if not already present
-		std::pair< std::map< Shader*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars; 
-		shaderVars = m_constVarLinks.insert( std::pair< Shader*, std::vector<AutoShaderVar> >(shader, std::vector<AutoShaderVar>()) );
+		std::pair< std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars;
+		shaderVars = m_constVarLinks.insert( std::pair< ShaderBase*, std::vector<AutoShaderVar> >( shader, std::vector<AutoShaderVar>() ) );
 
 		// add shader var to list
 		shaderVars.first->second.push_back( AutoShaderVar(varName, varType) );
@@ -105,7 +105,7 @@ namespace kgx
 
 	void Material::activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj )
 	{
-		std::map< Shader*, std::vector<AutoShaderVar> >::iterator shaderIt;
+		std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator shaderIt;
 		std::vector<AutoShaderVar>::iterator varIt;
 
 		// bind shaders to pipeline
@@ -133,7 +133,7 @@ namespace kgx
 
 
 	void Material::updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
-											_In_ Shader *shader, AutoShaderVar shaderVar )
+										_In_ ShaderBase *shader, AutoShaderVar shaderVar )
 	{
 		float tempFloat = 0.0f;
 		DirectX::XMFLOAT4X4 tempFloat4x4;

@@ -14,7 +14,7 @@ namespace kgx
 	{
 		public:
 			explicit ConstantBuffer( _In_ ID3D11Device *dxDevice );
-			explicit ConstantBuffer(const ConstantBuffer &other);
+			explicit ConstantBuffer( const ConstantBuffer &other );
 			~ConstantBuffer();
 
 			//TODO: test copy-constructor and assignment-operator
@@ -37,6 +37,11 @@ namespace kgx
 
 				UINT offset;
 				UINT size;
+
+				bool operator==( const VarPosition &rhs ) const
+				{
+					return offset == rhs.offset && size == rhs.size;
+				}
 			};
 
 			ID3D11Device *m_dxDev;
@@ -46,7 +51,6 @@ namespace kgx
 
 			bool m_dataChanged;
 			std::map<std::string, VarPosition> m_variables;
-			//std::vector<void*> m_rawData;
 			UCHAR *m_rawData;
 
 	};

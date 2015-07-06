@@ -27,12 +27,15 @@ namespace kgx
 
 	VertexInputLayout& VertexInputLayout::operator=( const VertexInputLayout &other )
 	{
-		this->m_inputDescriptor = other.m_inputDescriptor;
-		this->m_dxLayout        = other.m_dxLayout;
-		this->m_bufferStride    = other.m_bufferStride;
+		if ( this != &other )
+		{
+			this->m_inputDescriptor = other.m_inputDescriptor;
+			this->m_dxLayout        = other.m_dxLayout;
+			this->m_bufferStride    = other.m_bufferStride;
 
-		if ( this->m_dxLayout )
-			this->m_dxLayout->AddRef();
+			if ( this->m_dxLayout )
+				this->m_dxLayout->AddRef();
+		}
 
 		return *this;
 	}

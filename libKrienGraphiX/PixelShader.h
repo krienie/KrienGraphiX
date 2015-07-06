@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include "Shader.h"
+#include "ShaderBase.h"
 
 namespace kgx
 {
-	class PixelShader : public Shader
+	class PixelShader : public ShaderBase
 	{
 		public:
 			explicit PixelShader( _In_ ID3D11Device *dxDev );

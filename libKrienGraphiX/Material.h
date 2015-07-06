@@ -11,7 +11,7 @@ namespace kgx
 	class Camera;
 	class RenderableObject;
 	class VertexInputLayout;
-	class Shader;
+	class ShaderBase;
 	class VertexShader;
 	class PixelShader;
 
@@ -51,7 +51,7 @@ namespace kgx
 			void addTexture( _In_ ID3D11ShaderResourceView* texView, _In_ ID3D11Resource* texture );
 			void setSampler( _In_ ID3D11SamplerState *samp );
 
-			void addAutoShaderVar(_In_ Shader *shader, const std::string &varName, ShaderAutoBindType varType);
+			void addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 
 			void activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj );
 
@@ -69,7 +69,7 @@ namespace kgx
 			};
 
 			void updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
-										_In_ Shader *shader, AutoShaderVar shaderVar );
+									  _In_ ShaderBase *shader, AutoShaderVar shaderVar );
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
@@ -83,6 +83,6 @@ namespace kgx
 			std::vector<ID3D11Resource*> m_texData;
 			ID3D11SamplerState *m_sampler;
 
-			std::map< Shader*, std::vector<AutoShaderVar> > m_constVarLinks;
+			std::map< ShaderBase*, std::vector<AutoShaderVar> > m_constVarLinks;
 	};
 }

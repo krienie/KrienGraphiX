@@ -238,7 +238,7 @@ namespace kgx
 		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, objContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	}
 
-	void KgParser::setShaderVariables( Material *material, Shader *sh, const KgMatData::ShaderDef &shDef )
+	void KgParser::setShaderVariables( Material *material, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
 	{
 		std::vector<KgMatData::ShaderVar>::const_iterator it;
 		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )

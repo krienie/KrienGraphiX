@@ -5,7 +5,7 @@
 namespace kgx
 {
 	VertexShader::VertexShader( _In_ ID3D11Device *dxDev, const VertexInputLayout &layout )
-		: Shader( dxDev ), m_shaderSource(nullptr), m_vertShader(nullptr), m_inputLayout(layout)
+		: ShaderBase( dxDev ), m_shaderSource( nullptr ), m_vertShader( nullptr ), m_inputLayout( layout )
 	{
 	}
 
