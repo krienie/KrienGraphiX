@@ -27,6 +27,7 @@ namespace kgx
 			ID3D11DeviceContext *m_dxDevCont;
 
 			std::vector<ConstantBuffer*> m_constBuffers;
+			std::vector<ID3D11Buffer*> m_dxConstBuffers;		// used for setting all the constant buffers in one API call
 
 		private:
 			// no copying allowed

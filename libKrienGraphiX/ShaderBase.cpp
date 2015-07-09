@@ -14,7 +14,7 @@
 namespace kgx
 {
 	ShaderBase::ShaderBase( _In_ ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers()
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers(), m_dxConstBuffers()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -77,6 +77,7 @@ namespace kgx
 			}
 
 			m_constBuffers.push_back( cBuff );
+			m_dxConstBuffers.push_back( cBuff->getDxBufferPtr() );
 		}
 
 		reflector->Release();
