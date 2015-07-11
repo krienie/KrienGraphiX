@@ -32,8 +32,12 @@ namespace kgx
 				ObjectModelMatrix
 			};
 
-			explicit Material( _In_ ID3D11Device *dxDevice );
+			typedef UINT MaterialID;
+
+			Material( _In_ ID3D11Device *dxDevice, MaterialID id );
 			~Material();
+
+			MaterialID getID() const;
 
 			VertexShader* createVertexShader( const std::string &filename, const VertexInputLayout &layout );
 			VertexShader* createVertexShader( const std::wstring &filename, const VertexInputLayout &layout );
@@ -42,9 +46,8 @@ namespace kgx
 			//void setGeometryShader( _In_ GeometryShader *shader );
 			PixelShader* createPixelShader( const std::string &filename );
 			PixelShader* createPixelShader( const std::wstring &filename );
-			//TODO: compute shader krijgt een eigen ding, los van een Material
+			//TODO: add support for other shader types, except for compute-shaders => it will get its own thing, separate from Material
 
-			//TODO: add getters for the shaders
 			VertexShader* getVertexShader() const;
 			PixelShader* getPixelShader() const;
 
@@ -73,6 +76,8 @@ namespace kgx
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
+
+			MaterialID m_matID;
 
 			// shaders
 			VertexShader *m_vertShader;

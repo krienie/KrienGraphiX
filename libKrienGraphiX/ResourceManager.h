@@ -6,13 +6,11 @@
 #include <vector>
 
 #include "Defines.h"
-//#include "Material.h"
+#include "Material.h"
 
 
 namespace kgx
 {
-	class Material;
-
 	class ResourceManager
 	{
 		public:
@@ -26,11 +24,9 @@ namespace kgx
 								const VertexInputLayout &inputDescriptor, HRESULT &result );
 			void releaseBuffer( MeshBufferID id );
 
-			//TODO: probably create a function like createMaterial, so the ResourceManager creates the materials and doesn't claim them
-			typedef UINT MaterialID;
-			Material* getMaterial( MaterialID id ) const;
-			MaterialID claimMaterial( _In_ Material *mat );
-			void releaseMaterial( MaterialID id );
+			Material* getMaterial( Material::MaterialID id ) const;
+			Material* createMaterial();
+			void releaseMaterial( Material::MaterialID id );
 
 
 		private:
@@ -47,7 +43,7 @@ namespace kgx
 			
 			MeshBufferID m_nextBufferID;
 			std::map<MeshBufferID, MeshBuffer> m_meshBuffers;
-			MaterialID m_nextMaterialID;
-			std::map<MaterialID, Material*> m_materials;
+			Material::MaterialID m_nextMaterialID;
+			std::map<Material::MaterialID, Material*> m_materials;
 	};
 }

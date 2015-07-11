@@ -186,7 +186,7 @@ namespace kgx
 		std::map<std::string, KgMatData>::iterator matIt;
 		for ( matIt = materials.begin(); matIt != materials.end(); ++matIt )
 		{
-			Material *material = new Material( KGXCore::getInst()->getDxDevicePtr() );
+			Material *material = ResourceManager::getInst()->createMaterial();
 
 			VertexShader *vertShader = material->createVertexShader( matIt->second.vertexShader.name, vertLayout );
 			setShaderVariables( material, vertShader, matIt->second.vertexShader );
@@ -195,8 +195,6 @@ namespace kgx
 
 			PixelShader *pixShader = material->createPixelShader( matIt->second.pixelShader.name );
 			setShaderVariables( material, pixShader, matIt->second.pixelShader );
-
-			ResourceManager::getInst()->claimMaterial( material );
 
 			materialPtrMap.insert( std::pair<std::string, Material*>( matIt->first, material ) );
 		}

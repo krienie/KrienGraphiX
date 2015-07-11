@@ -48,7 +48,7 @@ namespace kgx
 		}
 
 		// release all material
-		std::map<MaterialID, Material*>::iterator mIt;
+		std::map<Material::MaterialID, Material*>::iterator mIt;
 		for ( mIt = m_materials.begin(); mIt != m_materials.end(); ++mIt )
 			delete mIt->second;
 	}
@@ -152,9 +152,9 @@ namespace kgx
 	}
 
 
-	Material* ResourceManager::getMaterial( MaterialID id ) const
+	Material* ResourceManager::getMaterial( Material::MaterialID id ) const
 	{
-		std::map<MaterialID, Material*>::const_iterator it;
+		std::map<Material::MaterialID, Material*>::const_iterator it;
 		it = m_materials.find(id);
 
 		if ( it != m_materials.cend() )
@@ -164,17 +164,19 @@ namespace kgx
 		return nullptr;
 	}
 
-	ResourceManager::MaterialID ResourceManager::claimMaterial( _In_ Material *mat )
+	Material* ResourceManager::createMaterial()
 	{
-		m_materials.insert( std::pair<MaterialID, Material*>(m_nextMaterialID, mat) );
+		Material *newMat = new Material( m_dxDev, m_nextMaterialID );
+
+		m_materials.insert( std::pair<Material::MaterialID, Material*>( m_nextMaterialID, newMat ) );
 		m_nextMaterialID++;
 
-		return m_nextMaterialID - 1;
+		return newMat;
 	}
 
-	void ResourceManager::releaseMaterial( MaterialID id )
+	void ResourceManager::releaseMaterial( Material::MaterialID id )
 	{
-		std::map<MaterialID, Material*>::iterator it;
+		std::map<Material::MaterialID, Material*>::iterator it;
 		it = m_materials.find(id);
 
 		if ( it != m_materials.end() )

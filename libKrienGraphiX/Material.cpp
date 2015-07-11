@@ -10,8 +10,8 @@
 
 namespace kgx
 {
-	Material::Material( _In_ ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_vertShader(nullptr),
+	Material::Material( _In_ ID3D11Device *dxDevice, MaterialID id )
+		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_matID(), m_vertShader( nullptr ),
 			m_pixShader(nullptr), m_texViews(), m_texData(), m_sampler(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -25,6 +25,12 @@ namespace kgx
 			delete m_pixShader;
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
+	}
+
+
+	Material::MaterialID Material::getID() const
+	{
+		return m_matID;
 	}
 
 
