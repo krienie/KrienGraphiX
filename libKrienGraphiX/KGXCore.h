@@ -19,6 +19,7 @@ namespace kgx
 			ID3D11Device* getDxDevicePtr() const;
 
 			RenderWindow* createRenderWindow( HWND windowHandle );
+			RenderWindow* getRenderWindow( HWND windowHandle ) const;
 
 			//void addFrameListener( Listener *l ); //TODO: add listener functionality
 

@@ -8,9 +8,12 @@ namespace kgx
 {
 	RenderWindow::RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory )
 		: m_dxDev(dxDevice), m_dxDevCont(0), m_dxgiFactory(dxgiFactory), m_swapChain(0), m_depthStencilView(0),
-			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U), m_isInit(false)
+			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U),
+			m_isInit(false), m_clearColor()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
+
+		memset( m_clearColor, 0.4f, sizeof(float) * 4u );
 	}
 
 	RenderWindow::~RenderWindow()
@@ -32,7 +35,6 @@ namespace kgx
 	}
 
 
-	//TODO: maybe merge the create function into the constructor
 	bool RenderWindow::create( HWND windowHandle )
 	{
 		// create m_swapChain descriptor
@@ -56,8 +58,7 @@ namespace kgx
 
 		if ( FAILED(res) )
 		{
-			//TODO: add better error description here
-			std::cout << "Error (RenderWindow::create): Error creating m_swapChain." << std::endl;
+			std::cout << "Error (RenderWindow::create): Error creating swapchain." << std::endl;
 			return false;
 		}
 
@@ -178,6 +179,14 @@ namespace kgx
 		m_curViewport = Viewport(dxViewport, cam);
 	}
 
+	void RenderWindow::setClearColor( float red, float green, float blue, float alpha )
+	{
+		m_clearColor[0] = red;
+		m_clearColor[1] = green;
+		m_clearColor[2] = blue;
+		m_clearColor[3] = alpha;
+	}
+
 
 	void RenderWindow::update()
 	{
@@ -192,10 +201,8 @@ namespace kgx
 		//TODO: add support for multiple viewports
 		m_dxDevCont->RSSetViewports( 1, &m_curViewport.dxViewport );
 
-		// clear the back buffer to grey
-		//TODO: create something so that the user can change the clearcolor
-		const float clearColor[4] = { 0.4f, 0.4f, 0.4f, 1.0f };
-		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, clearColor );
+		// clear the back buffer
+		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, m_clearColor );
 		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
 

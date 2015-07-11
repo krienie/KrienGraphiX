@@ -42,7 +42,7 @@ namespace kgx
 		if ( !DirectX::XMVerifyCPUSupport() )
 		{
 			std::cout << "Error (KGXCore::KGXCore): SSE/SSE2 instructions are not supported on current hardware." << std::endl;
-			abort();							//TODO: throw proper exception explaining what the problem is
+			abort();
 		}
 
 
@@ -67,7 +67,7 @@ namespace kgx
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error creating D3D11 device." << std::endl;
-			abort();							//TODO: throw proper exception explaining what the problem is
+			abort();
 		}
 
 		// retrieve default DXGIAdaptor
@@ -139,16 +139,28 @@ namespace kgx
 		if ( it != m_renderWindows.end() )
 		{
 			std::cout << "Aborted (Environment::createRenderWindow): Window handle " << windowHandle << " already has a RenderWindow bound." << std::endl;
-			//TODO: insert assert(false)
-			return NULL;
+			return it->second;
 		}
 
 		RenderWindow *renWin = new RenderWindow( m_dxDev, m_dxgiFactory );
-		renWin->create(windowHandle);
+		if ( !renWin->create( windowHandle ) )
+		{
+			delete renWin;
+			return nullptr;
+		}
 
 		m_renderWindows.insert( std::pair<HWND, RenderWindow*>(windowHandle, renWin) );
 
 		return renWin;
+	}
+
+	RenderWindow* KGXCore::getRenderWindow( HWND windowHandle ) const
+	{
+		std::map<HWND, RenderWindow*>::const_iterator it = m_renderWindows.find( windowHandle );
+		if ( it != m_renderWindows.cend() )
+			return it->second;
+
+		return nullptr;
 	}
 
 
