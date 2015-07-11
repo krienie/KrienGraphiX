@@ -136,19 +136,14 @@ namespace kgx
 
 	void RenderWindow::setViewport( _In_ Camera *cam, float topLeftX, float topLeftY, float width, float height )
 	{
-		// NOTE: no warning is given when this function is called when the RenderWindow is not initialized
-
 		// initialize viewport
 		D3D11_VIEWPORT dxViewport;
 		ZeroMemory(&dxViewport, sizeof(D3D11_VIEWPORT));
 
-		if ( topLeftX + width <= D3D11_VIEWPORT_BOUNDS_MAX )
+		if ( width > 0 && topLeftX + width <= D3D11_VIEWPORT_BOUNDS_MAX )
 		{
 			dxViewport.TopLeftX = topLeftX;
-
-			if ( width < 0.0f )
-				dxViewport.Width = static_cast<float>(m_backBuffWidth);
-			else dxViewport.Width = width;
+			dxViewport.Width    = width;
 			
 		} else
 		{
@@ -157,13 +152,10 @@ namespace kgx
 			dxViewport.Width    = D3D11_VIEWPORT_BOUNDS_MAX;
 		}
 
-		if ( topLeftY + height <= D3D11_VIEWPORT_BOUNDS_MAX )
+		if ( height > 0 && topLeftY + height <= D3D11_VIEWPORT_BOUNDS_MAX )
 		{
 			dxViewport.TopLeftY = topLeftY;
-
-			if ( height < 0.0f )
-				dxViewport.Height = static_cast<float>(m_backBuffHeight);
-			else dxViewport.Height = height;
+			dxViewport.Height   = height;
 			
 		} else
 		{
