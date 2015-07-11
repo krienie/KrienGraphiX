@@ -9,11 +9,11 @@ namespace kgx
 	RenderWindow::RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory )
 		: m_dxDev(dxDevice), m_dxDevCont(0), m_dxgiFactory(dxgiFactory), m_swapChain(0), m_depthStencilView(0),
 			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U),
-			m_isInit(false), m_clearColor()
+			m_isInit(false)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 
-		memset( m_clearColor, 0.4f, sizeof(float) * 4u );
+		setClearColor( 0.4f, 0.4f, 0.4f, 1.0f );
 	}
 
 	RenderWindow::~RenderWindow()
