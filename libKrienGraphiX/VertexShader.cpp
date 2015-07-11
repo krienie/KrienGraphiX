@@ -24,15 +24,13 @@ namespace kgx
 		m_dxDevCont->VSSetShader( m_vertShader, 0, 0 );
 		m_dxDevCont->IASetInputLayout(m_inputLayout.getDxInputLayout(m_dxDev, m_shaderSource));
 
-		UINT buffCounter = 0U;
+		// update all buffers if necessary
 		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it, ++buffCounter )
-		{
-			//TODO: iets verzinnen zodat alle buffers in 1x aangezet kunnen worden..
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
 			(*it)->commit();
-			ID3D11Buffer *buff = (*it)->getDxBufferPtr();
-			m_dxDevCont->VSSetConstantBuffers(buffCounter, 1U, &buff);
-		}
+
+		// set buffers
+		m_dxDevCont->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
 	}
 
 
