@@ -81,7 +81,6 @@ namespace kgx
 				return false;
 			}
 
-			//TODO: format parseOutput to KgMatData
 			if ( !parseMtl(ssMtl.str(), objMats) )
 			{
 				std::cout << "Error: MTL parsing failed." << std::endl;
@@ -93,8 +92,11 @@ namespace kgx
 			objMats.push_back( ObjMatData() );
 			ObjMatData &objMatData = objMats[objMats.size() - 1u];
 			objMatData.name = "DefaultMaterial";
-			//TODO: generate random color to set as default value
-			objMatData.diffClr = DirectX::XMFLOAT3( 1.0f, 1.0f, 1.0f );
+
+			float red   = rand() / (float)RAND_MAX;
+			float green = rand() / (float)RAND_MAX;
+			float blue  = rand() / (float)RAND_MAX;
+			objMatData.diffClr = DirectX::XMFLOAT3( red, green, blue );
 
 			// set default material for the first object
 			if ( objData.faces.size() > 0 )
@@ -148,7 +150,6 @@ namespace kgx
 	{
 		//TODO: add support for smoothing groups
 
-		//TODO: maybe define these structs outside of the function?...
 		struct ObjGram : qi::grammar<std::string::const_iterator, ObjParseData(), Skipper>
 		{
 			ObjGram() : ObjGram::base_type(start)
