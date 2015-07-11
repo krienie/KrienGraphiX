@@ -147,7 +147,7 @@ namespace kgx
 			
 		} else
 		{
-			std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Using default settings." << std::endl;
+			std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Clamping viewport." << std::endl;
 			dxViewport.TopLeftX = 0.0f;
 			dxViewport.Width    = D3D11_VIEWPORT_BOUNDS_MAX;
 		}
@@ -159,7 +159,7 @@ namespace kgx
 			
 		} else
 		{
-			std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Using default settings." << std::endl;
+			std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Clamping viewport." << std::endl;
 			dxViewport.TopLeftY = 0.0f;
 			dxViewport.Height   = D3D11_VIEWPORT_BOUNDS_MAX;
 		}
@@ -167,7 +167,6 @@ namespace kgx
 		dxViewport.MinDepth = D3D11_MIN_DEPTH;
 		dxViewport.MaxDepth = D3D11_MAX_DEPTH;
 
-		//viewports.push_back( Viewport(dxViewport, cam) );
 		m_curViewport = Viewport(dxViewport, cam);
 	}
 

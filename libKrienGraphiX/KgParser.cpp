@@ -164,7 +164,6 @@ namespace kgx
 			return nullptr;
 		}
 
-		//TODO: create RenderableObject and return it
 		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, materials );
 	}
 
@@ -178,7 +177,7 @@ namespace kgx
 		ResourceManager::MeshBufferID buffID = ResourceManager::getInst()->addMeshBuffer( vertices, indices, vertLayout, buffCreated );
 
 		if ( FAILED( buffCreated ) )
-			return nullptr;		//TODO: maybe add warning here
+			return nullptr;
 
 
 		// create materials
