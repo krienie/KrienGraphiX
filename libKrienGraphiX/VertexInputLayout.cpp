@@ -51,20 +51,17 @@ namespace kgx
 			case Type::Position:
 				desc.SemanticName = "POSITION";
 				break;
-
 			case Type::TextureCoordinate:
 				desc.SemanticName = "TEXCOORD";
 				break;
-
 			case Type::Normal:
 				desc.SemanticName = "NORMAL";
 				break;
-
 			case Type::Tangent:
-				/* fall-through */
-			default:
 				desc.SemanticName = "TANGENT";
-				break;
+			default:
+				// there is no default semantic => exit function
+				return;
 		}
 
 		desc.SemanticIndex        = 0U;
@@ -74,9 +71,14 @@ namespace kgx
 		desc.InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
 		desc.InstanceDataStepRate = 0U;
 
-		m_inputDescriptor.push_back(desc);
+		addInputType( desc );
+	}
+	void VertexInputLayout::addInputType( const D3D11_INPUT_ELEMENT_DESC &inputDesc )
+	{
+		// this is quite a lazy way to support custom input-layouts, but ah well.. it's ok for the time being I guess..
+		m_inputDescriptor.push_back( inputDesc );
 
-		m_bufferStride += sizeof(float) * 3U;
+		m_bufferStride += sizeof( float ) * 3U;
 	}
 
 
