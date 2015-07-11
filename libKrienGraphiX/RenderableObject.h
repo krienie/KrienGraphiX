@@ -13,7 +13,6 @@ namespace kgx
 	class Camera;
 	class Material;
 
-	//TODO: maybe rename this class to something more suitable => One RenderableObject can contain more than one object to render..
 	class RenderableObject : public MovableObject
 	{
 		public:

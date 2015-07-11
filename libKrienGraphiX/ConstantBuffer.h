@@ -17,7 +17,6 @@ namespace kgx
 			explicit ConstantBuffer( const ConstantBuffer &other );
 			~ConstantBuffer();
 
-			//TODO: test copy-constructor and assignment-operator
 			ConstantBuffer& operator=( const ConstantBuffer &rhs );
 
 

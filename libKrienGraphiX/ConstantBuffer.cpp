@@ -18,9 +18,9 @@ namespace kgx
 		m_variables(other.m_variables)
 	{
 		if ( m_dxBuffer )
-			m_dxBuffer->AddRef();
+			m_dxBuffer->AddRef();		//TODO: this might give some problems later on, maybe its better to just recreate the whole damn buffer
 		if ( m_dxDevCont )
-			m_dxDevCont->AddRef();
+			m_dxDevCont->AddRef();		// same for the device context
 		if ( other.m_rawData )
 		{
 			m_rawData = new UCHAR[m_bufferElementSize];
@@ -150,9 +150,8 @@ namespace kgx
 			memcpy( m_rawData + it->second.offset, var, it->second.size );
 			m_dataChanged = true;
 			return true;
-		} else
-		{
-			return false;
 		}
+
+		return false;
 	}
 }

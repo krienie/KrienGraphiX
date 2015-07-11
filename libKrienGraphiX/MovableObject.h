@@ -22,7 +22,6 @@ namespace kgx
 		private:
 			DirectX::XMFLOAT4X4 m_modelMatrix;
 
-
 			float m_xPos;
 			float m_yPos;
 			float m_zPos;

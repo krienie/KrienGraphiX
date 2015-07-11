@@ -35,7 +35,6 @@ namespace kgx
 			void renderCurrentView();
 
 			void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
-			//TODO: reactivate these functions
 			void moveForward( float dist );
 			void moveBackward( float dist );
 			void moveLeft( float dist );
@@ -49,8 +48,6 @@ namespace kgx
 			void rotateRight( float degrees );
 
 		private:
-			//TODO: add something that can manipulate the rasterizer
-
 			Scene *m_parentScene;
 
 			DirectX::XMFLOAT4X4 m_projMatrix;

@@ -13,7 +13,7 @@ namespace kgx
 		MeshBuffer()
 			: vertBuff(0), indexBuff(0), inputDescriptor() {}
 
-		//TODO: define copy-constructor and assignment-operator overload to make a deep-copy
+		// using default copy-constructor and assignment-operator
 
 		ID3D11Buffer *vertBuff, *indexBuff;
 		VertexInputLayout inputDescriptor;
