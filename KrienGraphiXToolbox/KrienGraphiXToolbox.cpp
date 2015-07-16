@@ -5,6 +5,8 @@
 #include <KGXCore.h>
 #include <Camera.h>
 #include <RenderableObject.h>
+#include <PixelShader.h>
+#include <TextureManager.h>
 
 #include "KrienGraphiXToolbox.h"
 
@@ -28,7 +30,7 @@ namespace kgxt
 		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
 
 		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.001f, 3000.0f,
-								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 50.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
+								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 		m_defaultScene = new kgx::Scene();
 		m_mainCam->setParentScene( m_defaultScene );
 
@@ -38,6 +40,15 @@ namespace kgxt
 		if ( kgoScene.size() > 0 )
 		{
 			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
+
+			//TODO: temporary
+			/*kgx::Texture *tex = kgx::TextureManager::getInst()->loadTexture( L"uvCheckerboard.jpg" );
+			kgx::RenderableObject::ObjectIterator it = renObj->getChildrenBegin();
+			for ( it; it != renObj->getChildrenEnd(); ++it )
+			{
+				kgx::PixelShader *pixShader = it->mat->getPixelShader();
+				pixShader->addTexture( tex );
+			}*/
 
 			// add RenderableObject to scene
 			m_defaultScene->claimRenderableObject( renObj );
@@ -137,6 +148,10 @@ namespace kgxt
 				break;
 			case KeyEvent::Key::Key_D:
 				m_dKeyDown = true;
+				break;
+			case KeyEvent::Key::Key_Return:
+				if ( (evt.modifiers() & KeyEvent::KeyModifiers::Alt) == KeyEvent::KeyModifiers::Alt )
+					m_ui.renderWidget1->toggleFullscreen();
 				break;
 			default:
 				break;

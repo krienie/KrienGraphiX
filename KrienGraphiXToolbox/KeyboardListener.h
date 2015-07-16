@@ -15,7 +15,7 @@ namespace kgxt
 				Released
 			};
 
-			enum class KeyModifiers
+			enum KeyModifiers
 			{
 				NoModifier = Qt::NoModifier,
 				Shift      = Qt::ShiftModifier,

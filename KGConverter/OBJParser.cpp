@@ -452,12 +452,7 @@ namespace kgx
 	{
 		kgMat.name = objMat.name;
 
-		
-		//TODO: change to Default OBJ shaders
-		kgMat.vertexShader.name = "DefaultVertexShaderVS.cso";
-		kgMat.pixelShader.name  = "DefaultPixelShaderPS.cso";
-
-		//vertex shader auto variables
+		// vertex shader auto variables
 		KgMatData::ShaderVar var;
 		var.name         = "viewMatrix";
 		var.type         = "mat4x4";
@@ -477,7 +472,23 @@ namespace kgx
 		// pixel shader variables
 		//TODO: add pixel shader variables
 
-		//TODO: add textures
+		// add textures
+		if ( objMat.ambMap.size() > 0u )
+			kgMat.pixelShader.textures.push_back( objMat.ambMap );
+		if ( objMat.diffMap.size() > 0u )
+			kgMat.pixelShader.textures.push_back( objMat.diffMap );
+		if ( objMat.specMap.size() > 0u )
+			kgMat.pixelShader.textures.push_back( objMat.specMap );
+		if ( objMat.bumpMap.size() > 0u )
+			kgMat.pixelShader.textures.push_back( objMat.bumpMap );
+		if ( objMat.transMap.size() > 0u )
+			kgMat.pixelShader.textures.push_back( objMat.transMap );
+
+		//TODO: change to Default OBJ shaders => preferably some sort of ubershader
+		kgMat.vertexShader.name = "DefaultVertexShaderVS.cso";
+		if ( kgMat.pixelShader.textures.size() > 0u )
+			kgMat.pixelShader.name = "DefaultTextureShaderPS.cso";
+		else kgMat.pixelShader.name = "DefaultPixelShaderPS.cso";
 	}
 }
 

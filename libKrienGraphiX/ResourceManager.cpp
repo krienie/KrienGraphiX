@@ -7,7 +7,7 @@
 
 namespace kgx
 {
-	ResourceManager* ResourceManager::m_inst = 0;
+	ResourceManager* ResourceManager::m_inst = nullptr;
 
 	ResourceManager* ResourceManager::getInst()
 	{

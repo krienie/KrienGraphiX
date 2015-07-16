@@ -6,6 +6,8 @@
 
 #include "RenderWindow.h"
 #include "ResourceManager.h"
+#include "TextureManager.h"
+#include "TextureLoader.h"
 #include "KGXCore.h"
 
 namespace kgx
@@ -97,18 +99,21 @@ namespace kgx
 		dxgiAdapter->Release();
 
 
-		// init ResourceManager
+		// init ResourceManagers
 		ResourceManager::construct(m_dxDev);
+		TextureManager::construct(m_dxDev);
 	}
 
 	KGXCore::~KGXCore()
 	{
-		//m_renderWindows.clear();
 		std::map<HWND, RenderWindow*>::iterator it;
 		for ( it = m_renderWindows.begin(); it != m_renderWindows.end(); ++it )
 			delete it->second;
 
+		// destroy resource managers
 		ResourceManager::destroy();
+		TextureManager::destroy();
+		TextureLoader::closeThread();
 
 		if ( m_dxgiFactory )
 			m_dxgiFactory->Release();

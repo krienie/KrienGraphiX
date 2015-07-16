@@ -26,6 +26,8 @@ namespace kgxt
 		void initialize();
 		kgx::RenderWindow* getRenderWindow() const;
 
+		void toggleFullscreen();
+
 		void addFrameListener( _In_ FrameListener *listener );
 		void addMouseListener( _In_ MouseListener *listener );
 		void addKeyboardListener( _In_ KeyboardListener *listener );
@@ -49,7 +51,6 @@ namespace kgxt
 		bool m_isInit;
 		kgx::RenderWindow *m_renderWin;
 		double m_lastFrameTime;
-		//TODO: change these two below in one vector2
 		float m_prevMousePosX;
 		float m_prevMousePosY;
 

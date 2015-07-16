@@ -28,18 +28,52 @@ namespace kgx
 			m_depthStencilView->Release();
 
 		if ( m_swapChain )
+		{
+			m_swapChain->SetFullscreenState( FALSE, nullptr );
 			m_swapChain->Release();
+		}
 
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
 	}
 
 
+
+	/*void RenderWindow::enumAdaptersTest()
+	{
+		IDXGIAdapter1 *adapter = nullptr;
+		HRESULT res = m_dxgiFactory->EnumAdapters1( 0u, &adapter );
+
+		DXGI_ADAPTER_DESC1 adapterDesc;
+		ZeroMemory( &adapterDesc, sizeof(DXGI_ADAPTER_DESC1) );
+		adapter->GetDesc1( &adapterDesc );
+
+		UINT i = 0;
+		IDXGIOutput *output;
+		adapter->EnumOutputs( 0u, &output );
+		DXGI_OUTPUT_DESC outputDesc;
+		ZeroMemory( &outputDesc, sizeof(DXGI_OUTPUT_DESC) );
+		output->GetDesc( &outputDesc );
+
+		UINT numModes = 0u;
+		output->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, 0u, &numModes, nullptr );
+		DXGI_MODE_DESC *modes = new DXGI_MODE_DESC[numModes];
+		output->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, 0u, &numModes, modes );
+
+		DXGI_MODE_DESC lastMode = modes[numModes - 1u];
+
+		std::cout << "giggety" << std::endl;
+
+		delete[] modes;
+		output->Release();
+		adapter->Release();
+	}*/
+
 	bool RenderWindow::create( HWND windowHandle )
 	{
-		// create m_swapChain descriptor
+		// create swapchain descriptor
 		DXGI_SWAP_CHAIN_DESC1 swapDesc;
-		ZeroMemory(&swapDesc, sizeof(DXGI_SWAP_CHAIN_DESC1));
+		ZeroMemory( &swapDesc, sizeof(DXGI_SWAP_CHAIN_DESC1) );
 		swapDesc.Width  = 0;
 		swapDesc.Height = 0;
 		swapDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -54,7 +88,18 @@ namespace kgx
 		swapDesc.SwapEffect         = DXGI_SWAP_EFFECT_DISCARD;
 		swapDesc.AlphaMode          = DXGI_ALPHA_MODE_UNSPECIFIED;
 		swapDesc.Flags              = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		HRESULT res = m_dxgiFactory->CreateSwapChainForHwnd( m_dxDev, windowHandle, &swapDesc, NULL, NULL, &m_swapChain );
+
+		// create fullscreen swapchain descriptor
+		/*DXGI_SWAP_CHAIN_FULLSCREEN_DESC fullscreenSwapDesc;
+		ZeroMemory( &fullscreenSwapDesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC) );
+		fullscreenSwapDesc.RefreshRate      = { 60000, 1000 };
+		fullscreenSwapDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+		fullscreenSwapDesc.Windowed         = TRUE;
+		fullscreenSwapDesc.Scaling          = DXGI_MODE_SCALING_UNSPECIFIED;*/
+
+		//enumAdaptersTest();
+
+		HRESULT res = m_dxgiFactory->CreateSwapChainForHwnd( m_dxDev, windowHandle, &swapDesc, nullptr, nullptr, &m_swapChain );
 
 		if ( FAILED(res) )
 		{
@@ -73,7 +118,7 @@ namespace kgx
 		m_backBuffHeight = backBufferDesc.Height;
 
 		// create and initialize depth-stencil buffer
-		ID3D11Texture2D *depthBuff = NULL;
+		ID3D11Texture2D *depthBuff = nullptr;
 		D3D11_TEXTURE2D_DESC depthBuffDesc;
 		depthBuffDesc.Width              = backBufferDesc.Width;
 		depthBuffDesc.Height             = backBufferDesc.Height;
@@ -87,8 +132,8 @@ namespace kgx
 		depthBuffDesc.SampleDesc.Quality = swapDesc.SampleDesc.Quality;
 		depthBuffDesc.MiscFlags          = 0;
 
-		m_dxDev->CreateTexture2D( &depthBuffDesc, NULL, &depthBuff );
-		res = m_dxDev->CreateDepthStencilView( depthBuff, NULL, &m_depthStencilView );
+		m_dxDev->CreateTexture2D( &depthBuffDesc, nullptr, &depthBuff );
+		res = m_dxDev->CreateDepthStencilView( depthBuff, nullptr, &m_depthStencilView );
 		depthBuff->Release();
 
 		if ( FAILED(res) )
@@ -100,7 +145,7 @@ namespace kgx
 		
 
 		// create renderTarget from the backBuffer and depth stencil view
-		res = m_dxDev->CreateRenderTargetView(backBuff, NULL, &m_renderTargetView);
+		res = m_dxDev->CreateRenderTargetView( backBuff, nullptr, &m_renderTargetView );
 		backBuff->Release();
 
 		if ( FAILED(res) )
@@ -112,11 +157,11 @@ namespace kgx
 		// Setup the m_rasterizer
 		D3D11_RASTERIZER_DESC rasterDesc;
 		rasterDesc.AntialiasedLineEnable = false;
-		rasterDesc.CullMode				 = D3D11_CULL_BACK;			//D3D11_CULL_FRONT, D3D11_CULL_BACK or D3D11_CULL_NONE
+		rasterDesc.CullMode				 = D3D11_CULL_BACK;		//D3D11_CULL_FRONT, D3D11_CULL_BACK or D3D11_CULL_NONE
 		rasterDesc.DepthBias			 = 0;
 		rasterDesc.DepthBiasClamp		 = 0.0f;
 		rasterDesc.DepthClipEnable		 = true;
-		rasterDesc.FillMode				 = D3D11_FILL_WIREFRAME;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
+		rasterDesc.FillMode				 = D3D11_FILL_SOLID;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
 		rasterDesc.FrontCounterClockwise = false;
 		rasterDesc.MultisampleEnable	 = false;
 		rasterDesc.ScissorEnable		 = false;
@@ -186,6 +231,20 @@ namespace kgx
 		m_clearColor[3] = alpha;
 	}
 
+	bool RenderWindow::isFullscreen() const
+	{
+		BOOL fullscreen = FALSE;
+		if ( m_swapChain )
+			m_swapChain->GetFullscreenState( &fullscreen, nullptr );
+
+		return fullscreen != FALSE;
+	}
+
+	void RenderWindow::setFullscreen( bool active )
+	{
+		if ( m_swapChain )
+			m_swapChain->SetFullscreenState( active, nullptr );
+	}
 
 	void RenderWindow::update()
 	{

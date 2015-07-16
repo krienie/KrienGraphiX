@@ -40,6 +40,10 @@ namespace kgx
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
 			~RenderableObject();
 
+			typedef std::vector<ObjectContainer>::const_iterator ObjectIterator;
+			ObjectIterator getChildrenBegin() const;
+			ObjectIterator getChildrenEnd() const;
+
 			void draw( _In_ Camera *renderCam );
 
 		private:
@@ -51,7 +55,7 @@ namespace kgx
 			ID3D11DeviceContext *m_dxDevCont;
 
 			MeshBuffer m_meshBuff;
-			std::vector<ObjectContainer> m_matContainers;
+			std::vector<ObjectContainer> m_objContainers;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;
 	};

@@ -19,14 +19,21 @@ namespace kgx
 			~RenderWindow();
 
 			bool create( HWND windowHandle );
+
 			void setViewport( _In_ Camera *cam, float topLeftX = 0, float topLeftY = 0, float width = -1.0f, float height = -1.0f );
 			void setClearColor( float red, float green, float blue, float alpha = 1.0f );
+
+			bool isFullscreen() const;
+			void setFullscreen( bool active );
+
 			void update();
 
 		private:
 			// no copying allowed
 			RenderWindow( const RenderWindow& );
 			RenderWindow& operator=( const RenderWindow& );
+
+			//void enumAdaptersTest();
 
 			struct Viewport
 			{

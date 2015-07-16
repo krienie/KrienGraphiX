@@ -56,6 +56,7 @@ namespace kgxt
 		//Accept input focus
 		setFocusPolicy( Qt::StrongFocus );
 
+		//TODO: might want to force the user to explicitly initialize KGXCore..
 		m_renderWin = kgx::KGXCore::getInst()->createRenderWindow( HWND( winId() ) );
 
 		setMouseTracking( true );
@@ -69,6 +70,12 @@ namespace kgxt
 	kgx::RenderWindow* KgxRenderWidget::getRenderWindow() const
 	{
 		return m_renderWin;
+	}
+
+	void KgxRenderWidget::toggleFullscreen()
+	{
+		if ( m_renderWin )
+			m_renderWin->setFullscreen( !m_renderWin->isFullscreen() );
 	}
 
 	void KgxRenderWidget::addFrameListener( _In_ FrameListener *listener )
@@ -148,9 +155,6 @@ namespace kgxt
 		for ( it = m_keyboardListeners.begin(); it != m_keyboardListeners.end(); ++it )
 			(*it)->keyReleased( KeyEvent( static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Released, static_cast<KeyEvent::KeyModifiers>(mod) ) );
 	}
-
-
-
 
 	MouseEvent KgxRenderWidget::createMouseEvent( _In_ QWheelEvent *qtEvt ) const
 	{

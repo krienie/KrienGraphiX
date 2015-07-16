@@ -33,9 +33,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Source Files\Shaders">
-      <UniqueIdentifier>{9debadb5-6945-439e-8c49-b8faa8ef90f1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -111,13 +108,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KrienGraphiXToolbox.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="DefaultVertexShaderVS.hlsl">
-      <Filter>Source Files\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DefaultPixelShaderPS.hlsl">
-      <Filter>Source Files\Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

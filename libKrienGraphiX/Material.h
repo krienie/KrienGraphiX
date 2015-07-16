@@ -51,9 +51,6 @@ namespace kgx
 			VertexShader* getVertexShader() const;
 			PixelShader* getPixelShader() const;
 
-			void addTexture( _In_ ID3D11ShaderResourceView* texView, _In_ ID3D11Resource* texture );
-			void setSampler( _In_ ID3D11SamplerState *samp );
-
 			void addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 
 			void activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj );
@@ -82,11 +79,6 @@ namespace kgx
 			// shaders
 			VertexShader *m_vertShader;
 			PixelShader *m_pixShader;
-
-			// texture resources
-			std::vector<ID3D11ShaderResourceView*> m_texViews;
-			std::vector<ID3D11Resource*> m_texData;
-			ID3D11SamplerState *m_sampler;
 
 			std::map< ShaderBase*, std::vector<AutoShaderVar> > m_constVarLinks;
 	};

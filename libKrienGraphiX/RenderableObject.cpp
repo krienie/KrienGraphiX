@@ -8,7 +8,7 @@ namespace kgx
 {
 	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
-		: m_dxDev( dxDevice ), m_dxDevCont( 0 ), m_meshBuff( buff ), m_matContainers( objectContainers ), m_topology( meshTopology )
+		: m_dxDev( dxDevice ), m_dxDevCont( 0 ), m_meshBuff( buff ), m_objContainers( objectContainers ), m_topology( meshTopology )
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 
@@ -18,6 +18,16 @@ namespace kgx
 	{
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
+	}
+
+
+	RenderableObject::ObjectIterator RenderableObject::getChildrenBegin() const
+	{
+		return m_objContainers.cbegin();
+	}
+	RenderableObject::ObjectIterator RenderableObject::getChildrenEnd() const
+	{
+		return m_objContainers.cend();
 	}
 
 
@@ -31,7 +41,7 @@ namespace kgx
 		m_dxDevCont->IASetPrimitiveTopology( m_topology );
 
 		std::vector<ObjectContainer>::iterator objIt;
-		for ( objIt = m_matContainers.begin(); objIt != m_matContainers.end(); ++objIt )
+		for ( objIt = m_objContainers.begin(); objIt != m_objContainers.end(); ++objIt )
 		{
 			// activate material
 			objIt->mat->activate( renderCam, this );

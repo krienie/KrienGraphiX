@@ -16,6 +16,7 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "ResourceManager.h"
+#include "TextureManager.h"
 
 #include "KgParser.h"
 
@@ -40,6 +41,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderDef,
 	(std::string, name)
 	(std::vector<kgx::KgMatData::ShaderVar>, variables)
+	(std::vector<std::string>, textures)
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -122,8 +124,9 @@ namespace kgx
 					| eps[_val = Material::ShaderAutoBindType::NoAutoBind];
 
 				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
+				texture = "Texture(" >> *~qi::char_( ')' ) >> lit( ");" );
 				shaderDefinition = (qi::lit("VertexShader") | qi::lit("PixelShader")) >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit("{") >> *shaderVariable >> lit("}");
+					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
 
 				material = shaderDefinition >> shaderDefinition;
 				nameMatPair = omit[lit("Material(")] >> *~qi::char_(')') >> omit[lit(")")]
@@ -142,6 +145,7 @@ namespace kgx
 
 			qi::rule<std::string::const_iterator, Material::ShaderAutoBindType()> shaderAutoBindType;
 			qi::rule<std::string::const_iterator, KgMatData::ShaderVar(), Skipper> shaderVariable;
+			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
 			qi::rule<std::string::const_iterator, KgMatData::ShaderDef(), Skipper> shaderDefinition;
 
 			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
@@ -189,18 +193,34 @@ namespace kgx
 
 			VertexShader *vertShader = material->createVertexShader( matIt->second.vertexShader.name, vertLayout );
 			setShaderVariables( material, vertShader, matIt->second.vertexShader );
+			// add vertex shader textures
+			std::vector<std::string>::iterator it;
+			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
+			{
+				Texture *tex = TextureManager::getInst()->loadTexture( *it );
+				if ( tex )
+					vertShader->addTexture( tex );
+			}
 
 			//TODO: add support for other shader types
 
 			PixelShader *pixShader = material->createPixelShader( matIt->second.pixelShader.name );
 			setShaderVariables( material, pixShader, matIt->second.pixelShader );
+			// add pixel shader textures
+			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
+			{
+				Texture *tex = TextureManager::getInst()->loadTexture( *it );
+				if ( tex )
+					pixShader->addTexture( tex );
+			}
+
 
 			materialPtrMap.insert( std::pair<std::string, Material*>( matIt->first, material ) );
 		}
 
 
 		// create models
-		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > materialMeshPair;
+		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > MaterialMeshPair;
 		std::map< std::string, std::vector<RenderableObject::Mesh> > materialMeshPtrMap;
 		std::vector<KgModelData>::iterator modIt;
 		for ( modIt = models.begin(); modIt != models.end(); ++modIt )
@@ -210,7 +230,7 @@ namespace kgx
 			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = materialMeshPtrMap.find( modIt->matName );
 			if ( matMeshIt != materialMeshPtrMap.end() )
 				matMeshIt->second.push_back( mesh );
-			else materialMeshPtrMap.insert( materialMeshPair( modIt->matName, { mesh } ) );
+			else materialMeshPtrMap.insert( MaterialMeshPair( modIt->matName, { mesh } ) );
 		}
 
 		// create meshes

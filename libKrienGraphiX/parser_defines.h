@@ -40,6 +40,7 @@ namespace kgx
 
 			std::string name;
 			std::vector<ShaderVar> variables;
+			std::vector<std::string> textures;
 		};
 
 		KgMatData() : name(), vertexShader(), pixelShader() {}

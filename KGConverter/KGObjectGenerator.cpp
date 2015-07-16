@@ -36,6 +36,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderDef,
 	(std::string, name)
 	(std::vector<kgx::KgMatData::ShaderVar>, variables)
+	(std::vector<std::string>, textures)
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -65,7 +66,7 @@ namespace kgx
 	{
 		// construct header string
 		std::stringstream headerStr;
-		headerStr << "// KrienGraphiX Object v0.1 - (c)2015 Krien Linnenbank" << std::endl;
+		headerStr << "// KrienGraphiX Object v0.2 - (c)2015 Krien Linnenbank" << std::endl;
 		// get local date and time
 		boost::posix_time::time_facet *facet = new boost::posix_time::time_facet( "%d-%b-%Y %H:%M:%S" );
 		headerStr.imbue( std::locale( headerStr.getloc(), facet ) );
@@ -102,8 +103,17 @@ namespace kgx
 				shaderAutoBindType = karma::stream;
 				shaderVariable     = no_delimit[eol] << "\t\t" << shaderAutoBindType << karma::string << no_delimit[karma::string] << "(" << karma::string << ");" << no_delimit[eol << "\t"];
 
-				vertexShader = "\tVertexShader(" << karma::string << no_delimit[")"] << no_delimit[eol] << "\t{" << *shaderVariable << "}" << no_delimit[eol];
-				pixelShader  = "\tPixelShader(" << karma::string << no_delimit[")"] << no_delimit[eol] << "\t{" << *shaderVariable << "}" << no_delimit[eol];
+				vertexShader = "\tVertexShader(" << karma::string << no_delimit[")"] << no_delimit[eol]
+								<< "\t{"
+								<< *shaderVariable << no_delimit[eol]
+								<< *("\t\tTexture(" << karma::string << ");" << no_delimit[eol]) << no_delimit[eol]
+								<< "\t}" << no_delimit[eol];
+
+				pixelShader  = "\tPixelShader(" << karma::string << no_delimit[")"] << no_delimit[eol]
+								<< "\t{"
+								<< *shaderVariable << no_delimit[eol]
+								<< *("\t\tTexture(" << karma::string << ");" << no_delimit[eol])
+								<< "\t}" << no_delimit[eol];
 
 				material = "Material(" << karma::string << ")" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
@@ -135,66 +145,5 @@ namespace kgx
 		//std::cout << "kgoFile: " << std::endl << outputString << std::endl;
 		//std::cout << std::endl;
 	}
-
-	/*bool generateKGM( _Inout_ BackInsertIt &sink, _In_ KgmData &input, _In_ const std::string &texturePath )
-	{
-		// construct header string
-		std::stringstream headerStr;
-		headerStr << "// KrienGraphiX KGM Converter v" << Version << " - (c)2014 Krien Linnenbank" << std::endl;
-		// create static comment strings
-		std::string vertStr = "// Vertex signature: Position(x,y,z) TextureCoordinate(x,y,z) Normal(x,y,z)";
-		std::string idxStr = "// Model indices";
-		std::string matStr = "// Material signature: Name SpecularPower OpticalDensity Transparency TransmissionFilter(x,y,z) AmbientColor(x,y,z) DiffuseColor(x,y,z) SpecularColor(x,y,z) EmissiveColor(x,y,z) AmbientMap DiffuseMap SpecularMap TransparencyMap BumpMap";
-		std::string modStr = "// Model signature: Name StartIndex IndexCount MaterialName";
-
-		// get local date and time
-		boost::posix_time::time_facet *facet = new boost::posix_time::time_facet( "%d-%b-%Y %H:%M:%S" );
-		headerStr.imbue( std::locale( headerStr.getloc(), facet ) );
-		headerStr << "// File created: " << boost::posix_time::second_clock::local_time() << std::endl;
-
-		struct KgmGram
-			: karma::grammar<BackInsertIt, KgmData(), karma::space_type>
-		{
-			KgmGram( const std::string &header, const std::string &vStr, const std::string &iStr,
-						const std::string &mtStr, const std::string &mdStr, const std::string &tPath )
-						: KgmGram::base_type( output )
-			{
-				using namespace karma;
-				headerComment = karma::string( header ) << no_delimit[eol];
-				vertComment = karma::string( vStr ) << no_delimit[eol];
-				idxComment = karma::string( iStr ) << no_delimit[eol];
-				matComment = karma::string( mtStr ) << no_delimit[eol];
-				modComment = karma::string( mdStr ) << no_delimit[eol];
-
-				vertices = headerComment << vertComment
-					<< *('v' << *double_) << no_delimit[eol << eol];
-				indices = idxComment << 'i' << *uint_ << no_delimit[eol << eol];
-				vector = repeat( phx::bind( &std::vector<float>::size, _val ) )[double_]
-					<< repeat( 3 - phx::bind( &std::vector<float>::size, _val ) )[lit( "0.0" )];
-
-				//eps(phx::bind(&std::string::size, _val) > 0)
-				texMap = (eps( phx::bind( &std::string::size, _val ) > 0 ) << no_delimit['\"' << lit( tPath ) << karma::string] << '\"')
-					| karma::lit( "\"\"" );
-				materials = matComment << *("mat" << karma::string << double_ << double_ << double_
-												<< vector << vector << vector << vector << vector
-												<< texMap << texMap << texMap << texMap << texMap << no_delimit[eol])
-												<< no_delimit[eol];
-				models = modComment << *("mod" << karma::string << int_ << int_ << karma::string << no_delimit[eol]) << no_delimit[eol];
-
-				output = vertices << indices << materials << models;
-			}
-
-			karma::rule<BackInsertIt, KgmData(), karma::space_type> output;
-			karma::rule<BackInsertIt, std::vector<float>(), karma::space_type> vertices;
-			karma::rule<BackInsertIt, std::vector<UINT>(), karma::space_type> indices;
-			karma::rule<BackInsertIt, std::vector<KgModelData>(), karma::space_type> models;
-			karma::rule<BackInsertIt, std::vector<KgMatData>(), karma::space_type> materials;
-			karma::rule<BackInsertIt, std::vector<float>(), karma::space_type> vector;
-			karma::rule<BackInsertIt, std::string(), karma::space_type> texMap;
-			karma::rule<BackInsertIt, karma::space_type> headerComment, vertComment, idxComment, matComment, modComment;
-		} kgmGram( headerStr.str(), vertStr, idxStr, matStr, modStr, texturePath );
-
-		return karma::generate_delimited( sink, kgmGram, karma::space, input );
-	}*/
 }
 

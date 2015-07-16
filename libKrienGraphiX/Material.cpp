@@ -12,7 +12,7 @@ namespace kgx
 {
 	Material::Material( _In_ ID3D11Device *dxDevice, MaterialID id )
 		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_matID(), m_vertShader( nullptr ),
-			m_pixShader(nullptr), m_texViews(), m_texData(), m_sampler(nullptr), m_constVarLinks()
+			m_pixShader(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -86,18 +86,6 @@ namespace kgx
 	}
 
 
-	void Material::addTexture( _In_ ID3D11ShaderResourceView* texView, _In_ ID3D11Resource* texture )
-	{
-		m_texViews.push_back(texView);
-		m_texData.push_back(texture);
-	}
-
-	void Material::setSampler( _In_ ID3D11SamplerState *samp )
-	{
-		m_sampler = samp;
-	}
-
-
 	void Material::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
 		// get auto variable list or create one if not already present
@@ -133,8 +121,6 @@ namespace kgx
 
 			m_pixShader->activate();
 		}
-
-		//TODO: activate buffers/textures/other resources
 	}
 
 
