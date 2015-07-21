@@ -12,6 +12,7 @@ namespace kgx
 			virtual ~MovableObject();
 
 			DirectX::XMFLOAT4X4 getModelMatrix() const;
+			DirectX::XMFLOAT4X4 getNormalMatrix() const;
 
 			virtual void translate( float deltaX, float deltaY, float deltaZ );
 			virtual void scale( float deltaScale );

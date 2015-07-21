@@ -121,6 +121,7 @@ namespace kgx
 					| qi::string( "CameraNearZ" )[_val = Material::ShaderAutoBindType::CameraNearZ]
 					| qi::string( "CameraFarZ" )[_val = Material::ShaderAutoBindType::CameraFarZ]
 					| qi::string( "ObjectModelMatrix" )[_val = Material::ShaderAutoBindType::ObjectModelMatrix]
+					| qi::string( "ObjectNormalMatrix" )[_val = Material::ShaderAutoBindType::ObjectNormalMatrix]
 					| eps[_val = Material::ShaderAutoBindType::NoAutoBind];
 
 				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
@@ -263,6 +264,7 @@ namespace kgx
 			if ( it->autoBindType != Material::ShaderAutoBindType::NoAutoBind )
 				material->addAutoShaderVar( sh, it->name, it->autoBindType );
 			//TODO: add support for default constant values
+			//TODO: do something with variable types => useful for custom ShaderVars
 			//else sh->updateConstantVariable( it->name, nullptr );
 		}
 	}

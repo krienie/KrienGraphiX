@@ -65,6 +65,9 @@ namespace kgx
 			case Material::ShaderAutoBindType::ObjectModelMatrix:
 				os << "ObjectModelMatrix";
 				break;
+			case Material::ShaderAutoBindType::ObjectNormalMatrix:
+				os << "ObjectNormalMatrix";
+				break;
 			default:
 				break;
 		}

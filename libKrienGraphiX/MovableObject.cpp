@@ -28,6 +28,19 @@ namespace kgx
 		return m_modelMatrix;
 	}
 
+	DirectX::XMFLOAT4X4 MovableObject::getNormalMatrix() const
+	{
+		// the normal matrix is the inverse-transpose of the model matrix
+		DirectX::XMMATRIX modelMat  = DirectX::XMLoadFloat4x4( &m_modelMatrix );
+		DirectX::XMMATRIX normalMat = DirectX::XMMatrixInverse( nullptr, modelMat );
+		normalMat = DirectX::XMMatrixTranspose( normalMat );
+
+		DirectX::XMFLOAT4X4 result;
+		DirectX::XMStoreFloat4x4( &result, normalMat );
+
+		return result;
+	}
+
 
 	void MovableObject::translate( float deltaX, float deltaY, float deltaZ )
 	{

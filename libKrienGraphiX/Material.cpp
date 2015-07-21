@@ -168,6 +168,10 @@ namespace kgx
 				tempFloat4x4 = renderObj->getModelMatrix();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
+			case ShaderAutoBindType::ObjectNormalMatrix:
+				tempFloat4x4 = renderObj->getNormalMatrix();
+				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
+				break;
 			default:
 				std::cout << "(Material::updateAutoShaderVar) Warning: Unknown shader variable type:" << shaderVar.type << " No update done." << std::endl;
 				break;

@@ -29,7 +29,8 @@ namespace kgx
 				CameraAspectRatio,
 				CameraNearZ,
 				CameraFarZ,
-				ObjectModelMatrix
+				ObjectModelMatrix,
+				ObjectNormalMatrix
 			};
 
 			typedef UINT MaterialID;
