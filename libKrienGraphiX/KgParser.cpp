@@ -31,7 +31,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderVar,
-	(kgx::Material::ShaderAutoBindType, autoBindType)
+	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
 	(std::string, type)
 	(std::string, name)
 	(std::string, defaultValue)
@@ -85,7 +85,7 @@ namespace kgx
 		std::vector<UINT> indices;
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 		std::vector<KgModelData> models;
-		std::map<std::string, KgMatData> materials;
+		std::map<std::string, KgMatData> ShaderPrograms;
 
 		struct KgoGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
@@ -112,26 +112,26 @@ namespace kgx
 					>> "Material(" >> *~qi::char_(')') >> lit(");")
 					>> lit("}");
 
-				shaderAutoBindType = qi::string( "CameraProjectionMatrix" )[_val = Material::ShaderAutoBindType::CameraProjectionMatrix]
-					| qi::string( "CameraViewMatrix" )[_val = Material::ShaderAutoBindType::CameraViewMatrix]
-					| qi::string( "CameraPosition" )[_val = Material::ShaderAutoBindType::CameraPosition]
-					| qi::string( "CameraTarget" )[_val = Material::ShaderAutoBindType::CameraTarget]
-					| qi::string( "CameraFieldOfView" )[_val = Material::ShaderAutoBindType::CameraFieldOfView]
-					| qi::string( "CameraAspectRatio" )[_val = Material::ShaderAutoBindType::CameraAspectRatio]
-					| qi::string( "CameraNearZ" )[_val = Material::ShaderAutoBindType::CameraNearZ]
-					| qi::string( "CameraFarZ" )[_val = Material::ShaderAutoBindType::CameraFarZ]
-					| qi::string( "ObjectModelMatrix" )[_val = Material::ShaderAutoBindType::ObjectModelMatrix]
-					| qi::string( "ObjectNormalMatrix" )[_val = Material::ShaderAutoBindType::ObjectNormalMatrix]
-					| eps[_val = Material::ShaderAutoBindType::NoAutoBind];
+				shaderAutoBindType = qi::string( "CameraProjectionMatrix" )[_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
+					| qi::string( "CameraViewMatrix" )[_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
+					| qi::string( "CameraPosition" )[_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
+					| qi::string( "CameraTarget" )[_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
+					| qi::string( "CameraFieldOfView" )[_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
+					| qi::string( "CameraAspectRatio" )[_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
+					| qi::string( "CameraNearZ" )[_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
+					| qi::string( "CameraFarZ" )[_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
+					| qi::string( "ObjectModelMatrix" )[_val = ShaderProgram::ShaderAutoBindType::ObjectModelMatrix]
+					| qi::string( "ObjectNormalMatrix" )[_val = ShaderProgram::ShaderAutoBindType::ObjectNormalMatrix]
+					| eps[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];
 
 				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
 				texture = "Texture(" >> *~qi::char_( ')' ) >> lit( ");" );
 				shaderDefinition = (qi::lit("VertexShader") | qi::lit("PixelShader")) >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
 
-				material = shaderDefinition >> shaderDefinition;
+				ShaderProgram = shaderDefinition >> shaderDefinition;
 				nameMatPair = omit[lit("Material(")] >> *~qi::char_(')') >> omit[lit(")")]
-					>> omit[lit("{")] >> material >> omit[lit("}")];
+					>> omit[lit("{")] >> ShaderProgram >> omit[lit("}")];
 
 				start = *(comment | vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
 						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
@@ -144,16 +144,16 @@ namespace kgx
 
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
-			qi::rule<std::string::const_iterator, Material::ShaderAutoBindType()> shaderAutoBindType;
+			qi::rule<std::string::const_iterator, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
 			qi::rule<std::string::const_iterator, KgMatData::ShaderVar(), Skipper> shaderVariable;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
 			qi::rule<std::string::const_iterator, KgMatData::ShaderDef(), Skipper> shaderDefinition;
 
-			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
+			qi::rule<std::string::const_iterator, KgMatData(), Skipper> ShaderProgram;
 			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
 
 			qi::rule<std::string::const_iterator> comment;
-		} kgmGrammar( vertices, indices, vertLayoutTypes, models, materials );
+		} kgmGrammar( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
 
 		Skipper skipper = iso8859::space;
 
@@ -169,13 +169,13 @@ namespace kgx
 			return nullptr;
 		}
 
-		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, materials );
+		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
 	}
 
 	RenderableObject* KgParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
 															   std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 															   std::vector<KgModelData> &models,
-															   std::map<std::string, KgMatData> &materials )
+															   std::map<std::string, KgMatData> &ShaderPrograms )
 	{
 		HRESULT buffCreated = E_FAIL;
 		VertexInputLayout vertLayout( vertLayoutTypes );
@@ -185,15 +185,15 @@ namespace kgx
 			return nullptr;
 
 
-		// create materials
-		std::map<std::string, Material*> materialPtrMap;
+		// create ShaderPrograms
+		std::map<std::string, ShaderProgram*> shaderProgramPtrMap;
 		std::map<std::string, KgMatData>::iterator matIt;
-		for ( matIt = materials.begin(); matIt != materials.end(); ++matIt )
+		for ( matIt = ShaderPrograms.begin(); matIt != ShaderPrograms.end(); ++matIt )
 		{
-			Material *material = ResourceManager::getInst()->createMaterial();
+			ShaderProgram *ShaderProgram = ResourceManager::getInst()->createShaderProgram();
 
-			VertexShader *vertShader = material->createVertexShader( matIt->second.vertexShader.name, vertLayout );
-			setShaderVariables( material, vertShader, matIt->second.vertexShader );
+			VertexShader *vertShader = ShaderProgram->createVertexShader( matIt->second.vertexShader.name, vertLayout );
+			setShaderVariables( ShaderProgram, vertShader, matIt->second.vertexShader );
 			// add vertex shader textures
 			std::vector<std::string>::iterator it;
 			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
@@ -205,8 +205,8 @@ namespace kgx
 
 			//TODO: add support for other shader types
 
-			PixelShader *pixShader = material->createPixelShader( matIt->second.pixelShader.name );
-			setShaderVariables( material, pixShader, matIt->second.pixelShader );
+			PixelShader *pixShader = ShaderProgram->createPixelShader( matIt->second.pixelShader.name );
+			setShaderVariables( ShaderProgram, pixShader, matIt->second.pixelShader );
 			// add pixel shader textures
 			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
 			{
@@ -216,39 +216,39 @@ namespace kgx
 			}
 
 
-			materialPtrMap.insert( std::pair<std::string, Material*>( matIt->first, material ) );
+			shaderProgramPtrMap.insert( std::pair<std::string, kgx::ShaderProgram*>( matIt->first, ShaderProgram ) );
 		}
 
 
 		// create models
-		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > MaterialMeshPair;
-		std::map< std::string, std::vector<RenderableObject::Mesh> > materialMeshPtrMap;
+		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > ShaderProgramMeshPair;
+		std::map< std::string, std::vector<RenderableObject::Mesh> > ShaderProgramMeshPtrMap;
 		std::vector<KgModelData>::iterator modIt;
 		for ( modIt = models.begin(); modIt != models.end(); ++modIt )
 		{
 			RenderableObject::Mesh mesh( modIt->modelName, modIt->startIndex, modIt->indexCount );
 
-			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = materialMeshPtrMap.find( modIt->matName );
-			if ( matMeshIt != materialMeshPtrMap.end() )
+			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = ShaderProgramMeshPtrMap.find( modIt->matName );
+			if ( matMeshIt != ShaderProgramMeshPtrMap.end() )
 				matMeshIt->second.push_back( mesh );
-			else materialMeshPtrMap.insert( MaterialMeshPair( modIt->matName, { mesh } ) );
+			else ShaderProgramMeshPtrMap.insert( ShaderProgramMeshPair( modIt->matName, { mesh } ) );
 		}
 
 		// create meshes
-		// sort meshes by material
+		// sort meshes by ShaderProgram
 		//		sort meshes by start index => maybe combine meshes?
 
 		//TODO: maybe combine meshes?
 		// create object containers
 		std::vector<RenderableObject::ObjectContainer> objContainers;
 		std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt;
-		for ( matMeshIt = materialMeshPtrMap.begin(); matMeshIt != materialMeshPtrMap.end(); ++matMeshIt )
+		for ( matMeshIt = ShaderProgramMeshPtrMap.begin(); matMeshIt != ShaderProgramMeshPtrMap.end(); ++matMeshIt )
 		{
 			// sort by mesh
 			std::sort( matMeshIt->second.begin(), matMeshIt->second.end() );
 
-			// assumes the material for the mesh is always found
-			objContainers.push_back( RenderableObject::ObjectContainer( matMeshIt->second, materialPtrMap.find(matMeshIt->first)->second ) );
+			// assumes the ShaderProgram for the mesh is always found
+			objContainers.push_back( RenderableObject::ObjectContainer( matMeshIt->second, shaderProgramPtrMap.find(matMeshIt->first)->second ) );
 		}
 			
 		MeshBuffer meshBuff = ResourceManager::getInst()->getBuffer( buffID );
@@ -256,13 +256,13 @@ namespace kgx
 		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, objContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	}
 
-	void KgParser::setShaderVariables( Material *material, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
+	void KgParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
 	{
 		std::vector<KgMatData::ShaderVar>::const_iterator it;
 		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )
 		{
-			if ( it->autoBindType != Material::ShaderAutoBindType::NoAutoBind )
-				material->addAutoShaderVar( sh, it->name, it->autoBindType );
+			if ( it->autoBindType != ShaderProgram::ShaderAutoBindType::NoAutoBind )
+				ShaderProgram->addAutoShaderVar( sh, it->name, it->autoBindType );
 			//TODO: add support for default constant values
 			//TODO: do something with variable types => useful for custom ShaderVars
 			//else sh->updateConstantVariable( it->name, nullptr );

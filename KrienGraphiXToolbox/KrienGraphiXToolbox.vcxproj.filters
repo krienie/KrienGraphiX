@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Source Files\shaders">
+      <UniqueIdentifier>{d05ff5c7-741d-4c44-acc5-feb4742562b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -108,5 +111,13 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KrienGraphiXToolbox.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\CopperVS.hlsl">
+      <Filter>Source Files\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\CopperPS.hlsl">
+      <Filter>Source Files\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

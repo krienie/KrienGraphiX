@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "Material.h"
+#include "ShaderProgram.h"
 #include "RenderableObject.h"
 
 namespace kgx
@@ -43,7 +43,7 @@ namespace kgx
 		std::vector<ObjectContainer>::iterator objIt;
 		for ( objIt = m_objContainers.begin(); objIt != m_objContainers.end(); ++objIt )
 		{
-			// activate material
+			// activate ShaderProgram
 			objIt->mat->activate( renderCam, this );
 
 			// draw Meshes

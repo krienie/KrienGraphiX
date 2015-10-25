@@ -30,42 +30,42 @@ namespace kgx
 		return os;
 	}
 
-	// the streaming operator for Material::ShaderAutoBindType
-	inline std::ostream& operator<< ( std::ostream& os, const Material::ShaderAutoBindType &type )
+	// the streaming operator for ShaderProgram::ShaderAutoBindType
+	inline std::ostream& operator<< ( std::ostream& os, const ShaderProgram::ShaderAutoBindType &type )
 	{
 		switch ( type )
 		{
-			case Material::ShaderAutoBindType::NoAutoBind:
+			case ShaderProgram::ShaderAutoBindType::NoAutoBind:
 				//os << "NoAutoBind";
 				break;
-			case Material::ShaderAutoBindType::CameraProjectionMatrix:
+			case ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix:
 				os << "CameraProjectionMatrix";
 				break;
-			case Material::ShaderAutoBindType::CameraViewMatrix:
+			case ShaderProgram::ShaderAutoBindType::CameraViewMatrix:
 				os << "CameraViewMatrix";
 				break;
-			case Material::ShaderAutoBindType::CameraPosition:
+			case ShaderProgram::ShaderAutoBindType::CameraPosition:
 				os << "CameraPosition";
 				break;
-			case Material::ShaderAutoBindType::CameraTarget:
+			case ShaderProgram::ShaderAutoBindType::CameraTarget:
 				os << "CameraTarget";
 				break;
-			case Material::ShaderAutoBindType::CameraFieldOfView:
+			case ShaderProgram::ShaderAutoBindType::CameraFieldOfView:
 				os << "CameraFieldOfView";
 				break;
-			case Material::ShaderAutoBindType::CameraAspectRatio:
+			case ShaderProgram::ShaderAutoBindType::CameraAspectRatio:
 				os << "CameraAspectRatio";
 				break;
-			case Material::ShaderAutoBindType::CameraNearZ:
+			case ShaderProgram::ShaderAutoBindType::CameraNearZ:
 				os << "CameraNearZ";
 				break;
-			case Material::ShaderAutoBindType::CameraFarZ:
+			case ShaderProgram::ShaderAutoBindType::CameraFarZ:
 				os << "CameraFarZ";
 				break;
-			case Material::ShaderAutoBindType::ObjectModelMatrix:
+			case ShaderProgram::ShaderAutoBindType::ObjectModelMatrix:
 				os << "ObjectModelMatrix";
 				break;
-			case Material::ShaderAutoBindType::ObjectNormalMatrix:
+			case ShaderProgram::ShaderAutoBindType::ObjectNormalMatrix:
 				os << "ObjectNormalMatrix";
 				break;
 			default:

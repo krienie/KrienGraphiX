@@ -456,17 +456,17 @@ namespace kgx
 		KgMatData::ShaderVar var;
 		var.name         = "viewMatrix";
 		var.type         = "mat4x4";
-		var.autoBindType = Material::ShaderAutoBindType::CameraViewMatrix;
+		var.autoBindType = ShaderProgram::ShaderAutoBindType::CameraViewMatrix;
 		kgMat.vertexShader.variables.push_back( var );
 
 		var.name         = "projMatrix";
 		var.type         = "mat4x4";
-		var.autoBindType = Material::ShaderAutoBindType::CameraProjectionMatrix;
+		var.autoBindType = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix;
 		kgMat.vertexShader.variables.push_back( var );
 
 		var.name         = "modelMatrix";
 		var.type         = "mat4x4";
-		var.autoBindType = Material::ShaderAutoBindType::ObjectModelMatrix;
+		var.autoBindType = ShaderProgram::ShaderAutoBindType::ObjectModelMatrix;
 		kgMat.vertexShader.variables.push_back( var );
 
 		// pixel shader variables

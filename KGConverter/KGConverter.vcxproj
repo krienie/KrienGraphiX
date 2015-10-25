@@ -41,11 +41,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(BOOST_DIR);../libKrienGraphiX;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(BOOST_DIR);../libKrienGraphiX;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

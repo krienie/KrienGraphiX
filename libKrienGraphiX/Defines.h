@@ -13,8 +13,6 @@ namespace kgx
 		MeshBuffer()
 			: vertBuff(0), indexBuff(0), inputDescriptor() {}
 
-		// using default copy-constructor and assignment-operator
-
 		ID3D11Buffer *vertBuff, *indexBuff;
 		VertexInputLayout inputDescriptor;
 	};

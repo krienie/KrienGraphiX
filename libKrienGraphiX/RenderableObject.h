@@ -11,7 +11,7 @@
 namespace kgx
 {
 	class Camera;
-	class Material;
+	class ShaderProgram;
 
 	class RenderableObject : public MovableObject
 	{
@@ -30,10 +30,10 @@ namespace kgx
 
 			struct ObjectContainer
 			{
-				ObjectContainer( const std::vector<Mesh> &me, Material *ma ) : meshes(me), mat(ma) {}
+				ObjectContainer( const std::vector<Mesh> &me, ShaderProgram *ma ) : meshes(me), mat(ma) {}
 
 				std::vector<Mesh> meshes;
-				Material *mat;
+				ShaderProgram *mat;
 			};
 
 			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,

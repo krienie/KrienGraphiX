@@ -8,7 +8,7 @@
 namespace kgx
 {
 	class RenderableObject;
-	class Shader;
+	class ShaderBase;
 	class VertexShader;
 	class PixelShader;
 
@@ -28,8 +28,8 @@ namespace kgx
 			static RenderableObject* renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
 																	std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 																	std::vector<KgModelData> &models,
-																	std::map<std::string, KgMatData> &materials );
+																	std::map<std::string, KgMatData> &ShaderPrograms );
 
-			static void setShaderVariables( Material *material, ShaderBase *sh, const KgMatData::ShaderDef &shDef );
+			static void setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgMatData::ShaderDef &shDef );
 	};
 }

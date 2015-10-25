@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "Material.h"
+#include "ShaderProgram.h"
 #include "VertexInputLayout.h"
 
 typedef unsigned int UINT;
@@ -26,9 +26,9 @@ namespace kgx
 	{
 		struct ShaderVar
 		{
-			ShaderVar() : name(), type(), defaultValue(), autoBindType(Material::ShaderAutoBindType::NoAutoBind) {}
+			ShaderVar() : name(), type(), defaultValue(), autoBindType(ShaderProgram::ShaderAutoBindType::NoAutoBind) {}
 
-			Material::ShaderAutoBindType autoBindType;
+			ShaderProgram::ShaderAutoBindType autoBindType;
 			std::string type;
 			std::string name;
 			std::string defaultValue;

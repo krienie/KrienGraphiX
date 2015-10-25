@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Defines.h"
-#include "Material.h"
+#include "ShaderProgram.h"
 
 
 namespace kgx
@@ -24,9 +24,9 @@ namespace kgx
 								const VertexInputLayout &inputDescriptor, HRESULT &result );
 			void releaseBuffer( MeshBufferID id );
 
-			Material* getMaterial( Material::MaterialID id ) const;
-			Material* createMaterial();
-			void releaseMaterial( Material::MaterialID id );
+			ShaderProgram* getShaderProgram( ShaderProgram::ShaderProgramID id ) const;
+			ShaderProgram* createShaderProgram();
+			void releaseShaderProgram( ShaderProgram::ShaderProgramID id );
 
 
 		private:
@@ -43,7 +43,7 @@ namespace kgx
 			
 			MeshBufferID m_nextBufferID;
 			std::map<MeshBufferID, MeshBuffer> m_meshBuffers;
-			Material::MaterialID m_nextMaterialID;
-			std::map<Material::MaterialID, Material*> m_materials;
+			ShaderProgram::ShaderProgramID m_nextShaderProgramID;
+			std::map<ShaderProgram::ShaderProgramID, ShaderProgram*> m_ShaderPrograms;
 	};
 }

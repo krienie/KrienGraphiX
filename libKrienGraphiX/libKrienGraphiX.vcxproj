@@ -16,7 +16,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="KgParser.h" />
     <ClInclude Include="KGXCore.h" />
-    <ClInclude Include="Material.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="MovableObject.h" />
     <ClInclude Include="parser_defines.h" />
     <ClInclude Include="PixelShader.h" />
@@ -36,7 +36,7 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="KgParser.cpp" />
     <ClCompile Include="KGXCore.cpp" />
-    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
@@ -101,11 +101,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

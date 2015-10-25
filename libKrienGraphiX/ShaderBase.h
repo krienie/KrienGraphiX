@@ -13,14 +13,15 @@ namespace kgx
 	class ShaderBase
 	{
 		public:
-			bool load( const std::wstring &filename );
+			HRESULT loadFromFile( const std::wstring &filename );
+			HRESULT loadFromSource( const std::string &source, const std::string &entryPoint = "main" );
 
 			void updateConstantVariable( const std::string &name, _In_ void *dataPtr );
 			void addTexture( _In_ Texture *tex );
 			virtual void activate() = 0;
 
 		protected:
-			explicit ShaderBase( _In_ ID3D11Device *dxDevice );
+			explicit ShaderBase( _In_ ID3D11Device *dxDevice, const std::string &target );
 			virtual ~ShaderBase();
 
 			virtual HRESULT build( _In_ ID3DBlob *shaderSource ) = 0;
@@ -36,9 +37,13 @@ namespace kgx
 			std::vector<ID3D11Resource*> m_texBuffers;
 			std::vector<ID3D11ShaderResourceView*> m_texViews;
 
+			std::string m_target;
+
 		private:
 			// no copying allowed
 			ShaderBase( const ShaderBase& );
 			ShaderBase& operator=(const ShaderBase&);
+
+			HRESULT processLoadedShaderBlob( _In_ ID3DBlob *shaderSource );
 	};
 }

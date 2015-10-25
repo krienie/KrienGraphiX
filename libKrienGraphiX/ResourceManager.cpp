@@ -2,7 +2,7 @@
 #include <comdef.h>
 #include <iostream>
 
-#include "Material.h"
+#include "ShaderProgram.h"
 #include "ResourceManager.h"
 
 namespace kgx
@@ -31,7 +31,7 @@ namespace kgx
 
 
 	ResourceManager::ResourceManager( _In_ ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_nextBufferID(1), m_meshBuffers(), m_nextMaterialID(1), m_materials()
+		: m_dxDev(dxDevice), m_nextBufferID(1), m_meshBuffers(), m_nextShaderProgramID(1), m_ShaderPrograms()
 	{
 	}
 
@@ -47,9 +47,9 @@ namespace kgx
 				bIt->second.indexBuff->Release();
 		}
 
-		// release all material
-		std::map<Material::MaterialID, Material*>::iterator mIt;
-		for ( mIt = m_materials.begin(); mIt != m_materials.end(); ++mIt )
+		// release all ShaderProgram
+		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator mIt;
+		for ( mIt = m_ShaderPrograms.begin(); mIt != m_ShaderPrograms.end(); ++mIt )
 			delete mIt->second;
 	}
 
@@ -152,34 +152,34 @@ namespace kgx
 	}
 
 
-	Material* ResourceManager::getMaterial( Material::MaterialID id ) const
+	ShaderProgram* ResourceManager::getShaderProgram( ShaderProgram::ShaderProgramID id ) const
 	{
-		std::map<Material::MaterialID, Material*>::const_iterator it;
-		it = m_materials.find(id);
+		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::const_iterator it;
+		it = m_ShaderPrograms.find(id);
 
-		if ( it != m_materials.cend() )
+		if ( it != m_ShaderPrograms.cend() )
 			return it->second;
 
-		std::cout << "Warning (ResourceManager::getMaterial): Material with id " << id << " was not found." << std::endl;
+		std::cout << "Warning (ResourceManager::getShaderProgram): ShaderProgram with id " << id << " was not found." << std::endl;
 		return nullptr;
 	}
 
-	Material* ResourceManager::createMaterial()
+	ShaderProgram* ResourceManager::createShaderProgram()
 	{
-		Material *newMat = new Material( m_dxDev, m_nextMaterialID );
+		ShaderProgram *newMat = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
 
-		m_materials.insert( std::pair<Material::MaterialID, Material*>( m_nextMaterialID, newMat ) );
-		m_nextMaterialID++;
+		m_ShaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newMat ) );
+		m_nextShaderProgramID++;
 
 		return newMat;
 	}
 
-	void ResourceManager::releaseMaterial( Material::MaterialID id )
+	void ResourceManager::releaseShaderProgram( ShaderProgram::ShaderProgramID id )
 	{
-		std::map<Material::MaterialID, Material*>::iterator it;
-		it = m_materials.find(id);
+		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator it;
+		it = m_ShaderPrograms.find(id);
 
-		if ( it != m_materials.end() )
+		if ( it != m_ShaderPrograms.end() )
 			delete it->second;
 	}
 }

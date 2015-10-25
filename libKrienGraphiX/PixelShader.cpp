@@ -8,7 +8,7 @@
 namespace kgx
 {
 	PixelShader::PixelShader( _In_ ID3D11Device *dxDev )
-		: ShaderBase( dxDev ), m_pixelShader( 0 )//, structBuffers(), bufferUAVs()
+		: ShaderBase( dxDev, "ps_5_0" ), m_pixelShader( 0 )//, structBuffers(), bufferUAVs()
 	{
 	}
 

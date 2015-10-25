@@ -11,7 +11,7 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <sstream>
 
-#include <Material.h>
+#include <ShaderProgram.h>
 
 #include "KGObjectGenerator.h"
 
@@ -26,7 +26,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderVar,
-	(kgx::Material::ShaderAutoBindType, autoBindType)
+	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
 	(std::string, type)
 	(std::string, name)
 	(std::string, defaultValue)
@@ -132,7 +132,7 @@ namespace kgx
 			karma::rule<BackInsertIt, karma::space_type> vertices;
 			karma::rule<BackInsertIt, karma::space_type> indices;
 			karma::rule<BackInsertIt, KgModelData(), karma::space_type> model;
-			karma::rule<BackInsertIt, Material::ShaderAutoBindType()> shaderAutoBindType;
+			karma::rule<BackInsertIt, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
 			karma::rule<BackInsertIt, KgMatData::ShaderVar(), karma::space_type> shaderVariable;
 			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> vertexShader;
 			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> pixelShader;

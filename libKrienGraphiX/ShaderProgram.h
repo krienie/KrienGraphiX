@@ -15,7 +15,7 @@ namespace kgx
 	class VertexShader;
 	class PixelShader;
 
-	class Material
+	class ShaderProgram
 	{
 		public:
 			enum ShaderAutoBindType
@@ -33,12 +33,12 @@ namespace kgx
 				ObjectNormalMatrix
 			};
 
-			typedef UINT MaterialID;
+			typedef UINT ShaderProgramID;
 
-			Material( _In_ ID3D11Device *dxDevice, MaterialID id );
-			~Material();
+			ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id );
+			virtual ~ShaderProgram();
 
-			MaterialID getID() const;
+			ShaderProgramID getID() const;
 
 			VertexShader* createVertexShader( const std::string &filename, const VertexInputLayout &layout );
 			VertexShader* createVertexShader( const std::wstring &filename, const VertexInputLayout &layout );
@@ -47,7 +47,7 @@ namespace kgx
 			//void setGeometryShader( _In_ GeometryShader *shader );
 			PixelShader* createPixelShader( const std::string &filename );
 			PixelShader* createPixelShader( const std::wstring &filename );
-			//TODO: add support for other shader types, except for compute-shaders => it will get its own thing, separate from Material
+			//TODO: add support for other shader types, except for compute-shaders => it will get its own thing, separate from ShaderProgram
 
 			VertexShader* getVertexShader() const;
 			PixelShader* getPixelShader() const;
@@ -58,8 +58,8 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			Material( const Material& );
-			Material& operator=( const Material& );
+			ShaderProgram( const ShaderProgram& );
+			ShaderProgram& operator=( const ShaderProgram& );
 
 			struct AutoShaderVar
 			{
@@ -75,7 +75,7 @@ namespace kgx
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
 
-			MaterialID m_matID;
+			ShaderProgramID m_matID;
 
 			// shaders
 			VertexShader *m_vertShader;

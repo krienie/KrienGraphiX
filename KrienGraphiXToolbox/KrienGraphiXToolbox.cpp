@@ -41,18 +41,26 @@ namespace kgxt
 		{
 			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
 
-			//TODO: temporary
-			/*kgx::Texture *tex = kgx::TextureManager::getInst()->loadTexture( L"uvCheckerboard.jpg" );
+			//TODO: temporary => only useful in combination with Sphere.cso (and Copper*S shaders)
+
+			float ambientLight[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
+			float lightDir[3]     = { 0.25f, 1.0f, 0.75f };
+			float lightIntensity  = 0.7f;
+
 			kgx::RenderableObject::ObjectIterator it = renObj->getChildrenBegin();
 			for ( it; it != renObj->getChildrenEnd(); ++it )
 			{
 				kgx::PixelShader *pixShader = it->mat->getPixelShader();
-				pixShader->addTexture( tex );
-			}*/
+
+				pixShader->updateConstantVariable( "aLightClr", ambientLight );
+				pixShader->updateConstantVariable( "dLightDir", lightDir );
+				pixShader->updateConstantVariable( "dLightIntensity", &lightIntensity );
+			}
 
 			// add RenderableObject to scene
 			m_defaultScene->claimRenderableObject( renObj );
 		}
+
 
 		m_ui.renderWidget1->startRendering();
 

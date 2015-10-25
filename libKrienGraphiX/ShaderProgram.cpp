@@ -6,18 +6,18 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "RenderableObject.h"
-#include "Material.h"
+#include "ShaderProgram.h"
 
 namespace kgx
 {
-	Material::Material( _In_ ID3D11Device *dxDevice, MaterialID id )
+	ShaderProgram::ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id )
 		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_matID(), m_vertShader( nullptr ),
 			m_pixShader(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
-	Material::~Material()
+	ShaderProgram::~ShaderProgram()
 	{
 		if ( m_vertShader )
 			delete m_vertShader;
@@ -28,19 +28,20 @@ namespace kgx
 	}
 
 
-	Material::MaterialID Material::getID() const
+	ShaderProgram::ShaderProgramID ShaderProgram::getID() const
 	{
 		return m_matID;
 	}
 
 
-	VertexShader* Material::createVertexShader( const std::wstring &filename, const VertexInputLayout &layout )
+	VertexShader* ShaderProgram::createVertexShader( const std::wstring &filename, const VertexInputLayout &layout )
 	{
 		m_vertShader = new VertexShader( m_dxDev, layout );
 
-		if ( !m_vertShader->load(filename) )
+		if ( FAILED(m_vertShader->loadFromFile(filename)) )
 		{
 			// shader loading failed
+			std::cout << "Error (ShaderProgram::createVertexShader): Error creating vertex shader" << std::endl;
 			delete m_vertShader;
 			m_vertShader = nullptr;
 		}
@@ -48,19 +49,20 @@ namespace kgx
 		return m_vertShader;
 	}
 
-	VertexShader* Material::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
+	VertexShader* ShaderProgram::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
 	{
 		std::wstring wFilename( filename.begin(), filename.end() );
 		return createVertexShader( wFilename, layout );
 	}
 
-	PixelShader* Material::createPixelShader( const std::wstring &filename )
+	PixelShader* ShaderProgram::createPixelShader( const std::wstring &filename )
 	{
 		m_pixShader = new PixelShader( m_dxDev );
 
-		if ( !m_pixShader->load(filename) )
+		if ( FAILED(m_pixShader->loadFromFile(filename)) )
 		{
 			// shader loading failed
+			std::cout << "Error (ShaderProgram::createPixelShader): Error creating pixel shader" << std::endl;
 			delete m_pixShader;
 			m_pixShader = nullptr;
 		}
@@ -68,25 +70,25 @@ namespace kgx
 		return m_pixShader;
 	}
 
-	PixelShader* Material::createPixelShader( const std::string &filename )
+	PixelShader* ShaderProgram::createPixelShader( const std::string &filename )
 	{
 		std::wstring wFilename( filename.begin(), filename.end() );
 		return createPixelShader( wFilename );
 	}
 
 
-	VertexShader* Material::getVertexShader() const
+	VertexShader* ShaderProgram::getVertexShader() const
 	{
 		return m_vertShader;
 	}
 
-	PixelShader* Material::getPixelShader() const
+	PixelShader* ShaderProgram::getPixelShader() const
 	{
 		return m_pixShader;
 	}
 
 
-	void Material::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
+	void ShaderProgram::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
 		// get auto variable list or create one if not already present
 		std::pair< std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars;
@@ -97,7 +99,7 @@ namespace kgx
 	}
 
 
-	void Material::activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj )
+	void ShaderProgram::activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj )
 	{
 		std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator shaderIt;
 		std::vector<AutoShaderVar>::iterator varIt;
@@ -124,7 +126,7 @@ namespace kgx
 	}
 
 
-	void Material::updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
+	void ShaderProgram::updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
 										_In_ ShaderBase *shader, AutoShaderVar shaderVar )
 	{
 		float tempFloat = 0.0f;
@@ -173,7 +175,7 @@ namespace kgx
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
 			default:
-				std::cout << "(Material::updateAutoShaderVar) Warning: Unknown shader variable type:" << shaderVar.type << " No update done." << std::endl;
+				std::cout << "(ShaderProgram::updateAutoShaderVar) Warning: Unknown shader variable type:" << shaderVar.type << " No update done." << std::endl;
 				break;
 		}
 	}

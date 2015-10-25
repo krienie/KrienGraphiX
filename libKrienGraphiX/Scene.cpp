@@ -27,10 +27,7 @@ namespace kgx
 
 	void Scene::render( _In_ Camera *renderCam )
 	{
-		// activate lights
-
-		// for every RenderableObject
-		//		draw RenderableObject
+		//TODO: activate lights
 
 		std::vector<RenderableObject*>::iterator it;
 		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
