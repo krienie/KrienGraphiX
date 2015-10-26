@@ -11,7 +11,7 @@
 namespace kgx
 {
 	ShaderProgram::ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id )
-		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_matID(), m_vertShader( nullptr ),
+		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_progID(), m_vertShader( nullptr ),
 			m_pixShader(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -30,7 +30,7 @@ namespace kgx
 
 	ShaderProgram::ShaderProgramID ShaderProgram::getID() const
 	{
-		return m_matID;
+		return m_progID;
 	}
 
 

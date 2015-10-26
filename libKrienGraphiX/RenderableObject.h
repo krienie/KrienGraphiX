@@ -30,10 +30,10 @@ namespace kgx
 
 			struct ObjectContainer
 			{
-				ObjectContainer( const std::vector<Mesh> &me, ShaderProgram *ma ) : meshes(me), mat(ma) {}
+				ObjectContainer( const std::vector<Mesh> &me, ShaderProgram *sp ) : meshes(me), shaderProg(sp) {}
 
 				std::vector<Mesh> meshes;
-				ShaderProgram *mat;
+				ShaderProgram *shaderProg;
 			};
 
 			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,

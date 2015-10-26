@@ -75,7 +75,7 @@ namespace kgx
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
 
-			ShaderProgramID m_matID;
+			ShaderProgramID m_progID;
 
 			// shaders
 			VertexShader *m_vertShader;

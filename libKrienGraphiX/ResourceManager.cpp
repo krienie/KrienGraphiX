@@ -166,12 +166,12 @@ namespace kgx
 
 	ShaderProgram* ResourceManager::createShaderProgram()
 	{
-		ShaderProgram *newMat = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
+		ShaderProgram *newProg = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
 
-		m_ShaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newMat ) );
+		m_ShaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newProg ) );
 		m_nextShaderProgramID++;
 
-		return newMat;
+		return newProg;
 	}
 
 	void ResourceManager::releaseShaderProgram( ShaderProgram::ShaderProgramID id )

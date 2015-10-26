@@ -44,7 +44,7 @@ namespace kgx
 		for ( objIt = m_objContainers.begin(); objIt != m_objContainers.end(); ++objIt )
 		{
 			// activate ShaderProgram
-			objIt->mat->activate( renderCam, this );
+			objIt->shaderProg->activate( renderCam, this );
 
 			// draw Meshes
 			std::vector<Mesh>::iterator meshIt;

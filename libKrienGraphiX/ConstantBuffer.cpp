@@ -103,8 +103,6 @@ namespace kgx
 
 		m_bufferElementSize = sizeInBytes;
 		m_rawData = new UCHAR[sizeInBytes];
-		//m_rawData.reserve(sizeInBytes);
-		//std::cout << "capacity: " << m_rawData.capacity() << std::endl;
 
 		return res;
 	}

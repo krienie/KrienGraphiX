@@ -50,7 +50,7 @@ namespace kgxt
 			kgx::RenderableObject::ObjectIterator it = renObj->getChildrenBegin();
 			for ( it; it != renObj->getChildrenEnd(); ++it )
 			{
-				kgx::PixelShader *pixShader = it->mat->getPixelShader();
+				kgx::PixelShader *pixShader = it->shaderProg->getPixelShader();
 
 				pixShader->updateConstantVariable( "aLightClr", ambientLight );
 				pixShader->updateConstantVariable( "dLightDir", lightDir );
