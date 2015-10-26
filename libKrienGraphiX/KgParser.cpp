@@ -3,6 +3,8 @@
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #endif
 
+#pragma warning( disable : 4244 )		// warning C4244: conversion from 'unsigned int' to 'float', possible loss of data. This is intentional.
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/support_iso8859_1.hpp>
@@ -102,7 +104,7 @@ namespace kgx
 									| qi::string( "Normal" )[_val = VertexInputLayout::Normal]
 									| qi::string( "Tangent" )[_val = VertexInputLayout::Tangent];
 				vertices = "Vertices(" >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') >> ")"
-					>> lit("{") >> *float_[phx::push_back( phx::ref( v ), qi::_1 )] >> lit( ";" ) >> "}";
+					>> lit("{") >> *float_[phx::push_back( phx::ref(v), qi::_1 )] >> lit(";") >> "}";
 
 				indices = "Indices()" >> lit("{") >> *uint_[phx::push_back( phx::ref(i), qi::_1 )] >> lit(";") >> "}";
 
@@ -125,7 +127,7 @@ namespace kgx
 					| eps[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];
 
 				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
-				texture = "Texture(" >> *~qi::char_( ')' ) >> lit( ");" );
+				texture = "Texture(" >> *~qi::char_(')') >> lit(");");
 				shaderDefinition = (qi::lit("VertexShader") | qi::lit("PixelShader")) >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
 
@@ -269,3 +271,5 @@ namespace kgx
 		}
 	}
 }
+
+#pragma warning( default : 4244 )	// restore default warning level

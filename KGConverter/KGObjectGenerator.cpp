@@ -147,3 +147,4 @@ namespace kgx
 	}
 }
 
+#pragma warning( default : 4996 )	// restore default warning level
