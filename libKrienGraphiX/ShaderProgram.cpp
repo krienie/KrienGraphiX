@@ -11,8 +11,8 @@
 namespace kgx
 {
 	ShaderProgram::ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id )
-		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_progID(id), m_vertShader( nullptr ),
-			m_pixShader(nullptr), m_constVarLinks()
+		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_progID(id), m_vertShader(nullptr),
+		/*m_hullShader(nullptr), m_domainShader(nullptr), m_geomShader(nullptr),*/ m_pixShader(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -21,6 +21,12 @@ namespace kgx
 	{
 		if ( m_vertShader )
 			delete m_vertShader;
+		/*if ( m_hullShader )
+			delete m_hullShader;
+		if ( m_domainShader )
+			delete m_domainShader;
+		if ( m_geomShader )
+			delete m_geomShader;*/
 		if ( m_pixShader )
 			delete m_pixShader;
 		if ( m_dxDevCont )
@@ -34,11 +40,11 @@ namespace kgx
 	}
 
 
-	VertexShader* ShaderProgram::createVertexShader( const std::wstring &filename, const VertexInputLayout &layout )
+	VertexShader* ShaderProgram::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
 	{
 		m_vertShader = new VertexShader( m_dxDev, layout );
 
-		if ( FAILED(m_vertShader->loadFromFile(filename)) )
+		if ( FAILED(m_vertShader->loadFromFile( std::wstring(filename.begin(), filename.end()) )) )
 		{
 			// shader loading failed
 			std::cout << "Error (ShaderProgram::createVertexShader): Error creating vertex shader" << std::endl;
@@ -49,17 +55,11 @@ namespace kgx
 		return m_vertShader;
 	}
 
-	VertexShader* ShaderProgram::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
-	{
-		std::wstring wFilename( filename.begin(), filename.end() );
-		return createVertexShader( wFilename, layout );
-	}
-
-	PixelShader* ShaderProgram::createPixelShader( const std::wstring &filename )
+	PixelShader* ShaderProgram::createPixelShader( const std::string &filename )
 	{
 		m_pixShader = new PixelShader( m_dxDev );
 
-		if ( FAILED(m_pixShader->loadFromFile(filename)) )
+		if ( FAILED(m_pixShader->loadFromFile( std::wstring(filename.begin(), filename.end()) )) )
 		{
 			// shader loading failed
 			std::cout << "Error (ShaderProgram::createPixelShader): Error creating pixel shader" << std::endl;
@@ -70,12 +70,36 @@ namespace kgx
 		return m_pixShader;
 	}
 
-	PixelShader* ShaderProgram::createPixelShader( const std::string &filename )
-	{
-		std::wstring wFilename( filename.begin(), filename.end() );
-		return createPixelShader( wFilename );
-	}
 
+	ShaderBase* ShaderProgram::getShader( ShaderType shader ) const
+	{
+		switch ( shader )
+		{
+			case ShaderType::Vertex:
+				return m_vertShader;
+				break;
+			case ShaderType::Hull:
+				std::cout << "Warning (ShaderProgram::getShader): Hull shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_hullShader;
+				break;
+			case ShaderType::Domain:
+				std::cout << "Warning (ShaderProgram::getShader): Domain shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_domainShader;
+				break;
+			case ShaderType::Geometry:
+				std::cout << "Warning (ShaderProgram::getShader): Geometry shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_geomShader;
+				break;
+			case ShaderType::Pixel:
+				return m_pixShader;
+				break;
+			default:
+				return nullptr;
+		}
+	}
 
 	VertexShader* ShaderProgram::getVertexShader() const
 	{
