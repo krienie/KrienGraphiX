@@ -71,14 +71,14 @@ namespace kgx
 	}
 
 
-	ShaderBase* ShaderProgram::getShader( ShaderType shader ) const
+	ShaderBase* ShaderProgram::getShader( ShaderType type ) const
 	{
-		switch ( shader )
+		switch ( type )
 		{
 			case ShaderType::Vertex:
 				return m_vertShader;
 				break;
-			case ShaderType::Hull:
+			/*case ShaderType::Hull:
 				std::cout << "Warning (ShaderProgram::getShader): Hull shader not supported yet." << std::endl;
 				return nullptr;
 				//return m_hullShader;
@@ -92,7 +92,7 @@ namespace kgx
 				std::cout << "Warning (ShaderProgram::getShader): Geometry shader not supported yet." << std::endl;
 				return nullptr;
 				//return m_geomShader;
-				break;
+				break;*/
 			case ShaderType::Pixel:
 				return m_pixShader;
 				break;
@@ -112,8 +112,21 @@ namespace kgx
 	}
 
 
+	void ShaderProgram::addAutoShaderVar( ShaderType shaderType, const std::string &varName, ShaderAutoBindType varType )
+	{
+		ShaderBase *shader = getShader( shaderType );
+		if ( shader )
+			addAutoShaderVar( shader, varName, varType );
+		else std::cout << "Error (ShaderProgram::addAutoShaderVar): Shader not found. Call ShaderProgram::createShadertypeShader() first." << std::endl;
+	}
 	void ShaderProgram::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
+		if ( !shader )
+		{
+			std::cout << "Error (ShaderProgram::addAutoShaderVar): Shader cannot be nullptr." << std::endl;
+			return;
+		}
+
 		// get auto variable list or create one if not already present
 		std::pair< std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator, bool > shaderVars;
 		shaderVars = m_constVarLinks.insert( std::pair< ShaderBase*, std::vector<AutoShaderVar> >( shader, std::vector<AutoShaderVar>() ) );
@@ -122,13 +135,21 @@ namespace kgx
 		shaderVars.first->second.push_back( AutoShaderVar(varName, varType) );
 	}
 
+	void ShaderProgram::updateShaderVar( ShaderType shaderType, const std::string &name, _In_ const void *dataPtr )
+	{
+		ShaderBase *shader = getShader( shaderType );
+		if ( shader )
+			shader->updateConstantVariable( name, dataPtr );
+		else std::cout << "Error (ShaderProgram::updateShaderVar): Shader not found. Call ShaderProgram::createShadertypeShader() first." << std::endl;
+	}
+
 
 	void ShaderProgram::activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj )
 	{
 		std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator shaderIt;
 		std::vector<AutoShaderVar>::iterator varIt;
 
-		// bind shaders to pipeline
+		// update shader constants and bind shaders to pipeline
 		if ( m_vertShader )
 		{
 			shaderIt = m_constVarLinks.find(m_vertShader);
@@ -199,6 +220,7 @@ namespace kgx
 				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
 			default:
+				//This should never happen...
 				std::cout << "(ShaderProgram::updateAutoShaderVar) Warning: Unknown shader variable type:" << shaderVar.type << " No update done." << std::endl;
 				break;
 		}

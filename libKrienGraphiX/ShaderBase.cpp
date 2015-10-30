@@ -90,14 +90,19 @@ namespace kgx
 	}
 
 
-	void ShaderBase::updateConstantVariable( const std::string &name, _In_ void *dataPtr )
+	void ShaderBase::updateConstantVariable( const std::string &name, _In_ const void *dataPtr )
 	{
-		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-			if ( (*it)->updateVariable(name, dataPtr) )
-				return;
+		//TODO: handle cases with duplicate variable names (two buffers, one variable in each buffer with the same name)
 
-		std::cout << "Warning (ShaderBase::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
+		if ( dataPtr )
+		{
+			std::vector<ConstantBuffer*>::iterator it;
+			for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
+				if ( (*it)->updateVariable( name, dataPtr ) )
+					return;
+
+			std::cout << "Warning (ShaderBase::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
+		}
 	}
 
 

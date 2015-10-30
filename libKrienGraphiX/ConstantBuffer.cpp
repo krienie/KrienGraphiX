@@ -12,6 +12,8 @@ namespace kgx
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
 
+	//TODO: create constructor that defines a ConstantBuffer based on a shader reflection struct, so you won't have to call addVariableDefinition() afterwards
+
 	ConstantBuffer::ConstantBuffer( const ConstantBuffer &other )
 		: m_dxDev(other.m_dxDev), m_dxDevCont(other.m_dxDevCont), m_dxBuffer(other.m_dxBuffer),
 		m_bufferElementSize(other.m_bufferElementSize), m_dataChanged(other.m_dataChanged),
@@ -83,31 +85,33 @@ namespace kgx
 			delete[] m_rawData;
 			m_rawData = nullptr;
 		}
-		//m_rawData.clear();
+
+		m_bufferElementSize = sizeInBytes;
+		m_rawData = new UCHAR[sizeInBytes];
+		memset( m_rawData, 0, sizeInBytes );
 
 		// create buffer descriptor
 		D3D11_BUFFER_DESC buffDesc;
 		ZeroMemory( &buffDesc, sizeof(buffDesc) );
-
-		buffDesc.ByteWidth      = ((sizeInBytes - 1) / 16 + 1) * 16;		//ByteWidth has to be a multiple of 16 for constant buffers;
+		buffDesc.ByteWidth      = ((sizeInBytes - 1u) / 16u + 1u) * 16u;		//ByteWidth has to be a multiple of 16 for constant buffers;
 		buffDesc.Usage          = D3D11_USAGE_DYNAMIC;
 		buffDesc.BindFlags      = D3D11_BIND_CONSTANT_BUFFER;
 		buffDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		HRESULT res = m_dxDev->CreateBuffer( &buffDesc, NULL, &m_dxBuffer );
+		// create initial data descriptor
+		D3D11_SUBRESOURCE_DATA initDataDesc;
+		ZeroMemory( &initDataDesc, sizeof( initDataDesc ) );
+		initDataDesc.pSysMem = m_rawData;
+
+		HRESULT res = m_dxDev->CreateBuffer( &buffDesc, &initDataDesc, &m_dxBuffer );
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (ConstantBuffer::create): Error creating buffer" << std::endl;
 			m_dxBuffer = nullptr;
 		}
 
-		m_bufferElementSize = sizeInBytes;
-		m_rawData = new UCHAR[sizeInBytes];
-
 		return res;
 	}
-
-
 
 
 	void ConstantBuffer::commit()
@@ -115,6 +119,7 @@ namespace kgx
 		if ( !m_dataChanged || !m_rawData )
 			return;
 
+		//TODO: create mechanism so that only the changed data is committed, not the whole buffer => maybe different update types: one that commits immediately, and one that does not...
 		D3D11_MAPPED_SUBRESOURCE mapRes;
 		m_dxDevCont->Map(m_dxBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapRes);
 		memcpy( mapRes.pData, m_rawData, m_bufferElementSize );
@@ -139,13 +144,13 @@ namespace kgx
 	 * Searches for a variable with the given name and updates its data when found.
 	 * Returns true if the variable was found, false otherwise
 	 */
-	bool ConstantBuffer::updateVariable( const std::string &name, const void *var )
+	bool ConstantBuffer::updateVariable( const std::string &name, const void *data )
 	{
 		std::map< std::string, VarPosition >::iterator it = m_variables.find(name);
 
 		if ( it != m_variables.end() )
 		{
-			memcpy( m_rawData + it->second.offset, var, it->second.size );
+			memcpy( m_rawData + it->second.offset, data, it->second.size );
 			m_dataChanged = true;
 			return true;
 		}

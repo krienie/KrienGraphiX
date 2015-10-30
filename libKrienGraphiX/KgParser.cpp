@@ -266,7 +266,6 @@ namespace kgx
 			if ( it->autoBindType != ShaderProgram::ShaderAutoBindType::NoAutoBind )
 				ShaderProgram->addAutoShaderVar( sh, it->name, it->autoBindType );
 			//TODO: add support for default constant values
-			//TODO: do something with variable types => useful for custom ShaderVars
 			//else sh->updateConstantVariable( it->name, nullptr );
 		}
 	}

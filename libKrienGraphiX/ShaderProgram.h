@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 
+#include "Defines.h"
+
 
 namespace kgx
 {
@@ -36,9 +38,9 @@ namespace kgx
 			enum class ShaderType
 			{
 				Vertex,
-				Hull,
+				/*Hull,
 				Domain,
-				Geometry,
+				Geometry,*/
 				Pixel
 			};
 
@@ -63,8 +65,9 @@ namespace kgx
 			//GeometryShader* getGeometryShader() const;
 			PixelShader* getPixelShader() const;
 
+			void addAutoShaderVar( ShaderType shaderType, const std::string &varName, ShaderAutoBindType varType );
 			void addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
-			void updateShaderVar(  );
+			void updateShaderVar( ShaderType shaderType, const std::string &name, _In_ const void *dataPtr );
 
 			//TODO: updateShaderVar( ShaderType, varName, dataPtr );
 			//TODO: updateShaderDataBlock( ShaderType, 

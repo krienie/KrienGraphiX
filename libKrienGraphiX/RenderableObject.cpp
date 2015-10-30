@@ -31,7 +31,7 @@ namespace kgx
 	}
 
 
-	void RenderableObject::draw( _In_ Camera *renderCam )
+	void RenderableObject::draw( _In_ Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor )
 	{
 		// bind Vertex- and Index-buffers to IA Stage
 		UINT bufferStride = m_meshBuff.inputDescriptor.getBufferStride();
@@ -45,8 +45,11 @@ namespace kgx
 		{
 			// activate ShaderProgram
 			objIt->shaderProg->activate( renderCam, this );
+			objIt->shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "lights", lights.data() );
+			objIt->shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "ambLightClr", &ambientColor );
 
 			// draw Meshes
+			//TODO: if the meshes are sorted in the vertex buffer, they can be drawn all at once => sort meshes in the vertex buffer according to shaderprogram
 			std::vector<Mesh>::iterator meshIt;
 			for ( meshIt = objIt->meshes.begin(); meshIt != objIt->meshes.end(); ++meshIt )
 				m_dxDevCont->DrawIndexed( meshIt->indexCount, meshIt->startIndex, 0 );

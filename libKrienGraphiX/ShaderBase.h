@@ -16,7 +16,7 @@ namespace kgx
 			HRESULT loadFromFile( const std::wstring &filename );
 			HRESULT loadFromSource( const std::string &source, const std::string &entryPoint = "main" );
 
-			void updateConstantVariable( const std::string &name, _In_ void *dataPtr );
+			void updateConstantVariable( const std::string &name, _In_ const void *dataPtr );
 			void addTexture( _In_ Texture *tex );
 			virtual void activate() = 0;
 

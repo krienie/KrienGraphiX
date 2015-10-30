@@ -233,10 +233,6 @@ namespace kgx { namespace TextureLoader
 	HRESULT loadAsShaderResource( const std::wstring &file, ID3D11Resource **texture, ID3D11ShaderResourceView **shaderView,
 									ID3D11Device *dxDev, ID3D11DeviceContext *dxDevCont )
 	{
-		//std::string texStr(file.begin(), file.end());
-
-		//std::cout << "loading texture: " << texStr << std::endl;
-
 		if ( !dxDev || !dxDevCont )
 			return E_INVALIDARG;
 

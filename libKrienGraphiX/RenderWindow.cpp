@@ -252,10 +252,8 @@ namespace kgx
 			return;
 
 		//static float lastTime = (float)timeGetTime();
-
-		m_dxDevCont->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
-		//TODO: make sure RSSetState and RSSetViewports are only called when they are really needed to be called
-		m_dxDevCont->RSSetState(m_rasterizer);
+		m_dxDevCont->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView );
+		m_dxDevCont->RSSetState( m_rasterizer );
 		//TODO: add support for multiple viewports
 		m_dxDevCont->RSSetViewports( 1, &m_curViewport.dxViewport );
 

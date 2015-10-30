@@ -11,8 +11,10 @@
 #include "KrienGraphiXToolbox.h"
 
 
+//TODO: change kgxt to kgt (KrienGraphics Toolkit)
 namespace kgxt
 {
+	//TODO: rename KrienGraphixToolbox to KrienGraphixToolkit
 	KrienGraphiXToolbox::KrienGraphiXToolbox( const std::string &kgoScene, QWidget *parent )
 		: QMainWindow(parent), m_materialEditorWin(nullptr), m_mainCam(nullptr), m_defaultScene(nullptr),
 		m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
@@ -32,8 +34,10 @@ namespace kgxt
 		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.001f, 3000.0f,
 								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 		m_defaultScene = new kgx::Scene();
+		//TODO: change interface of adding camera to scene below to something like: m_defaultScene->addCamera(m_mainCam);
 		m_mainCam->setParentScene( m_defaultScene );
 
+		//TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
 		m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
 
 
@@ -41,21 +45,7 @@ namespace kgxt
 		{
 			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
 
-			//TODO: temporary => only useful in combination with Sphere.cso (and Copper*S shaders)
-
-			float ambientLight[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
-			float lightDir[3]     = { 0.25f, 1.0f, 0.75f };
-			float lightIntensity  = 0.7f;
-
-			kgx::RenderableObject::ObjectIterator it = renObj->getChildrenBegin();
-			for ( it; it != renObj->getChildrenEnd(); ++it )
-			{
-				kgx::PixelShader *pixShader = it->shaderProg->getPixelShader();
-
-				pixShader->updateConstantVariable( "aLightClr", ambientLight );
-				pixShader->updateConstantVariable( "dLightDir", lightDir );
-				pixShader->updateConstantVariable( "dLightIntensity", &lightIntensity );
-			}
+			m_defaultScene->addDirectionalLight( DirectX::XMFLOAT3( 0.25f, 1.0f, 0.75f ), 0.7f );
 
 			// add RenderableObject to scene
 			m_defaultScene->claimRenderableObject( renObj );

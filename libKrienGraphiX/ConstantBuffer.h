@@ -26,21 +26,15 @@ namespace kgx
 			bool hasVariable( const std::string &name ) const;
 			void addVariableDefinition( const std::string &name, UINT offset, UINT size );
 			/** Searches for a variable with the given name and updates its data when found. Returns true if the variable was found, false otherwise */
-			bool updateVariable( const std::string &name, const void *var );
+			bool updateVariable( const std::string &name, const void *datas );
 
 		private:
-
 			struct VarPosition
 			{
 				VarPosition( UINT o, UINT s ) : offset(o), size(s) { }
 
 				UINT offset;
 				UINT size;
-
-				bool operator==( const VarPosition &rhs ) const
-				{
-					return offset == rhs.offset && size == rhs.size;
-				}
 			};
 
 			ID3D11Device *m_dxDev;

@@ -6,7 +6,7 @@
 namespace kgx
 {
 	Scene::Scene()
-		: m_renderObjects()
+		: m_ambientLight(0.25f, 0.25f, 0.25f, 1.0f), m_lights(), m_renderObjects()
 	{
 
 	}
@@ -19,6 +19,12 @@ namespace kgx
 	}
 
 
+	void Scene::addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity )
+	{
+		m_lights.push_back( Light(direction, intensity) );
+	}
+
+
 	void Scene::claimRenderableObject( _In_ RenderableObject *obj )
 	{
 		m_renderObjects.push_back(obj);
@@ -27,10 +33,10 @@ namespace kgx
 
 	void Scene::render( _In_ Camera *renderCam )
 	{
-		//TODO: activate lights
+		//TODO: collect list of visible lights to be used in the draw call below
 
 		std::vector<RenderableObject*>::iterator it;
 		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
-			(*it)->draw( renderCam );
+			(*it)->draw( renderCam, m_lights, m_ambientLight );
 	}
 }

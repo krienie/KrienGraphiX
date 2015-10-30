@@ -16,6 +16,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="KgParser.h" />
     <ClInclude Include="KGXCore.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="MovableObject.h" />
     <ClInclude Include="parser_defines.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="KgParser.cpp" />
     <ClCompile Include="KGXCore.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />
