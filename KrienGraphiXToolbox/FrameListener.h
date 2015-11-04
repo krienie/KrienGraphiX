@@ -1,7 +1,7 @@
 
 #pragma once
 
-namespace kgxt
+namespace kgt
 {
 	//TODO: this prob better belongs in libKrienGraphiX, combined with a RenderWindow or in KGXCore
 	class FrameListener

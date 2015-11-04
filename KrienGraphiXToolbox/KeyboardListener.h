@@ -4,7 +4,7 @@
 
 #include <QKeyEvent>
 
-namespace kgxt
+namespace kgt
 {
 	class KeyEvent
 	{

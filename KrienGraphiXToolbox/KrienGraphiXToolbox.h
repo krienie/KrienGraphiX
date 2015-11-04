@@ -12,7 +12,7 @@
 #include "MaterialEditor.h"
 #include "ui_KrienGraphiXToolbox.h"
 
-namespace kgxt
+namespace kgt
 {
 	class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
 	{

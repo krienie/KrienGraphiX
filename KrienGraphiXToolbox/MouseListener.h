@@ -3,7 +3,7 @@
 
 #include <QMouseEvent>
 
-namespace kgxt
+namespace kgt
 {
 	class MouseEvent
 	{

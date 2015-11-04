@@ -5,7 +5,7 @@
 
 #include "ui_MaterialEditor.h"
 
-namespace kgxt
+namespace kgt
 {
 	class MaterialEditor : public QMainWindow
 	{

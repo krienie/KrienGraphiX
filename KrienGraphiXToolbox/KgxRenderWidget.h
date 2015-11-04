@@ -7,7 +7,7 @@
 
 #include "MouseListener.h"
 
-namespace kgxt
+namespace kgt
 {
 	class FrameListener;
 	class KeyboardListener;

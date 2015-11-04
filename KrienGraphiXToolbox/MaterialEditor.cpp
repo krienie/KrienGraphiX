@@ -3,7 +3,7 @@
 
 #include "MaterialEditor.h"
 
-namespace kgxt
+namespace kgt
 {
 	MaterialEditor::MaterialEditor( QWidget *parent )
 		: QMainWindow( parent )

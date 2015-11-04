@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
 	if ( argc > 1 )
 		sceneToLoad = argv[1];
 
-	kgxt::KrienGraphiXToolbox w(sceneToLoad);
+	kgt::KrienGraphiXToolbox w(sceneToLoad);
 	w.show();
 	return a.exec();
 }

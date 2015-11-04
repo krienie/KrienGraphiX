@@ -11,10 +11,8 @@
 #include "KrienGraphiXToolbox.h"
 
 
-//TODO: change kgxt to kgt (KrienGraphics Toolkit)
-namespace kgxt
+namespace kgt
 {
-	//TODO: rename KrienGraphixToolbox to KrienGraphixToolkit
 	KrienGraphiXToolbox::KrienGraphiXToolbox( const std::string &kgoScene, QWidget *parent )
 		: QMainWindow(parent), m_materialEditorWin(nullptr), m_mainCam(nullptr), m_defaultScene(nullptr),
 		m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
@@ -31,7 +29,7 @@ namespace kgxt
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
 		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
 
-		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.001f, 3000.0f,
+		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.01f, 1000.0f,
 								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 		m_defaultScene = new kgx::Scene();
 		//TODO: change interface of adding camera to scene below to something like: m_defaultScene->addCamera(m_mainCam);
@@ -91,7 +89,7 @@ namespace kgxt
 
 	void KrienGraphiXToolbox::frameUpdate( double deltaTime )
 	{
-		float speed = static_cast<float>(500.0 * deltaTime);
+		float speed = static_cast<float>(150.0 * deltaTime);
 		
 		if ( m_wKeyDown )
 			m_mainCam->moveForward( speed );

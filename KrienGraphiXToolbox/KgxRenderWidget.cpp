@@ -9,7 +9,7 @@
 #include "KgxRenderWidget.h"
 
 
-namespace kgxt
+namespace kgt
 {
 	KgxRenderWidget::KgxRenderWidget( _In_ QWidget *parent, Qt::WindowFlags f )
 		: QWidget(parent, f | Qt::MSWindowsOwnDC), m_isInit(false), m_renderWin(0), m_lastFrameTime(0.0),
