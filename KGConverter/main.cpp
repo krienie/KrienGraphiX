@@ -44,6 +44,10 @@ int main( int argc, char* argv[] )
 				return 0;
 			}
 		}
+	} else
+	{
+		printHelp();
+		return 0;
 	}
 
 	// create input directory if needed
