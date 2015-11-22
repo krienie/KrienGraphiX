@@ -8,11 +8,15 @@ namespace kgx
 {
 	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
-		: m_dxDev( dxDevice ), m_dxDevCont( 0 ), m_meshBuff( buff ), m_objContainers( objectContainers ), m_topology( meshTopology )
+		: RenderableObject(dxDevice, buff, objectContainers, meshTopology, "")
+	{
+	}
+	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+					  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name )
+		: MovableObject(), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_objContainers(objectContainers), m_topology(meshTopology), m_name(name)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
-
-	};
+	}
 
 	RenderableObject::~RenderableObject()
 	{
@@ -21,13 +25,13 @@ namespace kgx
 	}
 
 
-	RenderableObject::ObjectIterator RenderableObject::getChildrenBegin() const
+	std::string RenderableObject::getName() const
 	{
-		return m_objContainers.cbegin();
+		return m_name;
 	}
-	RenderableObject::ObjectIterator RenderableObject::getChildrenEnd() const
+	void RenderableObject::setName( const std::string &name )
 	{
-		return m_objContainers.cend();
+		m_name = name;
 	}
 
 

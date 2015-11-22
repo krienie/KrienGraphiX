@@ -13,8 +13,6 @@ namespace kgx
 	class Camera;
 	class ShaderProgram;
 
-	//TODO: this class actually acts as the entire scene container right now -> rename this to scene and rename current scene class to something like BHV or whatever...
-	//TODO: or better yet: merge the two classes.
 	class RenderableObject : public MovableObject
 	{
 		public:
@@ -40,11 +38,12 @@ namespace kgx
 
 			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
+			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+							  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name );
 			~RenderableObject();
 
-			typedef std::vector<ObjectContainer>::const_iterator ObjectIterator;
-			ObjectIterator getChildrenBegin() const;
-			ObjectIterator getChildrenEnd() const;
+			std::string getName() const;
+			void setName( const std::string &name );
 
 			void draw( _In_ Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
 
@@ -60,5 +59,7 @@ namespace kgx
 			std::vector<ObjectContainer> m_objContainers;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;
+
+			std::string m_name;
 	};
 }
