@@ -54,6 +54,13 @@ namespace kgx
 
 		DirectX::XMStoreFloat4x4( &m_modelMatrix, modelMat );
 	}
+	void MovableObject::setPosition( float x, float y, float z )
+	{
+		m_xPos = x;
+		m_yPos = y;
+		m_zPos = z;
+		translate( 0.0f, 0.0f, 0.0f );
+	}
 
 	void MovableObject::scale( float deltaScale )
 	{

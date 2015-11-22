@@ -14,11 +14,12 @@ namespace kgx
 			DirectX::XMFLOAT4X4 getModelMatrix() const;
 			DirectX::XMFLOAT4X4 getNormalMatrix() const;
 
-			virtual void translate( float deltaX, float deltaY, float deltaZ );
-			virtual void scale( float deltaScale );
-			virtual void scale( float deltaX, float deltaY, float deltaZ );
-			virtual void setScale( float newScale );
-			virtual void setScale( float xNewScale, float yNewScale, float zNewScale );
+			void translate( float deltaX, float deltaY, float deltaZ );
+			void setPosition( float x, float y, float z );
+			void scale( float deltaScale );
+			void scale( float deltaX, float deltaY, float deltaZ );
+			void setScale( float newScale );
+			void setScale( float xNewScale, float yNewScale, float zNewScale );
 
 		private:
 			DirectX::XMFLOAT4X4 m_modelMatrix;
