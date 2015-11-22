@@ -181,7 +181,11 @@ namespace kgx
 
 	void RenderWindow::setViewport( _In_ Camera *cam, float topLeftX, float topLeftY, float width, float height )
 	{
-		// NOTE: no warning is given when this function is called when the RenderWindow is not initialized
+		if ( !m_isInit )
+		{
+			std::cout << "Error (RenderWindow::setViewport): RenderWindow is not initialized. Call RenderWindow::create() first." << std::endl;
+			abort();
+		}
 
 		// initialize viewport
 		D3D11_VIEWPORT dxViewport;
