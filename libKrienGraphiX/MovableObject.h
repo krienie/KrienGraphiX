@@ -3,12 +3,15 @@
 
 #include <DirectXMath.h>
 
+#include "Object.h"
+
 namespace kgx
 {
-	class MovableObject
+	class MovableObject : public Object
 	{
 		public:
 			MovableObject();
+			explicit MovableObject( const std::string &name );
 			virtual ~MovableObject();
 
 			DirectX::XMFLOAT4X4 getModelMatrix() const;

@@ -21,6 +21,8 @@ namespace kgx
 			RenderWindow* createRenderWindow( HWND windowHandle );
 			RenderWindow* getRenderWindow( HWND windowHandle ) const;
 
+			void clearManagers();
+
 			//void addFrameListener( Listener *l ); //TODO: add listener functionality
 
 			void renderFrame();

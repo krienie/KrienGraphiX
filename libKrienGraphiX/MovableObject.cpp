@@ -6,7 +6,12 @@
 namespace kgx
 {
 	MovableObject::MovableObject()
-		: m_modelMatrix(), m_xPos(0.0f), m_yPos(0.0f), m_zPos(0.0f), m_xScale(1.0f), m_yScale(1.0f), m_zScale(1.0f)
+		: MovableObject("")
+	{
+	}
+
+	MovableObject::MovableObject( const std::string &name )
+		: Object(name), m_modelMatrix(), m_xPos(0.0f), m_yPos(0.0f), m_zPos(0.0f), m_xScale(1.0f), m_yScale(1.0f), m_zScale(1.0f)
 	{
 		// set m_modelMatrix to identity
 		DirectX::XMStoreFloat4x4( &m_modelMatrix, DirectX::XMMatrixIdentity() );

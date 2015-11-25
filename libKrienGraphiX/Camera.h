@@ -3,15 +3,17 @@
 
 #include <DirectXMath.h>
 
+#include "Object.h"
+
 namespace kgx
 {
 	class Scene;
 
-	class Camera
+	class Camera : public Object
 	{
 		public:
-			Camera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
-			Camera( float fovY, float aspect, float nearZ, float farZ,
+			Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
+			Camera( Scene *parentScene, float fovY, float aspect, float nearZ, float farZ,
 					const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
 					const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f),
 					const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3(0.0f, 1.0f,  0.0f) );
@@ -28,8 +30,6 @@ namespace kgx
 			float getAspectRatio() const;
 			float getNearZ() const;
 			float getFarZ() const;
-
-			void setParentScene( _In_ Scene *scene );
 
 			/** Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline */
 			void renderCurrentView();

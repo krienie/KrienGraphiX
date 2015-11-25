@@ -86,18 +86,18 @@ namespace kgx
 				vertex = double_;
 				vertices = "Vertices(" << inputLayout << ")" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
-					<< lit( '\t' ) << no_delimit[(vertex % karma::space)[karma::_1 = phx::ref( inVerts )]] << ";" << no_delimit[eol]
+					<< lit( '\t' ) << no_delimit[(vertex % karma::space)[karma::_1 = phx::ref( inVerts )]] << no_delimit[eol]
 					<< "}" << no_delimit[eol];
 
 				indices = "Indices()" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
-					<< lit('\t') << no_delimit[(uint_ % karma::space)[karma::_1 = phx::ref( inIndices )]] << ";" << no_delimit[eol]
+					<< lit('\t') << no_delimit[(uint_ % karma::space)[karma::_1 = phx::ref( inIndices )]] << no_delimit[eol]
 					<< "}" << no_delimit[eol];
 
 				model = "Model(" << karma::string << ")" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
-					<< "\tIndices(" << no_delimit[int_] << "," << int_ << ");" << no_delimit[eol]
-					<< "\tMaterial(" << karma::string << ");" << no_delimit[eol]
+					<< "\tIndices(" << no_delimit[int_] << "," << int_ << ")" << no_delimit[eol]
+					<< "\tMaterial(" << karma::string << ")" << no_delimit[eol]
 					<< "}" << no_delimit[eol];
 
 				shaderAutoBindType = karma::stream;

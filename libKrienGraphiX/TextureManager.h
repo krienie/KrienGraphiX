@@ -33,6 +33,9 @@ namespace kgx
 		void releaseTexture( const std::wstring &filename );
 		void releaseTexture( _In_ Texture* tex );
 
+
+		void clearTextureResources();
+
 	private:
 		explicit TextureManager( _In_ ID3D11Device *dxDevice );
 		~TextureManager();

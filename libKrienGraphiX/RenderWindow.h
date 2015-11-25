@@ -5,8 +5,6 @@
 #include <dxgi1_2.h>
 #include <vector>
 
-//#include "Camera.h"
-
 namespace kgx
 {
 	class Camera;
@@ -25,6 +23,8 @@ namespace kgx
 
 			bool isFullscreen() const;
 			void setFullscreen( bool active );
+
+			float getAspectRatio() const;
 
 			void update();
 
@@ -53,7 +53,6 @@ namespace kgx
 			ID3D11RenderTargetView *m_renderTargetView;
 			ID3D11RasterizerState *m_rasterizer;
 
-			//std::vector<Viewport> m_viewports;
 			Viewport m_curViewport;
 
 			UINT m_backBuffWidth;

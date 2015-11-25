@@ -30,12 +30,12 @@ int main( int argc, char* argv[] )
 		{
 			if ( std::string( argv[i] ) == "/indir" && i < (argc - 1) )
 			{
-				i++;
+				++i;
 				inDir = argv[i];
 				continue;
 			} else if ( std::string( argv[i] ) == "/outdir" && i < (argc - 1) )
 			{
-				i++;
+				++i;
 				outDir = argv[i];
 				continue;
 			} else
@@ -108,13 +108,7 @@ bool convertFile( _In_ const std::string &filename, _In_ const std::string &file
 
 	if ( !objP.parseFile( filename + ".obj", fileDir, parserOutput ) )
 		return false;
-
-	//TODO: vertex layout and mats(maybe)
 	std::cout << "Successfully parsed file " << filename << ".obj" << std::endl;
-
-	// create texture path string
-	/*std::stringstream tPathSS;
-	tPathSS << "textures/" << filename << "/";*/
 
 	kgx::KGObjectGenerator gen;
 	std::string kgoDataStr;

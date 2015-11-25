@@ -12,15 +12,16 @@
 #include <boost/filesystem.hpp>
 
 #include "parser_defines.h"
-#include "KGXCore.h"
-#include "RenderableObject.h"
-#include "VertexInputLayout.h"
-#include "VertexShader.h"
-#include "PixelShader.h"
-#include "ResourceManager.h"
-#include "TextureManager.h"
+#include "../KGXCore.h"
+#include "../RenderableObject.h"
+#include "../VertexInputLayout.h"
+#include "../VertexShader.h"
+#include "../PixelShader.h"
+#include "../IOManager.h"
+#include "../ResourceManager.h"
+#include "../TextureManager.h"
 
-#include "KgParser.h"
+#include "KGObjectParser.h"
 
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -56,28 +57,28 @@ BOOST_FUSION_ADAPT_STRUCT(
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
 namespace iso8859 = boost::spirit::iso8859_1;
-using namespace qi;
 typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgx
 {
-	RenderableObject* KgParser::loadKGO( const std::string &kgoFile )
+	RenderableObject* KGObjectParser::loadKGO( const std::string &kgoFile )
 	{
-		if ( kgoFile.size() == 0 )
+		std::string absKGOFile = IOManager::getInst()->getAbsolutePath( kgoFile );
+		if ( absKGOFile.size() == 0 )
 		{
-			std::cout << "Error (KgParser::loadKGO): Model source file not specified." << std::endl;
+			std::cout << "Error (KGObjectParser::loadKGO): Model source file not specified." << std::endl;
 			return nullptr;
 		}
 
-		if ( !boost::filesystem::exists( kgoFile ) )
+		if ( !boost::filesystem::exists( absKGOFile ) )
 		{
-			std::cout << "Error (KgParser::loadKGO): Model source file does not exist." << std::endl;
+			std::cout << "Error (KGObjectParser::loadKGO): Model source file does not exist." << std::endl;
 			return nullptr;
 		}
 
 		std::stringstream ssKgo;
 		std::filebuf fb;
-		if ( fb.open( kgoFile, std::ios::in ) )
+		if ( fb.open( absKGOFile, std::ios::in ) )
 		{
 			ssKgo << &fb;
 			fb.close();
@@ -88,7 +89,6 @@ namespace kgx
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 		std::vector<KgModelData> models;
 		std::map<std::string, KgMatData> ShaderPrograms;
-
 		struct KgoGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			KgoGrammar( std::vector<float> &v, std::vector<UINT> &i, std::vector<VertexInputLayout::Type> &l,
@@ -100,18 +100,18 @@ namespace kgx
 				comment = "//" >> skip( blank )[*print];
 
 				vertexInputLayout = qi::string("Position")[_val = VertexInputLayout::Position]
-									| qi::string( "TextureCoordinate" )[_val = VertexInputLayout::TextureCoordinate]
-									| qi::string( "Normal" )[_val = VertexInputLayout::Normal]
-									| qi::string( "Tangent" )[_val = VertexInputLayout::Tangent];
-				vertices = "Vertices(" >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') >> ")"
-					>> lit("{") >> *float_[phx::push_back( phx::ref(v), qi::_1 )] >> lit(";") >> "}";
+									| qi::string("TextureCoordinate")[_val = VertexInputLayout::TextureCoordinate]
+									| qi::string("Normal")[_val = VertexInputLayout::Normal]
+									| qi::string("Tangent")[_val = VertexInputLayout::Tangent];
+				vertices = "Vertices" >> lit("(") >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') >> ")"
+					>> lit("{") >> *float_[phx::push_back( phx::ref(v), qi::_1 )] >> "}";
 
-				indices = "Indices()" >> lit("{") >> *uint_[phx::push_back( phx::ref(i), qi::_1 )] >> lit(";") >> "}";
+				indices = "Indices" >> lit("(") >> lit(")") >> lit("{") >> *uint_[phx::push_back( phx::ref(i), qi::_1 )] >> "}";
 
 				//TODO: add support for different order of model contents
-				models = "Model(" >> *~qi::char_(')') >> lit(")") >> lit("{")
-					>> "Indices(" >> int_ >> "," >> int_ >> ");"
-					>> "Material(" >> *~qi::char_(')') >> lit(");")
+				models = "Model" >> lit("(") >> *~qi::char_(')') >> lit(")") >> lit("{")
+					>> "Indices" >> lit("(") >> int_ >> lit(",") >> int_ >> lit(")")
+					>> "Material" >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("}");
 
 				shaderAutoBindType = qi::string( "CameraProjectionMatrix" )[_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
@@ -127,15 +127,16 @@ namespace kgx
 					| eps[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];
 
 				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
-				texture = "Texture(" >> *~qi::char_(')') >> lit(");");
+				texture = "Texture" >> lit("(") >> *~qi::char_(')') >> lit(");");
 				shaderDefinition = (qi::lit("VertexShader") | qi::lit("PixelShader")) >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
 
+				//TODO: rename legacy Material type
 				ShaderProgram = shaderDefinition >> shaderDefinition;
-				nameMatPair = omit[lit("Material(")] >> *~qi::char_(')') >> omit[lit(")")]
-					>> omit[lit("{")] >> ShaderProgram >> omit[lit("}")];
+				nameMatPair = lit("Material") >> lit("(") >> *~qi::char_(')') >> lit(")")
+					>> lit("{") >> ShaderProgram >> lit("}");
 
-				start = *(comment | vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
+				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
 						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
 			}
 
@@ -157,7 +158,7 @@ namespace kgx
 			qi::rule<std::string::const_iterator> comment;
 		} kgmGrammar( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
 
-		Skipper skipper = iso8859::space;
+		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
 		std::string input             = ssKgo.str();
 		std::string::const_iterator f = input.cbegin();
@@ -174,7 +175,7 @@ namespace kgx
 		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
 	}
 
-	RenderableObject* KgParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
+	RenderableObject* KGObjectParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
 															   std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 															   std::vector<KgModelData> &models,
 															   std::map<std::string, KgMatData> &ShaderPrograms )
@@ -258,7 +259,7 @@ namespace kgx
 		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, objContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	}
 
-	void KgParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
+	void KGObjectParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
 	{
 		std::vector<KgMatData::ShaderVar>::const_iterator it;
 		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )

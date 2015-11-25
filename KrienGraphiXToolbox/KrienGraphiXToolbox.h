@@ -9,7 +9,6 @@
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"
-#include "MaterialEditor.h"
 #include "ui_KrienGraphiXToolbox.h"
 
 namespace kgt
@@ -18,11 +17,8 @@ namespace kgt
 	{
 		Q_OBJECT
 
-			public slots:
-		void openMaterialEditor();
-
 	public:
-		explicit KrienGraphiXToolbox( const std::string &kgoScene = "", QWidget *parent = nullptr );
+		explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
 		~KrienGraphiXToolbox();
 
 		void frameUpdate( double deltaTime );
@@ -33,12 +29,17 @@ namespace kgt
 		void keyPressed( const KeyEvent &evt );
 		void keyReleased( const KeyEvent &evt );
 
+	private slots:
+		void createNewProject();
+		void openProjectFile();
+		void saveProjectFile();
+		void saveProjectAsNewFile();
+		void exitProgram();
+
 	private:
-		void setupTestScene();
+		void loadProject( const std::string &projFile );
 
 		Ui::KrienGraphiXToolboxClass m_ui;
-
-		MaterialEditor *m_materialEditorWin;
 
 		kgx::Camera *m_mainCam;
 		kgx::Scene *m_defaultScene;

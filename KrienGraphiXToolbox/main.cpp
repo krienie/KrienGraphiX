@@ -7,13 +7,7 @@ int main( int argc, char *argv[] )
 {
 	QApplication a(argc, argv);
 
-	// /loadScene ..\\..\\Assets\\sponzaNoBanner.kgo
-
-	std::string sceneToLoad;
-	if ( argc > 1 )
-		sceneToLoad = argv[1];
-
-	kgt::KrienGraphiXToolbox w(sceneToLoad);
+	kgt::KrienGraphiXToolbox w;
 	w.show();
 	return a.exec();
 }

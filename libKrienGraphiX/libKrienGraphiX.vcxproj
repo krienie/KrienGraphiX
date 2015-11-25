@@ -14,12 +14,15 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Defines.h" />
-    <ClInclude Include="KgParser.h" />
+    <ClInclude Include="IOManager.h" />
     <ClInclude Include="KGXCore.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="parsers\KGObjectParser.h" />
+    <ClInclude Include="parsers\KGSceneParser.h" />
+    <ClInclude Include="parsers\parser_defines.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="MovableObject.h" />
-    <ClInclude Include="parser_defines.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderableObject.h" />
     <ClInclude Include="RenderWindow.h" />
@@ -35,9 +38,12 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="KgParser.cpp" />
+    <ClCompile Include="IOManager.cpp" />
     <ClCompile Include="KGXCore.cpp" />
     <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="parsers\KGObjectParser.cpp" />
+    <ClCompile Include="parsers\KGSceneParser.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />

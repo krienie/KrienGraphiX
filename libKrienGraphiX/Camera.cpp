@@ -6,15 +6,14 @@
 
 namespace kgx
 {
-	Camera::Camera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up )
-		: Camera( DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, m_target, up )
+	Camera::Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up )
+		: Camera( parentScene, DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, m_target, up )
 	{
 	}
 
-
-	Camera::Camera( float fovY, float aspect, float m_nearZ, float m_farZ,
+	Camera::Camera( Scene *parentScene, float fovY, float aspect, float m_nearZ, float m_farZ,
 						const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
-		: m_parentScene(nullptr), m_projMatrix(), m_viewMatrix(), m_position(eye), m_target(target_), m_camUp(up),
+		: Object(""), m_parentScene(parentScene), m_projMatrix(), m_viewMatrix(), m_position(eye), m_target(target_), m_camUp(up),
 			m_fov(fovY), m_aspectRatio(aspect), m_nearZ(m_nearZ), m_farZ(m_farZ)
 	{
 		// create perspective matrix
@@ -40,7 +39,7 @@ namespace kgx
 
 
 	Camera::Camera( const Camera &other )
-		: m_parentScene(other.m_parentScene), m_projMatrix(other.m_projMatrix), m_viewMatrix(other.m_viewMatrix), m_position(other.m_position),
+		: Object(""), m_parentScene(other.m_parentScene), m_projMatrix(other.m_projMatrix), m_viewMatrix(other.m_viewMatrix), m_position(other.m_position),
 		m_target(other.m_target), m_camUp(other.m_camUp), m_fov(other.m_fov), m_aspectRatio(other.m_aspectRatio), m_nearZ(other.m_nearZ), m_farZ(other.m_farZ)
 	{
 	}
@@ -109,11 +108,6 @@ namespace kgx
 		return m_farZ;
 	}
 
-
-	void Camera::setParentScene( _In_ Scene *scene )
-	{
-		m_parentScene = scene;
-	}
 
 	/**
 	 * Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline

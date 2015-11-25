@@ -1,24 +1,31 @@
 
 #include <iostream>
+#include <sstream>
 
-#include <KgParser.h>
+#include <boost/filesystem.hpp>
+
+#include <qfiledialog.h>
+
+#include <KGObjectParser.h>
 #include <KGXCore.h>
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
 #include <TextureManager.h>
 
+#include "parsers\KGProjectParser.h"
+#include "parsers\KGSceneParser.h"
+#include "IOManager.h"
 #include "KrienGraphiXToolbox.h"
 
 
 namespace kgt
 {
-	KrienGraphiXToolbox::KrienGraphiXToolbox( const std::string &kgoScene, QWidget *parent )
-		: QMainWindow(parent), m_materialEditorWin(nullptr), m_mainCam(nullptr), m_defaultScene(nullptr),
-		m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
+	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
+		: QMainWindow(parent), m_mainCam(nullptr), m_defaultScene(nullptr), m_leftMouseBtnDown(false),
+			m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
 	{
 		m_ui.setupUi( this );
-
 
 		m_ui.renderWidget1->initialize();
 		m_ui.renderWidget1->addFrameListener( this );
@@ -29,42 +36,17 @@ namespace kgt
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
 		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
 
-		m_mainCam = new kgx::Camera( DirectX::XM_PIDIV4, aspectRatio, 0.01f, 1000.0f,
-								   DirectX::XMFLOAT3( 50.0f, 50.0f, 50.0f ), DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ), DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
-		m_defaultScene = new kgx::Scene();
-		//TODO: change interface of adding camera to scene below to something like: m_defaultScene->addCamera(m_mainCam);
-		m_mainCam->setParentScene( m_defaultScene );
-
-		//TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
-		m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
-
-
-		if ( kgoScene.size() > 0 )
-		{
-			kgx::RenderableObject *renObj = kgx::KgParser::loadKGO( kgoScene );
-
-			m_defaultScene->addDirectionalLight( DirectX::XMFLOAT3( 0.25f, 1.0f, 0.75f ), 0.7f );
-
-			// add RenderableObject to scene
-			m_defaultScene->claimRenderableObject( renObj );
-		}
-
-
 		m_ui.renderWidget1->startRendering();
 
-		QObject::connect( m_ui.actionMaterial_Editor, &QAction::triggered, this, &KrienGraphiXToolbox::openMaterialEditor );
+		QObject::connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewProject );
+		QObject::connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openProjectFile );
+		QObject::connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectFile );
+		QObject::connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectAsNewFile );
+		QObject::connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
 	}
 
 	KrienGraphiXToolbox::~KrienGraphiXToolbox()
 	{
-		if ( m_materialEditorWin )
-		{
-			m_materialEditorWin->close();
-			delete m_materialEditorWin;
-		}
-
-		if ( m_mainCam )
-			delete m_mainCam;
 		if ( m_defaultScene )
 			delete m_defaultScene;
 
@@ -72,23 +54,11 @@ namespace kgt
 	}
 
 
-	void KrienGraphiXToolbox::setupTestScene()
-	{
-
-	}
-
-
-	void KrienGraphiXToolbox::openMaterialEditor()
-	{
-		if ( !m_materialEditorWin )
-			m_materialEditorWin = new MaterialEditor( this );
-
-		m_materialEditorWin->show();
-	}
-
-
 	void KrienGraphiXToolbox::frameUpdate( double deltaTime )
 	{
+		if ( !m_mainCam )
+			return;
+
 		float speed = static_cast<float>(150.0 * deltaTime);
 		
 		if ( m_wKeyDown )
@@ -102,10 +72,9 @@ namespace kgt
 	}
 
 
-	//TODO: migrate these input methods to a separate ToolboxScene class or something like that
 	void KrienGraphiXToolbox::mouseMoved( const MouseEvent &evt )
 	{
-		if ( m_leftMouseBtnDown )
+		if ( m_mainCam && m_leftMouseBtnDown )
 		{
 			m_mainCam->rotateRight( float(-evt.X().rel()) * 0.5f );
 			m_mainCam->rotateUp( float(evt.Y().rel()) * 0.5f );
@@ -172,6 +141,69 @@ namespace kgt
 				break;
 			default:
 				break;
+		}
+	}
+
+
+	void KrienGraphiXToolbox::createNewProject()
+	{
+		std::cout << "Error (KrienGraphiXToolbox::createNewProject): Not implemented." << std::endl;
+	}
+	void KrienGraphiXToolbox::openProjectFile()
+	{
+		QString filename = QFileDialog::getOpenFileName( this, tr( "Open project file" ), "", tr( "KrienGraphiX Project File (*.kgproject)" ) );
+		loadProject( filename.toStdString() );
+	}
+	void KrienGraphiXToolbox::saveProjectFile()
+	{
+		std::cout << "Error (KrienGraphiXToolbox::saveProjectFile): Not implemented." << std::endl;
+	}
+	void KrienGraphiXToolbox::saveProjectAsNewFile()
+	{
+		std::cout << "Error (KrienGraphiXToolbox::saveProjectAsNewFile): Not implemented." << std::endl;
+	}
+
+	void KrienGraphiXToolbox::exitProgram()
+	{
+		this->close();
+	}
+
+
+	void KrienGraphiXToolbox::loadProject( const std::string &projFile )
+	{
+		// unload current scene
+		if ( m_defaultScene )
+			delete m_defaultScene;
+		kgx::KGXCore::getInst()->clearManagers();
+
+
+		// parse and load project file
+		KgProjectData projData;
+		if ( !KGProjectParser::loadKGProject( projFile, projData ) )
+		{
+			std::cout << "Error (KrienGraphiXToolbox::loadProject): Error parsing KgProject file " << projFile << std::endl;
+			return;
+		}
+
+		std::cout << "Loaded project: " << projData.projectName << ": " << projData.sceneFile << std::endl;
+
+		// set project folder
+		boost::filesystem::path projectPath( projFile );
+		kgx::IOManager::getInst()->addSearchPath( projectPath.parent_path().string() );
+
+		// set window title
+		std::stringstream titleSS;
+		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
+		setWindowTitle( QString( titleSS.str().c_str() ) );
+
+		// parse and load scene file
+		m_defaultScene = kgx::KGSceneParser::loadKGScene( projData.sceneFile, m_ui.renderWidget1->getRenderWindow() );
+		if ( m_defaultScene && m_defaultScene->getDefaultCamera() )
+		{
+			m_mainCam = m_defaultScene->getDefaultCamera();
+
+			//TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
+			m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
 		}
 	}
 }

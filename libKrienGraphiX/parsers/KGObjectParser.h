@@ -12,18 +12,18 @@ namespace kgx
 	class VertexShader;
 	class PixelShader;
 
-	class KgParser
+	class KGObjectParser
 	{
 		public:
 			static RenderableObject* loadKGO( const std::string &kgoFile );
 
 		private:
-			KgParser();
-			~KgParser();
+			KGObjectParser();
+			~KGObjectParser();
 
 			// no copying allowed
-			KgParser( const KgParser& );
-			KgParser& operator=( const KgParser& );
+			KGObjectParser( const KGObjectParser& );
+			KGObjectParser& operator=(const KGObjectParser&);
 
 			static RenderableObject* renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
 																	std::vector<VertexInputLayout::Type> &vertLayoutTypes,

@@ -31,26 +31,13 @@ namespace kgx
 
 
 	ResourceManager::ResourceManager( _In_ ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_nextBufferID(1), m_meshBuffers(), m_nextShaderProgramID(1), m_ShaderPrograms()
+		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_nextShaderProgramID(1), m_shaderPrograms()
 	{
 	}
 
 	ResourceManager::~ResourceManager()
 	{
-		// release all vertex- and index buffers
-		std::map<MeshBufferID, MeshBuffer>::iterator bIt;
-		for ( bIt = m_meshBuffers.begin(); bIt != m_meshBuffers.end(); ++bIt )
-		{
-			if ( bIt->second.vertBuff )
-				bIt->second.vertBuff->Release();
-			if ( bIt->second.indexBuff )
-				bIt->second.indexBuff->Release();
-		}
-
-		// release all ShaderProgram
-		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator mIt;
-		for ( mIt = m_ShaderPrograms.begin(); mIt != m_ShaderPrograms.end(); ++mIt )
-			delete mIt->second;
+		clearResources();
 	}
 
 
@@ -128,7 +115,7 @@ namespace kgx
 		mBuff.inputDescriptor = inputDescriptor;
 
 		m_meshBuffers.insert( std::pair<MeshBufferID, MeshBuffer>(m_nextBufferID, mBuff) );
-		m_nextBufferID++;
+		++m_nextBufferID;
 
 		result = S_OK;
 
@@ -155,9 +142,9 @@ namespace kgx
 	ShaderProgram* ResourceManager::getShaderProgram( ShaderProgram::ShaderProgramID id ) const
 	{
 		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::const_iterator it;
-		it = m_ShaderPrograms.find(id);
+		it = m_shaderPrograms.find( id );
 
-		if ( it != m_ShaderPrograms.cend() )
+		if ( it != m_shaderPrograms.cend() )
 			return it->second;
 
 		std::cout << "Warning (ResourceManager::getShaderProgram): ShaderProgram with id " << id << " was not found." << std::endl;
@@ -168,7 +155,7 @@ namespace kgx
 	{
 		ShaderProgram *newProg = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
 
-		m_ShaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newProg ) );
+		m_shaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newProg ) );
 		m_nextShaderProgramID++;
 
 		return newProg;
@@ -177,9 +164,30 @@ namespace kgx
 	void ResourceManager::releaseShaderProgram( ShaderProgram::ShaderProgramID id )
 	{
 		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator it;
-		it = m_ShaderPrograms.find(id);
+		it = m_shaderPrograms.find( id );
 
-		if ( it != m_ShaderPrograms.end() )
+		if ( it != m_shaderPrograms.end() )
 			delete it->second;
+	}
+
+
+	void ResourceManager::clearResources()
+	{
+		// release all vertex- and index buffers
+		std::map<MeshBufferID, MeshBuffer>::iterator bIt;
+		for ( bIt = m_meshBuffers.begin(); bIt != m_meshBuffers.end(); ++bIt )
+		{
+			if ( bIt->second.vertBuff )
+				bIt->second.vertBuff->Release();
+			if ( bIt->second.indexBuff )
+				bIt->second.indexBuff->Release();
+		}
+		m_meshBuffers.clear();
+
+		// release all ShaderProgram
+		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator mIt;
+		for ( mIt = m_shaderPrograms.begin(); mIt != m_shaderPrograms.end(); ++mIt )
+			delete mIt->second;
+		m_shaderPrograms.clear();
 	}
 }

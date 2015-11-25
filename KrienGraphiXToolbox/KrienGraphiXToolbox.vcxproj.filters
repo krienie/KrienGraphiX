@@ -36,6 +36,12 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{d05ff5c7-741d-4c44-acc5-feb4742562b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\parsers">
+      <UniqueIdentifier>{6e40dfe5-ee80-4a5d-9f70-2ffb0d9f5e07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\parsers">
+      <UniqueIdentifier>{27aff48d-a73c-4409-bdc7-9870d364d338}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -62,14 +68,8 @@
     <ClCompile Include="GeneratedFiles\Release\moc_KgxRenderWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MaterialEditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MaterialEditor.cpp">
-      <Filter>Generated Files\Release</Filter>
+    <ClCompile Include="parsers\KGProjectParser.cpp">
+      <Filter>Source Files\parsers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,18 +85,9 @@
     <CustomBuild Include="KgxRenderWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="MaterialEditor.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MaterialEditor.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_KrienGraphiXToolbox.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_MaterialEditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="MouseListener.h">
@@ -107,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="FrameListener.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parsers\KGProjectParser.h">
+      <Filter>Header Files\parsers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

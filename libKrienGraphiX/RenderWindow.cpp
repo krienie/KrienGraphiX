@@ -243,19 +243,24 @@ namespace kgx
 
 		return fullscreen != FALSE;
 	}
-
 	void RenderWindow::setFullscreen( bool active )
 	{
 		if ( m_swapChain )
 			m_swapChain->SetFullscreenState( active, nullptr );
 	}
 
+
+	float RenderWindow::getAspectRatio() const
+	{
+		return m_backBuffWidth / static_cast<float>(m_backBuffHeight);
+	}
+
+
 	void RenderWindow::update()
 	{
 		if ( !m_isInit || !m_curViewport.cam )
 			return;
 
-		//static float lastTime = (float)timeGetTime();
 		m_dxDevCont->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView );
 		m_dxDevCont->RSSetState( m_rasterizer );
 		//TODO: add support for multiple viewports
@@ -265,20 +270,9 @@ namespace kgx
 		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, m_clearColor );
 		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-
-		//float currTime  = (float)timeGetTime();
-		//float deltaTime = (currTime - lastTime) * 0.001f;
-		//update( deltaTime );
-
-
 		m_curViewport.cam->renderCurrentView();
-
-		//mActiveCam->renderCurrentView();
-
-
 
 		// flip the back buffer and the front buffer
 		m_swapChain->Present(1, 0);
-		//lastTime = currTime;
 	}
 }

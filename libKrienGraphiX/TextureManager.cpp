@@ -39,12 +39,7 @@ namespace kgx
 
 	TextureManager::~TextureManager()
 	{
-		if ( m_defaultSamp )
-			m_defaultSamp->Release();
-
-		std::map<std::wstring, Texture*>::iterator it;
-		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
-			delete it->second;
+		clearTextureResources();
 	}
 
 
@@ -131,6 +126,22 @@ namespace kgx
 			}
 		}
 	}
+
+
+	void TextureManager::clearTextureResources()
+	{
+		if ( m_defaultSamp )
+		{
+			m_defaultSamp->Release();
+			m_defaultSamp = nullptr;
+		}
+
+		std::map<std::wstring, Texture*>::iterator it;
+		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
+			delete it->second;
+		m_textures.clear();
+	}
+
 
 	ID3D11SamplerState* TextureManager::createSampler( const D3D11_FILTER &filter, const D3D11_TEXTURE_ADDRESS_MODE &mode, UINT anisotropy ) const
 	{

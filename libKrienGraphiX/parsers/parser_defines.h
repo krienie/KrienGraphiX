@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "ShaderProgram.h"
-#include "VertexInputLayout.h"
+#include "../ShaderProgram.h"
+#include "../VertexInputLayout.h"
 
 typedef unsigned int UINT;
 
@@ -13,7 +13,7 @@ namespace kgx
 	struct KgModelData
 	{
 		KgModelData( const std::string &mName = "", const std::string &usemtl = "", int start = 0, int count = 0 )
-			: modelName(mName), matName(usemtl), startIndex(start), indexCount(count) { }
+			: modelName(mName), matName(usemtl), startIndex(start), indexCount(count) {}
 
 		std::string modelName;
 		int startIndex;

@@ -28,6 +28,7 @@ namespace kgx
 			ShaderProgram* createShaderProgram();
 			void releaseShaderProgram( ShaderProgram::ShaderProgramID id );
 
+			void clearResources();
 
 		private:
 			explicit ResourceManager( _In_ ID3D11Device *dxDevice );
@@ -39,11 +40,10 @@ namespace kgx
 			static ResourceManager* m_inst;
 
 			ID3D11Device *m_dxDev;
-
 			
 			MeshBufferID m_nextBufferID;
 			std::map<MeshBufferID, MeshBuffer> m_meshBuffers;
 			ShaderProgram::ShaderProgramID m_nextShaderProgramID;
-			std::map<ShaderProgram::ShaderProgramID, ShaderProgram*> m_ShaderPrograms;
+			std::map<ShaderProgram::ShaderProgramID, ShaderProgram*> m_shaderPrograms;
 	};
 }
