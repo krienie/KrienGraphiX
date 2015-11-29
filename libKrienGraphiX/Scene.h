@@ -38,11 +38,11 @@ namespace kgx
 			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity );
 
 			/** Adds a RenderableObject to the scene. Takes ownership of the object */
-			void claimRenderableObject( _In_ RenderableObject *obj );
+			void claimRenderableObject( RenderableObject *obj );
 
 			//TODO: add functionality to find RO in the scene
 
-			void render( _In_ Camera *renderCam );
+			void render( Camera *renderCam );
 			void renderDefaultCam();
 
 		private:

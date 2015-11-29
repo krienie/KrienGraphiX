@@ -5,7 +5,7 @@
 
 namespace kgx
 {
-	VertexShader::VertexShader( _In_ ID3D11Device *dxDev, const VertexInputLayout &layout )
+	VertexShader::VertexShader( ID3D11Device *dxDev, const VertexInputLayout &layout )
 		: ShaderBase( dxDev, "vs_5_0" ), m_shaderSource( nullptr ), m_vertShader( nullptr ), m_inputLayout( layout )
 	{
 	}
@@ -43,7 +43,7 @@ namespace kgx
 	}
 
 
-	HRESULT VertexShader::build( _In_ ID3DBlob *source )
+	HRESULT VertexShader::build( ID3DBlob *source )
 	{
 		m_shaderSource = source;
 		m_shaderSource->AddRef();

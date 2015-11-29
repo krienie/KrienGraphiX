@@ -15,7 +15,7 @@ namespace kgx
 	{
 		public:
 			static ResourceManager* getInst();
-			static void construct( _In_ ID3D11Device *dxDevice );
+			static void construct( ID3D11Device *dxDevice );
 			static void destroy();
 
 			typedef UINT MeshBufferID;
@@ -31,7 +31,7 @@ namespace kgx
 			void clearResources();
 
 		private:
-			explicit ResourceManager( _In_ ID3D11Device *dxDevice );
+			explicit ResourceManager( ID3D11Device *dxDevice );
 			~ResourceManager();
 			// no copying allowed
 			ResourceManager( const ResourceManager& );

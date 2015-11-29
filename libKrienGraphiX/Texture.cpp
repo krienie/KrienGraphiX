@@ -7,7 +7,7 @@
 
 namespace kgx
 {
-	Texture::Texture( const std::wstring &file, _In_ ID3D11Device *dxDevice )
+	Texture::Texture( const std::wstring &file, ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_buffer(nullptr), m_shaderView(nullptr),
 			m_filename(file)
 	{

@@ -12,7 +12,7 @@ namespace kgx
 	{
 	public:
 		static TextureManager* getInst();
-		static void construct( _In_ ID3D11Device *dxDevice );
+		static void construct( ID3D11Device *dxDevice );
 		static void destroy();
 
 		//TODO: add default search path(s)
@@ -31,13 +31,13 @@ namespace kgx
 
 		void releaseTexture( const std::string &filename );
 		void releaseTexture( const std::wstring &filename );
-		void releaseTexture( _In_ Texture* tex );
+		void releaseTexture( Texture* tex );
 
 
 		void clearTextureResources();
 
 	private:
-		explicit TextureManager( _In_ ID3D11Device *dxDevice );
+		explicit TextureManager( ID3D11Device *dxDevice );
 		~TextureManager();
 		// no copying allowed
 		TextureManager( const TextureManager& );

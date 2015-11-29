@@ -10,13 +10,13 @@ namespace kgx
 	class PixelShader : public ShaderBase
 	{
 		public:
-			explicit PixelShader( _In_ ID3D11Device *dxDev );
+			explicit PixelShader( ID3D11Device *dxDev );
 			~PixelShader();
 
 			void activate();
 
 		protected:
-			HRESULT build( _In_ ID3DBlob *shaderSource );
+			HRESULT build( ID3DBlob *shaderSource );
 
 		private:
 			// no copying allowed

@@ -14,7 +14,7 @@
 
 namespace kgx
 {
-	ShaderBase::ShaderBase( _In_ ID3D11Device *dxDevice, const std::string &target )
+	ShaderBase::ShaderBase( ID3D11Device *dxDevice, const std::string &target )
 		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers(), m_dxConstBuffers(),
 		m_textures(), m_texBuffers(), m_texViews(), m_target(target)
 	{
@@ -90,7 +90,7 @@ namespace kgx
 	}
 
 
-	void ShaderBase::updateConstantVariable( const std::string &name, _In_ const void *dataPtr )
+	void ShaderBase::updateConstantVariable( const std::string &name, const void *dataPtr )
 	{
 		//TODO: handle cases with duplicate variable names (two buffers, one variable in each buffer with the same name)
 
@@ -106,7 +106,7 @@ namespace kgx
 	}
 
 
-	void ShaderBase::addTexture( _In_ Texture *tex )
+	void ShaderBase::addTexture( Texture *tex )
 	{
 		if ( tex )
 		{
@@ -116,7 +116,7 @@ namespace kgx
 		}
 	}
 
-	HRESULT ShaderBase::processLoadedShaderBlob( _In_ ID3DBlob *shaderSource )
+	HRESULT ShaderBase::processLoadedShaderBlob( ID3DBlob *shaderSource )
 	{
 		HRESULT res = build( shaderSource );
 		if ( FAILED(res) )

@@ -7,7 +7,7 @@
 
 namespace kgx
 {
-	PixelShader::PixelShader( _In_ ID3D11Device *dxDev )
+	PixelShader::PixelShader( ID3D11Device *dxDev )
 		: ShaderBase( dxDev, "ps_5_0" ), m_pixelShader( 0 )//, structBuffers(), bufferUAVs()
 	{
 	}
@@ -50,7 +50,7 @@ namespace kgx
 	}
 
 
-	HRESULT PixelShader::build( _In_ ID3DBlob *shaderSource )
+	HRESULT PixelShader::build( ID3DBlob *shaderSource )
 	{
 		return m_dxDev->CreatePixelShader(shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), NULL, &m_pixelShader);
 	}

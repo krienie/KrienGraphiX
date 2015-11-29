@@ -81,13 +81,13 @@ namespace kgx
 	}
 
 
-	void Scene::claimRenderableObject( _In_ RenderableObject *obj )
+	void Scene::claimRenderableObject( RenderableObject *obj )
 	{
 		m_renderObjects.push_back(obj);
 	}
 
 
-	void Scene::render( _In_ Camera *renderCam )
+	void Scene::render( Camera *renderCam )
 	{
 		//TODO: collect list of visible lights to be used in the draw call below
 

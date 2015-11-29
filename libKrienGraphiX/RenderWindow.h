@@ -13,12 +13,12 @@ namespace kgx
 	class RenderWindow
 	{
 		public:
-			RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory );
+			RenderWindow( ID3D11Device *dxDevice, IDXGIFactory2 *dxgiFactory );
 			~RenderWindow();
 
 			bool create( HWND windowHandle );
 
-			void setViewport( _In_ Camera *cam, float topLeftX = 0, float topLeftY = 0, float width = -1.0f, float height = -1.0f );
+			void setViewport( Camera *cam, float topLeftX = 0, float topLeftY = 0, float width = -1.0f, float height = -1.0f );
 			void setClearColor( float red, float green, float blue, float alpha = 1.0f );
 
 			bool isFullscreen() const;

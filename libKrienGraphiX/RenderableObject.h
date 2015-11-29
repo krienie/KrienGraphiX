@@ -36,13 +36,13 @@ namespace kgx
 				ShaderProgram *shaderProg;
 			};
 
-			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
-			RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 							  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name );
 			~RenderableObject();
 
-			void draw( _In_ Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
+			void draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
 
 		private:
 			// no copying allowed

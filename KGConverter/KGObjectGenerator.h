@@ -79,7 +79,7 @@ namespace kgx
 	class KGObjectGenerator
 	{
 		public:
-			static void generate( _In_ KgoData &inputData, _Inout_ std::string &output );
+			static void generate( KgoData &inputData, std::string &output );
 
 		private:
 			KGObjectGenerator();

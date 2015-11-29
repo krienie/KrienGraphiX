@@ -14,7 +14,7 @@ namespace kgx
 	class Texture
 	{
 		public:
-			Texture( const std::wstring &file, _In_ ID3D11Device *dxDevice );
+			Texture( const std::wstring &file, ID3D11Device *dxDevice );
 			explicit Texture( const Texture &other );
 			~Texture();
 

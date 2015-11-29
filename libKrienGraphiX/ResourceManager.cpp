@@ -14,7 +14,7 @@ namespace kgx
 		return m_inst;
 	}
 
-	void ResourceManager::construct( _In_ ID3D11Device *m_dxDev )
+	void ResourceManager::construct( ID3D11Device *m_dxDev )
 	{
 		if ( ResourceManager::m_inst )
 			delete ResourceManager::m_inst;
@@ -30,7 +30,7 @@ namespace kgx
 	}
 
 
-	ResourceManager::ResourceManager( _In_ ID3D11Device *dxDevice )
+	ResourceManager::ResourceManager( ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_nextShaderProgramID(1), m_shaderPrograms()
 	{
 	}
@@ -54,7 +54,7 @@ namespace kgx
 	}
 
 	ResourceManager::MeshBufferID ResourceManager::addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
-																const VertexInputLayout &inputDescriptor, HRESULT &result )
+																	const VertexInputLayout &inputDescriptor, HRESULT &result )
 	{
 		if ( vertices.size() <= 0 || indices.size() <= 0 )
 		{

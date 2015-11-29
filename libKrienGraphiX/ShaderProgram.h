@@ -46,7 +46,7 @@ namespace kgx
 
 			typedef UINT ShaderProgramID;
 
-			ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id );
+			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id );
 			virtual ~ShaderProgram();
 
 			ShaderProgramID getID() const;
@@ -66,14 +66,14 @@ namespace kgx
 			PixelShader* getPixelShader() const;
 
 			void addAutoShaderVar( ShaderType shaderType, const std::string &varName, ShaderAutoBindType varType );
-			void addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
-			void updateShaderVar( ShaderType shaderType, const std::string &name, _In_ const void *dataPtr );
+			void addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
+			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
 
 			//TODO: updateShaderVar( ShaderType, varName, dataPtr );
 			//TODO: updateShaderDataBlock( ShaderType, 
 
 
-			void activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj );
+			void activate( Camera *renderCam, RenderableObject *renderObj );
 
 		private:
 			// no copying allowed
@@ -88,8 +88,8 @@ namespace kgx
 				ShaderAutoBindType type;
 			};
 
-			void updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
-									  _In_ ShaderBase *shader, AutoShaderVar shaderVar );
+			void updateAutoShaderVar( Camera *renderCam,  RenderableObject *renderObj,
+									   ShaderBase *shader, AutoShaderVar shaderVar );
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;

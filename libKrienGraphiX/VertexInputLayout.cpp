@@ -82,7 +82,7 @@ namespace kgx
 	}
 
 
-	ID3D11InputLayout* VertexInputLayout::getDxInputLayout( _In_ ID3D11Device *dxDevice, _In_ ID3DBlob *shaderSource, bool forceRebuild )
+	ID3D11InputLayout* VertexInputLayout::getDxInputLayout( ID3D11Device *dxDevice, ID3DBlob *shaderSource, bool forceRebuild )
 	{
 		if ( m_dxLayout )
 		{

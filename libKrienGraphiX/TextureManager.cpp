@@ -14,7 +14,7 @@ namespace kgx
 		return m_inst;
 	}
 
-	void TextureManager::construct( _In_ ID3D11Device *m_dxDev )
+	void TextureManager::construct( ID3D11Device *m_dxDev )
 	{
 		if ( TextureManager::m_inst )
 			delete TextureManager::m_inst;
@@ -30,7 +30,7 @@ namespace kgx
 	}
 
 
-	TextureManager::TextureManager( _In_ ID3D11Device *dxDevice )
+	TextureManager::TextureManager( ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_textures(), m_defaultSamp(nullptr)
 	{
 		// create default sampler
@@ -113,7 +113,7 @@ namespace kgx
 	{
 		m_textures.erase( filename );
 	}
-	void TextureManager::releaseTexture( _In_ Texture* tex )
+	void TextureManager::releaseTexture( Texture* tex )
 	{
 		std::map<std::wstring, Texture*>::const_iterator it;
 

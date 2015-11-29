@@ -20,7 +20,7 @@ namespace kgt
 		void startRendering();
 
 	public:
-		KgxRenderWidget( _In_ QWidget *parent = 0, Qt::WindowFlags f = 0 );
+		KgxRenderWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 );
 		//~KgxRenderWidget();
 
 		void initialize();
@@ -28,25 +28,25 @@ namespace kgt
 
 		void toggleFullscreen();
 
-		void addFrameListener( _In_ FrameListener *listener );
-		void addMouseListener( _In_ MouseListener *listener );
-		void addKeyboardListener( _In_ KeyboardListener *listener );
+		void addFrameListener( FrameListener *listener );
+		void addMouseListener( MouseListener *listener );
+		void addKeyboardListener( KeyboardListener *listener );
 
 	protected:
 		QPaintEngine* paintEngine() const;
-		void paintEvent( _In_ QPaintEvent *evt ) {}
-		void resizeEvent( _In_ QResizeEvent *evt ) {}
-		void focusInEvent( _In_ QFocusEvent *evt ) {}
-		void mouseMoveEvent( _In_ QMouseEvent *evt );
-		void mousePressEvent( _In_ QMouseEvent *evt );
-		void mouseReleaseEvent( _In_ QMouseEvent *evt );
-		void wheelEvent( _In_ QWheelEvent *evt );
-		void keyPressEvent( _In_ QKeyEvent *evt );
-		void keyReleaseEvent( _In_ QKeyEvent *evt );
+		void paintEvent( QPaintEvent *evt ) {}
+		void resizeEvent( QResizeEvent *evt ) {}
+		void focusInEvent( QFocusEvent *evt ) {}
+		void mouseMoveEvent( QMouseEvent *evt );
+		void mousePressEvent( QMouseEvent *evt );
+		void mouseReleaseEvent( QMouseEvent *evt );
+		void wheelEvent( QWheelEvent *evt );
+		void keyPressEvent( QKeyEvent *evt );
+		void keyReleaseEvent( QKeyEvent *evt );
 
 	private:
-		MouseEvent createMouseEvent( _In_ QWheelEvent *qtEvt ) const;
-		MouseEvent createMouseEvent( _In_ QMouseEvent *qtEvt, MouseEvent::ButtonState state ) const;
+		MouseEvent createMouseEvent( QWheelEvent *qtEvt ) const;
+		MouseEvent createMouseEvent( QMouseEvent *qtEvt, MouseEvent::ButtonState state ) const;
 
 		bool m_isInit;
 		kgx::RenderWindow *m_renderWin;

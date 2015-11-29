@@ -11,7 +11,7 @@
 
 namespace kgt
 {
-	KgxRenderWidget::KgxRenderWidget( _In_ QWidget *parent, Qt::WindowFlags f )
+	KgxRenderWidget::KgxRenderWidget( QWidget *parent, Qt::WindowFlags f )
 		: QWidget(parent, f | Qt::MSWindowsOwnDC), m_isInit(false), m_renderWin(0), m_lastFrameTime(0.0),
 		m_prevMousePosX( 0.0f ), m_prevMousePosY( 0.0f ), m_frameListeners(), m_mouseListeners(), m_keyboardListeners()
 	{
@@ -78,17 +78,17 @@ namespace kgt
 			m_renderWin->setFullscreen( !m_renderWin->isFullscreen() );
 	}
 
-	void KgxRenderWidget::addFrameListener( _In_ FrameListener *listener )
+	void KgxRenderWidget::addFrameListener( FrameListener *listener )
 	{
 		m_frameListeners.push_back( listener );
 	}
 
-	void KgxRenderWidget::addMouseListener( _In_ MouseListener *listener )
+	void KgxRenderWidget::addMouseListener( MouseListener *listener )
 	{
 		m_mouseListeners.push_back( listener );
 	}
 
-	void KgxRenderWidget::addKeyboardListener( _In_ KeyboardListener *listener )
+	void KgxRenderWidget::addKeyboardListener( KeyboardListener *listener )
 	{
 		m_keyboardListeners.push_back( listener );
 	}
@@ -100,7 +100,7 @@ namespace kgt
 	}
 
 
-	void KgxRenderWidget::mouseMoveEvent( _In_ QMouseEvent *evt )
+	void KgxRenderWidget::mouseMoveEvent( QMouseEvent *evt )
 	{
 		std::vector<MouseListener*>::iterator it;
 		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
@@ -111,7 +111,7 @@ namespace kgt
 
 	}
 
-	void KgxRenderWidget::mousePressEvent( _In_ QMouseEvent *evt )
+	void KgxRenderWidget::mousePressEvent( QMouseEvent *evt )
 	{
 		m_prevMousePosX = evt->x();
 		m_prevMousePosY = evt->y();
@@ -121,7 +121,7 @@ namespace kgt
 			(*it)->mousePressed( createMouseEvent( evt, MouseEvent::ButtonState::Down ) );
 	}
 
-	void KgxRenderWidget::mouseReleaseEvent( _In_ QMouseEvent *evt )
+	void KgxRenderWidget::mouseReleaseEvent( QMouseEvent *evt )
 	{
 		m_prevMousePosX = evt->x();
 		m_prevMousePosY = evt->y();
@@ -131,14 +131,14 @@ namespace kgt
 			(*it)->mouseReleased( createMouseEvent( evt, MouseEvent::ButtonState::Up ) );
 	}
 
-	void KgxRenderWidget::wheelEvent( _In_ QWheelEvent *evt )
+	void KgxRenderWidget::wheelEvent( QWheelEvent *evt )
 	{
 		std::vector<MouseListener*>::iterator it;
 		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
 			(*it)->wheelEvent( createMouseEvent( evt ) );
 	}
 
-	void KgxRenderWidget::keyPressEvent( _In_ QKeyEvent *evt )
+	void KgxRenderWidget::keyPressEvent( QKeyEvent *evt )
 	{
 		int mod = evt->modifiers();
 
@@ -147,7 +147,7 @@ namespace kgt
 			(*it)->keyPressed( KeyEvent(static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Pressed, static_cast<KeyEvent::KeyModifiers>(mod)) );
 	}
 
-	void KgxRenderWidget::keyReleaseEvent( _In_ QKeyEvent *evt )
+	void KgxRenderWidget::keyReleaseEvent( QKeyEvent *evt )
 	{
 		int mod = evt->modifiers();
 
@@ -156,7 +156,7 @@ namespace kgt
 			(*it)->keyReleased( KeyEvent( static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Released, static_cast<KeyEvent::KeyModifiers>(mod) ) );
 	}
 
-	MouseEvent KgxRenderWidget::createMouseEvent( _In_ QWheelEvent *qtEvt ) const
+	MouseEvent KgxRenderWidget::createMouseEvent( QWheelEvent *qtEvt ) const
 	{
 		float normX = qtEvt->x() / float( this->width() );
 		float normY = qtEvt->y() / float( this->height() );
@@ -168,7 +168,7 @@ namespace kgt
 		return MouseEvent( xAxis, yAxis, zAxis, this->width(), this->height(), MouseEvent::Button::MiddleButton, MouseEvent::ButtonState::None );
 	}
 
-	MouseEvent KgxRenderWidget::createMouseEvent( _In_ QMouseEvent *qtEvt, MouseEvent::ButtonState state )  const
+	MouseEvent KgxRenderWidget::createMouseEvent( QMouseEvent *qtEvt, MouseEvent::ButtonState state )  const
 	{
 		float normX = qtEvt->x() / float( this->width() );
 		float normY = qtEvt->y() / float( this->height() );

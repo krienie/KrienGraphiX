@@ -6,7 +6,7 @@
 
 namespace kgx
 {
-	RenderWindow::RenderWindow( _In_ ID3D11Device *dxDevice, _In_ IDXGIFactory2 *dxgiFactory )
+	RenderWindow::RenderWindow( ID3D11Device *dxDevice,  IDXGIFactory2 *dxgiFactory )
 		: m_dxDev(dxDevice), m_dxDevCont(0), m_dxgiFactory(dxgiFactory), m_swapChain(0), m_depthStencilView(0),
 			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U),
 			m_isInit(false)
@@ -179,7 +179,7 @@ namespace kgx
 	}
 
 
-	void RenderWindow::setViewport( _In_ Camera *cam, float topLeftX, float topLeftY, float width, float height )
+	void RenderWindow::setViewport( Camera *cam, float topLeftX, float topLeftY, float width, float height )
 	{
 		if ( !m_isInit )
 		{

@@ -39,7 +39,7 @@ namespace kgx
 	//~OBJParser()
 
 
-	bool OBJParser::parseFile( _In_ const std::string &file, _In_ const std::string &fileDir, _Inout_ KgoData &outputData )
+	bool OBJParser::parseFile( const std::string &file, const std::string &fileDir, KgoData &outputData )
 	{
 		std::stringstream objFile;
 		objFile << fileDir << "/" << file;

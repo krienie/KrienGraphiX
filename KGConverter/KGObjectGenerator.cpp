@@ -62,7 +62,7 @@ namespace kgx
 	{
 	}*/
 
-	void KGObjectGenerator::generate( _In_ KgoData &inputData, _Inout_ std::string &outputString )
+	void KGObjectGenerator::generate( KgoData &inputData, std::string &outputString )
 	{
 		// construct header string
 		std::stringstream headerStr;
@@ -72,7 +72,7 @@ namespace kgx
 		headerStr.imbue( std::locale( headerStr.getloc(), facet ) );
 		headerStr << "// File created: " << boost::posix_time::second_clock::local_time() << std::endl;
 
-		struct KgoGram : karma::grammar < BackInsertIt, karma::space_type >
+		struct KgoGram : karma::grammar<BackInsertIt, karma::space_type>
 		{
 			KgoGram( const std::string &header, const std::vector<VertexInputLayout::Type> &inLayout,
 					 const std::vector<float> &inVerts, const std::vector<UINT> &inIndices,

@@ -13,7 +13,7 @@ namespace kgx
 	class ConstantBuffer
 	{
 		public:
-			explicit ConstantBuffer( _In_ ID3D11Device *dxDevice );
+			explicit ConstantBuffer( ID3D11Device *dxDevice );
 			explicit ConstantBuffer( const ConstantBuffer &other );
 			~ConstantBuffer();
 

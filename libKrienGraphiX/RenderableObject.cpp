@@ -6,12 +6,12 @@
 
 namespace kgx
 {
-	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
 		: RenderableObject(dxDevice, buff, objectContainers, meshTopology, "")
 	{
 	}
-	RenderableObject::RenderableObject( _In_ ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 					  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name )
 		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_objContainers(objectContainers), m_topology(meshTopology)
 	{
@@ -24,7 +24,7 @@ namespace kgx
 			m_dxDevCont->Release();
 	}
 
-	void RenderableObject::draw( _In_ Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor )
+	void RenderableObject::draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor )
 	{
 		// bind Vertex- and Index-buffers to IA Stage
 		UINT bufferStride = m_meshBuff.inputDescriptor.getBufferStride();

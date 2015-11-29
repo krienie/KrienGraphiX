@@ -11,13 +11,13 @@ namespace kgx
 	class VertexShader : public ShaderBase
 	{
 		public:
-			VertexShader( _In_ ID3D11Device *dxDev, const VertexInputLayout &layout );
+			VertexShader( ID3D11Device *dxDev, const VertexInputLayout &layout );
 			~VertexShader();
 
 			void activate();
 
 		protected:
-			HRESULT build( _In_ ID3DBlob *shaderSource );
+			HRESULT build( ID3DBlob *shaderSource );
 
 		private:
 			// no copying allowed

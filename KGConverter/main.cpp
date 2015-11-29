@@ -12,7 +12,7 @@ namespace fs = boost::filesystem;
 namespace qi = boost::spirit::qi;
 
 
-bool convertFile( _In_ const std::string &filename, _In_ const std::string &fileDir, _In_ const std::string &outDir );
+bool convertFile( const std::string &filename, const std::string &fileDir, const std::string &outDir );
 void printHelp();
 
 
@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
 }
 
 
-bool convertFile( _In_ const std::string &filename, _In_ const std::string &fileDir, _In_ const std::string &outDir )
+bool convertFile( const std::string &filename, const std::string &fileDir, const std::string &outDir )
 {
 	kgx::KgoData parserOutput;
 	kgx::OBJParser objP;

@@ -10,7 +10,7 @@
 
 namespace kgx
 {
-	ShaderProgram::ShaderProgram( _In_ ID3D11Device *dxDevice, ShaderProgramID id )
+	ShaderProgram::ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id )
 		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_progID(id), m_vertShader(nullptr),
 		/*m_hullShader(nullptr), m_domainShader(nullptr), m_geomShader(nullptr),*/ m_pixShader(nullptr), m_constVarLinks()
 	{
@@ -119,7 +119,7 @@ namespace kgx
 			addAutoShaderVar( shader, varName, varType );
 		else std::cout << "Error (ShaderProgram::addAutoShaderVar): Shader not found. Call ShaderProgram::createShadertypeShader() first." << std::endl;
 	}
-	void ShaderProgram::addAutoShaderVar( _In_ ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
+	void ShaderProgram::addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType )
 	{
 		if ( !shader )
 		{
@@ -135,7 +135,7 @@ namespace kgx
 		shaderVars.first->second.push_back( AutoShaderVar(varName, varType) );
 	}
 
-	void ShaderProgram::updateShaderVar( ShaderType shaderType, const std::string &name, _In_ const void *dataPtr )
+	void ShaderProgram::updateShaderVar( ShaderType shaderType, const std::string &name, const void *dataPtr )
 	{
 		ShaderBase *shader = getShader( shaderType );
 		if ( shader )
@@ -144,7 +144,7 @@ namespace kgx
 	}
 
 
-	void ShaderProgram::activate( _In_ Camera *renderCam, _In_ RenderableObject *renderObj )
+	void ShaderProgram::activate( Camera *renderCam, RenderableObject *renderObj )
 	{
 		std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator shaderIt;
 		std::vector<AutoShaderVar>::iterator varIt;
@@ -171,8 +171,8 @@ namespace kgx
 	}
 
 
-	void ShaderProgram::updateAutoShaderVar( _In_ Camera *renderCam, _In_ RenderableObject *renderObj,
-										_In_ ShaderBase *shader, AutoShaderVar shaderVar )
+	void ShaderProgram::updateAutoShaderVar( Camera *renderCam, RenderableObject *renderObj,
+										 ShaderBase *shader, AutoShaderVar shaderVar )
 	{
 		float tempFloat = 0.0f;
 		DirectX::XMFLOAT4X4 tempFloat4x4;

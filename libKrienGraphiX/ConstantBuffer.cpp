@@ -5,7 +5,7 @@
 
 namespace kgx
 {
-	ConstantBuffer::ConstantBuffer( _In_ ID3D11Device *m_dxDevice )
+	ConstantBuffer::ConstantBuffer( ID3D11Device *m_dxDevice )
 		: m_dxDev(m_dxDevice), m_dxDevCont(nullptr), m_dxBuffer(nullptr),
 			m_bufferElementSize(0U), m_dataChanged(false), m_variables(), m_rawData(nullptr)
 	{

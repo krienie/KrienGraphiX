@@ -62,7 +62,7 @@ namespace kgx
 			OBJParser();
 			//~OBJParser();
 
-			bool parseFile( _In_ const std::string &file, _In_ const std::string &fileDir, _Inout_ KgoData &outputData );
+			bool parseFile( const std::string &file, const std::string &fileDir, KgoData &outputData );
 
 		private:
 			struct VertexData
