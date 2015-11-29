@@ -47,7 +47,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 
-namespace phx = boost::phoenix;
+namespace phx   = boost::phoenix;
 namespace karma = boost::spirit::karma;
 typedef std::back_insert_iterator<std::string> BackInsertIt;
 
@@ -142,8 +142,6 @@ namespace kgx
 
 		BackInsertIt sink( outputString );
 		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
-		//std::cout << "kgoFile: " << std::endl << outputString << std::endl;
-		//std::cout << std::endl;
 	}
 }
 

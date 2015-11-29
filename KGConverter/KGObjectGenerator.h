@@ -75,16 +75,19 @@ namespace kgx
 		return os;
 	}
 
-	//TODO: dit hoeft helemaal geen klasse te zijn...
+
 	class KGObjectGenerator
 	{
 		public:
+			static void generate( _In_ KgoData &inputData, _Inout_ std::string &output );
+
+		private:
 			KGObjectGenerator();
 			//~KGObjectGenerator();
 
-			void generate( _In_ KgoData &inputData, _Inout_ std::string &output );
-
-		private:
+			// no copying allowed
+			KGObjectGenerator( const KGObjectGenerator& );
+			KGObjectGenerator& operator=(const KGObjectGenerator&);
 
 	};
 }

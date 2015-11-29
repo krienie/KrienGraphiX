@@ -110,9 +110,8 @@ bool convertFile( _In_ const std::string &filename, _In_ const std::string &file
 		return false;
 	std::cout << "Successfully parsed file " << filename << ".obj" << std::endl;
 
-	kgx::KGObjectGenerator gen;
 	std::string kgoDataStr;
-	gen.generate( parserOutput, kgoDataStr );
+	kgx::KGObjectGenerator::generate( parserOutput, kgoDataStr );
 
 	std::stringstream ss;
 	ss << outDir << "/" << filename << ".kgo";
