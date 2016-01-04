@@ -24,13 +24,10 @@ namespace kgx
 
 
 		Texture* loadTexture( const std::string &filename );
-		Texture* loadTexture( const std::wstring &filename );
 
 		Texture* getTexture( const std::string &filename ) const;
-		Texture* getTexture( const std::wstring &filename ) const;
 
 		void releaseTexture( const std::string &filename );
-		void releaseTexture( const std::wstring &filename );
 		void releaseTexture( Texture* tex );
 
 
@@ -49,7 +46,7 @@ namespace kgx
 
 		ID3D11Device *m_dxDev;
 
-		std::map<std::wstring, Texture*> m_textures;
+		std::map<std::string, Texture*> m_textures;
 		ID3D11SamplerState *m_defaultSamp;
 	};
 }

@@ -78,27 +78,19 @@ namespace kgx
 
 	Texture* TextureManager::loadTexture( const std::string &filename )
 	{
-		return loadTexture( std::wstring(filename.begin(), filename.end()) );
-	}
-	Texture* TextureManager::loadTexture( const std::wstring &filename )
-	{
 		Texture *tex = getTexture( filename );
 		if ( tex )
 			return tex;
 
 		tex = new Texture( filename, m_dxDev );
-		m_textures.insert( std::pair<std::wstring, Texture*>(filename, tex) );
+		m_textures.insert( std::pair<std::string, Texture*>(filename, tex) );
 
 		return tex;
 	}
 
 	Texture* TextureManager::getTexture( const std::string &filename ) const
 	{
-		return getTexture( std::wstring(filename.cbegin(), filename.cend()) );
-	}
-	Texture* TextureManager::getTexture( const std::wstring &filename ) const
-	{
-		std::map<std::wstring, Texture*>::const_iterator it = m_textures.find( filename );
+		std::map<std::string, Texture*>::const_iterator it = m_textures.find( filename );
 		if ( it != m_textures.cend() )
 			return it->second;
 
@@ -107,15 +99,11 @@ namespace kgx
 
 	void TextureManager::releaseTexture( const std::string &filename )
 	{
-		releaseTexture( std::wstring(filename.cbegin(), filename.cend()) );
-	}
-	void TextureManager::releaseTexture( const std::wstring &filename )
-	{
 		m_textures.erase( filename );
 	}
 	void TextureManager::releaseTexture( Texture* tex )
 	{
-		std::map<std::wstring, Texture*>::const_iterator it;
+		std::map<std::string, Texture*>::const_iterator it;
 
 		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
 		{
@@ -136,7 +124,7 @@ namespace kgx
 			m_defaultSamp = nullptr;
 		}
 
-		std::map<std::wstring, Texture*>::iterator it;
+		std::map<std::string, Texture*>::iterator it;
 		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
 			delete it->second;
 		m_textures.clear();

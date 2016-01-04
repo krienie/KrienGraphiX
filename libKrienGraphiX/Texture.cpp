@@ -7,13 +7,13 @@
 
 namespace kgx
 {
-	Texture::Texture( const std::wstring &file, ID3D11Device *dxDevice )
+	Texture::Texture( const std::string &file, ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_buffer(nullptr), m_shaderView(nullptr),
 			m_filename(file)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 
-		HRESULT res = TextureLoader::loadAsShaderResource( file, &m_buffer, &m_shaderView, m_dxDev, m_dxDevCont );
+		HRESULT res = TextureLoader::loadAsShaderResource( std::wstring(file.begin(), file.end()), &m_buffer, &m_shaderView, m_dxDev, m_dxDevCont );
 
 		if ( FAILED(res) )
 		{
@@ -46,7 +46,7 @@ namespace kgx
 			m_dxDevCont->Release();
 	}
 
-	std::wstring Texture::getName() const
+	std::string Texture::getName() const
 	{
 		return m_filename;
 	}
