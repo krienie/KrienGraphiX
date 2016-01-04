@@ -1,4 +1,7 @@
 
+#include <sstream>
+#include <iostream>
+
 #include <boost/filesystem.hpp>
 
 #include "IOManager.h"
@@ -38,6 +41,7 @@ namespace kgx
 		std::set<std::string>::const_iterator it;
 		for ( it = m_searchPaths.cbegin(); it != m_searchPaths.cend(); ++it )
 		{
+			//TODO: consider making this non-recursive and make addSearchPath recursive..
 			boost::filesystem::recursive_directory_iterator dirIt( *it ), eod;
 			while ( dirIt != eod )
 			{
@@ -66,5 +70,33 @@ namespace kgx
 	void IOManager::clearSearchPaths()
 	{
 		m_searchPaths.clear();
+	}
+
+
+	bool IOManager::saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents ) const
+	{
+		if ( !boost::filesystem::is_directory(fileDir) )
+		{
+			std::cout << "Error (IOManager::saveFile): " << fileDir << " is not a valid directory. Aborting" << std::endl;
+			return false;
+		}
+
+		boost::filesystem::path dir( fileDir );
+		if ( dir.is_relative() || !boost::filesystem::exists(dir) && !boost::filesystem::create_directory(dir) )
+		{
+			std::cout << "Error (IOManager::saveFile): Error creating directory: " << fileDir << " Aborting" << std::endl;
+			return false;
+		}
+
+		boost::filesystem::path file( fileName );
+		boost::filesystem::path fullPath = dir / file;
+
+		if ( boost::filesystem::exists(fullPath) )
+			std::cout << "Warning (IOManager::saveFile): File already exists. Overwriting..." << std::endl;
+
+		std::ofstream fileOut( fullPath.string() );
+		fileOut << contents;
+		fileOut.close();
+		return true;
 	}
 }

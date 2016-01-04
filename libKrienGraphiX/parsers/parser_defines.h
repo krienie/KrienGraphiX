@@ -36,9 +36,9 @@ namespace kgx
 
 		struct ShaderDef
 		{
-			ShaderDef() : name(), variables() {}
+			ShaderDef() : filename(), variables() {}
 
-			std::string name;
+			std::string filename;
 			std::vector<ShaderVar> variables;
 			std::vector<std::string> textures;
 		};

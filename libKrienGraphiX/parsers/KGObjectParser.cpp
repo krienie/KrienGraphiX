@@ -42,7 +42,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderDef,
-	(std::string, name)
+	(std::string, filename)
 	(std::vector<kgx::KgMatData::ShaderVar>, variables)
 	(std::vector<std::string>, textures)
 );
@@ -88,7 +88,7 @@ namespace kgx
 		std::vector<UINT> indices;
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 		std::vector<KgModelData> models;
-		std::map<std::string, KgMatData> ShaderPrograms;
+		std::map<std::string, KgMatData> shaderPrograms;
 		struct KgoGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			KgoGrammar( std::vector<float> &v, std::vector<UINT> &i, std::vector<VertexInputLayout::Type> &l,
@@ -132,9 +132,9 @@ namespace kgx
 					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
 
 				//TODO: rename legacy Material type
-				ShaderProgram = shaderDefinition >> shaderDefinition;
+				shaderProgram = shaderDefinition >> shaderDefinition;
 				nameMatPair = lit("Material") >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit("{") >> ShaderProgram >> lit("}");
+					>> lit( "{" ) >> shaderProgram >> lit( "}" );
 
 				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
 						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
@@ -152,11 +152,11 @@ namespace kgx
 			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
 			qi::rule<std::string::const_iterator, KgMatData::ShaderDef(), Skipper> shaderDefinition;
 
-			qi::rule<std::string::const_iterator, KgMatData(), Skipper> ShaderProgram;
+			qi::rule<std::string::const_iterator, KgMatData(), Skipper> shaderProgram;
 			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
 
 			qi::rule<std::string::const_iterator> comment;
-		} kgmGrammar( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
+		} kgmGrammar( vertices, indices, vertLayoutTypes, models, shaderPrograms );
 
 		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
@@ -172,7 +172,7 @@ namespace kgx
 			return nullptr;
 		}
 
-		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, ShaderPrograms );
+		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, shaderPrograms );
 	}
 
 	RenderableObject* KGObjectParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
@@ -193,33 +193,34 @@ namespace kgx
 		std::map<std::string, KgMatData>::iterator matIt;
 		for ( matIt = ShaderPrograms.begin(); matIt != ShaderPrograms.end(); ++matIt )
 		{
-			ShaderProgram *ShaderProgram = ResourceManager::getInst()->createShaderProgram();
+			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
+			shaderProgram->setName( matIt->first );
 
-			VertexShader *vertShader = ShaderProgram->createVertexShader( matIt->second.vertexShader.name, vertLayout );
-			setShaderVariables( ShaderProgram, vertShader, matIt->second.vertexShader );
+			VertexShader *vertShader = shaderProgram->createVertexShader( matIt->second.vertexShader.filename, vertLayout );
+			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
 			// add vertex shader textures
 			std::vector<std::string>::iterator it;
 			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
 			{
-				Texture *tex = TextureManager::getInst()->loadTexture( *it );
+				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath(*it) );
 				if ( tex )
 					vertShader->addTexture( tex );
 			}
 
 			//TODO: add support for other shader types
 
-			PixelShader *pixShader = ShaderProgram->createPixelShader( matIt->second.pixelShader.name );
-			setShaderVariables( ShaderProgram, pixShader, matIt->second.pixelShader );
+			PixelShader *pixShader = shaderProgram->createPixelShader( matIt->second.pixelShader.filename );
+			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
 			// add pixel shader textures
 			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
 			{
-				Texture *tex = TextureManager::getInst()->loadTexture( *it );
+				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath(*it) );
 				if ( tex )
 					pixShader->addTexture( tex );
 			}
 
 
-			shaderProgramPtrMap.insert( std::pair<std::string, kgx::ShaderProgram*>( matIt->first, ShaderProgram ) );
+			shaderProgramPtrMap.insert( std::pair<std::string, kgx::ShaderProgram*>( matIt->first, shaderProgram ) );
 		}
 
 

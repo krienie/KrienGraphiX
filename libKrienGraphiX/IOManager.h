@@ -15,6 +15,8 @@ namespace kgx
 			void addSearchPath( const std::string &absolutePath );
 			void clearSearchPaths();
 
+			bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents ) const;
+
 		private:
 			IOManager();
 			//~IOManager();
