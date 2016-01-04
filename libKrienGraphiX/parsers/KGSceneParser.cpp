@@ -139,7 +139,7 @@ namespace kgx
 
 				objName  = lit("(") >> *~qi::char_(')') >> lit(")");
 				file     = "source" >> lit("(") >> *~qi::char_('.') >> qi::string(".kgo") >> lit(")");
-				position = "worldPos" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
+				position = "position" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
 				objScale = "scale" >> lit("(") >> qi::float_ >> lit(")");
 
 				start = objName[phx::ref(name) = qi::_1]
