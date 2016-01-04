@@ -40,14 +40,25 @@ namespace kgx
 		return m_nextCamID - 1u;
 	}
 
-	Scene::CameraIterator Scene::getCameraBegin()
+
+	Scene::const_cameraiterator Scene::getCameraCBegin() const
 	{
-		return m_cameras.begin();
+		return m_cameras.cbegin();
 	}
-	Scene::CameraIterator Scene::getCameraEnd()
+	Scene::const_cameraiterator Scene::getCameraCEnd() const
 	{
-		return m_cameras.end();
+		return m_cameras.cend();
 	}
+	
+	Scene::const_renobjectiterator Scene::getRenObjectCBegin() const
+	{
+		return m_renderObjects.cbegin();
+	}
+	Scene::const_renobjectiterator Scene::getRenObjectCEnd() const
+	{
+		return m_renderObjects.cend();
+	}
+
 
 	Camera* Scene::getCamera( CameraID id ) const
 	{

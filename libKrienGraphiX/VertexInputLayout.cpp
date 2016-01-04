@@ -4,7 +4,7 @@
 namespace kgx
 {
 	VertexInputLayout::VertexInputLayout( const std::vector<Type> &inputTypes )
-		: m_inputDescriptor(), m_dxLayout(nullptr), m_bufferStride(0U)
+		: m_inputTypes(), m_inputDescriptor(), m_dxLayout( nullptr ), m_bufferStride( 0U )
 	{
 		std::vector<Type>::const_iterator it;
 		for ( it = inputTypes.begin(); it != inputTypes.end(); ++it )
@@ -12,7 +12,7 @@ namespace kgx
 	}
 
 	VertexInputLayout::VertexInputLayout( const VertexInputLayout &other )
-		: m_inputDescriptor(other.m_inputDescriptor), m_dxLayout(other.m_dxLayout), m_bufferStride(other.m_bufferStride)
+		: m_inputTypes(other.m_inputTypes), m_inputDescriptor(other.m_inputDescriptor), m_dxLayout(other.m_dxLayout), m_bufferStride(other.m_bufferStride)
 	{
 		if ( m_dxLayout )
 			m_dxLayout->AddRef();
@@ -29,6 +29,7 @@ namespace kgx
 	{
 		if ( this != &other )
 		{
+			this->m_inputTypes      = other.m_inputTypes;
 			this->m_inputDescriptor = other.m_inputDescriptor;
 			this->m_dxLayout        = other.m_dxLayout;
 			this->m_bufferStride    = other.m_bufferStride;
@@ -71,6 +72,7 @@ namespace kgx
 		desc.InputSlotClass       = D3D11_INPUT_PER_VERTEX_DATA;
 		desc.InstanceDataStepRate = 0U;
 
+		m_inputTypes.push_back( t );
 		addInputType( desc );
 	}
 	void VertexInputLayout::addInputType( const D3D11_INPUT_ELEMENT_DESC &inputDesc )
@@ -79,9 +81,14 @@ namespace kgx
 		m_inputDescriptor.push_back( inputDesc );
 
 		m_bufferStride += sizeof( float ) * 3U;
+
+		//TODO: add custom input-layouts to m_inputTypes
 	}
 
-
+	std::vector<VertexInputLayout::Type> VertexInputLayout::getInputTypes() const
+	{
+		return m_inputTypes;
+	}
 	ID3D11InputLayout* VertexInputLayout::getDxInputLayout( ID3D11Device *dxDevice, ID3DBlob *shaderSource, bool forceRebuild )
 	{
 		if ( m_dxLayout )

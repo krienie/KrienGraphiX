@@ -5,23 +5,30 @@
 #include <string>
 #include <vector>
 
+#include "Object.h"
+
 namespace kgx
 {
 	class ConstantBuffer;
 	class Texture;
 
-	class ShaderBase
+	class ShaderBase : public Object
 	{
 		public:
 			HRESULT loadFromFile( const std::wstring &filename );
 			HRESULT loadFromSource( const std::string &source, const std::string &entryPoint = "main" );
 
 			void updateConstantVariable( const std::string &name, const void *dataPtr );
+
+			typedef std::vector<Texture*>::const_iterator const_textureiterator;
+			const_textureiterator getTextureCBegin() const;
+			const_textureiterator getTextureCEnd() const;
 			void addTexture( Texture *tex );
+
 			virtual void activate() = 0;
 
 		protected:
-			explicit ShaderBase( ID3D11Device *dxDevice, const std::string &target );
+			ShaderBase( ID3D11Device *dxDevice, const std::string &target );
 			virtual ~ShaderBase();
 
 			virtual HRESULT build( ID3DBlob *shaderSource ) = 0;

@@ -17,6 +17,9 @@ namespace kgx
 			DirectX::XMFLOAT4X4 getModelMatrix() const;
 			DirectX::XMFLOAT4X4 getNormalMatrix() const;
 
+			DirectX::XMFLOAT3 getPosition() const;
+			DirectX::XMFLOAT3 getScale() const;
+
 			void translate( float deltaX, float deltaY, float deltaZ );
 			void setPosition( float x, float y, float z );
 			void scale( float deltaScale );

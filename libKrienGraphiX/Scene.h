@@ -25,9 +25,13 @@ namespace kgx
 							   const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3( 0.0f, 0.0f, -1.0f ),
 							   const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 
-			typedef std::map<CameraID, Camera*>::iterator CameraIterator;
-			CameraIterator getCameraBegin();
-			CameraIterator getCameraEnd();
+			typedef std::map<CameraID, Camera*>::const_iterator const_cameraiterator;
+			const_cameraiterator getCameraCBegin() const;
+			const_cameraiterator getCameraCEnd() const;
+
+			typedef std::vector<RenderableObject*>::const_iterator const_renobjectiterator;
+			const_renobjectiterator getRenObjectCBegin() const;
+			const_renobjectiterator getRenObjectCEnd() const;
 
 			Camera* getCamera( CameraID id ) const;
 			Camera* getDefaultCamera() const;
@@ -40,8 +44,6 @@ namespace kgx
 			/** Adds a RenderableObject to the scene. Takes ownership of the object */
 			void claimRenderableObject( RenderableObject *obj );
 
-			//TODO: add functionality to find RO in the scene
-
 			void render( Camera *renderCam );
 			void renderDefaultCam();
 
@@ -50,7 +52,6 @@ namespace kgx
 			Scene( const Scene& );
 			Scene& operator=( const Scene& );
 
-			//TODO: consider making this a float3
 			DirectX::XMFLOAT4 m_ambientLight;
 
 			CameraID m_nextCamID;

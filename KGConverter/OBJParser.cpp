@@ -485,10 +485,10 @@ namespace kgx
 			kgMat.pixelShader.textures.push_back( objMat.transMap );
 
 		//TODO: change to Default OBJ shaders => preferably some sort of ubershader
-		kgMat.vertexShader.name = "DefaultVertexShaderVS.cso";
+		kgMat.vertexShader.filename = "DefaultVertexShaderVS.cso";
 		if ( kgMat.pixelShader.textures.size() > 0u )
-			kgMat.pixelShader.name = "DefaultTextureShaderPS.cso";
-		else kgMat.pixelShader.name = "DefaultPixelShaderPS.cso";
+			kgMat.pixelShader.filename = "DefaultTextureShaderPS.cso";
+		else kgMat.pixelShader.filename = "DefaultPixelShaderPS.cso";
 	}
 }
 

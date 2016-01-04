@@ -5,11 +5,11 @@
 
 namespace kgx
 {
+	//TODO: remove static dependency of VertexShader on VertexInputLayout => allow the VIL to change after creation
 	VertexShader::VertexShader( ID3D11Device *dxDev, const VertexInputLayout &layout )
 		: ShaderBase( dxDev, "vs_5_0" ), m_shaderSource( nullptr ), m_vertShader( nullptr ), m_inputLayout( layout )
 	{
 	}
-
 
 	VertexShader::~VertexShader()
 	{
@@ -18,7 +18,6 @@ namespace kgx
 		if ( m_shaderSource )
 			m_shaderSource->Release();
 	}
-
 
 	void VertexShader::activate()
 	{
@@ -42,6 +41,10 @@ namespace kgx
 		}
 	}
 
+	VertexInputLayout* VertexShader::getInputLayout()
+	{
+		return &m_inputLayout;
+	}
 
 	HRESULT VertexShader::build( ID3DBlob *source )
 	{

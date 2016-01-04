@@ -45,6 +45,8 @@ namespace kgx
 			void draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
 
 		private:
+			friend class KGObjectGenerator;
+
 			// no copying allowed
 			RenderableObject( const RenderableObject& );
 			RenderableObject& operator=( const RenderableObject& );

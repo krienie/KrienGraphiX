@@ -15,6 +15,7 @@ namespace kgx
 			~VertexShader();
 
 			void activate();
+			VertexInputLayout* getInputLayout();
 
 		protected:
 			HRESULT build( ID3DBlob *shaderSource );

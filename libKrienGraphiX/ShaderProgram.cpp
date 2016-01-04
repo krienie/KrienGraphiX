@@ -10,8 +10,8 @@
 
 namespace kgx
 {
-	ShaderProgram::ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id )
-		: m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_progID(id), m_vertShader(nullptr),
+	ShaderProgram::ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name )
+		: Object(name), m_dxDev(dxDevice), m_dxDevCont(nullptr), m_progID(id), m_vertShader(nullptr),
 		/*m_hullShader(nullptr), m_domainShader(nullptr), m_geomShader(nullptr),*/ m_pixShader(nullptr), m_constVarLinks()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );

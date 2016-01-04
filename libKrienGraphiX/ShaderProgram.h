@@ -6,6 +6,7 @@
 #include <map>
 
 #include "Defines.h"
+#include "Object.h"
 
 
 namespace kgx
@@ -17,7 +18,7 @@ namespace kgx
 	class VertexShader;
 	class PixelShader;
 
-	class ShaderProgram
+	class ShaderProgram : public Object
 	{
 		public:
 			enum ShaderAutoBindType
@@ -46,7 +47,7 @@ namespace kgx
 
 			typedef UINT ShaderProgramID;
 
-			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id );
+			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name = "" );
 			virtual ~ShaderProgram();
 
 			ShaderProgramID getID() const;
@@ -68,10 +69,6 @@ namespace kgx
 			void addAutoShaderVar( ShaderType shaderType, const std::string &varName, ShaderAutoBindType varType );
 			void addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
-
-			//TODO: updateShaderVar( ShaderType, varName, dataPtr );
-			//TODO: updateShaderDataBlock( ShaderType, 
-
 
 			void activate( Camera *renderCam, RenderableObject *renderObj );
 

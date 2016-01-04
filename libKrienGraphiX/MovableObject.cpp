@@ -47,6 +47,17 @@ namespace kgx
 	}
 
 
+	DirectX::XMFLOAT3 MovableObject::getPosition() const
+	{
+		return DirectX::XMFLOAT3( m_xPos, m_yPos, m_zPos );
+	}
+
+	DirectX::XMFLOAT3 MovableObject::getScale() const
+	{
+		return DirectX::XMFLOAT3( m_xScale, m_yScale, m_zScale );
+	}
+
+
 	void MovableObject::translate( float deltaX, float deltaY, float deltaZ )
 	{
 		m_xPos += deltaX;
