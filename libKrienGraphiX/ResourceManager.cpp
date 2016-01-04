@@ -72,7 +72,7 @@ namespace kgx
 		ZeroMemory( &buffDesc, sizeof(buffDesc) );
 
 		buffDesc.ByteWidth = sizeof(float) * UINT(vertices.size());
-		buffDesc.Usage     = D3D11_USAGE_DEFAULT;
+		buffDesc.Usage     = D3D11_USAGE_IMMUTABLE;
 		buffDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 		ID3D11Buffer *vertBuff;
@@ -86,7 +86,7 @@ namespace kgx
 		}
 
 		buffDesc.ByteWidth = sizeof(UINT) * UINT(indices.size());
-		buffDesc.Usage     = D3D11_USAGE_DEFAULT;
+		buffDesc.Usage     = D3D11_USAGE_IMMUTABLE;
 		buffDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA indexResource;
