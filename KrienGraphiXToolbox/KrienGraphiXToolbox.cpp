@@ -13,8 +13,9 @@
 #include <PixelShader.h>
 #include <TextureManager.h>
 
-#include "parsers\KGProjectParser.h"
-#include "parsers\KGSceneParser.h"
+#include "parsers/KGProjectParser.h"
+#include "parsers/KGSceneParser.h"
+#include "generators/KGSceneGenerator.h"
 #include "IOManager.h"
 #include "KrienGraphiXToolbox.h"
 

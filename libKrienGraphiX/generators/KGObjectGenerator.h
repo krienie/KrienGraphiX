@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <parser_defines.h>
+#include "../parsers/parser_defines.h"
 
 
 namespace kgx
@@ -75,13 +75,19 @@ namespace kgx
 		return os;
 	}
 
+	class RenderableObject;
 
 	class KGObjectGenerator
 	{
 		public:
+			static void generate( const RenderableObject *renObj, std::string &output );
 			static void generate( KgoData &inputData, std::string &output );
 
 		private:
+			static void renderableObjToKgoData( const RenderableObject *renObj, KgoData &outputData );
+			template<typename T> static void copyFromBufferToVector( ID3D11Buffer *inputBuff, std::vector<T> &outputVec,
+																	 ID3D11Device* dxDev, ID3D11DeviceContext *dxDevCont );
+
 			KGObjectGenerator();
 			//~KGObjectGenerator();
 

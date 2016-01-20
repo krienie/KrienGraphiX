@@ -24,7 +24,7 @@ Light( AmbientLight )
 	color(0.25, 0.25, 0.25)
 }
 
-Light( SunLight )
+Light()
 {
 	direction(0.25, 1.0, 0.75)
 	type(DIRECTIONAL)

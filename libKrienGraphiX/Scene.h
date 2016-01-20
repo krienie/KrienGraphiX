@@ -33,13 +33,18 @@ namespace kgx
 			const_renobjectiterator getRenObjectCBegin() const;
 			const_renobjectiterator getRenObjectCEnd() const;
 
+			typedef std::vector<Light>::const_iterator const_lightiterator;
+			const_lightiterator getLightCBegin() const;
+			const_lightiterator getLightCEnd() const;
+
 			Camera* getCamera( CameraID id ) const;
 			Camera* getDefaultCamera() const;
 			void setDefaultCamera( CameraID id );
 
+			DirectX::XMFLOAT3 getAmbient() const;
 			void setAmbient( const DirectX::XMFLOAT3 &color );
 			void setAmbient( float r, float g, float b );
-			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity );
+			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity, const std::string &name = "" );
 
 			/** Adds a RenderableObject to the scene. Takes ownership of the object */
 			void claimRenderableObject( RenderableObject *obj );

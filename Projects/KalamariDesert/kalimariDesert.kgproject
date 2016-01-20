@@ -5,6 +5,7 @@ kgproject
 {
 	name = "Kalimari Desert"
 	sceneFile = "kalimariDesert.kgscene"
+	//sceneFile = "texturePlane.kgscene"
 
 	//TODO: support multiple scene files
 }

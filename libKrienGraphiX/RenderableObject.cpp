@@ -13,7 +13,8 @@ namespace kgx
 	}
 	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
 					  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name )
-		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_objContainers(objectContainers), m_topology(meshTopology)
+		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_objContainers(objectContainers),
+			m_topology(meshTopology), m_originalFilename()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -22,6 +23,15 @@ namespace kgx
 	{
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
+	}
+
+	std::string RenderableObject::getOriginalFilename() const
+	{
+		return m_originalFilename;
+	}
+	void RenderableObject::setOriginalFilename( const std::string &filename )
+	{
+		m_originalFilename = filename;
 	}
 
 	void RenderableObject::draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor )

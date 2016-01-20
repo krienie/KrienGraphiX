@@ -59,6 +59,15 @@ namespace kgx
 		return m_renderObjects.cend();
 	}
 
+	Scene::const_lightiterator Scene::getLightCBegin() const
+	{
+		return m_lights.cbegin();
+	}
+	Scene::const_lightiterator Scene::getLightCEnd() const
+	{
+		return m_lights.cend();
+	}
+
 
 	Camera* Scene::getCamera( CameraID id ) const
 	{
@@ -77,6 +86,11 @@ namespace kgx
 		m_defaultCamera = getCamera( id );
 	}
 
+	DirectX::XMFLOAT3 Scene::getAmbient() const
+	{
+		return DirectX::XMFLOAT3( m_ambientLight.x, m_ambientLight.y, m_ambientLight.z );
+	}
+
 	void Scene::setAmbient( const DirectX::XMFLOAT3 &color )
 	{
 		m_ambientLight = DirectX::XMFLOAT4( color.x, color.y, color.z, 1.0f );
@@ -86,7 +100,7 @@ namespace kgx
 		m_ambientLight = DirectX::XMFLOAT4( r, g, b, 1.0f );
 	}
 
-	void Scene::addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity )
+	void Scene::addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity, const std::string &name )
 	{
 		m_lights.push_back( Light(direction, intensity) );
 	}
@@ -100,7 +114,7 @@ namespace kgx
 
 	void Scene::render( Camera *renderCam )
 	{
-		//TODO: collect list of visible lights to be used in the draw call below
+		//TODO: implement tiled/clustered shading
 
 		std::vector<RenderableObject*>::iterator it;
 		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )

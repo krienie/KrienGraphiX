@@ -172,7 +172,12 @@ namespace kgx
 			return nullptr;
 		}
 
-		return renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, shaderPrograms );
+
+		RenderableObject *ro = renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, shaderPrograms );
+		if ( ro )
+			ro->setOriginalFilename( kgoFile );
+
+		return ro;
 	}
 
 	RenderableObject* KGObjectParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,

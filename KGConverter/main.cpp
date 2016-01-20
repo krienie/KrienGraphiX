@@ -18,7 +18,7 @@ void printHelp();
 
 int main( int argc, char* argv[] )
 {
-	std::cout << "-= KrienGraphiX Parser v0.4 - (c)2015 Krien Linnenbank =-" << std::endl << std::endl;
+	std::cout << "-= KrienGraphiX Parser v0.4 - (c)2016 Krien Linnenbank =-" << std::endl << std::endl;
 
 	std::string inDir  = "/";
 	std::string outDir = "/";

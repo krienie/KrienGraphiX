@@ -22,6 +22,12 @@
     <Filter Include="Source Files\parsers">
       <UniqueIdentifier>{64abc991-f1d5-46ab-9708-11f893da34ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\generators">
+      <UniqueIdentifier>{9b8907b8-6382-444d-b528-c4487436c217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generators">
+      <UniqueIdentifier>{0f9fbef9-0878-4323-9e53-3b631577494d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceManager.h">
@@ -75,9 +81,6 @@
     <ClInclude Include="ShaderProgram.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parsers\KGObjectParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
@@ -92,6 +95,12 @@
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\KGSceneGenerator.h">
+      <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\KGObjectGenerator.h">
+      <Filter>Header Files\generators</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +152,6 @@
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parsers\KGObjectParser.cpp">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
@@ -157,6 +163,12 @@
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generators\KGSceneGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
+    </ClCompile>
+    <ClCompile Include="generators\KGObjectGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 
 struct Light
 {
-	float3 dLightDir;
-	float dLightIntensity;
+	float3 direction;
+	float intensity;
 };
 
 cbuffer PerPixelData : register(b0)
@@ -26,12 +26,12 @@ float4 main( PixelInput input ) : SV_TARGET
 
 	// calculate lighting
 	float3 norm = normalize( input.normal ).xyz;
-	float nDotl = saturate( dot( norm, lights.dLightDir ) );
+	float nDotl = saturate( dot( norm, lights.direction ) );
 
 	// calculate reflectance
-	float3 h = normalize( lights.dLightDir - camPosition );
+	float3 h = normalize( lights.direction - camPosition );
 	float specLighting = pow( saturate( dot( h, norm ) ), 128 );
 
-	float4 finalColor = ambLightClr + (copper * nDotl * lights.dLightIntensity) + specLighting * 0.25f;
+	float4 finalColor = ambLightClr + (copper * nDotl * lights.intensity) + specLighting * 0.25f;
 	return float4(finalColor.rgb, 1.0f);
 }

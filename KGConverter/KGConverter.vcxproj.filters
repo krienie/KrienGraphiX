@@ -18,18 +18,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KGObjectGenerator.cpp">
+    <ClCompile Include="OBJParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OBJParser.cpp">
+    <ClCompile Include="..\libKrienGraphiX\generators\KGObjectGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KGObjectGenerator.h">
+    <ClInclude Include="OBJParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OBJParser.h">
+    <ClInclude Include="..\libKrienGraphiX\generators\KGObjectGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

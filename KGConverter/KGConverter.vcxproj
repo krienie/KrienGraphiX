@@ -40,12 +40,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/generators;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(BOOST_DIR)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/generators;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(BOOST_DIR)\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -55,6 +55,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libKrienGraphiX.lib;d3d11.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -69,16 +70,22 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libKrienGraphiX.lib;d3d11.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="KGObjectGenerator.cpp" />
+    <ClCompile Include="..\libKrienGraphiX\generators\KGObjectGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OBJParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KGObjectGenerator.h" />
+    <ClInclude Include="..\libKrienGraphiX\generators\KGObjectGenerator.h" />
     <ClInclude Include="OBJParser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libKrienGraphiX\libKrienGraphiX.vcxproj">
+      <Project>{2c3410ee-9e65-44f0-a6d8-9ace7134d68c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

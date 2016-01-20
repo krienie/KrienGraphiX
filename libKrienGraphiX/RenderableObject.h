@@ -42,6 +42,9 @@ namespace kgx
 							  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name );
 			~RenderableObject();
 
+			std::string getOriginalFilename() const;
+			void setOriginalFilename( const std::string &filename );
+
 			void draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
 
 		private:
@@ -58,5 +61,7 @@ namespace kgx
 			std::vector<ObjectContainer> m_objContainers;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;
+
+			std::string m_originalFilename;
 	};
 }
