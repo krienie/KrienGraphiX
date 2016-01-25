@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "parser_defines.h"
+#include "KGParserDefines.h"
 
 namespace kgx
 {

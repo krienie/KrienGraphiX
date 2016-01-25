@@ -11,7 +11,7 @@
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/filesystem.hpp>
 
-#include "parser_defines.h"
+#include "KGParserDefines.h"
 #include "../KGXCore.h"
 #include "../RenderableObject.h"
 #include "../VertexInputLayout.h"

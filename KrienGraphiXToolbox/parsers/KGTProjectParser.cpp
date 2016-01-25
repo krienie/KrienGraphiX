@@ -7,7 +7,7 @@
 #include <boost/spirit/include/support_iso8859_1.hpp>
 #include <boost/filesystem.hpp>
 
-#include "KGProjectParser.h"
+#include "KGTProjectParser.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgt::KgProjectData,
@@ -22,17 +22,17 @@ typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgt
 {
-	bool KGProjectParser::loadKGProject( const std::string &kgprojectFile, KgProjectData &projectData )
+	bool KGTProjectParser::loadKGProject( const std::string &kgprojectFile, KgProjectData &projectData )
 	{
 		if ( kgprojectFile.size() == 0 )
 		{
-			std::cout << "Error (KGProjectParser::loadKGProject): Project file not specified." << std::endl;
+			std::cout << "Error (KGTProjectParser::loadKGProject): Project file not specified." << std::endl;
 			return false;
 		}
 
 		if ( !boost::filesystem::exists( kgprojectFile ) )
 		{
-			std::cout << "Error (KGProjectParser::loadKGProject): Project file does not exist." << std::endl;
+			std::cout << "Error (KGTProjectParser::loadKGProject): Project file does not exist." << std::endl;
 			return false;
 		}
 

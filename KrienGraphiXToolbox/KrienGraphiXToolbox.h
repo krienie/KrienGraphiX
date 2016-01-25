@@ -3,9 +3,9 @@
 
 #include <QtWidgets/QMainWindow>
 
-
 #include <Scene.h>
 
+#include "parsers/KGTParserDefines.h"
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"
@@ -13,6 +13,8 @@
 
 namespace kgt
 {
+	class NewProjectDialog;
+
 	class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
 	{
 		Q_OBJECT
@@ -40,6 +42,8 @@ namespace kgt
 		void loadProject( const std::string &projFile );
 
 		Ui::KrienGraphiXToolboxClass m_ui;
+
+		KgProjectData m_currentProject;
 
 		kgx::Camera *m_mainCam;
 		kgx::Scene *m_defaultScene;

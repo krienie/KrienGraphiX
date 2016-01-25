@@ -5,7 +5,6 @@
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
 #include <boost/spirit/include/karma.hpp>
-#include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -27,7 +26,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 namespace karma = boost::spirit::karma;
-namespace qi    = boost::spirit::qi;
 namespace phx   = boost::phoenix;
 typedef std::back_insert_iterator<std::string> BackInsertIt;
 

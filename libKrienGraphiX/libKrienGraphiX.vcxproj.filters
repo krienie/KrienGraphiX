@@ -87,9 +87,6 @@
     <ClInclude Include="parsers\KGSceneParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\parser_defines.h">
-      <Filter>Header Files\parsers</Filter>
-    </ClInclude>
     <ClInclude Include="IOManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -101,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="generators\KGObjectGenerator.h">
       <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="parsers\KGParserDefines.h">
+      <Filter>Header Files\parsers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

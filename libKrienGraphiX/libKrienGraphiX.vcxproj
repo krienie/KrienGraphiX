@@ -21,7 +21,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="parsers\KGObjectParser.h" />
     <ClInclude Include="parsers\KGSceneParser.h" />
-    <ClInclude Include="parsers\parser_defines.h" />
+    <ClInclude Include="parsers\KGParserDefines.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="MovableObject.h" />
     <ClInclude Include="PixelShader.h" />

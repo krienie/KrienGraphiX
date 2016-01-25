@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../parsers/parser_defines.h"
+#include "../parsers/KGParserDefines.h"
 
 
 namespace kgx

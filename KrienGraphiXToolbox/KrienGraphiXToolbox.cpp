@@ -11,10 +11,11 @@
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
-#include <TextureManager.h>
+#include <TextureManager.h>\
 
-#include "parsers/KGProjectParser.h"
+#include "parsers/KGTProjectParser.h"
 #include "parsers/KGSceneParser.h"
+#include "generators/KGTProjectGenerator.h"
 #include "generators/KGSceneGenerator.h"
 #include "IOManager.h"
 #include "KrienGraphiXToolbox.h"
@@ -23,16 +24,15 @@
 namespace kgt
 {
 	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
-		: QMainWindow(parent), m_mainCam(nullptr), m_defaultScene(nullptr), m_leftMouseBtnDown(false),
-			m_wKeyDown(false), m_sKeyDown(false), m_aKeyDown(false), m_dKeyDown(false)
+		: QMainWindow(parent), m_currentProject(), m_mainCam(nullptr),
+			m_defaultScene(nullptr), m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
+			m_aKeyDown(false), m_dKeyDown(false)
 	{
 		m_ui.setupUi( this );
-
 		m_ui.renderWidget1->initialize();
 		m_ui.renderWidget1->addFrameListener( this );
 		m_ui.renderWidget1->addMouseListener( this );
 		m_ui.renderWidget1->addKeyboardListener( this );
-
 
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
 		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
@@ -96,7 +96,7 @@ namespace kgt
 
 	void KrienGraphiXToolbox::wheelEvent( const MouseEvent &evt )
 	{
-
+		//TODO: implement
 	}
 
 	void KrienGraphiXToolbox::keyPressed( const KeyEvent &evt )
@@ -152,7 +152,7 @@ namespace kgt
 	}
 	void KrienGraphiXToolbox::openProjectFile()
 	{
-		QString filename = QFileDialog::getOpenFileName( this, tr( "Open project file" ), "", tr( "KrienGraphiX Project File (*.kgproject)" ) );
+		QString filename = QFileDialog::getOpenFileName( this, tr("Open project file"), "", tr("KrienGraphiX Project File (*.kgproject)") );
 		loadProject( filename.toStdString() );
 	}
 	void KrienGraphiXToolbox::saveProjectFile()
@@ -179,14 +179,13 @@ namespace kgt
 
 
 		// parse and load project file
-		KgProjectData projData;
-		if ( !KGProjectParser::loadKGProject( projFile, projData ) )
+		if ( !KGTProjectParser::loadKGProject( projFile, m_currentProject ) )
 		{
 			std::cout << "Error (KrienGraphiXToolbox::loadProject): Error parsing KgProject file " << projFile << std::endl;
 			return;
 		}
 
-		std::cout << "Loaded project: " << projData.projectName << ": " << projData.sceneFile << std::endl;
+		std::cout << "Loaded project: " << m_currentProject.projectName << ": " << m_currentProject.sceneFile << std::endl;
 
 		// set project folder
 		boost::filesystem::path projectPath( projFile );
@@ -194,11 +193,11 @@ namespace kgt
 
 		// set window title
 		std::stringstream titleSS;
-		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
+		titleSS << "KrienGraphiX Toolbox - " << m_currentProject.projectName;
 		setWindowTitle( QString( titleSS.str().c_str() ) );
 
 		// parse and load scene file
-		m_defaultScene = kgx::KGSceneParser::loadKGScene( projData.sceneFile, m_ui.renderWidget1->getRenderWindow() );
+		m_defaultScene = kgx::KGSceneParser::loadKGScene( m_currentProject.sceneFile, m_ui.renderWidget1->getRenderWindow() );
 		if ( m_defaultScene && m_defaultScene->getDefaultCamera() )
 		{
 			m_mainCam = m_defaultScene->getDefaultCamera();

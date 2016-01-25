@@ -42,6 +42,12 @@
     <Filter Include="Source Files\parsers">
       <UniqueIdentifier>{27aff48d-a73c-4409-bdc7-9870d364d338}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\generators">
+      <UniqueIdentifier>{247f407c-9a05-4a47-955c-18312587d01c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generators">
+      <UniqueIdentifier>{a9dd5c6e-ae14-4455-a39a-20b61f674f7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,7 +74,10 @@
     <ClCompile Include="GeneratedFiles\Release\moc_KgxRenderWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="parsers\KGProjectParser.cpp">
+    <ClCompile Include="generators\KGTProjectGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
+    </ClCompile>
+    <ClCompile Include="parsers\KGTProjectParser.cpp">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -99,7 +108,13 @@
     <ClInclude Include="FrameListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGProjectParser.h">
+    <ClInclude Include="generators\KGTProjectGenerator.h">
+      <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="parsers\KGTProjectParser.h">
+      <Filter>Header Files\parsers</Filter>
+    </ClInclude>
+    <ClInclude Include="parsers\KGTParserDefines.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
   </ItemGroup>

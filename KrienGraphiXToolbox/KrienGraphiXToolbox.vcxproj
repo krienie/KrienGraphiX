@@ -109,10 +109,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_KrienGraphiXToolbox.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="generators\KGTProjectGenerator.cpp" />
     <ClCompile Include="KgxRenderWidget.cpp" />
     <ClCompile Include="KrienGraphiXToolbox.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="parsers\KGProjectParser.cpp" />
+    <ClCompile Include="parsers\KGTProjectParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="KrienGraphiXToolbox.h">
@@ -141,9 +142,11 @@
   <ItemGroup>
     <ClInclude Include="FrameListener.h" />
     <ClInclude Include="GeneratedFiles\ui_KrienGraphiXToolbox.h" />
+    <ClInclude Include="generators\KGTProjectGenerator.h" />
     <ClInclude Include="KeyboardListener.h" />
     <ClInclude Include="MouseListener.h" />
-    <ClInclude Include="parsers\KGProjectParser.h" />
+    <ClInclude Include="parsers\KGTParserDefines.h" />
+    <ClInclude Include="parsers\KGTProjectParser.h" />
     <CustomBuild Include="KgxRenderWidget.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing KgxRenderWidget.h...</Message>
