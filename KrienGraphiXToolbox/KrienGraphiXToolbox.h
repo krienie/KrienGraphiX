@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 
+
 #include <Scene.h>
 
 #include "parsers/KGTParserDefines.h"
@@ -13,8 +14,6 @@
 
 namespace kgt
 {
-	class NewProjectDialog;
-
 	class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
 	{
 		Q_OBJECT
@@ -36,6 +35,7 @@ namespace kgt
 		void openProjectFile();
 		void saveProjectFile();
 		void saveProjectAsNewFile();
+		void setProjectFolder();
 		void exitProgram();
 
 	private:
@@ -43,7 +43,8 @@ namespace kgt
 
 		Ui::KrienGraphiXToolboxClass m_ui;
 
-		KgProjectData m_currentProject;
+		//KgProjectData m_currentProject;
+		std::string m_projectDir;
 
 		kgx::Camera *m_mainCam;
 		kgx::Scene *m_defaultScene;

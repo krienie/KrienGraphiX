@@ -11,7 +11,7 @@
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
-#include <TextureManager.h>\
+#include <TextureManager.h>
 
 #include "parsers/KGTProjectParser.h"
 #include "parsers/KGSceneParser.h"
@@ -20,11 +20,19 @@
 #include "IOManager.h"
 #include "KrienGraphiXToolbox.h"
 
+namespace bfs = boost::filesystem;
+
+namespace
+{
+	const std::string SCENE_FOLDER    = "scenes";
+	const std::string RESOURCE_FOLDER = "resources";
+}
+
 
 namespace kgt
 {
 	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
-		: QMainWindow(parent), m_currentProject(), m_mainCam(nullptr),
+		: QMainWindow(parent), m_projectDir(), m_mainCam(nullptr),
 			m_defaultScene(nullptr), m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
 			m_aKeyDown(false), m_dKeyDown(false)
 	{
@@ -43,6 +51,7 @@ namespace kgt
 		QObject::connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openProjectFile );
 		QObject::connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectFile );
 		QObject::connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectAsNewFile );
+		QObject::connect( m_ui.actionSetProjectFolder, &QAction::triggered, this, &KrienGraphiXToolbox::setProjectFolder );
 		QObject::connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
 	}
 
@@ -152,8 +161,7 @@ namespace kgt
 	}
 	void KrienGraphiXToolbox::openProjectFile()
 	{
-		QString filename = QFileDialog::getOpenFileName( this, tr("Open project file"), "", tr("KrienGraphiX Project File (*.kgproject)") );
-		loadProject( filename.toStdString() );
+		std::cout << "Error (KrienGraphiXToolbox::openProjectFile): Not implemented." << std::endl;
 	}
 	void KrienGraphiXToolbox::saveProjectFile()
 	{
@@ -162,6 +170,30 @@ namespace kgt
 	void KrienGraphiXToolbox::saveProjectAsNewFile()
 	{
 		std::cout << "Error (KrienGraphiXToolbox::saveProjectAsNewFile): Not implemented." << std::endl;
+	}
+
+	void KrienGraphiXToolbox::setProjectFolder()
+	{
+		std::string selectedDir = QFileDialog::getExistingDirectory( this, tr( "Select project directory" ), "" ).toStdString();
+
+		if ( !bfs::is_directory( selectedDir ) )
+		{
+			std::cout << "Error (KrienGraphiXToolbox::setProjectFolder): Not a valid directory: " << selectedDir << std::endl;
+			return;
+		}
+		m_projectDir = selectedDir;
+
+		// create scene folders
+		bfs::path scenePath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
+		if ( !bfs::exists(scenePath) )
+			bfs::create_directory( scenePath );
+
+		// create resource folder
+		bfs::path resourcePath = bfs::path( m_projectDir ).append( RESOURCE_FOLDER );
+		if ( !bfs::exists( resourcePath ) )
+			bfs::create_directory( resourcePath );
+
+
 	}
 
 	void KrienGraphiXToolbox::exitProgram()
@@ -179,25 +211,26 @@ namespace kgt
 
 
 		// parse and load project file
-		if ( !KGTProjectParser::loadKGProject( projFile, m_currentProject ) )
+		KgProjectData projData;
+		if ( !KGTProjectParser::loadKGProject( projFile, projData ) )
 		{
 			std::cout << "Error (KrienGraphiXToolbox::loadProject): Error parsing KgProject file " << projFile << std::endl;
 			return;
 		}
 
-		std::cout << "Loaded project: " << m_currentProject.projectName << ": " << m_currentProject.sceneFile << std::endl;
+		std::cout << "Loaded project: " << projData.projectName << ": " << projData.sceneFile << std::endl;
 
 		// set project folder
-		boost::filesystem::path projectPath( projFile );
+		bfs::path projectPath( projFile );
 		kgx::IOManager::getInst()->addSearchPath( projectPath.parent_path().string() );
 
 		// set window title
 		std::stringstream titleSS;
-		titleSS << "KrienGraphiX Toolbox - " << m_currentProject.projectName;
+		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
 		setWindowTitle( QString( titleSS.str().c_str() ) );
 
 		// parse and load scene file
-		m_defaultScene = kgx::KGSceneParser::loadKGScene( m_currentProject.sceneFile, m_ui.renderWidget1->getRenderWindow() );
+		m_defaultScene = kgx::KGSceneParser::loadKGScene( projData.sceneFile, m_ui.renderWidget1->getRenderWindow() );
 		if ( m_defaultScene && m_defaultScene->getDefaultCamera() )
 		{
 			m_mainCam = m_defaultScene->getDefaultCamera();
