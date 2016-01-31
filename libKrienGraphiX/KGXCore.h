@@ -22,11 +22,7 @@ namespace kgx
 			RenderWindow* getRenderWindow( HWND windowHandle ) const;
 
 			void clearManagers();
-
-			//void addFrameListener( Listener *l ); //TODO: add listener functionality
-
 			void renderFrame();
-			//void startRendering();
 
 		private:
 			KGXCore();

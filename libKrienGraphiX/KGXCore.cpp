@@ -121,15 +121,8 @@ namespace kgx
 			m_dxgiFactory->Release();
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
-
-		//ID3D11Debug *d3dDebug = nullptr;
-		//m_dxDev->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
-
 		if ( m_dxDev )
 			m_dxDev->Release();
-
-		//d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-		//d3dDebug->Release();
 	}
 
 
