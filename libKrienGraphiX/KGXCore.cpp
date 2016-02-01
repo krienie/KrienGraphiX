@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "RenderWindow.h"
+#include "ConfigManager.h"
 #include "IOManager.h"
 #include "ResourceManager.h"
 #include "TextureManager.h"
@@ -112,6 +113,7 @@ namespace kgx
 			delete it->second;
 
 		// destroy managers
+		ConfigManager::destroy();
 		IOManager::destroy();
 		ResourceManager::destroy();
 		TextureManager::destroy();

@@ -1,6 +1,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <Windows.h>
 
 #include <boost/filesystem.hpp>
 
@@ -28,16 +29,25 @@ namespace kgx
 	IOManager::IOManager()
 		: m_searchPaths()
 	{
-
+		// add current program path to IOManager
+		addSearchPath( getCurrentProgramPath() );
 	}
 
 	/*IOManager::~IOManager()
 	{
 	}*/
 
+	std::string IOManager::getCurrentProgramPath() const
+	{
+		char result[MAX_PATH];
+		std::string progPath = std::string( result, GetModuleFileName( NULL, result, MAX_PATH ) );
+		return progPath.substr( 0, progPath.find_last_of( "/\\" ) );
+	}
 
 	std::string IOManager::getAbsolutePath( const std::string &file ) const
 	{
+		//TODO: handle files with the same name, but in different search paths
+
 		std::set<std::string>::const_iterator it;
 		for ( it = m_searchPaths.cbegin(); it != m_searchPaths.cend(); ++it )
 		{

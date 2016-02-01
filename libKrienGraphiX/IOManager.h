@@ -10,6 +10,7 @@ namespace kgx
 			static IOManager* getInst();
 			static void destroy();
 
+			std::string getCurrentProgramPath() const;
 			std::string getAbsolutePath( const std::string &file ) const;
 
 			void addSearchPath( const std::string &absolutePath );
