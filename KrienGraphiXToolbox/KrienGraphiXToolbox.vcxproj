@@ -176,6 +176,11 @@
   <ItemGroup>
     <ProjectReference Include="..\libKrienGraphiX\libKrienGraphiX.vcxproj">
       <Project>{2c3410ee-9e65-44f0-a6d8-9ace7134d68c}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

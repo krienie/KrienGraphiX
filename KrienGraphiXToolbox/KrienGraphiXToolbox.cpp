@@ -6,18 +6,19 @@
 
 #include <qfiledialog.h>
 
-#include <KGObjectParser.h>
 #include <KGXCore.h>
+#include <KGObjectParser.h>
+#include <IOManager.h>
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
+#include <ConfigManager.h>
 #include <TextureManager.h>
 
 #include "parsers/KGTProjectParser.h"
 #include "parsers/KGSceneParser.h"
 #include "generators/KGTProjectGenerator.h"
 #include "generators/KGSceneGenerator.h"
-#include "IOManager.h"
 #include "KrienGraphiXToolbox.h"
 
 namespace bfs = boost::filesystem;
@@ -44,6 +45,11 @@ namespace kgt
 
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
 		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
+
+		//try and load project directory from KGConfig
+		m_projectDir = kgx::ConfigManager::getInst()->getProperty<std::string>( "projectFolder" );
+		if ( m_projectDir.size() == 0 )
+			setProjectFolder();
 
 		m_ui.renderWidget1->startRendering();
 
@@ -175,12 +181,13 @@ namespace kgt
 	void KrienGraphiXToolbox::setProjectFolder()
 	{
 		std::string selectedDir = QFileDialog::getExistingDirectory( this, tr( "Select project directory" ), "" ).toStdString();
-
 		if ( !bfs::is_directory( selectedDir ) )
 		{
 			std::cout << "Error (KrienGraphiXToolbox::setProjectFolder): Not a valid directory: " << selectedDir << std::endl;
 			return;
 		}
+
+		kgx::ConfigManager::getInst()->setProperty( "projectFolder", selectedDir );
 		m_projectDir = selectedDir;
 
 		// create scene folders
