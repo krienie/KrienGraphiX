@@ -77,6 +77,11 @@ namespace kgx
 			m_searchPaths.insert( absolutePath );
 	}
 
+	bool IOManager::removeSearchPath( const std::string &pathToRemove )
+	{
+		return 1 == m_searchPaths.erase( pathToRemove );
+	}
+
 	void IOManager::clearSearchPaths()
 	{
 		m_searchPaths.clear();

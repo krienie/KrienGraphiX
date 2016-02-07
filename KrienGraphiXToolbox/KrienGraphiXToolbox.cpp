@@ -171,7 +171,8 @@ namespace kgt
 	void KrienGraphiXToolbox::openSceneFile()
 	{
 		// get scene filename
-		std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr(m_projectDir.c_str()),
+		bfs::path sceneDirPath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
+		std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr(sceneDirPath.string().c_str()),
 															  tr( "KrienGraphiX Scene File (*.kgscene)" ) ).toStdString();
 		if ( sceneFile.size() <= 0 )
 			return;
@@ -220,8 +221,11 @@ namespace kgt
 			return;
 		}
 
-		//TODO: remove any existing project search folder from IOManager and add the new one
+		// remove existing project directory from IOManager, if present
+		if ( m_projectDir.size() > 0 )
+			kgx::IOManager::getInst()->removeSearchPath( m_projectDir );
 
+		// save project directory in KG configuration file
 		kgx::ConfigManager::getInst()->setProperty( "projectFolder", selectedDir );
 		m_projectDir = selectedDir;
 
