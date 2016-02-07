@@ -63,7 +63,9 @@ namespace kgx
 {
 	RenderableObject* KGObjectParser::loadKGO( const std::string &kgoFile )
 	{
-		std::string absKGOFile = IOManager::getInst()->getAbsolutePath( kgoFile );
+		std::string absKGOFile = kgoFile;
+		if ( !boost::filesystem::path( kgoFile ).is_absolute() )
+			absKGOFile = IOManager::getInst()->getAbsolutePath( kgoFile );
 		if ( absKGOFile.size() == 0 )
 		{
 			std::cout << "Error (KGObjectParser::loadKGO): Model source file not specified." << std::endl;
@@ -201,7 +203,9 @@ namespace kgx
 			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
 			shaderProgram->setName( matIt->first );
 
-			VertexShader *vertShader = shaderProgram->createVertexShader( matIt->second.vertexShader.filename, vertLayout );
+			// shaders should always be present under IOManager's search paths. No extra check is done if it isn't.
+			std::string shaderPath   = IOManager::getInst()->getAbsolutePath( matIt->second.vertexShader.filename );
+			VertexShader *vertShader = shaderProgram->createVertexShader( shaderPath, vertLayout );
 			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
 			// add vertex shader textures
 			std::vector<std::string>::iterator it;
@@ -214,7 +218,8 @@ namespace kgx
 
 			//TODO: add support for other shader types
 
-			PixelShader *pixShader = shaderProgram->createPixelShader( matIt->second.pixelShader.filename );
+			shaderPath             = IOManager::getInst()->getAbsolutePath( matIt->second.pixelShader.filename );
+			PixelShader *pixShader = shaderProgram->createPixelShader( shaderPath );
 			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
 			// add pixel shader textures
 			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
@@ -223,7 +228,6 @@ namespace kgx
 				if ( tex )
 					pixShader->addTexture( tex );
 			}
-
 
 			shaderProgramPtrMap.insert( std::pair<std::string, kgx::ShaderProgram*>( matIt->first, shaderProgram ) );
 		}

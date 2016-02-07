@@ -32,7 +32,9 @@ namespace kgx
 {
 	Scene* KGSceneParser::loadKGScene( const std::string &kgsceneFile, RenderWindow *renderWin )
 	{
-		std::string absSceneFile = IOManager::getInst()->getAbsolutePath( kgsceneFile );
+		std::string absSceneFile = kgsceneFile;
+		if ( !boost::filesystem::path(kgsceneFile).is_absolute() )
+			absSceneFile = IOManager::getInst()->getAbsolutePath( kgsceneFile );
 		if ( absSceneFile.size() == 0 )
 		{
 			std::cout << "Error (KGSceneParser::loadKGScene): Scene source file not specified." << std::endl;

@@ -80,6 +80,9 @@ namespace kgx
 	void IOManager::clearSearchPaths()
 	{
 		m_searchPaths.clear();
+
+		// keep current program path in searchPath
+		addSearchPath( getCurrentProgramPath() );
 	}
 
 

@@ -33,8 +33,8 @@ namespace
 namespace kgt
 {
 	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
-		: QMainWindow(parent), m_projectDir(), m_mainCam(nullptr),
-			m_defaultScene(nullptr), m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
+		: QMainWindow(parent), m_projectDir(), m_mainCam(nullptr), m_currentScene(nullptr),
+			m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
 			m_aKeyDown(false), m_dKeyDown(false)
 	{
 		m_ui.setupUi( this );
@@ -44,27 +44,30 @@ namespace kgt
 		m_ui.renderWidget1->addKeyboardListener( this );
 
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
-		float aspectRatio = static_cast<float>(widgetGeom.width()) / widgetGeom.height();
+		float aspectRatio = float(widgetGeom.width()) / widgetGeom.height();
 
 		//try and load project directory from KGConfig
 		m_projectDir = kgx::ConfigManager::getInst()->getProperty<std::string>( "projectFolder" );
 		if ( m_projectDir.size() == 0 )
 			setProjectFolder();
 
+		// add project work directory to IOManager
+		kgx::IOManager::getInst()->addSearchPath( m_projectDir );
+
 		m_ui.renderWidget1->startRendering();
 
-		QObject::connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewProject );
-		QObject::connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openProjectFile );
-		QObject::connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectFile );
-		QObject::connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveProjectAsNewFile );
+		QObject::connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewScene );
+		QObject::connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openSceneFile );
+		QObject::connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneFile );
+		QObject::connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneAsNewFile );
 		QObject::connect( m_ui.actionSetProjectFolder, &QAction::triggered, this, &KrienGraphiXToolbox::setProjectFolder );
 		QObject::connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
 	}
 
 	KrienGraphiXToolbox::~KrienGraphiXToolbox()
 	{
-		if ( m_defaultScene )
-			delete m_defaultScene;
+		if ( m_currentScene )
+			delete m_currentScene;
 
 		kgx::KGXCore::destroy();
 	}
@@ -161,21 +164,51 @@ namespace kgt
 	}
 
 
-	void KrienGraphiXToolbox::createNewProject()
+	void KrienGraphiXToolbox::createNewScene()
 	{
-		std::cout << "Error (KrienGraphiXToolbox::createNewProject): Not implemented." << std::endl;
+		std::cout << "Error (KrienGraphiXToolbox::createNewScene): Not implemented." << std::endl;
 	}
-	void KrienGraphiXToolbox::openProjectFile()
+	void KrienGraphiXToolbox::openSceneFile()
 	{
-		std::cout << "Error (KrienGraphiXToolbox::openProjectFile): Not implemented." << std::endl;
+		// get scene filename
+		std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr(m_projectDir.c_str()),
+															  tr( "KrienGraphiX Scene File (*.kgscene)" ) ).toStdString();
+		if ( sceneFile.size() <= 0 )
+			return;
+		
+		// unload current scene
+		if ( m_currentScene )
+			delete m_currentScene;
+		kgx::KGXCore::getInst()->clearManagers();
+
+		// add project work directory to IOManager
+		kgx::IOManager::getInst()->addSearchPath( m_projectDir );
+
+
+		// parse and load scene file
+		m_currentScene = kgx::KGSceneParser::loadKGScene( sceneFile, m_ui.renderWidget1->getRenderWindow() );
+		if ( m_currentScene && m_currentScene->getDefaultCamera() )
+		{
+			m_mainCam = m_currentScene->getDefaultCamera();
+
+			//TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
+			m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
+		}
+
+		//TODO: enable code below
+		// set window title
+		/*std::stringstream titleSS;
+		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
+		setWindowTitle( QString( titleSS.str().c_str() ) );*/
+
 	}
-	void KrienGraphiXToolbox::saveProjectFile()
+	void KrienGraphiXToolbox::saveSceneFile()
 	{
-		std::cout << "Error (KrienGraphiXToolbox::saveProjectFile): Not implemented." << std::endl;
+		std::cout << "Error (KrienGraphiXToolbox::saveSceneFile): Not implemented." << std::endl;
 	}
-	void KrienGraphiXToolbox::saveProjectAsNewFile()
+	void KrienGraphiXToolbox::saveSceneAsNewFile()
 	{
-		std::cout << "Error (KrienGraphiXToolbox::saveProjectAsNewFile): Not implemented." << std::endl;
+		std::cout << "Error (KrienGraphiXToolbox::saveSceneAsNewFile): Not implemented." << std::endl;
 	}
 
 	void KrienGraphiXToolbox::setProjectFolder()
@@ -186,6 +219,8 @@ namespace kgt
 			std::cout << "Error (KrienGraphiXToolbox::setProjectFolder): Not a valid directory: " << selectedDir << std::endl;
 			return;
 		}
+
+		//TODO: remove any existing project search folder from IOManager and add the new one
 
 		kgx::ConfigManager::getInst()->setProperty( "projectFolder", selectedDir );
 		m_projectDir = selectedDir;
@@ -199,8 +234,6 @@ namespace kgt
 		bfs::path resourcePath = bfs::path( m_projectDir ).append( RESOURCE_FOLDER );
 		if ( !bfs::exists( resourcePath ) )
 			bfs::create_directory( resourcePath );
-
-
 	}
 
 	void KrienGraphiXToolbox::exitProgram()
@@ -209,41 +242,8 @@ namespace kgt
 	}
 
 
-	void KrienGraphiXToolbox::loadProject( const std::string &projFile )
+	void KrienGraphiXToolbox::loadScene( const std::string &sceneFile )
 	{
-		// unload current scene
-		if ( m_defaultScene )
-			delete m_defaultScene;
-		kgx::KGXCore::getInst()->clearManagers();
-
-
-		// parse and load project file
-		KgProjectData projData;
-		if ( !KGTProjectParser::loadKGProject( projFile, projData ) )
-		{
-			std::cout << "Error (KrienGraphiXToolbox::loadProject): Error parsing KgProject file " << projFile << std::endl;
-			return;
-		}
-
-		std::cout << "Loaded project: " << projData.projectName << ": " << projData.sceneFile << std::endl;
-
-		// set project folder
-		bfs::path projectPath( projFile );
-		kgx::IOManager::getInst()->addSearchPath( projectPath.parent_path().string() );
-
-		// set window title
-		std::stringstream titleSS;
-		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
-		setWindowTitle( QString( titleSS.str().c_str() ) );
-
-		// parse and load scene file
-		m_defaultScene = kgx::KGSceneParser::loadKGScene( projData.sceneFile, m_ui.renderWidget1->getRenderWindow() );
-		if ( m_defaultScene && m_defaultScene->getDefaultCamera() )
-		{
-			m_mainCam = m_defaultScene->getDefaultCamera();
-
-			//TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
-			m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
-		}
+		
 	}
 }

@@ -3,10 +3,8 @@
 
 #include <QtWidgets/QMainWindow>
 
-
 #include <Scene.h>
 
-#include "parsers/KGTParserDefines.h"
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"
@@ -31,23 +29,22 @@ namespace kgt
 		void keyReleased( const KeyEvent &evt );
 
 	private slots:
-		void createNewProject();
-		void openProjectFile();
-		void saveProjectFile();
-		void saveProjectAsNewFile();
+		void createNewScene();
+		void openSceneFile();
+		void saveSceneFile();
+		void saveSceneAsNewFile();
 		void setProjectFolder();
 		void exitProgram();
 
 	private:
-		void loadProject( const std::string &projFile );
+		void loadScene( const std::string &sceneFile );
 
 		Ui::KrienGraphiXToolboxClass m_ui;
 
-		//KgProjectData m_currentProject;
 		std::string m_projectDir;
 
 		kgx::Camera *m_mainCam;
-		kgx::Scene *m_defaultScene;
+		kgx::Scene *m_currentScene;
 
 		bool m_leftMouseBtnDown;
 		bool m_wKeyDown;
