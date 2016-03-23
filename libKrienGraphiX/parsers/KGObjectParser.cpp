@@ -15,11 +15,8 @@
 #include "../KGXCore.h"
 #include "../RenderableObject.h"
 #include "../VertexInputLayout.h"
-#include "../VertexShader.h"
-#include "../PixelShader.h"
 #include "../IOManager.h"
 #include "../ResourceManager.h"
-#include "../TextureManager.h"
 
 #include "KGObjectParser.h"
 
@@ -33,24 +30,16 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgMatData::ShaderVar,
-	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
-	(std::string, type)
-	(std::string, name)
-	(std::string, defaultValue)
-);
-
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgMatData::ShaderDef,
-	(std::string, filename)
-	(std::vector<kgx::KgMatData::ShaderVar>, variables)
-	(std::vector<std::string>, textures)
-);
+	DirectX::XMFLOAT3,
+	(float, x)
+	(float, y)
+	(float, z)
+	);
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData,
-	(kgx::KgMatData::ShaderDef, vertexShader)
-	(kgx::KgMatData::ShaderDef, pixelShader)
+	(DirectX::XMFLOAT3, diffuse)
+	(DirectX::XMFLOAT3, specular)
 );
 
 
@@ -90,7 +79,7 @@ namespace kgx
 		std::vector<UINT> indices;
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 		std::vector<KgModelData> models;
-		std::map<std::string, KgMatData> shaderPrograms;
+		std::map<std::string, KgMatData> materials;
 		struct KgoGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			KgoGrammar( std::vector<float> &v, std::vector<UINT> &i, std::vector<VertexInputLayout::Type> &l,
@@ -116,27 +105,11 @@ namespace kgx
 					>> "Material" >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("}");
 
-				shaderAutoBindType = qi::string( "CameraProjectionMatrix" )[_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
-					| qi::string( "CameraViewMatrix" )[_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
-					| qi::string( "CameraPosition" )[_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
-					| qi::string( "CameraTarget" )[_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
-					| qi::string( "CameraFieldOfView" )[_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
-					| qi::string( "CameraAspectRatio" )[_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
-					| qi::string( "CameraNearZ" )[_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
-					| qi::string( "CameraFarZ" )[_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
-					| qi::string( "ObjectModelMatrix" )[_val = ShaderProgram::ShaderAutoBindType::ObjectModelMatrix]
-					| qi::string( "ObjectNormalMatrix" )[_val = ShaderProgram::ShaderAutoBindType::ObjectNormalMatrix]
-					| eps[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];
-
-				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit('(') >> *~qi::char_(')') >> lit(");");
-				texture = "Texture" >> lit("(") >> *~qi::char_(')') >> lit(");");
-				shaderDefinition = (qi::lit("VertexShader") | qi::lit("PixelShader")) >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
-
-				//TODO: rename legacy Material type
-				shaderProgram = shaderDefinition >> shaderDefinition;
+				float3Property = lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
+				material =    lit("float3") >> lit("diffuse") >> float3Property
+						   >> lit("float3") >> lit("specular") >> float3Property;
 				nameMatPair = lit("Material") >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit( "{" ) >> shaderProgram >> lit( "}" );
+					>> lit( "{" ) >> material >> lit( "}" );
 
 				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
 						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
@@ -149,16 +122,12 @@ namespace kgx
 
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
-			qi::rule<std::string::const_iterator, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
-			qi::rule<std::string::const_iterator, KgMatData::ShaderVar(), Skipper> shaderVariable;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
-			qi::rule<std::string::const_iterator, KgMatData::ShaderDef(), Skipper> shaderDefinition;
-
-			qi::rule<std::string::const_iterator, KgMatData(), Skipper> shaderProgram;
+			qi::rule<std::string::const_iterator, DirectX::XMFLOAT3(), Skipper> float3Property;
+			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
 			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
 
 			qi::rule<std::string::const_iterator> comment;
-		} kgmGrammar( vertices, indices, vertLayoutTypes, models, shaderPrograms );
+		} kgmGrammar( vertices, indices, vertLayoutTypes, models, materials );
 
 		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
@@ -175,7 +144,7 @@ namespace kgx
 		}
 
 
-		RenderableObject *ro = renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, shaderPrograms );
+		RenderableObject *ro = renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, materials );
 		if ( ro )
 			ro->setOriginalFilename( kgoFile );
 
@@ -185,7 +154,7 @@ namespace kgx
 	RenderableObject* KGObjectParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
 															   std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 															   std::vector<KgModelData> &models,
-															   std::map<std::string, KgMatData> &ShaderPrograms )
+															   std::map<std::string, KgMatData> &materials )
 	{
 		HRESULT buffCreated = E_FAIL;
 		VertexInputLayout vertLayout( vertLayoutTypes );
@@ -195,90 +164,22 @@ namespace kgx
 			return nullptr;
 
 
-		// create ShaderPrograms
-		std::map<std::string, ShaderProgram*> shaderProgramPtrMap;
-		std::map<std::string, KgMatData>::iterator matIt;
-		for ( matIt = ShaderPrograms.begin(); matIt != ShaderPrograms.end(); ++matIt )
-		{
-			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
-			shaderProgram->setName( matIt->first );
-
-			// shaders should always be present under IOManager's search paths. No extra check is done if it isn't.
-			std::string shaderPath   = IOManager::getInst()->getAbsolutePath( matIt->second.vertexShader.filename );
-			VertexShader *vertShader = shaderProgram->createVertexShader( shaderPath, vertLayout );
-			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
-			// add vertex shader textures
-			std::vector<std::string>::iterator it;
-			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
-			{
-				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath(*it) );
-				if ( tex )
-					vertShader->addTexture( tex );
-			}
-
-			//TODO: add support for other shader types
-
-			shaderPath             = IOManager::getInst()->getAbsolutePath( matIt->second.pixelShader.filename );
-			PixelShader *pixShader = shaderProgram->createPixelShader( shaderPath );
-			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
-			// add pixel shader textures
-			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
-			{
-				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath(*it) );
-				if ( tex )
-					pixShader->addTexture( tex );
-			}
-
-			shaderProgramPtrMap.insert( std::pair<std::string, kgx::ShaderProgram*>( matIt->first, shaderProgram ) );
-		}
-
+		//TODO: set material properties
 
 		// create models
-		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > ShaderProgramMeshPair;
-		std::map< std::string, std::vector<RenderableObject::Mesh> > ShaderProgramMeshPtrMap;
+		std::vector<RenderableObject::Mesh> meshes;
 		std::vector<KgModelData>::iterator modIt;
 		for ( modIt = models.begin(); modIt != models.end(); ++modIt )
 		{
-			RenderableObject::Mesh mesh( modIt->modelName, modIt->startIndex, modIt->indexCount );
+			//TODO: maybe combine meshes? => if so, do it in KGObjectGenerator, not in the parser
+			meshes.push_back( RenderableObject::Mesh(modIt->modelName, modIt->startIndex, modIt->indexCount) );
 
-			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = ShaderProgramMeshPtrMap.find( modIt->matName );
-			if ( matMeshIt != ShaderProgramMeshPtrMap.end() )
-				matMeshIt->second.push_back( mesh );
-			else ShaderProgramMeshPtrMap.insert( ShaderProgramMeshPair( modIt->matName, { mesh } ) );
-		}
-
-		// create meshes
-		// sort meshes by ShaderProgram
-		//		sort meshes by start index => maybe combine meshes?
-
-		//TODO: maybe combine meshes?
-		// create object containers
-		std::vector<RenderableObject::ObjectContainer> objContainers;
-		std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt;
-		for ( matMeshIt = ShaderProgramMeshPtrMap.begin(); matMeshIt != ShaderProgramMeshPtrMap.end(); ++matMeshIt )
-		{
-			// sort by mesh
-			std::sort( matMeshIt->second.begin(), matMeshIt->second.end() );
-
-			// assumes the ShaderProgram for the mesh is always found
-			objContainers.push_back( RenderableObject::ObjectContainer( matMeshIt->second, shaderProgramPtrMap.find(matMeshIt->first)->second ) );
+			//TODO: do something with the materials...
 		}
 			
 		MeshBuffer meshBuff = ResourceManager::getInst()->getBuffer( buffID );
 
-		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, objContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-	}
-
-	void KGObjectParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgMatData::ShaderDef &shDef )
-	{
-		std::vector<KgMatData::ShaderVar>::const_iterator it;
-		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )
-		{
-			if ( it->autoBindType != ShaderProgram::ShaderAutoBindType::NoAutoBind )
-				ShaderProgram->addAutoShaderVar( sh, it->name, it->autoBindType );
-			//TODO: add support for default constant values
-			//else sh->updateConstantVariable( it->name, nullptr );
-		}
+		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, meshes, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	}
 }
 

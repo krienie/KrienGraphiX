@@ -1,6 +1,7 @@
 
 #include "Camera.h"
 #include "RenderableObject.h"
+#include "ShaderProgram.h"
 #include "Scene.h"
 
 namespace kgx
@@ -112,16 +113,17 @@ namespace kgx
 	}
 
 
-	void Scene::render( Camera *renderCam )
+	void Scene::render( Camera *renderCam, ShaderProgram *shaderProg )
 	{
 		//TODO: implement tiled/clustered shading
 
+		// activate ShaderProgram and send update light data
+		shaderProg->activate( renderCam );
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "lights", m_lights.data() );
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "ambLightClr", &m_ambientLight );
+
 		std::vector<RenderableObject*>::iterator it;
 		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
-			(*it)->draw( renderCam, m_lights, m_ambientLight );
-	}
-	void Scene::renderDefaultCam()
-	{
-		render( m_defaultCamera );
+			(*it)->draw( renderCam, shaderProg );
 	}
 }

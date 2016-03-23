@@ -8,6 +8,7 @@
 namespace kgx
 {
 	class Scene;
+	class ShaderProgram;
 
 	class Camera : public Object
 	{
@@ -33,7 +34,7 @@ namespace kgx
 			float getFarZ() const;
 
 			/** Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline */
-			void renderCurrentView();
+			void renderCurrentView( ShaderProgram *shaderProg );
 
 			void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			void moveForward( float dist );

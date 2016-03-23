@@ -5,6 +5,8 @@
 #include <dxgi1_2.h>
 #include <vector>
 
+#include "RenderCore.h"
+
 namespace kgx
 {
 	class Camera;
@@ -18,8 +20,10 @@ namespace kgx
 
 			bool create( HWND windowHandle );
 
+			RenderCore* getRenderCorePtr();
+
 			void setViewport( Camera *cam, float topLeftX = 0, float topLeftY = 0, float width = -1.0f, float height = -1.0f );
-			void setClearColor( float red, float green, float blue, float alpha = 1.0f );
+			void setClearColor( float red, float green, float blue );
 
 			bool isFullscreen() const;
 			void setFullscreen( bool active );
@@ -47,11 +51,10 @@ namespace kgx
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
 			IDXGIFactory2 *m_dxgiFactory;
-
 			IDXGISwapChain1 *m_swapChain;
-			ID3D11DepthStencilView *m_depthStencilView;
 			ID3D11RenderTargetView *m_renderTargetView;
-			ID3D11RasterizerState *m_rasterizer;
+
+			RenderCore m_renderCore;
 
 			Viewport m_curViewport;
 

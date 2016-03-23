@@ -32,8 +32,6 @@ namespace kgx
 				CameraAspectRatio,
 				CameraNearZ,
 				CameraFarZ,
-				ObjectModelMatrix,
-				ObjectNormalMatrix
 			};
 
 			enum class ShaderType
@@ -59,7 +57,6 @@ namespace kgx
 			PixelShader* createPixelShader( const std::string &filename );
 			//TODO: add support for other shader types, except for compute-shaders => it will get its own thing, separate from ShaderProgram
 
-			ShaderBase* getShader( ShaderType shader ) const;
 			VertexShader* getVertexShader() const;
 			//HullShader* getHullShader() const;
 			//DomainShader* getDomainShader() const;
@@ -70,7 +67,7 @@ namespace kgx
 			void addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
 
-			void activate( Camera *renderCam, RenderableObject *renderObj );
+			void activate( Camera *renderCam );
 
 		private:
 			// no copying allowed
@@ -85,8 +82,8 @@ namespace kgx
 				ShaderAutoBindType type;
 			};
 
-			void updateAutoShaderVar( Camera *renderCam,  RenderableObject *renderObj,
-									   ShaderBase *shader, AutoShaderVar shaderVar );
+			ShaderBase* getShader( ShaderType shader ) const;
+			void updateAutoShaderVar( Camera *renderCam, ShaderBase *shader, AutoShaderVar shaderVar );
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;

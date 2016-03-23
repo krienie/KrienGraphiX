@@ -23,6 +23,7 @@
     <ClInclude Include="parsers\KGObjectParser.h" />
     <ClInclude Include="parsers\KGSceneParser.h" />
     <ClInclude Include="parsers\KGParserDefines.h" />
+    <ClInclude Include="RenderCore.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="MovableObject.h" />
     <ClInclude Include="PixelShader.h" />
@@ -48,6 +49,7 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="parsers\KGObjectParser.cpp" />
     <ClCompile Include="parsers\KGSceneParser.cpp" />
+    <ClCompile Include="RenderCore.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />

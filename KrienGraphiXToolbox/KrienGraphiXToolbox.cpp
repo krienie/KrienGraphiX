@@ -196,12 +196,6 @@ namespace kgt
 			m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
 		}
 
-		//TODO: enable code below
-		// set window title
-		/*std::stringstream titleSS;
-		titleSS << "KrienGraphiX Toolbox - " << projData.projectName;
-		setWindowTitle( QString( titleSS.str().c_str() ) );*/
-
 	}
 	void KrienGraphiXToolbox::saveSceneFile()
 	{

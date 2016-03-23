@@ -22,7 +22,7 @@ namespace kgx
 	};
 
 
-	struct KgMatData
+	struct KgShaderProgramData
 	{
 		struct ShaderVar
 		{
@@ -43,15 +43,20 @@ namespace kgx
 			std::vector<std::string> textures;
 		};
 
-		KgMatData() : name(), vertexShader(), pixelShader() {}
+		KgShaderProgramData() : name(), vertexShader(), pixelShader() {}
 
 		std::string name;
 		//TODO: add support for geometry, hull and domain shaders
 		ShaderDef vertexShader;
 		ShaderDef pixelShader;
+	};
 
-		//TODO: add support for textures + automatic texture binding
-		//std::vector<std::string> textures;
+	struct KgMatData
+	{
+		KgMatData() : diffuse(0.0f, 0.0f, 0.0f), specular(0.0f, 0.0f, 0.0f) {}
+
+		DirectX::XMFLOAT3 diffuse;
+		DirectX::XMFLOAT3 specular;
 	};
 
 

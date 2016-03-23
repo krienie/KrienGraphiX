@@ -35,6 +35,8 @@ namespace kgx
 
 	DirectX::XMFLOAT4X4 MovableObject::getNormalMatrix() const
 	{
+		//TODO: maybe cache this, if necessary?
+
 		// the normal matrix is the inverse-transpose of the model matrix
 		DirectX::XMMATRIX modelMat  = DirectX::XMLoadFloat4x4( &m_modelMatrix );
 		DirectX::XMMATRIX normalMat = DirectX::XMMatrixInverse( nullptr, modelMat );

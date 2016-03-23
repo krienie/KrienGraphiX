@@ -62,12 +62,6 @@ namespace kgx
 			case ShaderProgram::ShaderAutoBindType::CameraFarZ:
 				os << "CameraFarZ";
 				break;
-			case ShaderProgram::ShaderAutoBindType::ObjectModelMatrix:
-				os << "ObjectModelMatrix";
-				break;
-			case ShaderProgram::ShaderAutoBindType::ObjectNormalMatrix:
-				os << "ObjectNormalMatrix";
-				break;
 			default:
 				break;
 		}

@@ -5,7 +5,6 @@
 #include "VertexInputLayout.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
-#include "RenderableObject.h"
 #include "ShaderProgram.h"
 
 namespace kgx
@@ -71,36 +70,6 @@ namespace kgx
 	}
 
 
-	ShaderBase* ShaderProgram::getShader( ShaderType type ) const
-	{
-		switch ( type )
-		{
-			case ShaderType::Vertex:
-				return m_vertShader;
-				break;
-			/*case ShaderType::Hull:
-				std::cout << "Warning (ShaderProgram::getShader): Hull shader not supported yet." << std::endl;
-				return nullptr;
-				//return m_hullShader;
-				break;
-			case ShaderType::Domain:
-				std::cout << "Warning (ShaderProgram::getShader): Domain shader not supported yet." << std::endl;
-				return nullptr;
-				//return m_domainShader;
-				break;
-			case ShaderType::Geometry:
-				std::cout << "Warning (ShaderProgram::getShader): Geometry shader not supported yet." << std::endl;
-				return nullptr;
-				//return m_geomShader;
-				break;*/
-			case ShaderType::Pixel:
-				return m_pixShader;
-				break;
-			default:
-				return nullptr;
-		}
-	}
-
 	VertexShader* ShaderProgram::getVertexShader() const
 	{
 		return m_vertShader;
@@ -135,6 +104,36 @@ namespace kgx
 		shaderVars.first->second.push_back( AutoShaderVar(varName, varType) );
 	}
 
+	ShaderBase* ShaderProgram::getShader( ShaderType type ) const
+	{
+		switch ( type )
+		{
+			case ShaderType::Vertex:
+				return m_vertShader;
+				break;
+				/*case ShaderType::Hull:
+				std::cout << "Warning (ShaderProgram::getShader): Hull shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_hullShader;
+				break;
+				case ShaderType::Domain:
+				std::cout << "Warning (ShaderProgram::getShader): Domain shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_domainShader;
+				break;
+				case ShaderType::Geometry:
+				std::cout << "Warning (ShaderProgram::getShader): Geometry shader not supported yet." << std::endl;
+				return nullptr;
+				//return m_geomShader;
+				break;*/
+			case ShaderType::Pixel:
+				return m_pixShader;
+				break;
+			default:
+				return nullptr;
+		}
+	}
+
 	void ShaderProgram::updateShaderVar( ShaderType shaderType, const std::string &name, const void *dataPtr )
 	{
 		ShaderBase *shader = getShader( shaderType );
@@ -144,7 +143,7 @@ namespace kgx
 	}
 
 
-	void ShaderProgram::activate( Camera *renderCam, RenderableObject *renderObj )
+	void ShaderProgram::activate( Camera *renderCam )
 	{
 		std::map< ShaderBase*, std::vector<AutoShaderVar> >::iterator shaderIt;
 		std::vector<AutoShaderVar>::iterator varIt;
@@ -155,7 +154,7 @@ namespace kgx
 			shaderIt = m_constVarLinks.find(m_vertShader);
 			if ( shaderIt != m_constVarLinks.end() )
 				for ( varIt = shaderIt->second.begin(); varIt != shaderIt->second.end(); ++varIt )
-					updateAutoShaderVar( renderCam, renderObj, m_vertShader, *varIt );
+					updateAutoShaderVar( renderCam, m_vertShader, *varIt );
 
 			m_vertShader->activate();
 		}
@@ -164,36 +163,29 @@ namespace kgx
 			shaderIt = m_constVarLinks.find(m_pixShader);
 			if ( shaderIt != m_constVarLinks.end() )
 				for ( varIt = shaderIt->second.begin(); varIt != shaderIt->second.end(); ++varIt )
-					updateAutoShaderVar( renderCam, renderObj, m_pixShader, *varIt );
+					updateAutoShaderVar( renderCam, m_pixShader, *varIt );
 
 			m_pixShader->activate();
 		}
 	}
 
 
-	void ShaderProgram::updateAutoShaderVar( Camera *renderCam, RenderableObject *renderObj,
-										 ShaderBase *shader, AutoShaderVar shaderVar )
+	void ShaderProgram::updateAutoShaderVar( Camera *renderCam, ShaderBase *shader, AutoShaderVar shaderVar )
 	{
 		float tempFloat = 0.0f;
-		DirectX::XMFLOAT4X4 tempFloat4x4;
-		DirectX::XMFLOAT3 tempFloat3;
 		switch ( shaderVar.type )
 		{
 			case ShaderAutoBindType::CameraProjectionMatrix:
-				tempFloat4x4 = renderCam->getProjMatrix();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
+				shader->updateConstantVariable( shaderVar.name, &(renderCam->getProjMatrix().m[0]) );
 				break;
 			case ShaderAutoBindType::CameraViewMatrix:
-				tempFloat4x4 = renderCam->getViewMatrix();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
+				shader->updateConstantVariable( shaderVar.name, &(renderCam->getViewMatrix().m[0]) );
 				break;
 			case ShaderAutoBindType::CameraPosition:
-				tempFloat3 = renderCam->getPosition();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat );
+				shader->updateConstantVariable( shaderVar.name, &(renderCam->getPosition()) );
 				break;
 			case ShaderAutoBindType::CameraTarget:
-				tempFloat3 = renderCam->getTarget();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat );
+				shader->updateConstantVariable( shaderVar.name, &(renderCam->getTarget()) );
 				break;
 			case ShaderAutoBindType::CameraFieldOfView:
 				tempFloat = renderCam->getFOV();
@@ -210,14 +202,6 @@ namespace kgx
 			case ShaderAutoBindType::CameraFarZ:
 				tempFloat = renderCam->getFarZ();
 				shader->updateConstantVariable( shaderVar.name, &tempFloat );
-				break;
-			case ShaderAutoBindType::ObjectModelMatrix:
-				tempFloat4x4 = renderObj->getModelMatrix();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
-				break;
-			case ShaderAutoBindType::ObjectNormalMatrix:
-				tempFloat4x4 = renderObj->getNormalMatrix();
-				shader->updateConstantVariable( shaderVar.name, &tempFloat4x4.m[0] );
 				break;
 			default:
 				//This should never happen...

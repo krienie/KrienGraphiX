@@ -117,10 +117,10 @@ namespace kgx
 	/**
 	 * Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline
 	 */
-	void Camera::renderCurrentView()
+	void Camera::renderCurrentView( ShaderProgram *shaderProg )
 	{
 		if ( m_parentScene )
-			m_parentScene->render(this);
+			m_parentScene->render(this, shaderProg);
 	}
 
 

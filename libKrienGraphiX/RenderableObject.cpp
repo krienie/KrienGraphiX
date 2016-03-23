@@ -6,14 +6,14 @@
 
 namespace kgx
 {
-	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
-		: RenderableObject(dxDevice, buff, objectContainers, meshTopology, "")
+		: RenderableObject(dxDevice, buff, meshContainers, meshTopology, "")
 	{
 	}
-	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
 					  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name )
-		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_objContainers(objectContainers),
+		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_meshContainers(meshContainers),
 			m_topology(meshTopology), m_originalFilename()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -34,7 +34,7 @@ namespace kgx
 		m_originalFilename = filename;
 	}
 
-	void RenderableObject::draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor )
+	void RenderableObject::draw( Camera *renderCam, ShaderProgram *shaderProg )
 	{
 		// bind Vertex- and Index-buffers to IA Stage
 		UINT bufferStride = m_meshBuff.inputDescriptor.getBufferStride();
@@ -43,19 +43,17 @@ namespace kgx
 		m_dxDevCont->IASetIndexBuffer( m_meshBuff.indexBuff, DXGI_FORMAT_R32_UINT, 0 );
 		m_dxDevCont->IASetPrimitiveTopology( m_topology );
 
-		std::vector<ObjectContainer>::iterator objIt;
-		for ( objIt = m_objContainers.begin(); objIt != m_objContainers.end(); ++objIt )
-		{
-			// activate ShaderProgram
-			objIt->shaderProg->activate( renderCam, this );
-			objIt->shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "lights", lights.data() );
-			objIt->shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "ambLightClr", &ambientColor );
+		// update ShaderProgram constants
+		//TODO: make normalMatrix optional and maybe allow the user to change the matrix names => or have a fixed kgx_ prefix for all build-in contants
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "modelMatrix", &(m_modelMatrix.m[0]) );
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "normalMatrix", &(getNormalMatrix().m[0]) );
 
+		std::vector<Mesh>::iterator meshIt;
+		for ( meshIt = m_meshContainers.begin(); meshIt != m_meshContainers.end(); ++meshIt )
+		{
 			// draw Meshes
-			//TODO: if the meshes are sorted in the vertex buffer, they can be drawn all at once => sort meshes in the vertex buffer according to shaderprogram
-			std::vector<Mesh>::iterator meshIt;
-			for ( meshIt = objIt->meshes.begin(); meshIt != objIt->meshes.end(); ++meshIt )
-				m_dxDevCont->DrawIndexed( meshIt->indexCount, meshIt->startIndex, 0 );
+			//TODO: if the meshes are sorted in the vertex buffer, they can be drawn all at once => sort meshes in the vertex buffer
+			m_dxDevCont->DrawIndexed( meshIt->indexCount, meshIt->startIndex, 0 );
 		}
 	}
 }

@@ -10,6 +10,7 @@
 namespace kgx
 {
 	class Camera;
+	class ShaderProgram;
 	class RenderableObject;
 
 	class Scene
@@ -49,8 +50,7 @@ namespace kgx
 			/** Adds a RenderableObject to the scene. Takes ownership of the object */
 			void claimRenderableObject( RenderableObject *obj );
 
-			void render( Camera *renderCam );
-			void renderDefaultCam();
+			void render( Camera *renderCam, ShaderProgram *shaderProg );
 
 		private:
 			// no copying allowed

@@ -28,24 +28,16 @@ namespace kgx
 				inline bool operator==(const Mesh& rhs) const { return startIndex == rhs.startIndex; }
 			};
 
-			struct ObjectContainer
-			{
-				ObjectContainer( const std::vector<Mesh> &me, ShaderProgram *sp ) : meshes(me), shaderProg(sp) {}
-
-				std::vector<Mesh> meshes;
-				ShaderProgram *shaderProg;
-			};
-
-			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
 								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
-			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<ObjectContainer> &objectContainers,
+			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
 							  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name );
 			~RenderableObject();
 
 			std::string getOriginalFilename() const;
 			void setOriginalFilename( const std::string &filename );
 
-			void draw( Camera *renderCam, const std::vector<Light> &lights, const DirectX::XMFLOAT4 &ambientColor );
+			void draw( Camera *renderCam, ShaderProgram *shaderProg );
 
 		private:
 			friend class KGObjectGenerator;
@@ -58,7 +50,7 @@ namespace kgx
 			ID3D11DeviceContext *m_dxDevCont;
 
 			MeshBuffer m_meshBuff;
-			std::vector<ObjectContainer> m_objContainers;
+			std::vector<Mesh> m_meshContainers;
 
 			D3D11_PRIMITIVE_TOPOLOGY m_topology;
 

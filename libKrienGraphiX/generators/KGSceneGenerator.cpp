@@ -31,7 +31,8 @@ typedef std::back_insert_iterator<std::string> BackInsertIt;
 
 namespace kgx
 {
-	void KGSceneGenerator::generate( Scene *inputScene, const std::string &roSavePath, std::string &output )
+	//TODO: update KGSceneGenerator
+	void KGSceneGenerator::generate( Scene *inputScene, /*RenderCore *renderCore,*/ const std::string &roSavePath, std::string &output )
 	{
 		if ( !inputScene )
 		{

@@ -7,25 +7,19 @@
 namespace kgx
 {
 	RenderWindow::RenderWindow( ID3D11Device *dxDevice,  IDXGIFactory2 *dxgiFactory )
-		: m_dxDev(dxDevice), m_dxDevCont(0), m_dxgiFactory(dxgiFactory), m_swapChain(0), m_depthStencilView(0),
-			m_renderTargetView(0), m_rasterizer(0), m_curViewport(), m_backBuffWidth(0U), m_backBuffHeight(0U),
-			m_isInit(false)
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_dxgiFactory(dxgiFactory), m_swapChain(nullptr),
+			m_renderTargetView(nullptr), m_renderCore(dxDevice), m_curViewport(), m_backBuffWidth(0U),
+			m_backBuffHeight(0U), m_isInit(false)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 
-		setClearColor( 0.4f, 0.4f, 0.4f, 1.0f );
+		setClearColor( 0.4f, 0.4f, 0.4f );
 	}
 
 	RenderWindow::~RenderWindow()
 	{
-		if ( m_rasterizer )
-			m_rasterizer->Release();
-
 		if ( m_renderTargetView )
 			m_renderTargetView->Release();
-
-		if ( m_depthStencilView )
-			m_depthStencilView->Release();
 
 		if ( m_swapChain )
 		{
@@ -36,8 +30,6 @@ namespace kgx
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
 	}
-
-
 
 	/*void RenderWindow::enumAdaptersTest()
 	{
@@ -116,33 +108,17 @@ namespace kgx
 
 		m_backBuffWidth  = backBufferDesc.Width;
 		m_backBuffHeight = backBufferDesc.Height;
-
-		// create and initialize depth-stencil buffer
-		ID3D11Texture2D *depthBuff = nullptr;
-		D3D11_TEXTURE2D_DESC depthBuffDesc;
-		depthBuffDesc.Width              = backBufferDesc.Width;
-		depthBuffDesc.Height             = backBufferDesc.Height;
-		depthBuffDesc.MipLevels          = 1;
-		depthBuffDesc.ArraySize          = 1;
-		depthBuffDesc.Format             = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthBuffDesc.Usage              = D3D11_USAGE_DEFAULT;
-		depthBuffDesc.BindFlags          = D3D11_BIND_DEPTH_STENCIL;
-		depthBuffDesc.CPUAccessFlags     = 0;
-		depthBuffDesc.SampleDesc.Count   = swapDesc.SampleDesc.Count;
-		depthBuffDesc.SampleDesc.Quality = swapDesc.SampleDesc.Quality;
-		depthBuffDesc.MiscFlags          = 0;
-
-		m_dxDev->CreateTexture2D( &depthBuffDesc, nullptr, &depthBuff );
-		res = m_dxDev->CreateDepthStencilView( depthBuff, nullptr, &m_depthStencilView );
-		depthBuff->Release();
-
-		if ( FAILED(res) )
+		
+		// setup RenderCore => contains depthbuffer and rasterizer
+		bool renderCoreInit = m_renderCore.init( m_backBuffWidth, m_backBuffHeight, swapDesc.SampleDesc.Count, swapDesc.SampleDesc.Quality );
+		if ( !renderCoreInit )
 		{
 			backBuff->Release();
-			std::cout << "Error (RenderWindow::create): Error creating DepthStencilView." << std::endl;
+			m_swapChain->Release();
+			m_swapChain = nullptr;
+			std::cout << "Error (RenderWindow::create): Error initializing RenderCore." << std::endl;
 			return false;
 		}
-		
 
 		// create renderTarget from the backBuffer and depth stencil view
 		res = m_dxDev->CreateRenderTargetView( backBuff, nullptr, &m_renderTargetView );
@@ -150,32 +126,20 @@ namespace kgx
 
 		if ( FAILED(res) )
 		{
+			m_swapChain->Release();
+			m_swapChain = nullptr;
 			std::cout << "Error (RenderWindow::create): Error creating RenderTargetView." << std::endl;
-			return false;
-		}
-
-		// Setup the m_rasterizer
-		D3D11_RASTERIZER_DESC rasterDesc;
-		rasterDesc.AntialiasedLineEnable = false;
-		rasterDesc.CullMode				 = D3D11_CULL_BACK;		//D3D11_CULL_FRONT, D3D11_CULL_BACK or D3D11_CULL_NONE
-		rasterDesc.DepthBias			 = 0;
-		rasterDesc.DepthBiasClamp		 = 0.0f;
-		rasterDesc.DepthClipEnable		 = true;
-		rasterDesc.FillMode				 = D3D11_FILL_SOLID;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
-		rasterDesc.FrontCounterClockwise = false;
-		rasterDesc.MultisampleEnable	 = false;
-		rasterDesc.ScissorEnable		 = false;
-		rasterDesc.SlopeScaledDepthBias  = 0.0f;
-
-		res = m_dxDev->CreateRasterizerState(&rasterDesc, &m_rasterizer);
-		if ( FAILED(res) )
-		{
-			std::cout << "Error (RenderWindow::create): Error creating Rasterizer state." << std::endl;
 			return false;
 		}
 
 		m_isInit = true;
 		return true;
+	}
+
+
+	RenderCore* RenderWindow::getRenderCorePtr()
+	{
+		return &m_renderCore;
 	}
 
 
@@ -227,12 +191,12 @@ namespace kgx
 		m_curViewport = Viewport(dxViewport, cam);
 	}
 
-	void RenderWindow::setClearColor( float red, float green, float blue, float alpha )
+	void RenderWindow::setClearColor( float red, float green, float blue )
 	{
 		m_clearColor[0] = red;
 		m_clearColor[1] = green;
 		m_clearColor[2] = blue;
-		m_clearColor[3] = alpha;
+		m_clearColor[3] = 1.0f;
 	}
 
 	bool RenderWindow::isFullscreen() const
@@ -261,16 +225,14 @@ namespace kgx
 		if ( !m_isInit || !m_curViewport.cam )
 			return;
 
-		m_dxDevCont->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView );
-		m_dxDevCont->RSSetState( m_rasterizer );
 		//TODO: add support for multiple viewports
 		m_dxDevCont->RSSetViewports( 1, &m_curViewport.dxViewport );
+		m_dxDevCont->OMSetRenderTargets( 1, &m_renderTargetView, m_renderCore.getDepthStencilView() );
 
 		// clear the back buffer
 		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, m_clearColor );
-		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-		m_curViewport.cam->renderCurrentView();
+		m_renderCore.renderFrame( m_curViewport.cam );
 
 		// flip the back buffer and the front buffer
 		m_swapChain->Present(1, 0);

@@ -39,7 +39,7 @@ namespace kgx
 			std::vector<ConstantBuffer*> m_constBuffers;
 			std::vector<ID3D11Buffer*> m_dxConstBuffers;		// used for setting all the constant buffers in one API call
 
-			//TODO: m_textures might not be nessecary, but lets keep it for now..
+			//TODO: m_textures might not be necessary, but lets keep it for now..
 			std::vector<Texture*> m_textures;
 			std::vector<ID3D11Resource*> m_texBuffers;
 			std::vector<ID3D11ShaderResourceView*> m_texViews;

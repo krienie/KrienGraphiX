@@ -7,6 +7,7 @@
 
 namespace kgx
 {
+	//TODO: merge with RenderableObject
 	class MovableObject : public Object
 	{
 		public:
@@ -27,9 +28,10 @@ namespace kgx
 			void setScale( float newScale );
 			void setScale( float xNewScale, float yNewScale, float zNewScale );
 
-		private:
+		protected:
 			DirectX::XMFLOAT4X4 m_modelMatrix;
 
+		private:
 			float m_xPos;
 			float m_yPos;
 			float m_zPos;

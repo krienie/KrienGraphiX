@@ -1,6 +1,10 @@
 
 #pragma warning( disable : 4996 )		// warning C4996: Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. These are correct.
 
+
+//TODO: maybe scratch this whole thing, because it is not needed...
+
+
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
@@ -30,7 +34,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, matName)
 );
 
-BOOST_FUSION_ADAPT_STRUCT(
+/*BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData::ShaderVar,
 	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
 	(std::string, type)
@@ -50,7 +54,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, name)
 	(kgx::KgMatData::ShaderDef, vertexShader)
 	(kgx::KgMatData::ShaderDef, pixelShader)
-);
+);*/
 
 
 namespace phx   = boost::phoenix;
@@ -84,6 +88,7 @@ namespace kgx
 
 	void KGObjectGenerator::generate( KgoData &inputData, std::string &outputString )
 	{
+		/*
 		// construct header string
 		std::stringstream headerStr;
 		headerStr << "// KrienGraphiX Object v0.2 - (c)2016 Krien Linnenbank" << std::endl;
@@ -163,6 +168,10 @@ namespace kgx
 
 		BackInsertIt sink( outputString );
 		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
+
+		*/
+
+		//TODO: fix code above
 	}
 
 
@@ -184,11 +193,11 @@ namespace kgx
 			copyFromBufferToVector( renObj->m_meshBuff.indexBuff, outputData.indices, dxDev, dxDevCont );
 
 		// get model and shader program data
-		std::vector<RenderableObject::ObjectContainer>::const_iterator objContIt;
-		for ( objContIt = renObj->m_objContainers.cbegin(); objContIt != renObj->m_objContainers.cend(); ++objContIt )
+		std::vector<RenderableObject::Mesh>::const_iterator meshIt;
+		for ( meshIt = renObj->m_meshContainers.cbegin(); meshIt != renObj->m_meshContainers.cend(); ++meshIt )
 		{
 			// get model data
-			std::vector<RenderableObject::Mesh>::const_iterator meshIt;
+			/*std::vector<RenderableObject::Mesh>::const_iterator meshIt;
 			for ( meshIt = objContIt->meshes.cbegin(); meshIt != objContIt->meshes.cend(); ++meshIt )
 				outputData.models.push_back( KgModelData( meshIt->name, objContIt->shaderProg->getName(), meshIt->startIndex, meshIt->indexCount ) );
 
@@ -222,7 +231,9 @@ namespace kgx
 				ShaderBase::const_textureiterator texIt;
 				for ( texIt = pixShader->getTextureCBegin(); texIt != pixShader->getTextureCEnd(); ++texIt )
 					pixShaderData.textures.push_back( (*texIt)->getName() );
-			}
+			}*/
+
+			//TODO: fix code above
 
 			
 			//TODO: create generic file manager that keeps track of files and decides if files need to be saved to disk or not

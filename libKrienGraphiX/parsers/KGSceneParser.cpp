@@ -6,13 +6,20 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/support_iso8859_1.hpp>
+#include <boost/fusion/include/std_pair.hpp>
 #include <boost/filesystem.hpp>
 
 #include "../Camera.h"
 #include "../IOManager.h"
+#include "../ResourceManager.h"
 #include "../RenderableObject.h"
+#include "../RenderCore.h"
 #include "../RenderWindow.h"
 #include "../Scene.h"
+#include "../Texture.h"
+#include "../TextureManager.h"
+#include "../VertexShader.h"
+#include "../PixelShader.h"
 #include "KGObjectParser.h"
 #include "KGSceneParser.h"
 
@@ -21,6 +28,27 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(float, x)
 	(float, y)
 	(float, z)
+);
+
+BOOST_FUSION_ADAPT_STRUCT(
+	kgx::KgShaderProgramData::ShaderVar,
+	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
+	(std::string, type)
+	(std::string, name)
+	(std::string, defaultValue)
+);
+
+BOOST_FUSION_ADAPT_STRUCT(
+	kgx::KgShaderProgramData::ShaderDef,
+	(std::string, filename)
+	(std::vector<kgx::KgShaderProgramData::ShaderVar>, variables)
+	(std::vector<std::string>, textures)
+);
+
+BOOST_FUSION_ADAPT_STRUCT(
+	kgx::KgShaderProgramData,
+	(kgx::KgShaderProgramData::ShaderDef, vertexShader)
+	(kgx::KgShaderProgramData::ShaderDef, pixelShader)
 );
 
 namespace phx     = boost::phoenix;
@@ -59,30 +87,44 @@ namespace kgx
 		std::vector<std::string> objects;
 		std::vector<std::string> cameras;
 		std::vector<std::string> lights;
+		std::vector<std::string> renderPasses;
 		struct KgsceneGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
-			KgsceneGrammar( std::vector<std::string> &renderObjects, std::vector<std::string> &cams, std::vector<std::string> &lights )
+			KgsceneGrammar( std::vector<std::string> &renderObjects, std::vector<std::string> &cams,
+							std::vector<std::string> &lights, std::vector<std::string> &renPasses )
 				: KgsceneGrammar::base_type( start )
 			{
 				using namespace qi;
 
-				comment = "//" >> skip( blank )[*print];
+				comment = "//" >> skip(blank)[*print];
 
 				renderableObject = "RenderableObject" >> *~qi::char_('}') >> char_('}');
 				camera           = "Camera" >> *~qi::char_('}') >> char_('}');
 				light            = "Light" >> *~qi::char_('}') >> char_('}');
 
+				shader = (qi::string("VertexShader") | qi::string("PixelShader")) >> lexeme[ *~qi::char_('}') ] >> char_('}');
+				renderPass = qi::string("RenderPass") >> char_('(') >> *~qi::char_(')') >> char_(')')
+								>> qi::char_('{') >> *shader >> char_('}');
+				renderCore = "RenderCore" >> qi::char_('{')
+								>> *renderPass[phx::push_back( phx::ref(renPasses), qi::_1 )]
+								>> qi::char_('}');
+
+
 				start = *(comment | renderableObject[phx::push_back( phx::ref( renderObjects ), qi::_1 )]
 						   | camera[phx::push_back( phx::ref( cams ), qi::_1 )]
-						   | light[phx::push_back( phx::ref( lights ), qi::_1 )]);
+						   | light[phx::push_back( phx::ref( lights ), qi::_1 )]
+						   | renderCore);
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> renderableObject;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> camera;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> light;
+			qi::rule<std::string::const_iterator, std::string(), Skipper> shader;
+			qi::rule<std::string::const_iterator, std::string(), Skipper> renderPass;
+			qi::rule<std::string::const_iterator, Skipper> renderCore;
 			qi::rule<std::string::const_iterator> comment;
-		} kgsGrammar(objects, cameras, lights);
+		} kgsGrammar( objects, cameras, lights, renderPasses );
 
 		Skipper skipper = iso8859::space | kgsGrammar.comment;
 
@@ -97,7 +139,6 @@ namespace kgx
 			std::cout << std::endl << "KGScene parsing trail: " << std::string( f, end ) << std::endl;
 			return nullptr;
 		}
-
 
 		Scene *newScene = new Scene();
 
@@ -120,6 +161,11 @@ namespace kgx
 		for ( it = lights.cbegin(); it != lights.cend(); ++it )
 			if ( !loadLight(*it, newScene) )
 				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating light. Skipping." << std::endl;
+
+		// parse RenderPasses
+		for ( it = renderPasses.cbegin(); it != renderPasses.cend(); ++it )
+			if ( !loadRenderPass( *it, renderWin->getRenderCorePtr() ) )
+				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating RenderPass. Skipping." << std::endl;
 
 		return newScene;
 	}
@@ -310,5 +356,134 @@ namespace kgx
 		else parentScene->setAmbient( color );
 
 		return true;
+	}
+
+	bool KGSceneParser::loadRenderPass( const std::string &passString, RenderCore *renderCore )
+	{
+		if ( !renderCore )
+			return false;
+
+		std::vector<VertexInputLayout::Type> vertLayoutTypes;
+		std::map<int, KgShaderProgramData> shaderPrograms;
+		struct PassGrammar : qi::grammar<std::string::const_iterator, Skipper>
+		{
+			PassGrammar( std::map<int, KgShaderProgramData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
+				: PassGrammar::base_type( start )
+			{
+				using namespace qi;
+
+				comment = "//" >> skip( blank )[*print];
+
+				shaderAutoBindType = qi::string("CameraProjectionMatrix")[_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
+					| qi::string("CameraViewMatrix")[_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
+					| qi::string("CameraPosition")[_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
+					| qi::string("CameraTarget")[_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
+					| qi::string("CameraFieldOfView")[_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
+					| qi::string("CameraAspectRatio")[_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
+					| qi::string("CameraNearZ")[_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
+					| qi::string("CameraFarZ")[_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
+					| (!qi::string("Texture"))[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];		// make sure not to eat any possible texture definitions
+
+				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit("(") >> *~qi::char_(')') >> lit(")");
+				texture = qi::string("Texture") >> lit("(") >> *~qi::char_(')') >> lit(")");
+
+				vertexInputLayout = qi::string("Position")[_val = VertexInputLayout::Position]
+					| qi::string("TextureCoordinate")[_val = VertexInputLayout::TextureCoordinate]
+					| qi::string("Normal")[_val = VertexInputLayout::Normal]
+					| qi::string("Tangent")[_val = VertexInputLayout::Tangent];
+				vertexShaderDefinition = lit("VertexShader") >> lit("(") >> *~qi::char_(')') >> lit(")")
+					>> lit(":") >> omit[ vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') ]
+					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
+				pixelShaderDefinition  = lit("PixelShader") >> lit("(") >> *~qi::char_(')') >> lit(")")
+					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
+				//TODO: allow different order of shaderVariable and textures
+
+				//TODO: make shaderProgram parsing more robust => allow different orders or programs and allow some programs to be missing (no hull/domain shaders, for example)
+				shaderProgram = vertexShaderDefinition >> pixelShaderDefinition;
+				intMatPair = lit("RenderPass") >> lit("(") >> qi::int_ >> lit(")")
+					>> lit("{") >> shaderProgram >> lit("}");
+
+				start = *intMatPair[phx::insert( phx::ref(shaderProgs), qi::_1 )];
+			}
+
+			qi::rule<std::string::const_iterator> comment;
+
+			qi::rule<std::string::const_iterator, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
+			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderVar(), Skipper> shaderVariable;
+			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
+			qi::rule<std::string::const_iterator, VertexInputLayout::Type(), Skipper> vertexInputLayout;
+			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderDef(), Skipper> vertexShaderDefinition;
+			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderDef(), Skipper> pixelShaderDefinition;
+			qi::rule<std::string::const_iterator, KgShaderProgramData(), Skipper> shaderProgram;
+			qi::rule<std::string::const_iterator, std::pair<int, KgShaderProgramData>(), Skipper> intMatPair;
+
+			qi::rule<std::string::const_iterator, Skipper> start;
+		} passGrammar( shaderPrograms, vertLayoutTypes );
+
+		Skipper skipper = iso8859::space | passGrammar.comment;
+
+		std::string::const_iterator f = passString.cbegin();
+		bool res = qi::phrase_parse( f, passString.cend(), passGrammar, skipper );
+
+		// print everything that hasn't been processed by the parser
+		if ( f != passString.cend() )
+		{
+			std::string::const_iterator end = std::distance( f, passString.cend() ) > 100 ? f + 100 : passString.cend();
+			std::cout << std::endl << "RenderPass parsing trail: " << std::string( f, end ) << std::endl;
+			return false;
+		}
+
+		//TODO: add RenderPass to RenderCore
+
+		VertexInputLayout vertLayout( vertLayoutTypes );
+		// create ShaderPrograms
+		std::map<int, KgShaderProgramData>::iterator matIt;
+		for ( matIt = shaderPrograms.begin(); matIt != shaderPrograms.end(); ++matIt )
+		{
+			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
+
+			// shaders should always be present under IOManager's search paths. No extra check is done if it isn't.
+			std::string shaderPath = IOManager::getInst()->getAbsolutePath( matIt->second.vertexShader.filename );
+			VertexShader *vertShader = shaderProgram->createVertexShader( shaderPath, vertLayout );
+			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
+			// add vertex shader textures
+			std::vector<std::string>::iterator it;
+			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
+			{
+				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath( *it ) );
+				if ( tex )
+					vertShader->addTexture( tex );
+			}
+
+			//TODO: add support for other shader types
+
+			shaderPath = IOManager::getInst()->getAbsolutePath( matIt->second.pixelShader.filename );
+			PixelShader *pixShader = shaderProgram->createPixelShader( shaderPath );
+			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
+			// add pixel shader textures
+			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
+			{
+				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath( *it ) );
+				if ( tex )
+					pixShader->addTexture( tex );
+			}
+
+			//TODO: add support for multiple renderpasses
+			renderCore->setShaderProgram( shaderProgram );
+		}
+
+		return true;
+	}
+
+	void KGSceneParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgShaderProgramData::ShaderDef &shDef )
+	{
+		std::vector<KgShaderProgramData::ShaderVar>::const_iterator it;
+		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )
+		{
+			if ( it->autoBindType != ShaderProgram::ShaderAutoBindType::NoAutoBind )
+				ShaderProgram->addAutoShaderVar( sh, it->name, it->autoBindType );
+			//TODO: add support for default constant values
+			//else sh->updateConstantVariable( it->name, nullptr );
+		}
 	}
 }
