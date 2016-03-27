@@ -53,10 +53,10 @@ namespace kgx
 
 	struct KgMatData
 	{
-		KgMatData() : diffuse(0.0f, 0.0f, 0.0f), specular(0.0f, 0.0f, 0.0f) {}
+		KgMatData() : diffuse(0.0f, 0.0f, 0.0f, 1.0f), specular(0.0f, 0.0f, 0.0f, 1.0f) {}
 
-		DirectX::XMFLOAT3 diffuse;
-		DirectX::XMFLOAT3 specular;
+		DirectX::XMFLOAT4 diffuse;
+		DirectX::XMFLOAT4 specular;
 	};
 
 

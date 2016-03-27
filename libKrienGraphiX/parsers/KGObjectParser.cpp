@@ -30,16 +30,17 @@ BOOST_FUSION_ADAPT_STRUCT(
 );
 
 BOOST_FUSION_ADAPT_STRUCT(
-	DirectX::XMFLOAT3,
+	DirectX::XMFLOAT4,
 	(float, x)
 	(float, y)
 	(float, z)
+	(float, w)
 	);
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData,
-	(DirectX::XMFLOAT3, diffuse)
-	(DirectX::XMFLOAT3, specular)
+	(DirectX::XMFLOAT4, diffuse)
+	(DirectX::XMFLOAT4, specular)
 );
 
 
@@ -105,9 +106,9 @@ namespace kgx
 					>> "Material" >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit("}");
 
-				float3Property = lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				material =    lit("float3") >> lit("diffuse") >> float3Property
-						   >> lit("float3") >> lit("specular") >> float3Property;
+				float4Property = lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
+				material =    lit("float4") >> lit("diffuse") >> float4Property
+						   >> lit("float4") >> lit("specular") >> float4Property;
 				nameMatPair = lit("Material") >> lit("(") >> *~qi::char_(')') >> lit(")")
 					>> lit( "{" ) >> material >> lit( "}" );
 
@@ -122,7 +123,7 @@ namespace kgx
 
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
-			qi::rule<std::string::const_iterator, DirectX::XMFLOAT3(), Skipper> float3Property;
+			qi::rule<std::string::const_iterator, DirectX::XMFLOAT4(), Skipper> float4Property;
 			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
 			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
 
@@ -163,23 +164,39 @@ namespace kgx
 		if ( FAILED( buffCreated ) )
 			return nullptr;
 
-
-		//TODO: set material properties
-
-		// create models
-		std::vector<RenderableObject::Mesh> meshes;
-		std::vector<KgModelData>::iterator modIt;
-		for ( modIt = models.begin(); modIt != models.end(); ++modIt )
+		// create map of materials to meshes to sort meshes per material
+		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > MaterialMeshesPair;
+		std::map< std::string, std::vector<RenderableObject::Mesh> > matName2Mesh;
+		std::vector<KgModelData>::iterator modelIt;
+		for ( modelIt = models.begin(); modelIt != models.end(); ++modelIt )
 		{
-			//TODO: maybe combine meshes? => if so, do it in KGObjectGenerator, not in the parser
-			meshes.push_back( RenderableObject::Mesh(modIt->modelName, modIt->startIndex, modIt->indexCount) );
+			RenderableObject::Mesh mesh( modelIt->modelName, modelIt->startIndex, modelIt->indexCount );
 
-			//TODO: do something with the materials...
+			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = matName2Mesh.find( modelIt->matName );
+			if ( matMeshIt != matName2Mesh.end() )
+				matMeshIt->second.push_back( mesh );
+			else matName2Mesh.insert( MaterialMeshesPair( modelIt->matName, { mesh } ) );
 		}
-			
-		MeshBuffer meshBuff = ResourceManager::getInst()->getBuffer( buffID );
 
-		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, meshes, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		//TODO: maybe combine meshes?
+		// create object containers
+		std::vector<RenderableObject::MaterialMeshContainer> matMeshContainers;
+		std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt;
+		for ( matMeshIt = matName2Mesh.begin(); matMeshIt != matName2Mesh.end(); ++matMeshIt )
+		{
+			// sort by mesh
+			std::sort( matMeshIt->second.begin(), matMeshIt->second.end() );
+
+			std::map<std::string, KgMatData>::iterator matIt = materials.find( matMeshIt->first );
+			if ( matIt != materials.end() )
+			{
+				RenderableObject::Material mat( matIt->second.diffuse, matIt->second.specular );
+				matMeshContainers.push_back( RenderableObject::MaterialMeshContainer(matMeshIt->second, mat) );
+			}
+		}
+
+		MeshBuffer meshBuff = ResourceManager::getInst()->getBuffer( buffID );
+		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, matMeshContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	}
 }
 

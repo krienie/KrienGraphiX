@@ -193,8 +193,8 @@ namespace kgx
 			copyFromBufferToVector( renObj->m_meshBuff.indexBuff, outputData.indices, dxDev, dxDevCont );
 
 		// get model and shader program data
-		std::vector<RenderableObject::Mesh>::const_iterator meshIt;
-		for ( meshIt = renObj->m_meshContainers.cbegin(); meshIt != renObj->m_meshContainers.cend(); ++meshIt )
+		std::vector<RenderableObject::MaterialMeshContainer>::const_iterator matMeshIt;
+		for ( matMeshIt = renObj->m_matMeshContainers.cbegin(); matMeshIt != renObj->m_matMeshContainers.cend(); ++matMeshIt )
 		{
 			// get model data
 			/*std::vector<RenderableObject::Mesh>::const_iterator meshIt;

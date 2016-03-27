@@ -6,14 +6,14 @@
 
 namespace kgx
 {
-	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<MaterialMeshContainer> &matMeshContainers,
 										D3D11_PRIMITIVE_TOPOLOGY meshTopology )
-		: RenderableObject(dxDevice, buff, meshContainers, meshTopology, "")
+		: RenderableObject(dxDevice, buff, matMeshContainers, meshTopology, "")
 	{
 	}
-	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<Mesh> &meshContainers,
+	RenderableObject::RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<MaterialMeshContainer> &matMeshContainers,
 					  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name )
-		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_meshContainers(meshContainers),
+		: MovableObject(name), m_dxDev(dxDevice), m_dxDevCont(0), m_meshBuff(buff), m_matMeshContainers(matMeshContainers),
 			m_topology(meshTopology), m_originalFilename()
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -44,16 +44,23 @@ namespace kgx
 		m_dxDevCont->IASetPrimitiveTopology( m_topology );
 
 		// update ShaderProgram constants
-		//TODO: make normalMatrix optional and maybe allow the user to change the matrix names => or have a fixed kgx_ prefix for all build-in contants
-		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "modelMatrix", &(m_modelMatrix.m[0]) );
-		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "normalMatrix", &(getNormalMatrix().m[0]) );
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "kgx_modelMatrix", &(m_modelMatrix.m[0]) );
+		shaderProg->updateShaderVar( ShaderProgram::ShaderType::Vertex, "kgx_normalMatrix", &(getNormalMatrix().m[0]) );
 
-		std::vector<Mesh>::iterator meshIt;
-		for ( meshIt = m_meshContainers.begin(); meshIt != m_meshContainers.end(); ++meshIt )
+		std::vector<MaterialMeshContainer>::iterator matMeshIt;
+		for ( matMeshIt = m_matMeshContainers.begin(); matMeshIt != m_matMeshContainers.end(); ++matMeshIt )
 		{
+			// update shader material info
+			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_diffuse", &matMeshIt->material.diffuse );
+			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_specular", &matMeshIt->material.specular );
+
 			// draw Meshes
-			//TODO: if the meshes are sorted in the vertex buffer, they can be drawn all at once => sort meshes in the vertex buffer
-			m_dxDevCont->DrawIndexed( meshIt->indexCount, meshIt->startIndex, 0 );
+			std::vector<Mesh>::iterator meshIt;
+			for ( meshIt = matMeshIt->meshes.begin(); meshIt != matMeshIt->meshes.end(); ++meshIt )
+			{
+				//TODO: if the meshes are sorted in the vertex buffer, they can be drawn all at once => sort meshes in the vertex buffer
+				m_dxDevCont->DrawIndexed( meshIt->indexCount, meshIt->startIndex, 0 );
+			}
 		}
 	}
 }

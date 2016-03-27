@@ -96,6 +96,7 @@ namespace kgx
 
 		if ( dataPtr )
 		{
+			//TODO: make this a bit more efficient
 			std::vector<ConstantBuffer*>::iterator it;
 			for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
 				if ( (*it)->updateVariable( name, dataPtr ) )
