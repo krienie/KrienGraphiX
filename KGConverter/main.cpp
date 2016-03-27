@@ -28,12 +28,12 @@ int main( int argc, char* argv[] )
 	{
 		for ( int i = 1; i < argc; ++i )
 		{
-			if ( std::string( argv[i] ) == "/indir" && i < (argc - 1) )
+			if ( std::string( argv[i] ) == "--indir" && i < (argc - 1) )
 			{
 				++i;
 				inDir = argv[i];
 				continue;
-			} else if ( std::string( argv[i] ) == "/outdir" && i < (argc - 1) )
+			} else if ( std::string( argv[i] ) == "--outdir" && i < (argc - 1) )
 			{
 				++i;
 				outDir = argv[i];
@@ -135,9 +135,8 @@ void printHelp()
 	std::stringstream ssHelp;
 	ssHelp << "USAGE:\n    kgconvert [/? | /relative] [/indir path] [/outdir path]\n\n"
 		<< "where\n    Options:\n        /?           Display this help message.\n"
-		<< "        /relative    All paths are considered relative. Absolute paths are\n                     considered otherwise.\n"
-		<< "        /indir       Specifies the input directory containing the files to be\n                     converted.\n"
-		<< "        /outdir      Specifies the output directory where the converted files\n                     are to be stored.\n\n"
+		<< "        --indir       Specifies the input directory containing the files to be\n                     converted.\n"
+		<< "        --outdir      Specifies the output directory where the converted files\n                     are to be stored.\n\n"
 		<< "The default is to convert and store files in the current folder.\n\n"
 		<< "Examples\n    > kgconvert                                   ... Convert files in the\n                                                      current folder\n"
 		<< "    > kgconvert /relative /indir ..\\input         ... Convert files located in\n                                                      ..\\input\n"
