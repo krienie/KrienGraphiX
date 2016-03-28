@@ -25,6 +25,7 @@ namespace kgx
 			const_textureiterator getTextureCEnd() const;
 			void addTexture( Texture *tex );
 
+			virtual void commitChanges();
 			virtual void activate() = 0;
 
 		protected:

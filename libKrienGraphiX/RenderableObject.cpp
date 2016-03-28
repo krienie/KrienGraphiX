@@ -54,6 +54,8 @@ namespace kgx
 			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_diffuse", &matMeshIt->material.diffuse );
 			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_specular", &matMeshIt->material.specular );
 
+			shaderProg->commitAllChanges();
+
 			// draw Meshes
 			std::vector<Mesh>::iterator meshIt;
 			for ( meshIt = matMeshIt->meshes.begin(); meshIt != matMeshIt->meshes.end(); ++meshIt )

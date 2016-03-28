@@ -124,6 +124,14 @@ namespace kgx
 		}
 	}
 
+	void ShaderBase::commitChanges()
+	{
+		// update all buffers if necessary 
+		std::vector<ConstantBuffer*>::iterator it;
+		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
+		(*it)->commit();
+	}
+
 	HRESULT ShaderBase::processLoadedShaderBlob( ID3DBlob *shaderSource )
 	{
 		HRESULT res = build( shaderSource );

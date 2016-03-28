@@ -24,11 +24,6 @@ namespace kgx
 		m_dxDevCont->VSSetShader( m_vertShader, 0, 0 );
 		m_dxDevCont->IASetInputLayout(m_inputLayout.getDxInputLayout(m_dxDev, m_shaderSource));
 
-		// update all buffers if necessary
-		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-			(*it)->commit();
-
 		// set buffers
 		m_dxDevCont->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
 

@@ -31,11 +31,6 @@ namespace kgx
 	void PixelShader::activate()
 	{
 		m_dxDevCont->PSSetShader(m_pixelShader, 0, 0);
-
-		// update all buffers if necessary 
-		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-			(*it)->commit();
 		
 		// set buffers
 		m_dxDevCont->PSSetConstantBuffers(0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data());

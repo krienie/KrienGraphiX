@@ -67,6 +67,7 @@ namespace kgx
 			void addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
 
+			void commitAllChanges();
 			void activate( Camera *renderCam );
 
 		private:

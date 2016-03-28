@@ -142,6 +142,23 @@ namespace kgx
 		else std::cout << "Error (ShaderProgram::updateShaderVar): Shader not found. Call ShaderProgram::createShadertypeShader() first." << std::endl;
 	}
 
+	void ShaderProgram::commitAllChanges()
+	{
+		if ( m_vertShader )
+			m_vertShader->commitChanges();
+
+		/*if ( m_hullShader )
+			m_hullShader->commitChanges();*/
+
+		/*if ( m_domainShader )
+			m_domainShader->commitChanges();*/
+
+		/*if ( m_geomShader )
+			m_geomShader->commitChanges();*/
+
+		if ( m_pixShader )
+			m_pixShader->commitChanges();
+	}
 
 	void ShaderProgram::activate( Camera *renderCam )
 	{
