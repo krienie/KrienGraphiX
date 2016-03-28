@@ -35,9 +35,6 @@ namespace kgx
 	{
 		switch ( type )
 		{
-			case ShaderProgram::ShaderAutoBindType::NoAutoBind:
-				//os << "NoAutoBind";
-				break;
 			case ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix:
 				os << "CameraProjectionMatrix";
 				break;
@@ -62,8 +59,10 @@ namespace kgx
 			case ShaderProgram::ShaderAutoBindType::CameraFarZ:
 				os << "CameraFarZ";
 				break;
+			case ShaderProgram::ShaderAutoBindType::NoAutoBind:
+				/* fall-through */
 			default:
-				break;
+				break;;
 		}
 
 		return os;

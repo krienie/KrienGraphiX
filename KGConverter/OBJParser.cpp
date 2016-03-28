@@ -15,14 +15,12 @@
 
 #include "OBJParser.h"
 
-
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT3,
 	(float, x)
 	(float, y)
 	(float, z)
 );
-
 
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
@@ -237,7 +235,7 @@ namespace kgx
 					>> lexeme[*(print - iso8859::space)[addBumpMap]] >> qi::skip(qi::blank)[*qi::print];
 
 				xmFloat3 = float_ >> float_ >> float_;
-				transFilter = "Tf" >> xmFloat3[phx::bind(&ObjMatData::transFilter, _r1) = qi::_1];
+				transFilter = "Tf" >> xmFloat3[phx::bind( &ObjMatData::transFilter, _r1 ) = qi::_1];
 				ambClr      = "Ka" >> xmFloat3[phx::bind( &ObjMatData::ambClr, _r1 ) = qi::_1];
 				diffClr     = "Kd" >> xmFloat3[phx::bind( &ObjMatData::diffClr, _r1 ) = qi::_1];
 				specClr     = "Ks" >> xmFloat3[phx::bind( &ObjMatData::specClr, _r1 ) = qi::_1];
@@ -452,43 +450,15 @@ namespace kgx
 	{
 		kgMat.name = objMat.name;
 
-		// vertex shader auto variables
-		KgMatData::ShaderVar var;
-		var.name         = "viewMatrix";
-		var.type         = "mat4x4";
-		var.autoBindType = ShaderProgram::ShaderAutoBindType::CameraViewMatrix;
-		kgMat.vertexShader.variables.push_back( var );
+		kgMat.diffuse.x = objMat.diffClr.x;
+		kgMat.diffuse.y = objMat.diffClr.y;
+		kgMat.diffuse.z = objMat.diffClr.z;
+		kgMat.diffuse.w = 1.0f;
 
-		var.name         = "projMatrix";
-		var.type         = "mat4x4";
-		var.autoBindType = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix;
-		kgMat.vertexShader.variables.push_back( var );
-
-		var.name         = "modelMatrix";
-		var.type         = "mat4x4";
-		var.autoBindType = ShaderProgram::ShaderAutoBindType::ObjectModelMatrix;
-		kgMat.vertexShader.variables.push_back( var );
-
-		// pixel shader variables
-		//TODO: add pixel shader variables
-
-		// add textures
-		if ( objMat.ambMap.size() > 0u )
-			kgMat.pixelShader.textures.push_back( objMat.ambMap );
-		if ( objMat.diffMap.size() > 0u )
-			kgMat.pixelShader.textures.push_back( objMat.diffMap );
-		if ( objMat.specMap.size() > 0u )
-			kgMat.pixelShader.textures.push_back( objMat.specMap );
-		if ( objMat.bumpMap.size() > 0u )
-			kgMat.pixelShader.textures.push_back( objMat.bumpMap );
-		if ( objMat.transMap.size() > 0u )
-			kgMat.pixelShader.textures.push_back( objMat.transMap );
-
-		//TODO: change to Default OBJ shaders => preferably some sort of ubershader
-		kgMat.vertexShader.filename = "DefaultVertexShaderVS.cso";
-		if ( kgMat.pixelShader.textures.size() > 0u )
-			kgMat.pixelShader.filename = "DefaultTextureShaderPS.cso";
-		else kgMat.pixelShader.filename = "DefaultPixelShaderPS.cso";
+		kgMat.specular.x = objMat.specClr.x;
+		kgMat.specular.y = objMat.specClr.y;
+		kgMat.specular.z = objMat.specClr.z;
+		kgMat.specular.w = 1.0f;
 	}
 }
 

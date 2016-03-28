@@ -20,6 +20,13 @@
 
 #include "KGObjectParser.h"
 
+BOOST_FUSION_ADAPT_STRUCT(
+	DirectX::XMFLOAT4,
+	(float, x)
+	(float, y)
+	(float, z)
+	(float, w)
+);
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgModelData,
@@ -28,14 +35,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(int, indexCount)
 	(std::string, matName)
 );
-
-BOOST_FUSION_ADAPT_STRUCT(
-	DirectX::XMFLOAT4,
-	(float, x)
-	(float, y)
-	(float, z)
-	(float, w)
-	);
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData,

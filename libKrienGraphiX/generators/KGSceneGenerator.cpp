@@ -18,13 +18,6 @@
 #include "KGObjectGenerator.h"
 #include "KGSceneGenerator.h"
 
-BOOST_FUSION_ADAPT_STRUCT(
-	DirectX::XMFLOAT3,
-	(float, x)
-	(float, y)
-	(float, z)
-);
-
 namespace karma = boost::spirit::karma;
 namespace phx   = boost::phoenix;
 typedef std::back_insert_iterator<std::string> BackInsertIt;

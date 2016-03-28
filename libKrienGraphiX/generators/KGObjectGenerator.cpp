@@ -1,10 +1,6 @@
 
 #pragma warning( disable : 4996 )		// warning C4996: Function call with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct. These are correct.
 
-
-//TODO: maybe scratch this whole thing, because it is not needed...
-
-
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
@@ -18,13 +14,16 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
 #include "../KGXCore.h"
-#include "../ShaderProgram.h"
 #include "../RenderableObject.h"
-#include "../VertexShader.h"
-#include "../PixelShader.h"
-#include "../Texture.h"
 #include "KGObjectGenerator.h"
 
+BOOST_FUSION_ADAPT_STRUCT(
+	DirectX::XMFLOAT4,
+	(float, x)
+	(float, y)
+	(float, z)
+	(float, w)
+);
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgModelData,
@@ -34,27 +33,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, matName)
 );
 
-/*BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgMatData::ShaderVar,
-	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
-	(std::string, type)
-	(std::string, name)
-	(std::string, defaultValue)
-);
-
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgMatData::ShaderDef,
-	(std::string, filename)
-	(std::vector<kgx::KgMatData::ShaderVar>, variables)
-	(std::vector<std::string>, textures)
-);
-
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData,
 	(std::string, name)
-	(kgx::KgMatData::ShaderDef, vertexShader)
-	(kgx::KgMatData::ShaderDef, pixelShader)
-);*/
+	(DirectX::XMFLOAT4, diffuse)
+	(DirectX::XMFLOAT4, specular)
+);
 
 
 namespace phx   = boost::phoenix;
@@ -88,10 +72,9 @@ namespace kgx
 
 	void KGObjectGenerator::generate( KgoData &inputData, std::string &outputString )
 	{
-		/*
 		// construct header string
 		std::stringstream headerStr;
-		headerStr << "// KrienGraphiX Object v0.2 - (c)2016 Krien Linnenbank" << std::endl;
+		headerStr << "// KrienGraphiX Object v0.3 - (c)2016 Krien Linnenbank" << std::endl;
 		// get local date and time
 		boost::posix_time::time_facet *facet = new boost::posix_time::time_facet( "%d-%b-%Y %H:%M:%S" );
 		headerStr.imbue( std::locale( headerStr.getloc(), facet ) );
@@ -125,27 +108,17 @@ namespace kgx
 					<< "\tMaterial(" << karma::string << ")" << no_delimit[eol]
 					<< "}" << no_delimit[eol];
 
-				shaderAutoBindType = karma::stream;
-				shaderVariable     = no_delimit[eol] << "\t\t" << shaderAutoBindType
-										<< karma::string << no_delimit[karma::string] << "(" << karma::string << ");"
-										<< no_delimit[eol << "\t"];
-
-				vertexShader = "\tVertexShader(" << karma::string << no_delimit[")"] << no_delimit[eol]
-								<< "\t{"
-								<< *shaderVariable << no_delimit[eol]
-								<< *("\t\tTexture(" << karma::string << ");" << no_delimit[eol]) << no_delimit[eol]
-								<< "\t}" << no_delimit[eol];
-
-				pixelShader  = "\tPixelShader(" << karma::string << no_delimit[")"] << no_delimit[eol]
-								<< "\t{"
-								<< *shaderVariable << no_delimit[eol]
-								<< *("\t\tTexture(" << karma::string << ");" << no_delimit[eol])
-								<< "\t}" << no_delimit[eol];
-
+				xmFloat4 = "(" << no_delimit[karma::double_] << ","
+							   << no_delimit[karma::double_] << ","
+							   << no_delimit[karma::double_] << ","
+							   << karma::double_ << ")";
 				material = "Material(" << karma::string << ")" << no_delimit[eol]
 					<< "{" << no_delimit[eol]
-					<< vertexShader << no_delimit[eol] << pixelShader
+					<< no_delimit["\tfloat4 diffuse"] << xmFloat4 << no_delimit[eol]
+					<< no_delimit["\tfloat4 specular"] << xmFloat4 << no_delimit[eol]
 					<< "}" << no_delimit[eol];
+
+				//TODO: add texture support
 
 				output = header << no_delimit[eol] << vertices << no_delimit[eol] << indices << no_delimit[eol]
 					<< (*model)[karma::_1 = phx::ref( inModels )] << no_delimit[eol] << (*material)[karma::_1 = phx::ref( inMatData )];
@@ -158,20 +131,13 @@ namespace kgx
 			karma::rule<BackInsertIt, karma::space_type> vertices;
 			karma::rule<BackInsertIt, karma::space_type> indices;
 			karma::rule<BackInsertIt, KgModelData(), karma::space_type> model;
-			karma::rule<BackInsertIt, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
-			karma::rule<BackInsertIt, KgMatData::ShaderVar(), karma::space_type> shaderVariable;
-			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> vertexShader;
-			karma::rule<BackInsertIt, KgMatData::ShaderDef(), karma::space_type> pixelShader;
+			karma::rule<BackInsertIt, DirectX::XMFLOAT4(), karma::space_type> xmFloat4;
 			karma::rule<BackInsertIt, KgMatData(), karma::space_type> material;
 		} kgoGram( headerStr.str(), inputData.inputLayout, inputData.vertices, inputData.indices, inputData.models, inputData.mats );
 
 
 		BackInsertIt sink( outputString );
 		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
-
-		*/
-
-		//TODO: fix code above
 	}
 
 
