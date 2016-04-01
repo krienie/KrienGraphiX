@@ -33,7 +33,7 @@ PixelInput main( float4 pos : POSITION, float3 tex : TEXCOORD, float3 norm : NOR
 	PixelInput output;
 	output.position = newPos;
 	output.texCoord = tex.xy;
-	output.normal   = mul( kgx_normalMatrix, float4(norm, 0.0f) );
+	output.normal = mul( float4(norm, 0.0f), kgx_normalMatrix );
 
 	return output;
 }

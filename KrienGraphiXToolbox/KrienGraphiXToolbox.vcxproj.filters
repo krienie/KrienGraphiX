@@ -122,10 +122,10 @@
     <ResourceCompile Include="KrienGraphiXToolbox.rc" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\CopperVS.hlsl">
+    <FxCompile Include="shaders\DefaultPS.hlsl">
       <Filter>Source Files\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\CopperPS.hlsl">
+    <FxCompile Include="shaders\DefaultVS.hlsl">
       <Filter>Source Files\shaders</Filter>
     </FxCompile>
   </ItemGroup>
