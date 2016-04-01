@@ -77,7 +77,18 @@ namespace kgx
 		m_xPos = x;
 		m_yPos = y;
 		m_zPos = z;
-		translate( 0.0f, 0.0f, 0.0f );
+
+		// set m_modelMatrix to identity
+		DirectX::XMStoreFloat4x4( &m_modelMatrix, DirectX::XMMatrixIdentity() );
+		
+		DirectX::XMMATRIX translMat = DirectX::XMMatrixTranslation( m_xPos, m_yPos, m_zPos );
+		DirectX::XMMATRIX modelMat = DirectX::XMLoadFloat4x4( &m_modelMatrix );
+		modelMat = DirectX::XMMatrixMultiply( modelMat, translMat );
+
+		DirectX::XMStoreFloat4x4( &m_modelMatrix, modelMat );
+
+		// reset scale
+		setScale( m_xScale, m_yScale, m_zScale );
 	}
 
 	void MovableObject::scale( float deltaScale )
