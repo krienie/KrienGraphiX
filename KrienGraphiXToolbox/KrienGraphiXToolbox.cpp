@@ -17,8 +17,6 @@
 #include <parsers/KGSceneParser.h>
 #include <generators/KGSceneGenerator.h>
 
-#include "parsers/KGTProjectParser.h"
-#include "generators/KGTProjectGenerator.h"
 #include "KrienGraphiXToolbox.h"
 
 namespace bfs = boost::filesystem;

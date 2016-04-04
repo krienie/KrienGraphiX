@@ -14,7 +14,7 @@
    <string>KrienGraphiX Toolbox</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="kgt::KgxRenderWidget" name="renderWidget1" native="true">
+   <widget class="kgt::KGTRenderWidget" name="renderWidget1" native="true">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -92,9 +92,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>kgt::KgxRenderWidget</class>
+   <class>kgt::KGTRenderWidget</class>
    <extends>QWidget</extends>
-   <header>KgxRenderWidget.h</header>
+   <header>KGTRenderWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

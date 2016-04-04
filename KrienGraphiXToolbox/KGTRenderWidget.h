@@ -12,7 +12,7 @@ namespace kgt
 	class FrameListener;
 	class KeyboardListener;
 
-	class KgxRenderWidget : public QWidget
+	class KGTRenderWidget : public QWidget
 	{
 		Q_OBJECT
 
@@ -20,8 +20,8 @@ namespace kgt
 		void startRendering();
 
 	public:
-		KgxRenderWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 );
-		//~KgxRenderWidget();
+		KGTRenderWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 );
+		//~KGTRenderWidget();
 
 		void initialize();
 		kgx::RenderWindow* getRenderWindow() const;
