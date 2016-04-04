@@ -14,11 +14,11 @@
 #include <PixelShader.h>
 #include <ConfigManager.h>
 #include <TextureManager.h>
+#include <parsers/KGSceneParser.h>
+#include <generators/KGSceneGenerator.h>
 
 #include "parsers/KGTProjectParser.h"
-#include "parsers/KGSceneParser.h"
 #include "generators/KGTProjectGenerator.h"
-#include "generators/KGSceneGenerator.h"
 #include "KrienGraphiXToolbox.h"
 
 namespace bfs = boost::filesystem;
