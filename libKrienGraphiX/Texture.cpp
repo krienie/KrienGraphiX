@@ -27,7 +27,7 @@ namespace kgx
 		: m_dxDev(other.m_dxDev), m_dxDevCont(other.m_dxDevCont), m_buffer(other.m_buffer), m_shaderView(other.m_shaderView),
 			m_filename(other.m_filename)
 	{
-		if ( m_dxDevCont )
+		if ( !m_dxDevCont )
 			m_dxDev->GetImmediateContext( &m_dxDevCont );
 
 		if ( m_buffer )
