@@ -94,17 +94,15 @@ namespace kgx
 							std::vector<std::string> &lights, std::vector<std::string> &renPasses )
 				: KgsceneGrammar::base_type( start )
 			{
-				using namespace qi;
+				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 
-				comment = "//" >> skip(blank)[*print];
+				renderableObject = "RenderableObject" >> *~qi::char_('}') >> qi::char_('}');
+				camera           = "Camera" >> *~qi::char_('}') >> qi::char_('}');
+				light            = "Light" >> *~qi::char_('}') >> qi::char_('}');
 
-				renderableObject = "RenderableObject" >> *~qi::char_('}') >> char_('}');
-				camera           = "Camera" >> *~qi::char_('}') >> char_('}');
-				light            = "Light" >> *~qi::char_('}') >> char_('}');
-
-				shader = (qi::string("VertexShader") | qi::string("PixelShader")) >> lexeme[ *~qi::char_('}') ] >> char_('}');
-				renderPass = qi::string("RenderPass") >> char_('(') >> *~qi::char_(')') >> char_(')')
-								>> qi::char_('{') >> *shader >> char_('}');
+				shader = (qi::string("VertexShader") | qi::string("PixelShader")) >> qi::lexeme[ *~qi::char_('}') ] >> qi::char_('}');
+				renderPass = qi::string("RenderPass") >> qi::char_('(') >> *~qi::char_(')') >> qi::char_(')')
+								>> qi::char_('{') >> *shader >> qi::char_('}');
 				renderCore = "RenderCore" >> qi::char_('{')
 								>> *renderPass[phx::push_back( phx::ref(renPasses), qi::_1 )]
 								>> qi::char_('}');
@@ -183,17 +181,15 @@ namespace kgx
 			RenderObjectGrammar( std::string &name, std::string &source, DirectX::XMFLOAT3 &pos, float &scale )
 				: RenderObjectGrammar::base_type( start )
 			{
-				using namespace qi;
-
-				objName  = lit("(") >> *~qi::char_(')') >> lit(")");
-				file     = "source" >> lit("(") >> *~qi::char_('.') >> qi::string(".kgo") >> lit(")");
-				position = "position" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				objScale = "scale" >> lit("(") >> qi::float_ >> lit(")");
+				objName  = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
+				file     = "source" >> qi::lit("(") >> *~qi::char_('.') >> qi::string(".kgo") >> qi::lit(")");
+				position = "position" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
+				objScale = "scale" >> qi::lit("(") >> qi::float_ >> qi::lit(")");
 
 				start = objName[phx::ref(name) = qi::_1]
-					>> lit("{")
+					>> qi::lit("{")
 					>> *(file[phx::ref(source) = qi::_1] | position[phx::ref(pos) = qi::_1] | objScale[phx::ref(scale) = qi::_1])
-					>> lit("}");
+					>> qi::lit("}");
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
@@ -246,31 +242,29 @@ namespace kgx
 						   DirectX::XMFLOAT3 &eye, DirectX::XMFLOAT3 &target, DirectX::XMFLOAT3 &up )
 				: CameraGrammar::base_type( start )
 			{
-				using namespace qi;
-
-				objName = lit("(") >> *~qi::char_(')') >> lit(")");
+				objName = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
 				fieldOfView = "fieldOfView"
-					>> (qi::string("(PI)")[_val = DirectX::XM_PI]
-					| qi::string("(2PI)")[_val = DirectX::XM_2PI]
-					| qi::string("(1DIVPI)")[_val = DirectX::XM_1DIVPI]
-					| qi::string("(1DIV2PI)")[_val = DirectX::XM_1DIVPI]
-					| qi::string("(PIDIV2)")[_val = DirectX::XM_PIDIV2]
-					| qi::string("(PIDIV4)")[_val = DirectX::XM_PIDIV4]
+					>> (qi::string("(PI)")[qi::_val = DirectX::XM_PI]
+					| qi::string("(2PI)")[qi::_val = DirectX::XM_2PI]
+					| qi::string("(1DIVPI)")[qi::_val = DirectX::XM_1DIVPI]
+					| qi::string("(1DIV2PI)")[qi::_val = DirectX::XM_1DIVPI]
+					| qi::string("(PIDIV2)")[qi::_val = DirectX::XM_PIDIV2]
+					| qi::string("(PIDIV4)")[qi::_val = DirectX::XM_PIDIV4]
 					| qi::float_);
-				aspectRatio = "aspect" >> lit("(") >> qi::float_ >> lit(")");
-				nearPlane   = "nearZ" >> lit("(") >> qi::float_ >> lit(")");
-				farPlane    = "farZ" >> lit("(") >> qi::float_ >> lit(")");
-				eyePos      = "eye" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				targetPos   = "target" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				upVec       = "up" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
+				aspectRatio = "aspect" >> qi::lit("(") >> qi::float_ >> qi::lit(")");
+				nearPlane   = "nearZ" >> qi::lit("(") >> qi::float_ >> qi::lit(")");
+				farPlane    = "farZ" >> qi::lit("(") >> qi::float_ >> qi::lit(")");
+				eyePos      = "eye" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
+				targetPos   = "target" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
+				upVec       = "up" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
 
 				start = objName[phx::ref(name) = qi::_1]
-					>> lit("{")
+					>> qi::lit("{")
 					>> *( fieldOfView[phx::ref(fov) = qi::_1]     | aspectRatio[phx::ref(aspect) = qi::_1]
 							| nearPlane[phx::ref(nearZ) = qi::_1] | farPlane[phx::ref(farZ) = qi::_1]
 							| eyePos[phx::ref(eye) = qi::_1]      | targetPos[phx::ref(target) = qi::_1]
 							| upVec[phx::ref(up) = qi::_1] )
-					>> lit("}");
+					>> qi::lit("}");
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
@@ -315,19 +309,17 @@ namespace kgx
 			LightGrammar( std::string &name, bool &isAmb, float &intens, DirectX::XMFLOAT3 &clr, DirectX::XMFLOAT3 &dir )
 						   : LightGrammar::base_type( start )
 			{
-				using namespace qi;
-
-				objName   = lit("(") >> *~qi::char_(')') >> lit(")");
-				type      = "type" >> (qi::string("(AMBIENT)")[_val = true]| qi::string("(DIRECTIONAL)")[_val = false]);
-				intensity = "intensity" >> lit("(") >> qi::float_ >> lit(")");
-				color     = "color" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				direction = "direction" >> lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
+				objName   = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
+				type      = "type" >> (qi::string("(AMBIENT)")[qi::_val = true]| qi::string("(DIRECTIONAL)")[qi::_val = false]);
+				intensity = "intensity" >> qi::lit("(") >> qi::float_ >> qi::lit(")");
+				color     = "color" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
+				direction = "direction" >> qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
 
 				start = objName[phx::ref(name) = qi::_1]
-					>> lit("{")
+					>> qi::lit("{")
 					>> *( type[phx::ref(isAmb) = qi::_1]    | intensity[phx::ref(intens) = qi::_1]
 							| color[phx::ref(clr) = qi::_1] | direction[phx::ref(dir) = qi::_1] )
-					>> lit("}");
+					>> qi::lit("}");
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
@@ -370,38 +362,36 @@ namespace kgx
 			PassGrammar( std::map<int, KgShaderProgramData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
 				: PassGrammar::base_type( start )
 			{
-				using namespace qi;
+				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 
-				comment = "//" >> skip( blank )[*print];
+				shaderAutoBindType = qi::string("CameraProjectionMatrix")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
+					| qi::string("CameraViewMatrix")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
+					| qi::string("CameraPosition")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
+					| qi::string("CameraTarget")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
+					| qi::string("CameraFieldOfView")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
+					| qi::string("CameraAspectRatio")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
+					| qi::string("CameraNearZ")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
+					| qi::string("CameraFarZ")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
+					| (!qi::string("Texture"))[qi::_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];		// make sure not to eat any possible texture definitions
 
-				shaderAutoBindType = qi::string("CameraProjectionMatrix")[_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
-					| qi::string("CameraViewMatrix")[_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
-					| qi::string("CameraPosition")[_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
-					| qi::string("CameraTarget")[_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
-					| qi::string("CameraFieldOfView")[_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
-					| qi::string("CameraAspectRatio")[_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
-					| qi::string("CameraNearZ")[_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
-					| qi::string("CameraFarZ")[_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
-					| (!qi::string("Texture"))[_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];		// make sure not to eat any possible texture definitions
+				shaderVariable = shaderAutoBindType >> qi::lexeme[*(qi::print - iso8859::space)] >> *~qi::char_('(') >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
+				texture = qi::string("Texture") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
 
-				shaderVariable = shaderAutoBindType >> lexeme[*(print - iso8859::space)] >> *~qi::char_('(') >> lit("(") >> *~qi::char_(')') >> lit(")");
-				texture = qi::string("Texture") >> lit("(") >> *~qi::char_(')') >> lit(")");
-
-				vertexInputLayout = qi::string("Position")[_val = VertexInputLayout::Position]
-					| qi::string("TextureCoordinate")[_val = VertexInputLayout::TextureCoordinate]
-					| qi::string("Normal")[_val = VertexInputLayout::Normal]
-					| qi::string("Tangent")[_val = VertexInputLayout::Tangent];
-				vertexShaderDefinition = lit("VertexShader") >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit(":") >> omit[ vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') ]
-					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
-				pixelShaderDefinition  = lit("PixelShader") >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit("{") >> *shaderVariable >> *texture >> lit("}");
+				vertexInputLayout = qi::string("Position")[qi::_val = VertexInputLayout::Position]
+					| qi::string("TextureCoordinate")[qi::_val = VertexInputLayout::TextureCoordinate]
+					| qi::string("Normal")[qi::_val = VertexInputLayout::Normal]
+					| qi::string("Tangent")[qi::_val = VertexInputLayout::Tangent];
+				vertexShaderDefinition = qi::lit("VertexShader") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
+					>> qi::lit(":") >> qi::omit[ vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % qi::char_(',') ]
+					>> qi::lit("{") >> *shaderVariable >> *texture >> qi::lit("}");
+				pixelShaderDefinition  = qi::lit("PixelShader") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
+					>> qi::lit("{") >> *shaderVariable >> *texture >> qi::lit("}");
 				//TODO: allow different order of shaderVariable and textures
 
 				//TODO: make shaderProgram parsing more robust => allow different orders or programs and allow some programs to be missing (no hull/domain shaders, for example)
 				shaderProgram = vertexShaderDefinition >> pixelShaderDefinition;
-				intMatPair = lit("RenderPass") >> lit("(") >> qi::int_ >> lit(")")
-					>> lit("{") >> shaderProgram >> lit("}");
+				intMatPair = qi::lit("RenderPass") >> qi::lit("(") >> qi::int_ >> qi::lit(")")
+					>> qi::lit("{") >> shaderProgram >> qi::lit("}");
 
 				start = *intMatPair[phx::insert( phx::ref(shaderProgs), qi::_1 )];
 			}

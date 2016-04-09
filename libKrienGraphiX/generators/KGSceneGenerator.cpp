@@ -81,22 +81,20 @@ namespace kgx
 			RoGram( const std::string &name, const std::string &filename, DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &scale )
 				: RoGram::base_type( output )
 			{
-				using namespace karma;
+				objFile = "\tsource(" << karma::string(filename) << ")" << karma::no_delimit[karma::eol];
 
-				objFile = "\tsource(" << karma::string(filename) << ")" << no_delimit[eol];
+				objPos = "\tposition(" << karma::no_delimit[karma::double_(pos.x)] << ","
+									   << karma::no_delimit[karma::double_(pos.y)] << ","
+									   << karma::double_(pos.z) << ")" << karma::no_delimit[karma::eol];
 
-				objPos = "\tposition(" << no_delimit[karma::double_(pos.x)] << ","
-									   << no_delimit[karma::double_(pos.y)] << ","
-									   << karma::double_(pos.z) << ")" << no_delimit[eol];
+				objScale = "\tscale(" << karma::no_delimit[karma::double_(scale.x)] << ","
+									  << karma::no_delimit[karma::double_(scale.y)] << ","
+									  << karma::double_(scale.z) << ")" << karma::no_delimit[karma::eol];
 
-				objScale = "\tscale(" << no_delimit[karma::double_(scale.x)] << ","
-									  << no_delimit[karma::double_(scale.y)] << ","
-									  << karma::double_(scale.z) << ")" << no_delimit[eol];
-
-				output = "RenderableObject(" << karma::string(name) << ")" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
+				output = "RenderableObject(" << karma::string(name) << ")" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
 					<< objFile << objPos << objScale
-					<< "}" << no_delimit[eol];
+					<< "}" << karma::no_delimit[karma::eol];
 			}
 			
 			karma::rule<BackInsertIt, karma::space_type> output, objFile,objPos, objScale;
@@ -118,27 +116,25 @@ namespace kgx
 					 const DirectX::XMFLOAT3 &camEye, const DirectX::XMFLOAT3 &camTarget, const DirectX::XMFLOAT3 &camUp )
 				: CamGram::base_type( output )
 			{
-				using namespace karma;
-
-				fieldOfView = "\tfieldOfView(" << karma::double_(fov)    << ")" << no_delimit[eol];
-				aspectRatio = "\taspect("      << karma::double_(aspect) << ")" << no_delimit[eol];
-				nearPlane   = "\tnearZ("       << karma::double_(nearZ)  << ")" << no_delimit[eol];
-				farPlane    = "\tfarZ("        << karma::double_(farZ)   << ")" << no_delimit[eol];
+				fieldOfView = "\tfieldOfView(" << karma::double_(fov)    << ")" << karma::no_delimit[karma::eol];
+				aspectRatio = "\taspect("      << karma::double_(aspect) << ")" << karma::no_delimit[karma::eol];
+				nearPlane   = "\tnearZ("       << karma::double_(nearZ)  << ")" << karma::no_delimit[karma::eol];
+				farPlane    = "\tfarZ("        << karma::double_(farZ)   << ")" << karma::no_delimit[karma::eol];
 				
-				eye    = "\teye(" << no_delimit[karma::double_(camEye.x)] << ","
-							      << no_delimit[karma::double_(camEye.y)] << ","
-							      << karma::double_(camEye.z) << ")" << no_delimit[eol];
-				target = "\ttarget(" << no_delimit[karma::double_(camTarget.x)] << ","
-							         << no_delimit[karma::double_(camTarget.y)] << ","
-							         << karma::double_(camTarget.z) << ")" << no_delimit[eol];
-				up     = "\tup(" << no_delimit[karma::double_(camUp.x)] << ","
-								 << no_delimit[karma::double_(camUp.y)] << ","
-								 << karma::double_(camUp.z) << ")" << no_delimit[eol];
+				eye    = "\teye(" << karma::no_delimit[karma::double_(camEye.x)] << ","
+							      << karma::no_delimit[karma::double_(camEye.y)] << ","
+							      << karma::double_(camEye.z) << ")" << karma::no_delimit[karma::eol];
+				target = "\ttarget(" << karma::no_delimit[karma::double_(camTarget.x)] << ","
+							         << karma::no_delimit[karma::double_(camTarget.y)] << ","
+							         << karma::double_(camTarget.z) << ")" << karma::no_delimit[karma::eol];
+				up     = "\tup(" << karma::no_delimit[karma::double_(camUp.x)] << ","
+								 << karma::no_delimit[karma::double_(camUp.y)] << ","
+								 << karma::double_(camUp.z) << ")" << karma::no_delimit[karma::eol];
 
-				output = "Camera(" << karma::string(name) << ")" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
+				output = "Camera(" << karma::string(name) << ")" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
 					<< fieldOfView << aspectRatio << nearPlane << farPlane << eye << target << up
-					<< "}" << no_delimit[eol];
+					<< "}" << karma::no_delimit[karma::eol];
 			}
 
 			karma::rule<BackInsertIt, karma::space_type> output;
@@ -159,15 +155,13 @@ namespace kgx
 		{
 			AmbientGram( const DirectX::XMFLOAT3 &ambient ) : AmbientGram::base_type( output )
 			{
-				using namespace karma;
-
-				output = "Light()" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< "\ttype(AMBIENT)" << no_delimit[eol]
-					<< "\tcolor(" << no_delimit[karma::double_(ambient.x)] << ","
-								  << no_delimit[karma::double_(ambient.y)] << ","
-								  << karma::double_(ambient.z) << ")" << no_delimit[eol]
-					<< "}" << no_delimit[eol];
+				output = "Light()" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< "\ttype(AMBIENT)" << karma::no_delimit[karma::eol]
+					<< "\tcolor(" << karma::no_delimit[karma::double_(ambient.x)] << ","
+								  << karma::no_delimit[karma::double_(ambient.y)] << ","
+								  << karma::double_(ambient.z) << ")" << karma::no_delimit[karma::eol]
+					<< "}" << karma::no_delimit[karma::eol];
 			}
 
 			karma::rule<BackInsertIt, karma::space_type> output;
@@ -188,16 +182,14 @@ namespace kgx
 		{
 			LightGram( const DirectX::XMFLOAT3 &direction, float intensity ) : LightGram::base_type( output )
 			{
-				using namespace karma;
-
-				output = "Light()" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< "\ttype(DIRECTIONAL)" << no_delimit[eol]
-					<< "\tdirection(" << no_delimit[karma::double_( direction.x )] << ","
-								      << no_delimit[karma::double_(direction.y)] << ","
-								      << karma::double_(direction.z) << ")" << no_delimit[eol]
-					<< "\tintensity(" << karma::double_(intensity) << ")" << no_delimit[eol] 
-					<< "}" << no_delimit[eol];
+				output = "Light()" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< "\ttype(DIRECTIONAL)" << karma::no_delimit[karma::eol]
+					<< "\tdirection(" << karma::no_delimit[karma::double_( direction.x )] << ","
+								      << karma::no_delimit[karma::double_(direction.y)] << ","
+								      << karma::double_(direction.z) << ")" << karma::no_delimit[karma::eol]
+					<< "\tintensity(" << karma::double_(intensity) << ")" << karma::no_delimit[karma::eol] 
+					<< "}" << karma::no_delimit[karma::eol];
 			}
 
 			karma::rule<BackInsertIt, karma::space_type> output;
