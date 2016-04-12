@@ -55,8 +55,6 @@ namespace kgx
 			std::string getOriginalFilename() const;
 			void setOriginalFilename( const std::string &filename );
 
-			std::vector<Material> getAllUsedMaterials() const;
-
 			void draw( Camera *renderCam, ShaderProgram *shaderProg );
 
 		private:
