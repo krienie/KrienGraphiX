@@ -2,6 +2,9 @@
 #include <comdef.h>
 #include <iostream>
 
+#include <boost/filesystem.hpp>
+
+#include "IOManager.h"
 #include "Texture.h"
 #include "TextureManager.h"
 
@@ -78,11 +81,27 @@ namespace kgx
 
 	Texture* TextureManager::loadTexture( const std::string &filename )
 	{
+		// check if file exists, if not: abort
+		std::string absTexFile = filename;
+		if ( !boost::filesystem::path( filename ).is_absolute() )
+			absTexFile = IOManager::getInst()->getAbsolutePath( filename );
+		if ( absTexFile.size() == 0 )
+		{
+			std::cout << "Error (TextureManager::loadTexture): Texture source file not specified." << std::endl;
+			return nullptr;
+		}
+
+		if ( !boost::filesystem::exists( absTexFile ) )
+		{
+			std::cout << "Error (TextureManager::loadTexture): Texture source file does not exist." << std::endl;
+			return nullptr;
+		}
+
 		Texture *tex = getTexture( filename );
 		if ( tex )
 			return tex;
 
-		tex = new Texture( filename, m_dxDev );
+		tex = new Texture( absTexFile, m_dxDev );
 		m_textures.insert( std::pair<std::string, Texture*>(filename, tex) );
 
 		return tex;
