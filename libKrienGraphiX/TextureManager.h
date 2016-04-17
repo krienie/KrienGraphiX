@@ -17,7 +17,7 @@ namespace kgx
 
 		//TODO: add default search path(s)
 
-		ID3D11SamplerState* getDefaultSampler() const;
+		ID3D11SamplerState* getDefaultSampler();
 		void setDefaultFilter( const D3D11_FILTER &filter );
 		void setDefaultAddressMode( const D3D11_TEXTURE_ADDRESS_MODE &mode );
 		void setDefaultMaxAnisotropy( UINT val );

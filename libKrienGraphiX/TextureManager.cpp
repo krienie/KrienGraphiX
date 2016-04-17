@@ -36,8 +36,6 @@ namespace kgx
 	TextureManager::TextureManager( ID3D11Device *dxDevice )
 		: m_dxDev(dxDevice), m_textures(), m_defaultSamp(nullptr)
 	{
-		// create default sampler
-		m_defaultSamp = createSampler( D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, 4u );
 	}
 
 	TextureManager::~TextureManager()
@@ -46,8 +44,12 @@ namespace kgx
 	}
 
 
-	ID3D11SamplerState* TextureManager::getDefaultSampler() const
+	ID3D11SamplerState* TextureManager::getDefaultSampler()
 	{
+		// create default sampler
+		if ( !m_defaultSamp )
+			m_defaultSamp = createSampler( D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, 4u );
+
 		return m_defaultSamp;
 	}
 
