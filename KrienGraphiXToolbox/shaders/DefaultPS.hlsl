@@ -15,6 +15,9 @@ cbuffer PerPixelData : register(b0)
 	float padding;
 };
 
+Texture2D diffuseTexture    : register(t0);
+SamplerState DefaultSampler : register(s0);
+
 struct PixelInput
 {
 	float4 position : SV_POSITION;
@@ -32,6 +35,7 @@ float4 main( PixelInput input ) : SV_TARGET
 	float3 h = normalize( lights.direction - camPosition );
 	float specLighting = pow( saturate( dot( h, norm ) ), 128 );
 
-	float4 finalColor = ambLightClr + (kgx_diffuse * nDotl * lights.intensity) + (specLighting * 0.25f) * kgx_specular;
+	float4 diffuseClr = diffuseTexture.Sample( DefaultSampler, input.texCoord );
+	float4 finalColor = ambLightClr + (diffuseClr * nDotl * lights.intensity) + (specLighting * 0.25f) * kgx_specular;
 	return float4(finalColor.rgb, 1.0f);
 }
