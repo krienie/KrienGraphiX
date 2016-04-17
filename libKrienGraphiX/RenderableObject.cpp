@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "ShaderProgram.h"
+#include "TextureManager.h"
 #include "RenderableObject.h"
 
 namespace kgx
@@ -53,8 +54,14 @@ namespace kgx
 			// update shader material info
 			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_diffuse", &matMeshIt->material.diffuse );
 			shaderProg->updateShaderVar( ShaderProgram::ShaderType::Pixel, "kgx_specular", &matMeshIt->material.specular );
-
 			shaderProg->commitAllChanges();
+
+			if ( matMeshIt->material.textures.size() > 0u )
+			{
+				ID3D11SamplerState *sampler = TextureManager::getInst()->getDefaultSampler();
+				m_dxDevCont->PSSetSamplers(0, 1, &sampler);
+				m_dxDevCont->PSSetShaderResources(0, UINT(matMeshIt->material.textures.size()), matMeshIt->material.textures.data());
+			}
 
 			// draw Meshes
 			std::vector<Mesh>::iterator meshIt;

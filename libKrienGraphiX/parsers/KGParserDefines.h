@@ -58,6 +58,9 @@ namespace kgx
 		std::string       name;
 		DirectX::XMFLOAT4 diffuse;
 		DirectX::XMFLOAT4 specular;
+		std::string       diffuseMap;
+		std::string       specularMap;
+		std::string       normalMap;
 	};
 
 

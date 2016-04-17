@@ -12,6 +12,7 @@ namespace kgx
 {
 	class Camera;
 	class ShaderProgram;
+	class Texture;
 
 	class RenderableObject : public MovableObject
 	{
@@ -30,11 +31,12 @@ namespace kgx
 
 			struct Material
 			{
-				Material( const DirectX::XMFLOAT4 &diff, const DirectX::XMFLOAT4 &spec )
-					: diffuse( diff ), specular( spec ) {}
+				Material( const DirectX::XMFLOAT4 &diff, const DirectX::XMFLOAT4 &spec, const std::vector<ID3D11ShaderResourceView*> &texs )
+					: diffuse(diff), specular(spec), textures(texs) {}
 
 				DirectX::XMFLOAT4 diffuse;
 				DirectX::XMFLOAT4 specular;
+				std::vector<ID3D11ShaderResourceView*> textures;
 			};
 
 			struct MaterialMeshContainer

@@ -9,6 +9,7 @@
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/karma.hpp>
+#include <boost/spirit/include/karma_real.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -38,12 +39,23 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, name)
 	(DirectX::XMFLOAT4, diffuse)
 	(DirectX::XMFLOAT4, specular)
+	(std::string, diffuseMap)
+	(std::string, specularMap)
+	(std::string, normalMap)
 );
 
 
 namespace phx   = boost::phoenix;
 namespace karma = boost::spirit::karma;
 typedef std::back_insert_iterator<std::string> BackInsertIt;
+
+template <typename Num>
+struct scientific_policy : karma::real_policies<Num>
+{
+	// we want the numbers always to be in scientific format
+	static int floatfield(Num n) { return 1; }
+};
+typedef karma::real_generator<double, scientific_policy<double> > science_type;
 
 
 namespace kgx
@@ -87,41 +99,45 @@ namespace kgx
 					 const std::vector<KgModelData> &inModels, const std::vector<KgMatData> &inMatData )
 					 : KgoGram::base_type( output )
 			{
-				using namespace karma;
 				inputLayoutType = karma::stream;
 				inputLayout = (inputLayoutType % ", ")[karma::_1 = phx::ref( inLayout )];
 
-				vertex = double_;
-				vertices = "Vertices(" << inputLayout << ")" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< lit( '\t' ) << no_delimit[(vertex % karma::space)[karma::_1 = phx::ref( inVerts )]] << no_delimit[eol]
-					<< "}" << no_delimit[eol];
 
-				indices = "Indices()" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< lit('\t') << no_delimit[(uint_ % karma::space)[karma::_1 = phx::ref( inIndices )]] << no_delimit[eol]
-					<< "}" << no_delimit[eol];
+				science_type scienceDouble;
 
-				model = "Model(" << karma::string << ")" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< "\tIndices(" << no_delimit[int_] << "," << int_ << ")" << no_delimit[eol]
-					<< "\tMaterial(" << karma::string << ")" << no_delimit[eol]
-					<< "}" << no_delimit[eol];
+				vertex = scienceDouble;
+				vertices = "Vertices(" << inputLayout << ")" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< karma::lit('\t') << karma::no_delimit[(vertex % karma::space)[karma::_1 = phx::ref(inVerts)]] << karma::no_delimit[karma::eol]
+					<< "}" << karma::no_delimit[karma::eol];
 
-				xmFloat4 = "(" << no_delimit[karma::double_] << ","
-							   << no_delimit[karma::double_] << ","
-							   << no_delimit[karma::double_] << ","
+				indices = "Indices()" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< karma::lit('\t') << karma::no_delimit[(karma::uint_ % karma::space)[karma::_1 = phx::ref(inIndices)]] << karma::no_delimit[karma::eol]
+					<< "}" << karma::no_delimit[karma::eol];
+
+				model = "Model(" << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< "\tIndices(" << karma::no_delimit[karma::int_] << "," << karma::int_ << ")" << karma::no_delimit[karma::eol]
+					<< "\tMaterial(" << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< "}" << karma::no_delimit[karma::eol];
+
+				xmFloat4 = "(" << karma::no_delimit[karma::double_] << ","
+							   << karma::no_delimit[karma::double_] << ","
+							   << karma::no_delimit[karma::double_] << ","
 							   << karma::double_ << ")";
-				material = "Material(" << karma::string << ")" << no_delimit[eol]
-					<< "{" << no_delimit[eol]
-					<< no_delimit["\tfloat4 diffuse"] << xmFloat4 << no_delimit[eol]
-					<< no_delimit["\tfloat4 specular"] << xmFloat4 << no_delimit[eol]
-					<< "}" << no_delimit[eol];
 
-				//TODO: add texture support
+				material = "Material(" << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< "{" << karma::no_delimit[karma::eol]
+					<< karma::no_delimit["\tdiffuse"] << xmFloat4 << karma::no_delimit[karma::eol]
+					<< karma::no_delimit["\tspecular"] << xmFloat4 << karma::no_delimit[karma::eol]
+					<< karma::no_delimit["\tdiffuseMap( "] << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< karma::no_delimit["\tspecularMap( "] << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< karma::no_delimit["\tnormalMap( "] << karma::string << ")" << karma::no_delimit[karma::eol]
+					<< "}" << karma::no_delimit[karma::eol];
 
-				output = header << no_delimit[eol] << vertices << no_delimit[eol] << indices << no_delimit[eol]
-					<< (*model)[karma::_1 = phx::ref( inModels )] << no_delimit[eol] << (*material)[karma::_1 = phx::ref( inMatData )];
+				output = header << karma::no_delimit[karma::eol] << vertices << karma::no_delimit[karma::eol] << indices << karma::no_delimit[karma::eol]
+					<< (*model)[karma::_1 = phx::ref(inModels)] << karma::no_delimit[karma::eol] << (*material)[karma::_1 = phx::ref(inMatData)];
 			}
 
 			karma::rule<BackInsertIt, karma::space_type> output;
@@ -138,6 +154,7 @@ namespace kgx
 
 		BackInsertIt sink( outputString );
 		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
+		std::cout << std::endl;
 	}
 
 

@@ -17,6 +17,8 @@
 #include "../VertexInputLayout.h"
 #include "../IOManager.h"
 #include "../ResourceManager.h"
+#include "../Texture.h"
+#include "../TextureManager.h"
 
 #include "KGObjectParser.h"
 
@@ -40,6 +42,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgMatData,
 	(DirectX::XMFLOAT4, diffuse)
 	(DirectX::XMFLOAT4, specular)
+	(std::string, diffuseMap)
+	(std::string, specularMap)
+	(std::string, normalMap)
 );
 
 
@@ -86,30 +91,32 @@ namespace kgx
 						std::vector<KgModelData> &m, std::map<std::string, KgMatData> &mats )
 				: KgoGrammar::base_type( start )
 			{
-				using namespace qi;
+				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 
-				comment = "//" >> skip( blank )[*print];
+				vertexInputLayout = qi::string("Position")[qi::_val = VertexInputLayout::Position]
+									| qi::string("TextureCoordinate")[qi::_val = VertexInputLayout::TextureCoordinate]
+									| qi::string("Normal")[qi::_val = VertexInputLayout::Normal]
+									| qi::string("Tangent")[qi::_val = VertexInputLayout::Tangent];
+				vertices = "Vertices" >> qi::lit("(") >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % qi::char_(',') >> ")"
+					>> qi::lit("{") >> *qi::float_[phx::push_back( phx::ref(v), qi::_1 )] >> "}";
 
-				vertexInputLayout = qi::string("Position")[_val = VertexInputLayout::Position]
-									| qi::string("TextureCoordinate")[_val = VertexInputLayout::TextureCoordinate]
-									| qi::string("Normal")[_val = VertexInputLayout::Normal]
-									| qi::string("Tangent")[_val = VertexInputLayout::Tangent];
-				vertices = "Vertices" >> lit("(") >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % char_(',') >> ")"
-					>> lit("{") >> *float_[phx::push_back( phx::ref(v), qi::_1 )] >> "}";
-
-				indices = "Indices" >> lit("(") >> lit(")") >> lit("{") >> *uint_[phx::push_back( phx::ref(i), qi::_1 )] >> "}";
+				indices = "Indices" >> qi::lit("(") >> qi::lit(")") >> qi::lit("{") >> *qi::uint_[phx::push_back( phx::ref(i), qi::_1 )] >> "}";
 
 				//TODO: add support for different order of model contents
-				models = "Model" >> lit("(") >> *~qi::char_(')') >> lit(")") >> lit("{")
-					>> "Indices" >> lit("(") >> int_ >> lit(",") >> int_ >> lit(")")
-					>> "Material" >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit("}");
+				models = "Model" >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")") >> qi::lit("{")
+					>> "Indices" >> qi::lit("(") >> qi::int_ >> qi::lit(",") >> qi::int_ >> qi::lit(")")
+					>> "Material" >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
+					>> qi::lit("}");
 
-				float4Property = lit("(") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(",") >> qi::float_ >> lit(")");
-				material =    lit("float4") >> lit("diffuse") >> float4Property
-						   >> lit("float4") >> lit("specular") >> float4Property;
-				nameMatPair = lit("Material") >> lit("(") >> *~qi::char_(')') >> lit(")")
-					>> lit( "{" ) >> material >> lit( "}" );
+				float4Property = qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
+				stringProperty = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
+				material = qi::lit("diffuse")     >> float4Property
+						>> qi::lit("specular")    >> float4Property
+						>> -(qi::lit("diffuseMap")  >> stringProperty)
+						>> -(qi::lit("specularMap") >> stringProperty)
+						>> -(qi::lit("normalMap")   >> stringProperty);
+				nameMatPair = qi::lit("Material") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
+					>> qi::lit("{") >> material >> qi::lit("}");
 
 				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
 						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
@@ -123,6 +130,7 @@ namespace kgx
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
 			qi::rule<std::string::const_iterator, DirectX::XMFLOAT4(), Skipper> float4Property;
+			qi::rule<std::string::const_iterator, std::string(), Skipper> stringProperty;
 			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
 			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
 
@@ -189,7 +197,26 @@ namespace kgx
 			std::map<std::string, KgMatData>::iterator matIt = materials.find( matMeshIt->first );
 			if ( matIt != materials.end() )
 			{
-				RenderableObject::Material mat( matIt->second.diffuse, matIt->second.specular );
+				std::vector<ID3D11ShaderResourceView*> textures;
+
+				// attempt to load textures
+				if ( !matIt->second.diffuseMap.empty() )
+				{
+					Texture *diffuseMap = TextureManager::getInst()->loadTexture(matIt->second.diffuseMap);
+					textures.push_back( diffuseMap->getResourceView() );
+				}
+				if ( !matIt->second.specularMap.empty() )
+				{
+					Texture *specularMap = TextureManager::getInst()->loadTexture(matIt->second.specularMap);
+					textures.push_back( specularMap->getResourceView() );
+				}
+				if ( !matIt->second.normalMap.empty() )
+				{
+					Texture *normalMap = TextureManager::getInst()->loadTexture(matIt->second.normalMap);
+					textures.push_back( normalMap->getResourceView() );
+				}
+
+				RenderableObject::Material mat( matIt->second.diffuse, matIt->second.specular, textures );
 				matMeshContainers.push_back( RenderableObject::MaterialMeshContainer(matMeshIt->second, mat) );
 			}
 		}
