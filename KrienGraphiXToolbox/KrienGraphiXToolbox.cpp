@@ -1,4 +1,6 @@
 
+#define NOMINMAX
+
 #include <iostream>
 #include <sstream>
 
@@ -23,8 +25,9 @@ namespace bfs = boost::filesystem;
 
 namespace
 {
-	const std::string SCENE_FOLDER    = "scenes";
-	const std::string RESOURCE_FOLDER = "resources";
+	const std::string SCENE_FOLDER              = "scenes";
+	const std::string RESOURCE_FOLDER           = "resources";
+	const unsigned int MOUSE_BUFFER_FILTER_SIZE = 10u;
 }
 
 
@@ -32,7 +35,7 @@ namespace kgt
 {
 	KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
 		: QMainWindow(parent), m_projectDir(), m_mainCam(nullptr), m_currentScene(nullptr),
-			m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
+			m_mouseXFilterBuffer(), m_mouseYFilterBuffer(), m_leftMouseBtnDown(false), m_wKeyDown(false), m_sKeyDown(false),
 			m_aKeyDown(false), m_dKeyDown(false)
 	{
 		m_ui.setupUi( this );
@@ -43,6 +46,10 @@ namespace kgt
 
 		QRect widgetGeom = m_ui.renderWidget1->geometry();
 		float aspectRatio = float(widgetGeom.width()) / widgetGeom.height();
+
+		// reserve space for mouse movement filtering
+		m_mouseXFilterBuffer.reserve(MOUSE_BUFFER_FILTER_SIZE);
+		m_mouseYFilterBuffer.reserve(MOUSE_BUFFER_FILTER_SIZE);
 
 		//try and load project directory from KGConfig
 		m_projectDir = kgx::ConfigManager::getInst()->getProperty<std::string>( "projectFolder" );
@@ -93,8 +100,36 @@ namespace kgt
 	{
 		if ( m_mainCam && m_leftMouseBtnDown )
 		{
-			m_mainCam->rotateRight( float(-evt.X().rel()) * 0.5f );
-			m_mainCam->rotateUp( float(evt.Y().rel()) * 0.5f );
+			const float MOVE_WEIGHT_MODIFIER = 0.2f;
+			const float MOVE_SPEED_MODIFIER  = 1.5f;
+
+			// make sure the buffers with mouse movement history do not exceed the max length
+			if ( m_mouseXFilterBuffer.size() >= MOUSE_BUFFER_FILTER_SIZE )
+				m_mouseXFilterBuffer.erase( m_mouseXFilterBuffer.begin() );
+			if ( m_mouseYFilterBuffer.size() >= MOUSE_BUFFER_FILTER_SIZE )
+				m_mouseYFilterBuffer.erase( m_mouseYFilterBuffer.begin() );
+			
+			float relX = float(-evt.X().rel()) * MOVE_SPEED_MODIFIER;
+			float relY = float(evt.Y().rel()) * MOVE_SPEED_MODIFIER;
+
+			float filteredX = relX;
+			float filteredY = relY;
+			float weight    = 1.0;
+			for ( unsigned int i = 0u; i < m_mouseXFilterBuffer.size(); ++i )
+			{
+				weight *= MOVE_WEIGHT_MODIFIER;
+				filteredX += relX * weight;
+				filteredY += relY * weight;
+			}
+			filteredX /= std::max( 1.0f, static_cast<float>(m_mouseXFilterBuffer.size()) );
+			filteredY /= std::max( 1.0f, static_cast<float>(m_mouseYFilterBuffer.size()) );
+
+			m_mouseXFilterBuffer.push_back( relX );
+			m_mouseYFilterBuffer.push_back( relY );
+
+			// rotate camera with the filtered movement vector
+			m_mainCam->rotateRight( filteredX );
+			m_mainCam->rotateUp( filteredY );
 		}
 	}
 

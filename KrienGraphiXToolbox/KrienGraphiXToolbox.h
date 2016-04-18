@@ -46,6 +46,9 @@ namespace kgt
 		kgx::Camera *m_mainCam;
 		kgx::Scene *m_currentScene;
 
+		std::vector<float> m_mouseXFilterBuffer;
+		std::vector<float> m_mouseYFilterBuffer;
+
 		bool m_leftMouseBtnDown;
 		bool m_wKeyDown;
 		bool m_sKeyDown;
