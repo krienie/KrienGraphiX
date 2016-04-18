@@ -7,7 +7,7 @@
 namespace kgx
 {
 	Camera::Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up )
-		: Camera( parentScene, DirectX::XM_PIDIV4, 1.0f, 0.001f, 500.0f, eye, m_target, up )
+		: Camera( parentScene, DirectX::XM_PIDIV4, 1.0f, 0.001f, 5000.0f, eye, m_target, up )
 	{
 	}
 
