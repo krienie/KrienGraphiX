@@ -47,7 +47,7 @@ namespace kgx
 		depthBuffDesc.Height             = depthBuffHeight;
 		depthBuffDesc.MipLevels          = 1;
 		depthBuffDesc.ArraySize          = 1;
-		depthBuffDesc.Format             = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthBuffDesc.Format             = DXGI_FORMAT_D32_FLOAT; //DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthBuffDesc.Usage              = D3D11_USAGE_DEFAULT;
 		depthBuffDesc.BindFlags          = D3D11_BIND_DEPTH_STENCIL;
 		depthBuffDesc.CPUAccessFlags     = 0;

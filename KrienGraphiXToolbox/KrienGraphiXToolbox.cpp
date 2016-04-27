@@ -83,7 +83,7 @@ namespace kgt
 		if ( !m_mainCam )
 			return;
 
-		float speed = static_cast<float>(150.0 * deltaTime);
+		float speed = static_cast<float>(15.0 * deltaTime);
 		
 		if ( m_wKeyDown )
 			m_mainCam->moveForward( speed );
