@@ -13,7 +13,6 @@
 #include "../Camera.h"
 #include "../Scene.h"
 #include "../RenderableObject.h"
-#include "../IOManager.h"
 #include "../parsers/KGObjectParser.h"
 #include "KGObjectGenerator.h"
 #include "KGSceneGenerator.h"

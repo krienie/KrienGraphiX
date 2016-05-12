@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "IOManager.h"
+#include "Filesystem.h"
 #include "ConfigManager.h"
 
 namespace bpt = boost::property_tree;
@@ -28,7 +28,7 @@ namespace kgx
 	ConfigManager::ConfigManager()
 		: m_iniTree(), m_iniFilePath()
 	{
-		m_iniFilePath = IOManager::getInst()->getAbsolutePath( INI_FILENAME );
+		m_iniFilePath = filesystem::getAbsolutePath( INI_FILENAME );
 		if ( m_iniFilePath.size() > 0 )
 			bpt::ini_parser::read_ini( m_iniFilePath, m_iniTree );
 	}

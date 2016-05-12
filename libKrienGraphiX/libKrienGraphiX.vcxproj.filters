@@ -87,9 +87,6 @@
     <ClInclude Include="parsers\KGSceneParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
-    <ClInclude Include="IOManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -106,6 +103,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Filesystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -164,9 +164,6 @@
     <ClCompile Include="parsers\KGSceneParser.cpp">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="IOManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,6 +177,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Filesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

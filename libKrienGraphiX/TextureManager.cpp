@@ -4,7 +4,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "IOManager.h"
+#include "Filesystem.h"
 #include "Texture.h"
 #include "TextureManager.h"
 
@@ -85,8 +85,8 @@ namespace kgx
 	{
 		// check if file exists, if not: abort
 		std::string absTexFile = filename;
-		if ( !boost::filesystem::path( filename ).is_absolute() )
-			absTexFile = IOManager::getInst()->getAbsolutePath( filename );
+		if ( !boost::filesystem::path(filename).is_absolute() )
+			absTexFile = filesystem::getAbsolutePath(filename);
 		if ( absTexFile.size() == 0 )
 		{
 			std::cout << "Error (TextureManager::loadTexture): Texture source file not specified." << std::endl;

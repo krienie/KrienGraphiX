@@ -46,7 +46,7 @@ namespace kgx
 
 				if ( m_iniFilePath.size() == 0 )
 				{
-					m_iniFilePath = IOManager::getInst()->getCurrentProgramPath();
+					m_iniFilePath = filesystem::getCurrentProgramPath();
 
 					// write ini file
 					std::stringstream fileSS;

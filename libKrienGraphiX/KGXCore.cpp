@@ -6,7 +6,7 @@
 
 #include "RenderWindow.h"
 #include "ConfigManager.h"
-#include "IOManager.h"
+#include "Filesystem.h"
 #include "ResourceManager.h"
 #include "TextureManager.h"
 #include "TextureLoader.h"
@@ -114,7 +114,6 @@ namespace kgx
 
 		// destroy managers
 		ConfigManager::destroy();
-		IOManager::destroy();
 		ResourceManager::destroy();
 		TextureManager::destroy();
 		TextureLoader::closeThread();
@@ -168,7 +167,7 @@ namespace kgx
 
 	void KGXCore::clearManagers()
 	{
-		IOManager::getInst()->clearSearchPaths();
+		filesystem::clearSearchPaths();
 		ResourceManager::getInst()->clearResources();
 		TextureManager::getInst()->clearTextureResources();
 	}

@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 
 #include "../Camera.h"
-#include "../IOManager.h"
+#include "../Filesystem.h"
 #include "../ResourceManager.h"
 #include "../RenderableObject.h"
 #include "../RenderCore.h"
@@ -62,7 +62,9 @@ namespace kgx
 	{
 		std::string absSceneFile = kgsceneFile;
 		if ( !boost::filesystem::path(kgsceneFile).is_absolute() )
-			absSceneFile = IOManager::getInst()->getAbsolutePath( kgsceneFile );
+		{
+			absSceneFile = filesystem::getAbsolutePath(kgsceneFile);
+		}
 		if ( absSceneFile.size() == 0 )
 		{
 			std::cout << "Error (KGSceneParser::loadKGScene): Scene source file not specified." << std::endl;
@@ -432,28 +434,28 @@ namespace kgx
 		{
 			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
 
-			// shaders should always be present under IOManager's search paths. No extra check is done if it isn't.
-			std::string shaderPath = IOManager::getInst()->getAbsolutePath( matIt->second.vertexShader.filename );
+			// shaders should always be present under filesystem's search paths. No extra check is done if it isn't.
+			std::string shaderPath = filesystem::getAbsolutePath( matIt->second.vertexShader.filename );
 			VertexShader *vertShader = shaderProgram->createVertexShader( shaderPath, vertLayout );
 			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
 			// add vertex shader textures
 			std::vector<std::string>::iterator it;
 			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
 			{
-				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath( *it ) );
+				Texture *tex = TextureManager::getInst()->loadTexture( filesystem::getAbsolutePath( *it ) );
 				if ( tex )
 					vertShader->addTexture( tex );
 			}
 
 			//TODO: add support for other shader types
 
-			shaderPath = IOManager::getInst()->getAbsolutePath( matIt->second.pixelShader.filename );
+			shaderPath = filesystem::getAbsolutePath( matIt->second.pixelShader.filename );
 			PixelShader *pixShader = shaderProgram->createPixelShader( shaderPath );
 			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
 			// add pixel shader textures
 			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
 			{
-				Texture *tex = TextureManager::getInst()->loadTexture( IOManager::getInst()->getAbsolutePath( *it ) );
+				Texture *tex = TextureManager::getInst()->loadTexture( filesystem::getAbsolutePath( *it ) );
 				if ( tex )
 					pixShader->addTexture( tex );
 			}

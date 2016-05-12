@@ -10,7 +10,7 @@
 
 #include <KGXCore.h>
 #include <KGObjectParser.h>
-#include <IOManager.h>
+#include <Filesystem.h>
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
@@ -56,8 +56,8 @@ namespace kgt
 		if ( m_projectDir.size() == 0 )
 			setProjectFolder();
 
-		// add project work directory to IOManager
-		kgx::IOManager::getInst()->addSearchPath( m_projectDir );
+		// add project work directory to KGX filesystem
+		kgx::filesystem::addSearchPath( m_projectDir );
 
 		m_ui.renderWidget1->startRendering();
 
@@ -215,8 +215,8 @@ namespace kgt
 			delete m_currentScene;
 		kgx::KGXCore::getInst()->clearManagers();
 
-		// add project work directory to IOManager
-		kgx::IOManager::getInst()->addSearchPath( m_projectDir );
+		// add project work directory to KGX filesystem
+		kgx::filesystem::addSearchPath( m_projectDir );
 
 
 		// parse and load scene file
@@ -248,9 +248,9 @@ namespace kgt
 			return;
 		}
 
-		// remove existing project directory from IOManager, if present
+		// remove existing project directory from KGX filesystem, if present
 		if ( m_projectDir.size() > 0 )
-			kgx::IOManager::getInst()->removeSearchPath( m_projectDir );
+			kgx::filesystem::removeSearchPath(m_projectDir);
 
 		// save project directory in KG configuration file
 		kgx::ConfigManager::getInst()->setProperty( "projectFolder", selectedDir );

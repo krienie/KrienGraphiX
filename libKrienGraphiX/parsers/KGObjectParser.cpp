@@ -15,7 +15,7 @@
 #include "../KGXCore.h"
 #include "../RenderableObject.h"
 #include "../VertexInputLayout.h"
-#include "../IOManager.h"
+#include "../Filesystem.h"
 #include "../ResourceManager.h"
 #include "../Texture.h"
 #include "../TextureManager.h"
@@ -58,8 +58,8 @@ namespace kgx
 	RenderableObject* KGObjectParser::loadKGO( const std::string &kgoFile )
 	{
 		std::string absKGOFile = kgoFile;
-		if ( !boost::filesystem::path( kgoFile ).is_absolute() )
-			absKGOFile = IOManager::getInst()->getAbsolutePath( kgoFile );
+		if ( !boost::filesystem::path(kgoFile).is_absolute() )
+			absKGOFile = filesystem::getAbsolutePath(kgoFile);
 		if ( absKGOFile.size() == 0 )
 		{
 			std::cout << "Error (KGObjectParser::loadKGO): Model source file not specified." << std::endl;
