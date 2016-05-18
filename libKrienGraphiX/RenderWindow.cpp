@@ -18,14 +18,14 @@ namespace kgx
 
 	RenderWindow::~RenderWindow()
 	{
-		if ( m_renderTargetView )
-			m_renderTargetView->Release();
-
 		if ( m_swapChain )
 		{
 			m_swapChain->SetFullscreenState( FALSE, nullptr );
 			m_swapChain->Release();
 		}
+
+		if ( m_renderTargetView )
+			m_renderTargetView->Release();
 
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
