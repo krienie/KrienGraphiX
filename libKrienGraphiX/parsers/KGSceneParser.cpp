@@ -60,29 +60,11 @@ namespace kgx
 {
 	Scene* KGSceneParser::loadKGScene( const std::string &kgsceneFile, RenderWindow *renderWin )
 	{
-		std::string absSceneFile = kgsceneFile;
-		if ( !boost::filesystem::path(kgsceneFile).is_absolute() )
+		std::string kgSceneData;
+		if ( !filesystem::openFile(kgsceneFile, kgSceneData) )
 		{
-			absSceneFile = filesystem::getAbsolutePath(kgsceneFile);
-		}
-		if ( absSceneFile.size() == 0 )
-		{
-			std::cout << "Error (KGSceneParser::loadKGScene): Scene source file not specified." << std::endl;
+			std::cout << "(KGSceneParser::loadKGScene): Error loading kgscene file." << std::endl;
 			return nullptr;
-		}
-
-		if ( !boost::filesystem::exists( absSceneFile ) )
-		{
-			std::cout << "Error (KGSceneParser::loadKGScene): Scene source file does not exist." << std::endl;
-			return nullptr;
-		}
-
-		std::stringstream ssKgs;
-		std::filebuf fb;
-		if ( fb.open( absSceneFile, std::ios::in ) )
-		{
-			ssKgs << &fb;
-			fb.close();
 		}
 
 
@@ -128,14 +110,13 @@ namespace kgx
 
 		Skipper skipper = iso8859::space | kgsGrammar.comment;
 
-		std::string input = ssKgs.str();
-		std::string::const_iterator f = input.cbegin();
-		bool res = qi::phrase_parse( f, input.cend(), kgsGrammar, skipper );
+		std::string::const_iterator f = kgSceneData.cbegin();
+		bool res = qi::phrase_parse( f, kgSceneData.cend(), kgsGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
-		if ( f != input.cend() )
+		if ( f != kgSceneData.cend() )
 		{
-			std::string::const_iterator end = std::distance( f, input.cend() ) > 100 ? f + 100 : input.cend();
+			std::string::const_iterator end = std::distance( f, kgSceneData.cend() ) > 100 ? f + 100 : kgSceneData.cend();
 			std::cout << std::endl << "KGScene parsing trail: " << std::string( f, end ) << std::endl;
 			return nullptr;
 		}

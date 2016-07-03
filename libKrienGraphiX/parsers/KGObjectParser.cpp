@@ -57,27 +57,11 @@ namespace kgx
 {
 	RenderableObject* KGObjectParser::loadKGO( const std::string &kgoFile )
 	{
-		std::string absKGOFile = kgoFile;
-		if ( !boost::filesystem::path(kgoFile).is_absolute() )
-			absKGOFile = filesystem::getAbsolutePath(kgoFile);
-		if ( absKGOFile.size() == 0 )
+		std::string kgObjectData;
+		if ( !filesystem::openFile(kgoFile, kgObjectData) )
 		{
-			std::cout << "Error (KGObjectParser::loadKGO): Model source file not specified." << std::endl;
-			return nullptr;
-		}
-
-		if ( !boost::filesystem::exists( absKGOFile ) )
-		{
-			std::cout << "Error (KGObjectParser::loadKGO): Model source file does not exist." << std::endl;
-			return nullptr;
-		}
-
-		std::stringstream ssKgo;
-		std::filebuf fb;
-		if ( fb.open( absKGOFile, std::ios::in ) )
-		{
-			ssKgo << &fb;
-			fb.close();
+			std::cout << "(KGSceneParser::loadKGO): Error loading kgobject file." << std::endl;
+			return;
 		}
 
 		std::vector<float> vertices;
@@ -139,16 +123,16 @@ namespace kgx
 
 		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
-		std::string input             = ssKgo.str();
-		std::string::const_iterator f = input.cbegin();
-		bool res = qi::phrase_parse( f, input.cend(), kgmGrammar, skipper );
+		std::string::const_iterator f = kgObjectData.cbegin();
+		bool res = qi::phrase_parse( f, kgObjectData.cend(), kgmGrammar, skipper );
+		//TODO: handle res == false
 
 		// print everything that hasn't been processed by the parser
-		if ( f != input.cend() )
+		if ( f != kgObjectData.cend() )
 		{
-			std::string::const_iterator end = std::distance( f, input.cend() ) > 100 ? f + 100 : input.cend();
+			std::string::const_iterator end = std::distance( f, kgObjectData.cend() ) > 100 ? f + 100 : kgObjectData.cend();
 			std::cout << std::endl << "KGO parsing trail: " << std::string( f, end ) << std::endl;
-			return nullptr;
+			return;
 		}
 
 

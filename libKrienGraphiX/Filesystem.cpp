@@ -15,7 +15,6 @@ namespace
 
 namespace kgx { namespace filesystem
 {
-
 	std::string getCurrentProgramPath()
 	{
 		char result[MAX_PATH];
@@ -58,7 +57,7 @@ namespace kgx { namespace filesystem
 
 	bool removeSearchPath( const std::string &pathToRemove )
 	{
-		return 1 == searchPaths.erase( pathToRemove );
+		return searchPaths.erase(pathToRemove) == 1;
 	}
 
 	void clearSearchPaths()
@@ -66,6 +65,29 @@ namespace kgx { namespace filesystem
 		searchPaths.clear();
 	}
 
+
+	bool openFile( const std::string &file, std::string &contents )
+	{
+		std::string absFile = file;
+		if ( !boost::filesystem::path(file).is_absolute() )
+			absFile = filesystem::getAbsolutePath(file);
+		if ( absFile.size() == 0 || !boost::filesystem::exists( absFile ) )
+		{
+			std::cout << "Error (Filesystem::openFile): Source file not found." << std::endl;
+			return false;
+		}
+
+		std::stringstream ssFile;
+		std::filebuf fb;
+		if ( fb.open( absFile, std::ios::in ) )
+		{
+			ssFile << &fb;
+			fb.close();
+		}
+
+		contents = ssFile.str();
+		return true;
+	}
 
 	bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents )
 	{
