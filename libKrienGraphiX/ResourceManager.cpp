@@ -2,8 +2,13 @@
 #include <comdef.h>
 #include <iostream>
 
+#include "Filesystem.h"
 #include "ShaderProgram.h"
 #include "ResourceManager.h"
+#include "TextureManager.h"
+#include "VertexInputLayout.h"
+
+#include "parsers\KGMaterialLibraryParser.h"
 
 namespace kgx
 {
@@ -31,7 +36,8 @@ namespace kgx
 
 
 	ResourceManager::ResourceManager( ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_nextShaderProgramID(1), m_shaderPrograms()
+		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(),
+			m_materials(), m_nextShaderProgramID(0u), m_defaultShaderProgram(-1), m_shaderPrograms()
 	{
 	}
 
@@ -41,7 +47,7 @@ namespace kgx
 	}
 
 
-	MeshBuffer ResourceManager::getBuffer( MeshBufferID id ) const
+	MeshBuffer ResourceManager::getMeshBuffer( MeshBufferID id ) const
 	{
 		std::map<MeshBufferID, MeshBuffer>::const_iterator it;
 		it = m_meshBuffers.find(id);
@@ -53,7 +59,7 @@ namespace kgx
 		return MeshBuffer();
 	}
 
-	ResourceManager::MeshBufferID ResourceManager::addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
+	MeshBufferID ResourceManager::addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
 																	const VertexInputLayout &inputDescriptor, HRESULT &result )
 	{
 		if ( vertices.size() <= 0 || indices.size() <= 0 )
@@ -110,16 +116,16 @@ namespace kgx
 
 		// add buffers to buffers list
 		MeshBuffer mBuff;
-		mBuff.vertBuff        = vertBuff;
-		mBuff.indexBuff       = indexBuff;
-		mBuff.inputDescriptor = inputDescriptor;
+		mBuff.vertBuff           = vertBuff;
+		mBuff.indexBuff          = indexBuff;
+		mBuff.vertexBufferStride = inputDescriptor.getBufferStride();
 
 		m_meshBuffers.insert( std::pair<MeshBufferID, MeshBuffer>(m_nextBufferID, mBuff) );
 		++m_nextBufferID;
 
 		result = S_OK;
 
-		return m_nextBufferID - 1;
+		return m_nextBufferID - 1u;
 	}
 
 	void ResourceManager::releaseBuffer( MeshBufferID id )
@@ -136,6 +142,27 @@ namespace kgx
 
 			m_meshBuffers.erase(id);
 		}
+	}
+
+
+	Material ResourceManager::getMaterial( const std::string &matName )
+	{
+		if ( loadMaterials() )
+		{
+			std::map<std::string, Material>::const_iterator it;
+			it = m_materials.find( matName );
+
+			if ( it != m_materials.cend() )
+				return it->second;
+		}
+
+		return Material();
+	}
+
+	ShaderProgram::ShaderProgramID ResourceManager::getDefaultShaderProgram()
+	{
+		loadDefaultShaderProgram();
+		return m_defaultShaderProgram;
 	}
 
 
@@ -156,7 +183,7 @@ namespace kgx
 		ShaderProgram *newProg = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
 
 		m_shaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newProg ) );
-		m_nextShaderProgramID++;
+		++m_nextShaderProgramID;
 
 		return newProg;
 	}
@@ -189,5 +216,61 @@ namespace kgx
 		for ( mIt = m_shaderPrograms.begin(); mIt != m_shaderPrograms.end(); ++mIt )
 			delete mIt->second;
 		m_shaderPrograms.clear();
+	}
+
+	bool ResourceManager::loadMaterials()
+	{
+		if ( !m_materials.empty() )
+			return true;
+
+		std::string matLibraryString;
+		if ( filesystem::openFile( "MaterialLibrary.kgmat", matLibraryString ) )
+		{
+			std::map<std::string, KgMatData> materials;
+			KGMaterialLibraryParser::parse( matLibraryString, materials );
+
+			std::map<std::string, KgMatData>::const_iterator it;
+			for ( it = materials.cbegin(); it != materials.cend(); ++it )
+			{
+				Material mat;
+				mat.diffuse  = it->second.diffuse;
+				mat.specular = it->second.specular;
+
+				if ( it->second.diffuseMap.size() > 0 )
+					mat.diffuseMap = TextureManager::getInst()->loadTexture( it->second.diffuseMap );
+				else mat.diffuseMap = -1;
+
+				if ( it->second.specularMap.size() > 0 )
+					mat.specularMap = TextureManager::getInst()->loadTexture( it->second.specularMap );
+				else mat.specularMap = -1;
+
+				if ( it->second.normalMap.size() > 0 )
+					mat.normalMap = TextureManager::getInst()->loadTexture( it->second.normalMap );
+				else mat.normalMap = -1;
+
+				m_materials.insert( std::pair<std::string, Material>(it->first, mat) );
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	void ResourceManager::loadDefaultShaderProgram()
+	{
+		if ( m_defaultShaderProgram >= 0 )
+			return;
+
+		ShaderProgram *prog = createShaderProgram();
+		m_defaultShaderProgram = prog->getID();
+
+		VertexInputLayout vertInputLayout;
+		vertInputLayout.addInputType( VertexInputLayout::Position );
+		vertInputLayout.addInputType( VertexInputLayout::TextureCoordinate );
+		vertInputLayout.addInputType( VertexInputLayout::Normal );
+		prog->createVertexShader( "DefaultVS.cso", vertInputLayout );
+
+		prog->createPixelShader( "DefaultPS.cso" );
 	}
 }

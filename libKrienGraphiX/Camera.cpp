@@ -13,7 +13,7 @@ namespace kgx
 
 	Camera::Camera( Scene *parentScene, float fovY, float aspect, float m_nearZ, float m_farZ,
 						const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
-		: Object(""), m_parentScene(parentScene), m_projMatrix(), m_viewMatrix(), m_position(eye), m_target(target_), m_camUp(up),
+		: m_parentScene(parentScene), m_projMatrix(), m_viewMatrix(), m_position(eye), m_target(target_), m_camUp(up),
 			m_fov(fovY), m_aspectRatio(aspect), m_nearZ(m_nearZ), m_farZ(m_farZ)
 	{
 		// create perspective matrix
@@ -39,7 +39,7 @@ namespace kgx
 
 
 	Camera::Camera( const Camera &other )
-		: Object(""), m_parentScene(other.m_parentScene), m_projMatrix(other.m_projMatrix), m_viewMatrix(other.m_viewMatrix), m_position(other.m_position),
+		: m_parentScene(other.m_parentScene), m_projMatrix(other.m_projMatrix), m_viewMatrix(other.m_viewMatrix), m_position(other.m_position),
 		m_target(other.m_target), m_camUp(other.m_camUp), m_fov(other.m_fov), m_aspectRatio(other.m_aspectRatio), m_nearZ(other.m_nearZ), m_farZ(other.m_farZ)
 	{
 	}
@@ -117,10 +117,10 @@ namespace kgx
 	/**
 	 * Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline
 	 */
-	void Camera::renderCurrentView( ShaderProgram *shaderProg )
+	void Camera::renderCurrentView( ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
 		if ( m_parentScene )
-			m_parentScene->render(this, shaderProg);
+			m_parentScene->render(this, rtv, dsv);
 	}
 
 

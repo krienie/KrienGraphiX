@@ -1,16 +1,15 @@
 
 #pragma once
 
+#include <d3d11.h>
 #include <DirectXMath.h>
-
-#include "Object.h"
 
 namespace kgx
 {
 	class Scene;
 	class ShaderProgram;
 
-	class Camera : public Object
+	class Camera
 	{
 		public:
 			Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
@@ -34,7 +33,7 @@ namespace kgx
 			float getFarZ() const;
 
 			/** Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline */
-			void renderCurrentView( ShaderProgram *shaderProg );
+			void renderCurrentView( ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
 
 			void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			void moveForward( float dist );

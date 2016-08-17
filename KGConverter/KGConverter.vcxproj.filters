@@ -24,12 +24,24 @@
     <ClCompile Include="..\libKrienGraphiX\generators\KGObjectGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OBJParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\libKrienGraphiX\generators\KGObjectGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

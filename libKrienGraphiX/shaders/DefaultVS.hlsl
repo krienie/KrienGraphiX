@@ -1,8 +1,8 @@
 
 cbuffer PerCameraData : register(b0)
 {
-	matrix<float, 4, 4> viewMatrix;
-	matrix<float, 4, 4> projMatrix;
+	matrix<float, 4, 4> kgx_viewMatrix;
+	matrix<float, 4, 4> kgx_projMatrix;
 	//float3 cameraPos;
 };
 
@@ -27,8 +27,8 @@ struct PixelInput
 PixelInput main( float4 pos : POSITION, float3 tex : TEXCOORD, float3 norm : NORMAL )
 {
 	float4 newPos = mul( kgx_modelMatrix, pos );
-	newPos = mul( viewMatrix, newPos );
-	newPos = mul( projMatrix, newPos );
+	newPos = mul( kgx_viewMatrix, newPos );
+	newPos = mul( kgx_projMatrix, newPos );
 
 	PixelInput output;
 	output.position = newPos;

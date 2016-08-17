@@ -17,7 +17,6 @@
 #include <ConfigManager.h>
 #include <TextureManager.h>
 #include <parsers/KGSceneParser.h>
-#include <generators/KGSceneGenerator.h>
 
 #include "KrienGraphiXToolbox.h"
 

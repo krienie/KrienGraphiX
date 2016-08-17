@@ -65,17 +65,25 @@ namespace kgx { namespace filesystem
 		searchPaths.clear();
 	}
 
-
-	bool openFile( const std::string &file, std::string &contents )
+	std::string getFile( const std::string &filename )
 	{
-		std::string absFile = file;
-		if ( !boost::filesystem::path(file).is_absolute() )
-			absFile = filesystem::getAbsolutePath(file);
+		std::string absFile = filename;
+		if ( !boost::filesystem::path(filename).is_absolute() )
+			absFile = filesystem::getAbsolutePath(filename);
 		if ( absFile.size() == 0 || !boost::filesystem::exists( absFile ) )
 		{
 			std::cout << "Error (Filesystem::openFile): Source file not found." << std::endl;
-			return false;
+			return std::string();
 		}
+
+		return absFile;
+	}
+
+	bool openFile( const std::string &file, std::string &contents )
+	{
+		std::string absFile = getFile( file );
+		if ( absFile.empty() )
+			return false;
 
 		std::stringstream ssFile;
 		std::filebuf fb;

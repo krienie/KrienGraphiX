@@ -34,7 +34,7 @@ namespace kgx
 
 
 	TextureManager::TextureManager( ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_textures(), m_defaultSamp(nullptr)
+		: m_dxDev(dxDevice), m_nextTextureID(1u), m_textures(), m_defaultSamp(nullptr)
 	{
 	}
 
@@ -81,7 +81,7 @@ namespace kgx
 	}
 
 
-	Texture* TextureManager::loadTexture( const std::string &filename )
+	Texture::TextureID TextureManager::loadTexture( const std::string &filename )
 	{
 		// check if file exists, if not: abort
 		std::string absTexFile = filename;
@@ -90,41 +90,44 @@ namespace kgx
 		if ( absTexFile.size() == 0 )
 		{
 			std::cout << "Error (TextureManager::loadTexture): Texture source file not specified." << std::endl;
-			return nullptr;
+			return 0;
 		}
 
 		if ( !boost::filesystem::exists( absTexFile ) )
 		{
 			std::cout << "Error (TextureManager::loadTexture): Texture source file does not exist." << std::endl;
-			return nullptr;
+			return 0;
 		}
 
-		Texture *tex = getTexture( filename );
-		if ( tex )
-			return tex;
+		// check if the requested texture is already loaded
+		std::map<Texture::TextureID, Texture*>::const_iterator it;
+		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
+			if ( it->second->getFileName() == filename )
+				return it->first;
 
-		tex = new Texture( absTexFile, m_dxDev );
-		m_textures.insert( std::pair<std::string, Texture*>(filename, tex) );
+		Texture *tex = new Texture( absTexFile, m_nextTextureID, m_dxDev );
+		m_textures.insert( std::pair<Texture::TextureID, Texture*>(m_nextTextureID, tex) );
+		++m_nextTextureID;
 
-		return tex;
+		return m_nextTextureID - 1u;
 	}
 
-	Texture* TextureManager::getTexture( const std::string &filename ) const
+	Texture* TextureManager::getTexture( Texture::TextureID id ) const
 	{
-		std::map<std::string, Texture*>::const_iterator it = m_textures.find( filename );
+		std::map<Texture::TextureID, Texture*>::const_iterator it = m_textures.find( id );
 		if ( it != m_textures.cend() )
 			return it->second;
 
 		return nullptr;
 	}
 
-	void TextureManager::releaseTexture( const std::string &filename )
+	void TextureManager::releaseTexture( Texture::TextureID id )
 	{
-		m_textures.erase( filename );
+		m_textures.erase( id );
 	}
 	void TextureManager::releaseTexture( Texture* tex )
 	{
-		std::map<std::string, Texture*>::const_iterator it;
+		std::map<Texture::TextureID, Texture*>::const_iterator it;
 
 		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
 		{
@@ -145,7 +148,7 @@ namespace kgx
 			m_defaultSamp = nullptr;
 		}
 
-		std::map<std::string, Texture*>::iterator it;
+		std::map<Texture::TextureID, Texture*>::iterator it;
 		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
 			delete it->second;
 		m_textures.clear();

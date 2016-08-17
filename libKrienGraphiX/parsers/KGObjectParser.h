@@ -7,12 +7,12 @@
 
 namespace kgx
 {
-	class RenderableObject;
+	class Scene;
 
 	class KGObjectParser
 	{
 		public:
-			static RenderableObject* loadKGO( const std::string &kgoFile );
+			static void loadKGO( const std::string &kgoFile, Scene *scene );
 
 		private:
 			KGObjectParser();
@@ -22,9 +22,9 @@ namespace kgx
 			KGObjectParser( const KGObjectParser& );
 			KGObjectParser& operator=(const KGObjectParser&);
 
-			static RenderableObject* renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
-																	std::vector<VertexInputLayout::Type> &vertLayoutTypes,
-																	std::vector<KgModelData> &models,
-																	std::map<std::string, KgMatData> &materials );
+			static bool addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
+												std::vector<VertexInputLayout::Type> &vertLayoutTypes,
+												std::vector<KgModelData> &models,
+												Scene *scene );
 	};
 }

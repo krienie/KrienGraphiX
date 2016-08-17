@@ -74,12 +74,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.cpp" />
     <ClCompile Include="..\libKrienGraphiX\generators\KGObjectGenerator.cpp" />
+    <ClCompile Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OBJParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.h" />
     <ClInclude Include="..\libKrienGraphiX\generators\KGObjectGenerator.h" />
+    <ClInclude Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.h" />
     <ClInclude Include="OBJParser.h" />
   </ItemGroup>
   <ItemGroup>

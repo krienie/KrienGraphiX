@@ -5,9 +5,9 @@
 
 namespace kgx
 {
-	ConstantBuffer::ConstantBuffer( ID3D11Device *m_dxDevice )
-		: m_dxDev(m_dxDevice), m_dxDevCont(nullptr), m_dxBuffer(nullptr),
-			m_bufferElementSize(0U), m_dataChanged(false), m_variables(), m_rawData(nullptr)
+	ConstantBuffer::ConstantBuffer( ID3D11Device *m_dxDevice, UINT registerIndex, std::string name )
+		: m_dxDev(m_dxDevice), m_dxDevCont(nullptr), m_dxBuffer(nullptr), m_bufferSize(0U),
+			m_registerIndex(registerIndex), m_bufferName(name), m_dataChanged(false), m_variables(), m_rawData(nullptr)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -16,7 +16,7 @@ namespace kgx
 
 	ConstantBuffer::ConstantBuffer( const ConstantBuffer &other )
 		: m_dxDev(other.m_dxDev), m_dxDevCont(other.m_dxDevCont), m_dxBuffer(other.m_dxBuffer),
-		m_bufferElementSize(other.m_bufferElementSize), m_dataChanged(other.m_dataChanged),
+		m_bufferSize(other.m_bufferSize), m_dataChanged(other.m_dataChanged),
 		m_variables(other.m_variables)
 	{
 		if ( m_dxBuffer )
@@ -25,8 +25,8 @@ namespace kgx
 			m_dxDevCont->AddRef();		// same for the device context
 		if ( other.m_rawData )
 		{
-			m_rawData = new UCHAR[m_bufferElementSize];
-			memcpy( m_rawData, other.m_rawData, sizeof(UCHAR) * m_bufferElementSize );
+			m_rawData = new UCHAR[m_bufferSize];
+			memcpy( m_rawData, other.m_rawData, sizeof(UCHAR) * m_bufferSize );
 		}
 	}
 
@@ -44,12 +44,12 @@ namespace kgx
 	{
 		if ( this != &rhs )
 		{
-			m_dxDev             = rhs.m_dxDev;
-			m_dxDevCont         = rhs.m_dxDevCont;
-			m_dxBuffer          = rhs.m_dxBuffer;
-			m_bufferElementSize = rhs.m_bufferElementSize;
-			m_dataChanged       = rhs.m_dataChanged;
-			m_variables         = rhs.m_variables;
+			m_dxDev       = rhs.m_dxDev;
+			m_dxDevCont   = rhs.m_dxDevCont;
+			m_dxBuffer    = rhs.m_dxBuffer;
+			m_bufferSize  = rhs.m_bufferSize;
+			m_dataChanged = rhs.m_dataChanged;
+			m_variables   = rhs.m_variables;
 
 			if ( m_dxBuffer )
 				m_dxBuffer->AddRef();
@@ -57,14 +57,29 @@ namespace kgx
 				m_dxDevCont->AddRef();
 			if ( rhs.m_rawData )
 			{
-				m_rawData = new UCHAR[m_bufferElementSize];
-				memcpy( m_rawData, rhs.m_rawData, sizeof( UCHAR ) * m_bufferElementSize );
+				m_rawData = new UCHAR[m_bufferSize];
+				memcpy( m_rawData, rhs.m_rawData, sizeof( UCHAR ) * m_bufferSize );
 			}
 		}
 
 		return *this;
 	}
 
+
+	UINT ConstantBuffer::getRegisterIndex() const
+	{
+		return m_registerIndex;
+	}
+
+	std::string ConstantBuffer::getName() const
+	{
+		return m_bufferName;
+	}
+
+	UINT ConstantBuffer::getBufferSize() const
+	{
+		return m_bufferSize;
+	}
 
 	ID3D11Buffer* ConstantBuffer::getDxBufferPtr() const
 	{
@@ -86,8 +101,8 @@ namespace kgx
 			m_rawData = nullptr;
 		}
 
-		m_bufferElementSize = sizeInBytes;
-		m_rawData = new UCHAR[sizeInBytes];
+		m_bufferSize = sizeInBytes;
+		m_rawData    = new UCHAR[sizeInBytes];
 		memset( m_rawData, 0, sizeInBytes );
 
 		// create buffer descriptor
@@ -113,6 +128,13 @@ namespace kgx
 		return res;
 	}
 
+	void ConstantBuffer::copyBufferData( void *data, UINT size )
+	{
+		D3D11_MAPPED_SUBRESOURCE mapRes;
+		m_dxDevCont->Map(m_dxBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapRes);
+		memcpy( mapRes.pData, data, min(size, m_bufferSize) );
+		m_dxDevCont->Unmap(m_dxBuffer, NULL);
+	}
 
 	void ConstantBuffer::commit()
 	{
@@ -122,7 +144,7 @@ namespace kgx
 		//TODO: create mechanism so that only the changed data is committed, not the whole buffer => maybe different update types: one that commits immediately, and one that does not...
 		D3D11_MAPPED_SUBRESOURCE mapRes;
 		m_dxDevCont->Map(m_dxBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapRes);
-		memcpy( mapRes.pData, m_rawData, m_bufferElementSize );
+		memcpy( mapRes.pData, m_rawData, m_bufferSize );
 		m_dxDevCont->Unmap(m_dxBuffer, NULL);
 
 		m_dataChanged = false;

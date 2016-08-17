@@ -14,11 +14,11 @@
 #include "KGParserDefines.h"
 #include "../KGXCore.h"
 #include "../RenderableObject.h"
+#include "../Scene.h"
 #include "../VertexInputLayout.h"
 #include "../Filesystem.h"
 #include "../ResourceManager.h"
 #include "../Texture.h"
-#include "../TextureManager.h"
 
 #include "KGObjectParser.h"
 
@@ -38,16 +38,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, matName)
 );
 
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgMatData,
-	(DirectX::XMFLOAT4, diffuse)
-	(DirectX::XMFLOAT4, specular)
-	(std::string, diffuseMap)
-	(std::string, specularMap)
-	(std::string, normalMap)
-);
-
-
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
 namespace iso8859 = boost::spirit::iso8859_1;
@@ -55,7 +45,7 @@ typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgx
 {
-	RenderableObject* KGObjectParser::loadKGO( const std::string &kgoFile )
+	void KGObjectParser::loadKGO( const std::string &kgoFile, Scene *scene )
 	{
 		std::string kgObjectData;
 		if ( !filesystem::openFile(kgoFile, kgObjectData) )
@@ -68,11 +58,10 @@ namespace kgx
 		std::vector<UINT> indices;
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 		std::vector<KgModelData> models;
-		std::map<std::string, KgMatData> materials;
 		struct KgoGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			KgoGrammar( std::vector<float> &v, std::vector<UINT> &i, std::vector<VertexInputLayout::Type> &l,
-						std::vector<KgModelData> &m, std::map<std::string, KgMatData> &mats )
+						std::vector<KgModelData> &m )
 				: KgoGrammar::base_type( start )
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];
@@ -92,34 +81,17 @@ namespace kgx
 					>> "Material" >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
 					>> qi::lit("}");
 
-				float4Property = qi::lit("(") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(",") >> qi::float_ >> qi::lit(")");
-				stringProperty = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
-				material = qi::lit("diffuse")     >> float4Property
-						>> qi::lit("specular")    >> float4Property
-						>> -(qi::lit("diffuseMap")  >> stringProperty)
-						>> -(qi::lit("specularMap") >> stringProperty)
-						>> -(qi::lit("normalMap")   >> stringProperty);
-				nameMatPair = qi::lit("Material") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
-					>> qi::lit("{") >> material >> qi::lit("}");
-
-				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]
-						   | nameMatPair[phx::insert( phx::ref(mats), qi::_1 )]);
+				start = *(vertices | indices | models[phx::push_back( phx::ref(m), qi::_1 )]);
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
 			qi::rule<std::string::const_iterator, Skipper> vertices, indices;
 			qi::rule<std::string::const_iterator, VertexInputLayout::Type(), Skipper> vertexInputLayout;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> vertexInputLayoutName;
-
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
-			qi::rule<std::string::const_iterator, DirectX::XMFLOAT4(), Skipper> float4Property;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> stringProperty;
-			qi::rule<std::string::const_iterator, KgMatData(), Skipper> material;
-			qi::rule<std::string::const_iterator, std::pair<std::string, KgMatData>(), Skipper> nameMatPair;
-
 			qi::rule<std::string::const_iterator> comment;
-		} kgmGrammar( vertices, indices, vertLayoutTypes, models, materials );
+		} kgmGrammar( vertices, indices, vertLayoutTypes, models );
 
 		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
@@ -136,77 +108,49 @@ namespace kgx
 		}
 
 
-		RenderableObject *ro = renderableObjectFromParseData( vertices, indices, vertLayoutTypes, models, materials );
-		if ( ro )
-			ro->setOriginalFilename( kgoFile );
+		res = addParsedDataToScene( vertices, indices, vertLayoutTypes, models, scene );
 
-		return ro;
+		//TODO: handle res == false
 	}
 
-	RenderableObject* KGObjectParser::renderableObjectFromParseData( std::vector<float> vertices, std::vector<UINT> &indices,
-															   std::vector<VertexInputLayout::Type> &vertLayoutTypes,
-															   std::vector<KgModelData> &models,
-															   std::map<std::string, KgMatData> &materials )
+	bool KGObjectParser::addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
+												std::vector<VertexInputLayout::Type> &vertLayoutTypes,
+												std::vector<KgModelData> &models,
+												Scene *scene )
 	{
 		HRESULT buffCreated = E_FAIL;
 		VertexInputLayout vertLayout( vertLayoutTypes );
-		ResourceManager::MeshBufferID buffID = ResourceManager::getInst()->addMeshBuffer( vertices, indices, vertLayout, buffCreated );
+		MeshBufferID meshBuffer = ResourceManager::getInst()->addMeshBuffer( vertices, indices, vertLayout, buffCreated );
 
 		if ( FAILED( buffCreated ) )
-			return nullptr;
+			return false;
 
-		// create map of materials to meshes to sort meshes per material
-		typedef std::pair< std::string, std::vector<RenderableObject::Mesh> > MaterialMeshesPair;
-		std::map< std::string, std::vector<RenderableObject::Mesh> > matName2Mesh;
-		std::vector<KgModelData>::iterator modelIt;
-		for ( modelIt = models.begin(); modelIt != models.end(); ++modelIt )
+
+		std::vector<KgModelData>::const_iterator it;
+		for ( it = models.cbegin(); it != models.cend(); ++it )
 		{
-			RenderableObject::Mesh mesh( modelIt->modelName, modelIt->startIndex, modelIt->indexCount );
+			RenderableObject ro;
+			ro.topology   = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			ro.meshBuffer = meshBuffer;
 
-			std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt = matName2Mesh.find( modelIt->matName );
-			if ( matMeshIt != matName2Mesh.end() )
-				matMeshIt->second.push_back( mesh );
-			else matName2Mesh.insert( MaterialMeshesPair( modelIt->matName, { mesh } ) );
+			ro.indexCount = it->indexCount;
+			ro.startIndex = it->startIndex;
+			ro.baseVertex = 0u;
+
+			ro.material      = ResourceManager::getInst()->getMaterial( it->matName );
+			ro.shaderProgram = ResourceManager::getInst()->getDefaultShaderProgram();
+
+			ro.xPos   = 0.0;
+			ro.yPos   = 0.0;
+			ro.zPos   = 0.0;
+			ro.xScale = 1.0;
+			ro.yScale = 1.0;
+			ro.zScale = 1.0;
+
+			scene->addRenderableObject( ro );
 		}
 
-		//TODO: maybe combine meshes?
-		// create object containers
-		std::vector<RenderableObject::MaterialMeshContainer> matMeshContainers;
-		std::map< std::string, std::vector<RenderableObject::Mesh> >::iterator matMeshIt;
-		for ( matMeshIt = matName2Mesh.begin(); matMeshIt != matName2Mesh.end(); ++matMeshIt )
-		{
-			// sort by mesh
-			std::sort( matMeshIt->second.begin(), matMeshIt->second.end() );
-
-			std::map<std::string, KgMatData>::iterator matIt = materials.find( matMeshIt->first );
-			if ( matIt != materials.end() )
-			{
-				std::vector<ID3D11ShaderResourceView*> textures;
-
-				// attempt to load textures
-				if ( !matIt->second.diffuseMap.empty() )
-				{
-					Texture *diffuseMap = TextureManager::getInst()->loadTexture(matIt->second.diffuseMap);
-					textures.push_back( diffuseMap->getResourceView() );
-				}
-				if ( !matIt->second.specularMap.empty() )
-				{
-					Texture *specularMap = TextureManager::getInst()->loadTexture(matIt->second.specularMap);
-					textures.push_back( specularMap->getResourceView() );
-				}
-				if ( !matIt->second.normalMap.empty() )
-				{
-					Texture *normalMap = TextureManager::getInst()->loadTexture(matIt->second.normalMap);
-					textures.push_back( normalMap->getResourceView() );
-				}
-
-				RenderableObject::Material mat( matIt->second.diffuse, matIt->second.specular, textures );
-				matMeshContainers.push_back( RenderableObject::MaterialMeshContainer(matMeshIt->second, mat) );
-			}
-		}
-
-		MeshBuffer meshBuff = ResourceManager::getInst()->getBuffer( buffID );
-		return new RenderableObject( KGXCore::getInst()->getDxDevicePtr(), meshBuff, matMeshContainers, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+		return true;
 	}
 }
 

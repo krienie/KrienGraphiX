@@ -21,44 +21,12 @@ namespace kgx
 		std::string matName;
 	};
 
-
-	struct KgShaderProgramData
-	{
-		struct ShaderVar
-		{
-			ShaderVar() : name(), type(), defaultValue(), autoBindType(ShaderProgram::ShaderAutoBindType::NoAutoBind) {}
-
-			ShaderProgram::ShaderAutoBindType autoBindType;
-			std::string type;
-			std::string name;
-			std::string defaultValue;
-		};
-
-		struct ShaderDef
-		{
-			ShaderDef() : filename(), variables() {}
-
-			std::string filename;
-			std::vector<ShaderVar> variables;
-			std::vector<std::string> textures;
-		};
-
-		KgShaderProgramData() : name(), vertexShader(), pixelShader() {}
-
-		std::string name;
-		//TODO: add support for geometry, hull and domain shaders
-		ShaderDef vertexShader;
-		ShaderDef pixelShader;
-	};
-
 	struct KgMatData
 	{
-		KgMatData() : name(), diffuse(0.0f, 0.0f, 0.0f, 1.0f), specular(0.0f, 0.0f, 0.0f, 1.0f) {}
-
 		std::string       name;
 		DirectX::XMFLOAT4 diffuse;
-		DirectX::XMFLOAT4 specular;
 		std::string       diffuseMap;
+		DirectX::XMFLOAT4 specular;
 		std::string       specularMap;
 		std::string       normalMap;
 	};
@@ -74,4 +42,28 @@ namespace kgx
 		std::vector<KgModelData> models;
 		std::vector<KgMatData> mats;
 	};
+
+	// the streaming operator for VertexInputLayout::Type
+	inline std::ostream& operator<< (std::ostream& os, const VertexInputLayout::Type &type)
+	{
+		switch ( type )
+		{
+			case VertexInputLayout::Position:
+				os << "Position";
+				break;
+			case VertexInputLayout::TextureCoordinate:
+				os << "TextureCoordinate";
+				break;
+			case VertexInputLayout::Normal:
+				os << "Normal";
+				break;
+			case VertexInputLayout::Tangent:
+				os << "Tangent";
+				break;
+			default:
+				break;
+		}
+
+		return os;
+	}
 }

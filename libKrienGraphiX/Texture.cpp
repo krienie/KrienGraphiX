@@ -7,8 +7,8 @@
 
 namespace kgx
 {
-	Texture::Texture( const std::string &file, ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_buffer(nullptr), m_shaderView(nullptr),
+	Texture::Texture( const std::string &file, TextureID id, ID3D11Device *dxDevice )
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_textureID(id), m_buffer(nullptr), m_shaderView(nullptr),
 			m_filename(file)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -48,7 +48,12 @@ namespace kgx
 			m_dxDevCont->Release();
 	}
 
-	std::string Texture::getName() const
+	Texture::TextureID Texture::getID() const
+	{
+		return m_textureID;
+	}
+
+	std::string Texture::getFileName() const
 	{
 		return m_filename;
 	}

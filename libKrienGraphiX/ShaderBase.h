@@ -5,17 +5,17 @@
 #include <string>
 #include <vector>
 
-#include "Object.h"
-
 namespace kgx
 {
 	class ConstantBuffer;
 	class Texture;
 
-	class ShaderBase : public Object
+	class ShaderBase
 	{
 		public:
-			HRESULT loadFromFile( const std::wstring &filename );
+			ConstantBuffer* getConstantBufferPtrByIndex( UINT registerIndex ) const;
+
+			HRESULT loadFromFile( const std::string &filename );
 			HRESULT loadFromSource( const std::string &source, const std::string &entryPoint = "main" );
 
 			void updateConstantVariable( const std::string &name, const void *dataPtr );

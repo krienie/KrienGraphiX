@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include <iostream>
 
+#include "RenderBackend.h"
 #include "RenderWindow.h"
 #include "ConfigManager.h"
 #include "Filesystem.h"
@@ -100,8 +101,8 @@ namespace kgx
 		}
 		dxgiAdapter->Release();
 
-
-		// init ResourceManagers
+		// init RenderBackend and ResourceManagers
+		renderbackend::setDeviceContext(m_dxDev);
 		ResourceManager::construct(m_dxDev);
 		TextureManager::construct(m_dxDev);
 	}
@@ -113,6 +114,7 @@ namespace kgx
 			delete it->second;
 
 		// destroy managers
+		renderbackend::releaseDeviceContext();
 		ConfigManager::destroy();
 		ResourceManager::destroy();
 		TextureManager::destroy();
@@ -122,8 +124,16 @@ namespace kgx
 			m_dxgiFactory->Release();
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
+
+
+		//ID3D11Debug *d3dDebug = nullptr;
+		//m_dxDev->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
+
 		if ( m_dxDev )
 			m_dxDev->Release();
+
+		//d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+		//d3dDebug->Release();
 	}
 
 

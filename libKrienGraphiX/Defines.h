@@ -1,30 +1,42 @@
 
 #pragma once
 
+#include <vector>
 #include <d3d11.h>
 #include <DirectXMath.h>
 
-#include "VertexInputLayout.h"
+#include "Texture.h"
 
 namespace kgx
 {
 	/* Light information for passing to the shaders */
 	struct Light
 	{
-		Light( const DirectX::XMFLOAT3 &dir, float intens ) : direction( dir ), intensity( intens ) {}
-
 		//TODO: add colored light support
 		DirectX::XMFLOAT3 direction;
 		float intensity;
 	};
 
+	struct LightData
+	{
+		DirectX::XMFLOAT4 ambientLight;
+		std::vector<Light> lights;
+	};
+
+	struct Material
+	{
+		DirectX::XMFLOAT4 diffuse;
+		DirectX::XMFLOAT4 specular;
+		Texture::TextureID diffuseMap;
+		Texture::TextureID specularMap;
+		Texture::TextureID normalMap;
+	};
+
 	/* vertex- and index buffers */
+	typedef UINT MeshBufferID;
 	struct MeshBuffer
 	{
-		MeshBuffer()
-			: vertBuff(0), indexBuff(0), inputDescriptor() {}
-
+		UINT vertexBufferStride;
 		ID3D11Buffer *vertBuff, *indexBuff;
-		VertexInputLayout inputDescriptor;
 	};
 }

@@ -5,6 +5,10 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/filesystem.hpp>
 
+#include "Filesystem.h"
+
+#include "KGMaterialLibraryGenerator.h"
+#include "KGMaterialLibraryParser.h"
 #include "KGObjectGenerator.h"
 #include "OBJParser.h"
 
@@ -110,6 +114,18 @@ bool convertFile( const std::string &filename, const std::string &fileDir, const
 		return false;
 	std::cout << "Successfully parsed file " << filename << ".obj" << std::endl;
 
+	fs::path matLibPath = fs::path(outDir).append( "MaterialLibrary.kgmat" );
+	std::string kgmDataStr;
+	if ( !fs::exists(matLibPath) )
+	{
+		kgx::KGMaterialLibraryGenerator::generate( parserOutput.mats, kgmDataStr );
+	} else
+	{
+		kgx::filesystem::openFile( matLibPath.string(), kgmDataStr );
+		kgx::KGMaterialLibraryGenerator::append( parserOutput.mats, kgmDataStr );
+	}
+	kgx::filesystem::saveFile( outDir, "MaterialLibrary.kgmat", kgmDataStr );
+
 	std::string kgoDataStr;
 	kgx::KGObjectGenerator::generate( parserOutput, kgoDataStr );
 
@@ -133,14 +149,13 @@ bool convertFile( const std::string &filename, const std::string &fileDir, const
 void printHelp()
 {
 	std::stringstream ssHelp;
-	ssHelp << "USAGE:\n    kgconvert [/? | /relative] [/indir path] [/outdir path]\n\n"
-		<< "where\n    Options:\n        /?           Display this help message.\n"
+	ssHelp << "USAGE:\n    kgconvert [--?] [--indir path] [--outdir path]\n\n"
+		<< "where\n    Options:\n        --?           Display this help message.\n"
 		<< "        --indir       Specifies the input directory containing the files to be\n                     converted.\n"
 		<< "        --outdir      Specifies the output directory where the converted files\n                     are to be stored.\n\n"
 		<< "The default is to convert and store files in the current folder.\n\n"
 		<< "Examples\n    > kgconvert                                   ... Convert files in the\n                                                      current folder\n"
-		<< "    > kgconvert /relative /indir ..\\input         ... Convert files located in\n                                                      ..\\input\n"
-		<< "    > kgconvert /indir c:\\input /outdir c:\\output ... Convert files located in\n"
+		<< "    > kgconvert --indir c:\\input --outdir c:\\output ... Convert files located in\n"
 		<< "                                                      c:\\input and store them in                                                      c:\\output";
 
 	std::cout << ssHelp.str() << std::endl;

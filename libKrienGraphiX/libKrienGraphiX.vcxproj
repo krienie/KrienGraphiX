@@ -15,17 +15,19 @@
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="Defines.h" />
+    <ClInclude Include="generators\KGMaterialLibraryGenerator.h" />
     <ClInclude Include="generators\KGObjectGenerator.h" />
-    <ClInclude Include="generators\KGSceneGenerator.h" />
     <ClInclude Include="Filesystem.h" />
     <ClInclude Include="KGXCore.h" />
-    <ClInclude Include="Object.h" />
+    <ClInclude Include="parsers\KGMaterialLibraryParser.h" />
     <ClInclude Include="parsers\KGObjectParser.h" />
     <ClInclude Include="parsers\KGSceneParser.h" />
     <ClInclude Include="parsers\KGParserDefines.h" />
-    <ClInclude Include="RenderCore.h" />
+    <ClInclude Include="RenderBackend.h" />
+    <ClInclude Include="RenderBucket.h" />
+    <ClInclude Include="RenderCommandPacket.h" />
+    <ClInclude Include="RenderCommand.h" />
     <ClInclude Include="ShaderProgram.h" />
-    <ClInclude Include="MovableObject.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderableObject.h" />
     <ClInclude Include="RenderWindow.h" />
@@ -42,16 +44,18 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="generators\KGMaterialLibraryGenerator.cpp" />
     <ClCompile Include="generators\KGObjectGenerator.cpp" />
-    <ClCompile Include="generators\KGSceneGenerator.cpp" />
     <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="KGXCore.cpp" />
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="parsers\KGMaterialLibraryParser.cpp" />
     <ClCompile Include="parsers\KGObjectParser.cpp" />
     <ClCompile Include="parsers\KGSceneParser.cpp" />
-    <ClCompile Include="RenderCore.cpp" />
+    <ClCompile Include="RenderBackend.cpp" />
+    <ClCompile Include="RenderBucket.cpp" />
+    <ClCompile Include="RenderCommand.cpp" />
+    <ClCompile Include="RenderCommandPacket.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="MovableObject.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
@@ -65,23 +69,13 @@
     <ClCompile Include="VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\DefaultPixelShaderPS.hlsl">
+    <FxCompile Include="shaders\DefaultPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="shaders\DefaultTextureShaderPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="shaders\DefaultVertexShaderVS.hlsl">
+    <FxCompile Include="shaders\DefaultVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">

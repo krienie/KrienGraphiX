@@ -5,8 +5,6 @@
 #include <dxgi1_2.h>
 #include <vector>
 
-#include "RenderCore.h"
-
 namespace kgx
 {
 	class Camera;
@@ -19,8 +17,6 @@ namespace kgx
 			~RenderWindow();
 
 			bool create( HWND windowHandle );
-
-			RenderCore* getRenderCorePtr();
 
 			void setViewport( Camera *cam, float topLeftX = 0, float topLeftY = 0, float width = -1.0f, float height = -1.0f );
 			void setClearColor( float red, float green, float blue );
@@ -53,8 +49,8 @@ namespace kgx
 			IDXGIFactory2 *m_dxgiFactory;
 			IDXGISwapChain1 *m_swapChain;
 			ID3D11RenderTargetView *m_renderTargetView;
-
-			RenderCore m_renderCore;
+			ID3D11DepthStencilView *m_depthStencilView;
+			ID3D11RasterizerState *m_rasterizer;
 
 			Viewport m_curViewport;
 

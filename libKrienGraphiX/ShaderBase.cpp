@@ -8,6 +8,7 @@
 #include <d3dcompiler.h>
 
 #include "ConstantBuffer.h"
+#include "Filesystem.h"
 #include "Texture.h"
 #include "ShaderBase.h"
 
@@ -15,8 +16,8 @@
 namespace kgx
 {
 	ShaderBase::ShaderBase( ID3D11Device *dxDevice, const std::string &target )
-		: Object(""), m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers(), m_dxConstBuffers(),
-		m_textures(), m_texBuffers(), m_texViews(), m_target(target)
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers(), m_dxConstBuffers(),
+			m_textures(), m_texBuffers(), m_texViews(), m_target(target)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -33,21 +34,31 @@ namespace kgx
 	}
 
 
-	HRESULT ShaderBase::loadFromFile( const std::wstring &filename )
+	ConstantBuffer* ShaderBase::getConstantBufferPtrByIndex( UINT registerIndex ) const
 	{
+		// register indices are assumed to be ascending, starting from 0
+		return m_constBuffers[registerIndex];
+	}
+
+
+	HRESULT ShaderBase::loadFromFile( const std::string &filename )
+	{
+		std::string shaderFile = filesystem::getFile( filename );
+		std::wstring wShaderFile = std::wstring( shaderFile.begin(), shaderFile.end() );
+
 		//load shader file
 		ID3DBlob *shaderSource;
-		HRESULT res = D3DReadFileToBlob( filename.c_str(), &shaderSource );
+		HRESULT res = D3DReadFileToBlob( wShaderFile.c_str(), &shaderSource );
 		if ( FAILED(res) )
 		{
-			std::cout << "Error (ShaderBase::loadFromFile): Error loading shader source " << filename.c_str() << std::endl;
+			std::cout << "Error (ShaderBase::loadFromFile): Error loading shader source " << wShaderFile.c_str() << std::endl;
 			return res;
 		}
 
 		res = processLoadedShaderBlob( shaderSource );
 		if ( FAILED(res) )
 		{
-			std::cout << "Error (ShaderBase::loadFromFile): Error processing shader source " << filename.c_str() << std::endl;
+			std::cout << "Error (ShaderBase::loadFromFile): Error processing shader source " << wShaderFile.c_str() << std::endl;
 			shaderSource->Release();
 			return res;
 		}
@@ -129,7 +140,7 @@ namespace kgx
 		// update all buffers if necessary 
 		std::vector<ConstantBuffer*>::iterator it;
 		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-		(*it)->commit();
+			(*it)->commit();
 	}
 
 	HRESULT ShaderBase::processLoadedShaderBlob( ID3DBlob *shaderSource )
@@ -170,7 +181,8 @@ namespace kgx
 			D3D11_SHADER_BUFFER_DESC shaderBuffDesc;
 			constBuffReflection->GetDesc( &shaderBuffDesc );
 
-			ConstantBuffer *cBuff = new ConstantBuffer( m_dxDev );
+			//TODO: these can be put on the stack
+			ConstantBuffer *cBuff = new ConstantBuffer( m_dxDev, i, shaderBuffDesc.Name );
 			cBuff->create( shaderBuffDesc.Size );
 			for ( UINT j = 0U; j < shaderBuffDesc.Variables; ++j )
 			{

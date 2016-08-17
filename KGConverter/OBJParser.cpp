@@ -1,6 +1,9 @@
 
 #pragma warning( disable : 4244 )		// warning C4244: conversion from 'const double' to 'const float', possible loss of data. This is intentional.
 
+#define NOMINMAX
+
+#include <limits>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -325,12 +328,12 @@ namespace kgx
 				storeModelData( i->groupName, newModel, &sortedModels, &tempModels );
 			}
 
-			std::vector<long int>::const_iterator posIt = i->posIdx.cbegin();
-			std::vector<long int>::const_iterator texIt = i->texIdx.cbegin();
-			std::vector<long int>::const_iterator normIt = i->normIdx.cbegin();
+			std::vector<long>::const_iterator posIt = i->posIdx.cbegin();
+			std::vector<long>::const_iterator texIt = i->texIdx.cbegin();
+			std::vector<long>::const_iterator normIt = i->normIdx.cbegin();
 
 			UINT firstIdx = 0u;
-			VertexData firstVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );				//OBJ indices start at 1 and we need to start at 0, so idx - 1
+			VertexData firstVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) ); //OBJ indices start at 1 and we need to start at 0, so idx - 1
 			std::map<VertexData, UINT>::iterator vertIt;
 			vertIt = verts.find( firstVert );
 			if ( vertIt == verts.end() )
@@ -350,7 +353,7 @@ namespace kgx
 			{
 				// add triangle vertices to unique-vertex list
 				UINT endVertIdx = 0u;
-				VertexData endVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );
+				VertexData endVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) );
 				vertIt = verts.find( endVert );
 				if ( vertIt == verts.end() )
 				{
@@ -364,7 +367,7 @@ namespace kgx
 
 				UINT midVertIdx = 0u;
 				posIt++; normIt++; texIt++;
-				VertexData midVert( max(0, std::abs(*posIt) - 1), max(0, std::abs(*normIt) - 1), max(0, std::abs(*texIt) - 1) );
+				VertexData midVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) );
 				vertIt = verts.find( midVert );
 				if ( vertIt == verts.end() )
 				{

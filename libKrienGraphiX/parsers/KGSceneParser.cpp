@@ -13,7 +13,6 @@
 #include "../Filesystem.h"
 #include "../ResourceManager.h"
 #include "../RenderableObject.h"
-#include "../RenderCore.h"
 #include "../RenderWindow.h"
 #include "../Scene.h"
 #include "../Texture.h"
@@ -28,27 +27,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(float, x)
 	(float, y)
 	(float, z)
-);
-
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgShaderProgramData::ShaderVar,
-	(kgx::ShaderProgram::ShaderAutoBindType, autoBindType)
-	(std::string, type)
-	(std::string, name)
-	(std::string, defaultValue)
-);
-
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgShaderProgramData::ShaderDef,
-	(std::string, filename)
-	(std::vector<kgx::KgShaderProgramData::ShaderVar>, variables)
-	(std::vector<std::string>, textures)
-);
-
-BOOST_FUSION_ADAPT_STRUCT(
-	kgx::KgShaderProgramData,
-	(kgx::KgShaderProgramData::ShaderDef, vertexShader)
-	(kgx::KgShaderProgramData::ShaderDef, pixelShader)
 );
 
 namespace phx     = boost::phoenix;
@@ -126,12 +104,8 @@ namespace kgx
 		// parse RenderableObjects
 		std::vector<std::string>::const_iterator it;
 		for ( it = objects.cbegin(); it != objects.cend(); ++it )
-		{
-			RenderableObject *rObj = loadRenderObject( *it );
-			if ( rObj )
-				newScene->claimRenderableObject( rObj );
-			else std::cout << "Warning (KGSceneParser::loadKGScene): Error loading RenderableObject. Skipping." << std::endl;
-		}
+			if ( !loadRenderObject(*it, newScene) )
+				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating RenderableObject. Skipping." << std::endl;
 
 		// parse Camera's
 		for ( it = cameras.cbegin(); it != cameras.cend(); ++it )
@@ -143,16 +117,11 @@ namespace kgx
 			if ( !loadLight(*it, newScene) )
 				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating light. Skipping." << std::endl;
 
-		// parse RenderPasses
-		for ( it = renderPasses.cbegin(); it != renderPasses.cend(); ++it )
-			if ( !loadRenderPass( *it, renderWin->getRenderCorePtr() ) )
-				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating RenderPass. Skipping." << std::endl;
-
 		return newScene;
 	}
 
 
-	RenderableObject* KGSceneParser::loadRenderObject( const std::string &objString )
+	bool KGSceneParser::loadRenderObject( const std::string &objString, Scene* parentScene )
 	{
 		std::string name;
 		std::string sourceFile;
@@ -191,19 +160,20 @@ namespace kgx
 		{
 			std::string::const_iterator end = std::distance( f, objString.cend() ) > 100 ? f + 100 : objString.cend();
 			std::cout << std::endl << "RenderableObject parsing trail: " << std::string( f, end ) << std::endl;
-			return nullptr;
+			return false;
 		}
 
-		RenderableObject *renObj = kgx::KGObjectParser::loadKGO(sourceFile);
-		if ( !renObj )
+		kgx::KGObjectParser::loadKGO( sourceFile, parentScene );
+		/*if ( !renObj )
 			return nullptr;
 
 		// apply settings
 		renObj->setName( name );
 		renObj->setPosition( position.x, position.y, position.z );
-		renObj->setScale( scale );
+		renObj->setScale( scale );*/
 
-		return renObj;
+		//TODO: fix
+		return true;
 	}
 
 	bool KGSceneParser::loadCamera( const std::string &camString, RenderWindow *renderWin, Scene* parentScene )
@@ -272,7 +242,6 @@ namespace kgx
 		// apply settings
 		Scene::CameraID camID = parentScene->createCamera( fov, aspect, nearZ, farZ, eye, target, up );
 		Camera *newCam = parentScene->getCamera( camID );
-		newCam->setName( name );
 
 		return true;
 	}
@@ -331,132 +300,5 @@ namespace kgx
 		else parentScene->setAmbient( color );
 
 		return true;
-	}
-
-	bool KGSceneParser::loadRenderPass( const std::string &passString, RenderCore *renderCore )
-	{
-		if ( !renderCore )
-			return false;
-
-		std::vector<VertexInputLayout::Type> vertLayoutTypes;
-		std::map<int, KgShaderProgramData> shaderPrograms;
-		struct PassGrammar : qi::grammar<std::string::const_iterator, Skipper>
-		{
-			PassGrammar( std::map<int, KgShaderProgramData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
-				: PassGrammar::base_type( start )
-			{
-				comment = "//" >> qi::skip(qi::blank)[*qi::print];
-
-				shaderAutoBindType = qi::string("CameraProjectionMatrix")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraProjectionMatrix]
-					| qi::string("CameraViewMatrix")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraViewMatrix]
-					| qi::string("CameraPosition")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraPosition]
-					| qi::string("CameraTarget")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraTarget]
-					| qi::string("CameraFieldOfView")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraFieldOfView]
-					| qi::string("CameraAspectRatio")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraAspectRatio]
-					| qi::string("CameraNearZ")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraNearZ]
-					| qi::string("CameraFarZ")[qi::_val = ShaderProgram::ShaderAutoBindType::CameraFarZ]
-					| (!qi::string("Texture"))[qi::_val = ShaderProgram::ShaderAutoBindType::NoAutoBind];		// make sure not to eat any possible texture definitions
-
-				shaderVariable = shaderAutoBindType >> qi::lexeme[*(qi::print - iso8859::space)] >> *~qi::char_('(') >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
-				texture = qi::string("Texture") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
-
-				vertexInputLayout = qi::string("Position")[qi::_val = VertexInputLayout::Position]
-					| qi::string("TextureCoordinate")[qi::_val = VertexInputLayout::TextureCoordinate]
-					| qi::string("Normal")[qi::_val = VertexInputLayout::Normal]
-					| qi::string("Tangent")[qi::_val = VertexInputLayout::Tangent];
-				vertexShaderDefinition = qi::lit("VertexShader") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
-					>> qi::lit(":") >> qi::omit[ vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % qi::char_(',') ]
-					>> qi::lit("{") >> *shaderVariable >> *texture >> qi::lit("}");
-				pixelShaderDefinition  = qi::lit("PixelShader") >> qi::lit("(") >> *~qi::char_(')') >> qi::lit(")")
-					>> qi::lit("{") >> *shaderVariable >> *texture >> qi::lit("}");
-				//TODO: allow different order of shaderVariable and textures
-
-				//TODO: make shaderProgram parsing more robust => allow different orders or programs and allow some programs to be missing (no hull/domain shaders, for example)
-				shaderProgram = vertexShaderDefinition >> pixelShaderDefinition;
-				intMatPair = qi::lit("RenderPass") >> qi::lit("(") >> qi::int_ >> qi::lit(")")
-					>> qi::lit("{") >> shaderProgram >> qi::lit("}");
-
-				start = *intMatPair[phx::insert( phx::ref(shaderProgs), qi::_1 )];
-			}
-
-			qi::rule<std::string::const_iterator> comment;
-
-			qi::rule<std::string::const_iterator, ShaderProgram::ShaderAutoBindType()> shaderAutoBindType;
-			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderVar(), Skipper> shaderVariable;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> texture;
-			qi::rule<std::string::const_iterator, VertexInputLayout::Type(), Skipper> vertexInputLayout;
-			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderDef(), Skipper> vertexShaderDefinition;
-			qi::rule<std::string::const_iterator, KgShaderProgramData::ShaderDef(), Skipper> pixelShaderDefinition;
-			qi::rule<std::string::const_iterator, KgShaderProgramData(), Skipper> shaderProgram;
-			qi::rule<std::string::const_iterator, std::pair<int, KgShaderProgramData>(), Skipper> intMatPair;
-
-			qi::rule<std::string::const_iterator, Skipper> start;
-		} passGrammar( shaderPrograms, vertLayoutTypes );
-
-		Skipper skipper = iso8859::space | passGrammar.comment;
-
-		std::string::const_iterator f = passString.cbegin();
-		bool res = qi::phrase_parse( f, passString.cend(), passGrammar, skipper );
-
-		// print everything that hasn't been processed by the parser
-		if ( f != passString.cend() )
-		{
-			std::string::const_iterator end = std::distance( f, passString.cend() ) > 100 ? f + 100 : passString.cend();
-			std::cout << std::endl << "RenderPass parsing trail: " << std::string( f, end ) << std::endl;
-			return false;
-		}
-
-		//TODO: add RenderPass to RenderCore
-
-		VertexInputLayout vertLayout( vertLayoutTypes );
-		// create ShaderPrograms
-		std::map<int, KgShaderProgramData>::iterator matIt;
-		for ( matIt = shaderPrograms.begin(); matIt != shaderPrograms.end(); ++matIt )
-		{
-			ShaderProgram *shaderProgram = ResourceManager::getInst()->createShaderProgram();
-
-			// shaders should always be present under filesystem's search paths. No extra check is done if it isn't.
-			std::string shaderPath = filesystem::getAbsolutePath( matIt->second.vertexShader.filename );
-			VertexShader *vertShader = shaderProgram->createVertexShader( shaderPath, vertLayout );
-			setShaderVariables( shaderProgram, vertShader, matIt->second.vertexShader );
-			// add vertex shader textures
-			std::vector<std::string>::iterator it;
-			for ( it = matIt->second.vertexShader.textures.begin(); it != matIt->second.vertexShader.textures.end(); ++it )
-			{
-				Texture *tex = TextureManager::getInst()->loadTexture( filesystem::getAbsolutePath( *it ) );
-				if ( tex )
-					vertShader->addTexture( tex );
-			}
-
-			//TODO: add support for other shader types
-
-			shaderPath = filesystem::getAbsolutePath( matIt->second.pixelShader.filename );
-			PixelShader *pixShader = shaderProgram->createPixelShader( shaderPath );
-			setShaderVariables( shaderProgram, pixShader, matIt->second.pixelShader );
-			// add pixel shader textures
-			for ( it = matIt->second.pixelShader.textures.begin(); it != matIt->second.pixelShader.textures.end(); ++it )
-			{
-				Texture *tex = TextureManager::getInst()->loadTexture( filesystem::getAbsolutePath( *it ) );
-				if ( tex )
-					pixShader->addTexture( tex );
-			}
-
-			//TODO: add support for multiple renderpasses
-			renderCore->setShaderProgram( shaderProgram );
-		}
-
-		return true;
-	}
-
-	void KGSceneParser::setShaderVariables( ShaderProgram *ShaderProgram, ShaderBase *sh, const KgShaderProgramData::ShaderDef &shDef )
-	{
-		std::vector<KgShaderProgramData::ShaderVar>::const_iterator it;
-		for ( it = shDef.variables.begin(); it != shDef.variables.end(); ++it )
-		{
-			if ( it->autoBindType != ShaderProgram::ShaderAutoBindType::NoAutoBind )
-				ShaderProgram->addAutoShaderVar( sh, it->name, it->autoBindType );
-			//TODO: add support for default constant values
-			//else sh->updateConstantVariable( it->name, nullptr );
-		}
 	}
 }

@@ -2,38 +2,21 @@
 #pragma once
 
 #include <d3d11.h>
-#include <vector>
-#include <map>
 
 #include "Defines.h"
-#include "Object.h"
 
 
 namespace kgx
 {
-	class Camera;
-	class RenderableObject;
 	class VertexInputLayout;
 	class ShaderBase;
 	class VertexShader;
 	class PixelShader;
 
-	class ShaderProgram : public Object
+	//TODO: prob convert this class into a struct
+	class ShaderProgram
 	{
 		public:
-			enum ShaderAutoBindType
-			{
-				NoAutoBind,					// mainly used for parsing purposes
-				CameraProjectionMatrix,
-				CameraViewMatrix,
-				CameraPosition,
-				CameraTarget,
-				CameraFieldOfView,
-				CameraAspectRatio,
-				CameraNearZ,
-				CameraFarZ,
-			};
-
 			enum class ShaderType
 			{
 				Vertex,
@@ -43,7 +26,7 @@ namespace kgx
 				Pixel
 			};
 
-			typedef UINT ShaderProgramID;
+			typedef INT ShaderProgramID;
 
 			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name = "" );
 			virtual ~ShaderProgram();
@@ -63,28 +46,17 @@ namespace kgx
 			//GeometryShader* getGeometryShader() const;
 			PixelShader* getPixelShader() const;
 
-			void addAutoShaderVar( ShaderType shaderType, const std::string &varName, ShaderAutoBindType varType );
-			void addAutoShaderVar( ShaderBase *shader, const std::string &varName, ShaderAutoBindType varType );
 			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
 
 			void commitAllChanges();
-			void activate( Camera *renderCam );
+			void activate();
 
 		private:
 			// no copying allowed
 			ShaderProgram( const ShaderProgram& );
 			ShaderProgram& operator=( const ShaderProgram& );
 
-			struct AutoShaderVar
-			{
-				AutoShaderVar(std::string n, ShaderAutoBindType t) : name(n), type(t) {}
-
-				std::string name;
-				ShaderAutoBindType type;
-			};
-
 			ShaderBase* getShader( ShaderType shader ) const;
-			void updateAutoShaderVar( Camera *renderCam, ShaderBase *shader, AutoShaderVar shaderVar );
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
@@ -97,7 +69,5 @@ namespace kgx
 			//DomainShader *m_domainShader;
 			//GeometryShader *m_geomShader;
 			PixelShader *m_pixShader;
-
-			std::map< ShaderBase*, std::vector<AutoShaderVar> > m_constVarLinks;
 	};
 }

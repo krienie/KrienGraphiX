@@ -5,75 +5,32 @@
 #include <vector>
 
 #include "Defines.h"
-#include "MovableObject.h"
+#include "ShaderProgram.h"
 
 
 namespace kgx
 {
-	class Camera;
-	class ShaderProgram;
-	class Texture;
-
-	class RenderableObject : public MovableObject
+	struct RenderableObject
 	{
-		public:
-			struct Mesh
-			{
-				Mesh( std::string nm = "", UINT sIdx = 0U, UINT idxCnt = 0U ) : name(nm), startIndex(sIdx), indexCount(idxCnt) {}
+		D3D11_PRIMITIVE_TOPOLOGY topology;
+		MeshBufferID meshBuffer;
+		
+		UINT indexCount;
+		UINT startIndex;
+		UINT baseVertex;
 
-				std::string name;
-				UINT startIndex;
-				UINT indexCount;
-
-				inline bool operator< (const Mesh& rhs) const { return startIndex < rhs.startIndex; }
-				inline bool operator==(const Mesh& rhs) const { return startIndex == rhs.startIndex; }
-			};
-
-			struct Material
-			{
-				Material( const DirectX::XMFLOAT4 &diff, const DirectX::XMFLOAT4 &spec, const std::vector<ID3D11ShaderResourceView*> &texs )
-					: diffuse(diff), specular(spec), textures(texs) {}
-
-				DirectX::XMFLOAT4 diffuse;
-				DirectX::XMFLOAT4 specular;
-				std::vector<ID3D11ShaderResourceView*> textures;
-			};
-
-			struct MaterialMeshContainer
-			{
-				MaterialMeshContainer( const std::vector<Mesh> &me, const Material &mat )
-					: meshes(me), material(mat) {}
-
-				std::vector<Mesh> meshes;
-				Material material;
-			};
-
-			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<MaterialMeshContainer> &matMeshContainers,
-								D3D11_PRIMITIVE_TOPOLOGY meshTopology );
-			RenderableObject( ID3D11Device *dxDevice, MeshBuffer buff, const std::vector<MaterialMeshContainer> &matMeshContainers,
-							  D3D11_PRIMITIVE_TOPOLOGY meshTopology, const std::string &name );
-			~RenderableObject();
-
-			std::string getOriginalFilename() const;
-			void setOriginalFilename( const std::string &filename );
-
-			void draw( Camera *renderCam, ShaderProgram *shaderProg );
-
-		private:
-			friend class KGObjectGenerator;
-
-			// no copying allowed
-			RenderableObject( const RenderableObject& );
-			RenderableObject& operator=( const RenderableObject& );
-
-			ID3D11Device *m_dxDev;
-			ID3D11DeviceContext *m_dxDevCont;
-
-			MeshBuffer m_meshBuff;
-			std::vector<MaterialMeshContainer> m_matMeshContainers;
-
-			D3D11_PRIMITIVE_TOPOLOGY m_topology;
-
-			std::string m_originalFilename;
+		//TODO: place material data directly in this struct. It is quite pointless to let this live in a separate struct
+		Material material;
+		ShaderProgram::ShaderProgramID shaderProgram;
+		
+		float xPos;
+		float yPos;
+		float zPos;
+		float xScale;
+		float yScale;
+		float zScale;
 	};
+
+	DirectX::XMFLOAT4X4 getModelMatrix( RenderableObject &obj );
+	DirectX::XMFLOAT4X4 getNormalMatrix( RenderableObject &obj );
 }

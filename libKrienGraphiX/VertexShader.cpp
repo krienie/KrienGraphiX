@@ -24,7 +24,7 @@ namespace kgx
 		m_dxDevCont->VSSetShader( m_vertShader, 0, 0 );
 		m_dxDevCont->IASetInputLayout(m_inputLayout.getDxInputLayout(m_dxDev, m_shaderSource));
 
-		// set buffers
+		//TODO: create separate commands for binding constant buffers and textures/samplers
 		m_dxDevCont->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
 
 		// set textures, if available

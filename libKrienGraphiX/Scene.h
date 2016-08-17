@@ -6,12 +6,12 @@
 #include <vector>
 
 #include "Defines.h"
+#include "RenderableObject.h"
 
 namespace kgx
 {
 	class Camera;
 	class ShaderProgram;
-	class RenderableObject;
 
 	class Scene
 	{
@@ -30,7 +30,7 @@ namespace kgx
 			const_cameraiterator getCameraCBegin() const;
 			const_cameraiterator getCameraCEnd() const;
 
-			typedef std::vector<RenderableObject*>::const_iterator const_renobjectiterator;
+			typedef std::vector<RenderableObject>::const_iterator const_renobjectiterator;
 			const_renobjectiterator getRenObjectCBegin() const;
 			const_renobjectiterator getRenObjectCEnd() const;
 
@@ -45,25 +45,26 @@ namespace kgx
 			DirectX::XMFLOAT3 getAmbient() const;
 			void setAmbient( const DirectX::XMFLOAT3 &color );
 			void setAmbient( float r, float g, float b );
-			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity, const std::string &name = "" );
+			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity );
 
-			/** Adds a RenderableObject to the scene. Takes ownership of the object */
-			void claimRenderableObject( RenderableObject *obj );
+			/** Adds a RenderableObject to the scene */
+			void addRenderableObject( const RenderableObject &obj );
 
-			void render( Camera *renderCam, ShaderProgram *shaderProg );
+			void render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
 
 		private:
 			// no copying allowed
 			Scene( const Scene& );
 			Scene& operator=( const Scene& );
 
-			DirectX::XMFLOAT4 m_ambientLight;
+			UINT createCommandKey( const RenderableObject &obj ) const;
+
+			LightData m_lightData;
 
 			CameraID m_nextCamID;
 			Camera *m_defaultCamera;
 
 			std::map<CameraID, Camera*> m_cameras;
-			std::vector<Light> m_lights;
-			std::vector<RenderableObject*> m_renderObjects;
+			std::vector<RenderableObject> m_renderObjects;
 	};
 }

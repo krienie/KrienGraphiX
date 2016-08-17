@@ -14,11 +14,15 @@ namespace kgx
 	class Texture
 	{
 		public:
-			Texture( const std::string &file, ID3D11Device *dxDevice );
+			typedef INT TextureID;
+
+			Texture( const std::string &file, TextureID id, ID3D11Device *dxDevice );
 			explicit Texture( const Texture &other );
 			~Texture();
 
-			std::string getName() const;
+			TextureID getID() const;
+
+			std::string getFileName() const;
 			ID3D11Resource* getBuffer() const;
 			ID3D11ShaderResourceView* getResourceView() const;
 
@@ -27,6 +31,8 @@ namespace kgx
 		private:
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
+
+			TextureID m_textureID;
 
 			ID3D11Resource *m_buffer;
 			ID3D11ShaderResourceView *m_shaderView;

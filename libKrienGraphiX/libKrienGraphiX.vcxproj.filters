@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\shaders">
-      <UniqueIdentifier>{e91eb0f7-5923-4688-950b-e5f171a84352}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\parsers">
       <UniqueIdentifier>{cc56a9d8-38c6-4417-b318-91603a74c3a1}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,9 @@
     </Filter>
     <Filter Include="Source Files\generators">
       <UniqueIdentifier>{0f9fbef9-0878-4323-9e53-3b631577494d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\shaders">
+      <UniqueIdentifier>{a45427d9-56a0-4359-b944-a5d309a39281}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +63,6 @@
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MovableObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -87,12 +84,6 @@
     <ClInclude Include="parsers\KGSceneParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generators\KGSceneGenerator.h">
-      <Filter>Header Files\generators</Filter>
-    </ClInclude>
     <ClInclude Include="generators\KGObjectGenerator.h">
       <Filter>Header Files\generators</Filter>
     </ClInclude>
@@ -102,11 +93,26 @@
     <ClInclude Include="ConfigManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderCore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Filesystem.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderBucket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCommandPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generators\KGMaterialLibraryGenerator.h">
+      <Filter>Header Files\generators</Filter>
+    </ClInclude>
+    <ClInclude Include="parsers\KGMaterialLibraryParser.h">
+      <Filter>Header Files\parsers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,9 +146,6 @@
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MovableObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -164,34 +167,40 @@
     <ClCompile Include="parsers\KGSceneParser.cpp">
       <Filter>Source Files\parsers</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="generators\KGSceneGenerator.cpp">
-      <Filter>Source Files\generators</Filter>
-    </ClCompile>
     <ClCompile Include="generators\KGObjectGenerator.cpp">
       <Filter>Source Files\generators</Filter>
     </ClCompile>
     <ClCompile Include="ConfigManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderCore.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Filesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderBucket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderBackend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderCommandPacket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="generators\KGMaterialLibraryGenerator.cpp">
+      <Filter>Source Files\generators</Filter>
+    </ClCompile>
+    <ClCompile Include="parsers\KGMaterialLibraryParser.cpp">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="shaders\DefaultPixelShaderPS.hlsl">
-      <Filter>Source Files\shaders</Filter>
+    <FxCompile Include="shaders\DefaultPS.hlsl">
+      <Filter>Header Files\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="shaders\DefaultVertexShaderVS.hlsl">
-      <Filter>Source Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DefaultTextureShaderPS.hlsl">
-      <Filter>Source Files\shaders</Filter>
+    <FxCompile Include="shaders\DefaultVS.hlsl">
+      <Filter>Header Files\shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

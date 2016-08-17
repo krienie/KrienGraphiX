@@ -4,7 +4,7 @@
 #include <d3d11.h>
 #include <map>
 
-class Texture;
+#include "Texture.h"
 
 namespace kgx
 {
@@ -22,12 +22,10 @@ namespace kgx
 		void setDefaultAddressMode( const D3D11_TEXTURE_ADDRESS_MODE &mode );
 		void setDefaultMaxAnisotropy( UINT val );
 
+		Texture::TextureID loadTexture( const std::string &filename );
+		Texture* getTexture( Texture::TextureID id ) const;
 
-		Texture* loadTexture( const std::string &filename );
-
-		Texture* getTexture( const std::string &filename ) const;
-
-		void releaseTexture( const std::string &filename );
+		void releaseTexture( Texture::TextureID id );
 		void releaseTexture( Texture* tex );
 
 
@@ -46,7 +44,8 @@ namespace kgx
 
 		ID3D11Device *m_dxDev;
 
-		std::map<std::string, Texture*> m_textures;
+		Texture::TextureID m_nextTextureID;
+		std::map<Texture::TextureID, Texture*> m_textures;
 		ID3D11SamplerState *m_defaultSamp;
 	};
 }
