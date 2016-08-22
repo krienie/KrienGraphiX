@@ -30,9 +30,19 @@ namespace kgx
 			m_dxDevCont = nullptr;
 		}
 
+		// delete commands + all appended commands
 		std::vector<RenderCommandPacket>::iterator it;
 		for ( it = m_commandPackets.begin(); it != m_commandPackets.end(); ++it )
-			delete *it;
+		{
+			RenderCommandPacket packet = *it;
+			do
+			{
+				RenderCommandPacket curPacket = packet;
+				packet = rendercommandpacket::loadNextCommandPacket( packet );
+				if ( curPacket )
+					delete curPacket;
+			} while ( packet != nullptr );
+		}
 	}
 
 	void RenderBucket::sort()
