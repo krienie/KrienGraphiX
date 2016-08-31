@@ -152,6 +152,8 @@ namespace kgx
 		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
 			delete it->second;
 		m_textures.clear();
+
+		m_nextTextureID = 1u;
 	}
 
 

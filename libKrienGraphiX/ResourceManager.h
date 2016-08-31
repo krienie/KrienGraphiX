@@ -40,7 +40,6 @@ namespace kgx
 			ResourceManager& operator=( const ResourceManager& );
 
 			bool loadMaterials();
-			void loadDefaultShaderProgram();
 
 			static ResourceManager* m_inst;
 

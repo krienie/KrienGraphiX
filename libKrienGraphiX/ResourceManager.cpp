@@ -161,7 +161,21 @@ namespace kgx
 
 	ShaderProgram::ShaderProgramID ResourceManager::getDefaultShaderProgram()
 	{
-		loadDefaultShaderProgram();
+		if ( m_defaultShaderProgram >= 0 )
+			return m_defaultShaderProgram;
+
+		ShaderProgram *prog = createShaderProgram();
+		m_defaultShaderProgram = prog->getID();
+
+		VertexInputLayout vertInputLayout;
+		vertInputLayout.addInputType( VertexInputLayout::Position );
+		vertInputLayout.addInputType( VertexInputLayout::TextureCoordinate );
+		vertInputLayout.addInputType( VertexInputLayout::Normal );
+		prog->createVertexShader( "DefaultVS.cso", vertInputLayout );
+
+		prog->createPixelShader( "DefaultPS.cso" );
+
+
 		return m_defaultShaderProgram;
 	}
 
@@ -211,11 +225,19 @@ namespace kgx
 		}
 		m_meshBuffers.clear();
 
+		m_nextBufferID = 0u;
+
+		// clear all materials
+		m_materials.clear();
+
 		// release all ShaderProgram
 		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator mIt;
 		for ( mIt = m_shaderPrograms.begin(); mIt != m_shaderPrograms.end(); ++mIt )
 			delete mIt->second;
 		m_shaderPrograms.clear();
+
+		m_defaultShaderProgram = -1;
+		m_nextShaderProgramID  = 0u;
 	}
 
 	bool ResourceManager::loadMaterials()
@@ -255,22 +277,5 @@ namespace kgx
 		}
 
 		return false;
-	}
-
-	void ResourceManager::loadDefaultShaderProgram()
-	{
-		if ( m_defaultShaderProgram >= 0 )
-			return;
-
-		ShaderProgram *prog = createShaderProgram();
-		m_defaultShaderProgram = prog->getID();
-
-		VertexInputLayout vertInputLayout;
-		vertInputLayout.addInputType( VertexInputLayout::Position );
-		vertInputLayout.addInputType( VertexInputLayout::TextureCoordinate );
-		vertInputLayout.addInputType( VertexInputLayout::Normal );
-		prog->createVertexShader( "DefaultVS.cso", vertInputLayout );
-
-		prog->createPixelShader( "DefaultPS.cso" );
 	}
 }
