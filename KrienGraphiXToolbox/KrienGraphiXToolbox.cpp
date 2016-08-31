@@ -270,10 +270,4 @@ namespace kgt
 	{
 		this->close();
 	}
-
-
-	void KrienGraphiXToolbox::loadScene( const std::string &sceneFile )
-	{
-		
-	}
 }

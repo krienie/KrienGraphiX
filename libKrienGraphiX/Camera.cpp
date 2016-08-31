@@ -219,6 +219,7 @@ namespace kgx
 		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_position );
 		DirectX::XMVECTOR dirVect    = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
 
+		//TODO: fix assertion error when dirVect == (0.0, -1.0, 0.0) and upVect == (0.0, 1.0, 0.0)
 		DirectX::XMVECTOR rightVect = DirectX::XMVector3Cross( dirVect, upVect );
 		DirectX::XMVECTOR rotAxis   = DirectX::XMVector3Cross( rightVect, dirVect );
 		DirectX::XMMATRIX rotMat    = DirectX::XMMatrixRotationAxis( rotAxis, DirectX::XMConvertToRadians(degrees) );

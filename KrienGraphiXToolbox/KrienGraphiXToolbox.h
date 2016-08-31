@@ -37,8 +37,6 @@ namespace kgt
 		void exitProgram();
 
 	private:
-		void loadScene( const std::string &sceneFile );
-
 		Ui::KrienGraphiXToolboxClass m_ui;
 
 		std::string m_projectDir;
