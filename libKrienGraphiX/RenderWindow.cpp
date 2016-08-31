@@ -277,6 +277,6 @@ namespace kgx
 		m_curViewport.cam->renderCurrentView(m_renderTargetView, m_depthStencilView);
 
 		// flip the back buffer and the front buffer
-		m_swapChain->Present(1, 0);
+		m_swapChain->Present(0, 0);
 	}
 }
