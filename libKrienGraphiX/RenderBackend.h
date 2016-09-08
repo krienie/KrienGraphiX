@@ -25,6 +25,8 @@ namespace kgx
 		void setPixelShaderSamplers( const void *data );
 		void setPixelShaderResourceViews( const void *data );
 
+		void resetState();
+
 		void setDeviceContext( ID3D11Device *dxDevice );
 		void releaseDeviceContext();
 	}

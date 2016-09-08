@@ -83,6 +83,8 @@ namespace kgx
 
 	void RenderBucket::decodeKey( UINT key, const LightData &lightData )
 	{
+		renderbackend::resetState();
+
 		UINT shaderProgKey = (key >> 16) & 0xFFFF;
 		UINT materialKey   = key & 0xFFFF;		// not used for now
 

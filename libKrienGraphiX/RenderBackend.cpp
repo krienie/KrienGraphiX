@@ -6,12 +6,13 @@
 #include "RenderCommand.h"
 #include "RenderBackend.h"
 
-//TODO: temporary
-#include "TextureManager.h"
 
 namespace
 {
 	ID3D11DeviceContext *dxDevCont = nullptr;
+
+	UINT numSRVBoundVS = 0u;
+	UINT numSRVBoundPS = 0u;
 }
 
 namespace kgx
@@ -70,6 +71,8 @@ namespace kgx
 			const rendercommand::SetVertexShaderResourceViews* realData = reinterpret_cast<const rendercommand::SetVertexShaderResourceViews*>(data);
 
 			dxDevCont->VSSetShaderResources( realData->startSlot, realData->numViews, realData->views );
+
+			numSRVBoundVS += realData->numViews;
 		}
 
 		void setPixelShaderSamplers( const void *data )
@@ -85,8 +88,29 @@ namespace kgx
 			const rendercommand::SetPixelShaderResourceViews* realData = reinterpret_cast<const rendercommand::SetPixelShaderResourceViews*>(data);
 
 			dxDevCont->PSSetShaderResources( realData->startSlot, realData->numViews, realData->views );
+
+			numSRVBoundPS += realData->numViews;
 		}
 
+
+		void resetState()
+		{
+			if ( numSRVBoundVS > 0u )
+			{
+				std::vector<ID3D11ShaderResourceView*> nullSRV( numSRVBoundVS, nullptr);
+				dxDevCont->VSSetShaderResources( 0, numSRVBoundVS, nullSRV.data() );
+
+				numSRVBoundVS = 0u;
+			}
+
+			if ( numSRVBoundPS > 0u )
+			{
+				std::vector<ID3D11ShaderResourceView*> nullSRV( numSRVBoundPS, nullptr);
+				dxDevCont->PSSetShaderResources( 0, numSRVBoundPS, nullSRV.data() );
+
+				numSRVBoundPS = 0u;
+			}
+		}
 
 		void setDeviceContext( ID3D11Device *dxDevice )
 		{
