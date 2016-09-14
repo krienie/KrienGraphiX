@@ -139,12 +139,17 @@ namespace kgx
 			memcpy( modelNormalCommand->data, matrices, sizeof(DirectX::XMFLOAT4X4) * 2u );
 
 			// set material constants and shader resources (textures and such)
-			rendercommand::CopyConstantBufferData *materialCommand = mainRenderBucket.appendCommand<rendercommand::CopyConstantBufferData>( modelNormalCommand, sizeof(DirectX::XMFLOAT4) * 2u );
+			rendercommand::CopyConstantBufferData *materialCommand = mainRenderBucket.appendCommand<rendercommand::CopyConstantBufferData>( modelNormalCommand, sizeof(DirectX::XMFLOAT4) * 3u );
 			materialCommand->constantBuffer = shaderProg->getPixelShader()->getConstantBufferPtrByIndex(2);
-			materialCommand->size           = sizeof(DirectX::XMFLOAT4) * 2u;
+			materialCommand->size           = sizeof(DirectX::XMFLOAT4) * 3u;
 			materialCommand->data           = rendercommandpacket::getAuxiliaryMemory( materialCommand );
-			DirectX::XMFLOAT4 matData[2] = { it->material.diffuse, it->material.specular };
-			memcpy( materialCommand->data, matData, sizeof(DirectX::XMFLOAT4) * 2u );
+
+			int useTextures = static_cast<int>(it->material.diffuseMap >= 0);
+			DirectX::XMFLOAT4 useTextures4;
+			useTextures4.x = static_cast<float>(useTextures);
+
+			DirectX::XMFLOAT4 matData[3] = { it->material.diffuse, it->material.specular, useTextures4 };
+			memcpy( materialCommand->data, matData, sizeof(DirectX::XMFLOAT4) * 3u );
 
 			// set default texture sampler
 			rendercommand::SetPixelShaderSamplers *samplerCommand = mainRenderBucket.appendCommand<rendercommand::SetPixelShaderSamplers>( materialCommand, sizeof(ID3D11SamplerState*) * 1u );

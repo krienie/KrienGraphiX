@@ -14,13 +14,15 @@ cbuffer LightData : register(b0)
 cbuffer PerFrameData : register(b1)
 {
 	float3 camPosition;
-	float padding;
+	float padding_PerFrameData;
 };
 
 cbuffer PerObjectData : register(b2)
 {
 	float4 kgx_diffuse;
 	float4 kgx_specular;
+	bool   kgx_useTexture;
+	float3 padding_PerObjectData;
 };
 
 
@@ -44,7 +46,7 @@ float4 main( PixelInput input ) : SV_TARGET
 	float3 h = normalize( sunLight.direction - camPosition );
 	float specLighting = pow( saturate( dot( h, norm ) ), 128 );
 
-	float4 diffuseClr = diffuseTexture.Sample( DefaultSampler, input.texCoord );
+	float4 diffuseClr = kgx_useTexture ? diffuseTexture.Sample( DefaultSampler, input.texCoord ) : kgx_diffuse;
 	float4 finalColor = ambLightClr + (diffuseClr * nDotl * sunLight.intensity) + (specLighting * 0.25f) * kgx_specular;
 	return float4(finalColor.rgb, 1.0f);
 }
