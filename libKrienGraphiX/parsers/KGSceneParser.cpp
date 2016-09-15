@@ -163,7 +163,10 @@ namespace kgx
 			return false;
 		}
 
-		kgx::KGObjectParser::loadKGO( sourceFile, parentScene );
+		kgx::KGObjectParser::loadKGO( sourceFile, position, DirectX::XMFLOAT3(scale, scale, scale), parentScene );
+
+
+
 		/*if ( !renObj )
 			return nullptr;
 

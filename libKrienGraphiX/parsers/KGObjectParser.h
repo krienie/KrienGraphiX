@@ -12,7 +12,7 @@ namespace kgx
 	class KGObjectParser
 	{
 		public:
-			static void loadKGO( const std::string &kgoFile, Scene *scene );
+			static void loadKGO( const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale, Scene *scene );
 
 		private:
 			KGObjectParser();
@@ -25,6 +25,7 @@ namespace kgx
 			static bool addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
 												std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 												std::vector<KgModelData> &models,
+												const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale,
 												Scene *scene );
 	};
 }

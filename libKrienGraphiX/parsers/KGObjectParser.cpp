@@ -45,7 +45,7 @@ typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgx
 {
-	void KGObjectParser::loadKGO( const std::string &kgoFile, Scene *scene )
+	void KGObjectParser::loadKGO( const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale, Scene *scene )
 	{
 		std::string kgObjectData;
 		if ( !filesystem::openFile(kgoFile, kgObjectData) )
@@ -108,7 +108,7 @@ namespace kgx
 		}
 
 
-		res = addParsedDataToScene( vertices, indices, vertLayoutTypes, models, scene );
+		res = addParsedDataToScene( vertices, indices, vertLayoutTypes, models, position, scale, scene );
 
 		//TODO: handle res == false
 	}
@@ -116,6 +116,7 @@ namespace kgx
 	bool KGObjectParser::addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
 												std::vector<VertexInputLayout::Type> &vertLayoutTypes,
 												std::vector<KgModelData> &models,
+												const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale,
 												Scene *scene )
 	{
 		HRESULT buffCreated = E_FAIL;
@@ -140,12 +141,12 @@ namespace kgx
 			ro.material      = ResourceManager::getInst()->getMaterial( it->matName );
 			ro.shaderProgram = ResourceManager::getInst()->getDefaultShaderProgram();
 
-			ro.xPos   = 0.0;
-			ro.yPos   = 0.0;
-			ro.zPos   = 0.0;
-			ro.xScale = 1.0;
-			ro.yScale = 1.0;
-			ro.zScale = 1.0;
+			ro.xPos   = position.x;
+			ro.yPos   = position.y;
+			ro.zPos   = position.z;
+			ro.xScale = scale.x;
+			ro.yScale = scale.y;
+			ro.zScale = scale.z;
 
 			scene->addRenderableObject( ro );
 		}

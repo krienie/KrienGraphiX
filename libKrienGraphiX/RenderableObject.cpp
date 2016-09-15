@@ -11,7 +11,7 @@ namespace kgx
 
 		DirectX::XMMATRIX transMat = DirectX::XMMatrixTranslation( obj.xPos, obj.yPos, obj.zPos );
 		DirectX::XMMATRIX scaleMat = DirectX::XMMatrixScaling( obj.xScale, obj.yScale, obj.zScale );
-		DirectX::XMMATRIX modelMat = DirectX::XMMatrixMultiply( transMat, scaleMat );
+		DirectX::XMMATRIX modelMat = DirectX::XMMatrixMultiply( scaleMat, transMat );
 
 		DirectX::XMFLOAT4X4 result;
 		DirectX::XMStoreFloat4x4( &result, modelMat );
