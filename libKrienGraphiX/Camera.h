@@ -24,7 +24,7 @@ namespace kgx
 
 			const DirectX::XMFLOAT4X4& getProjMatrix() const;
 			const DirectX::XMFLOAT4X4& getViewMatrix() const;
-			const DirectX::XMFLOAT3& getPosition() const;		//TODO: rename to eye
+			const DirectX::XMFLOAT3& getEye() const;
 			const DirectX::XMFLOAT3& getTarget() const;
 			const DirectX::XMFLOAT3& getUp() const;
 			float getFOV() const;
@@ -54,7 +54,7 @@ namespace kgx
 			DirectX::XMFLOAT4X4 m_projMatrix;
 			DirectX::XMFLOAT4X4 m_viewMatrix;
 
-			DirectX::XMFLOAT3 m_position;
+			DirectX::XMFLOAT3 m_eye;
 			DirectX::XMFLOAT3 m_target;
 			DirectX::XMFLOAT3 m_camUp;
 
