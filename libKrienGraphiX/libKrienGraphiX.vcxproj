@@ -18,6 +18,7 @@
     <ClInclude Include="generators\KGMaterialLibraryGenerator.h" />
     <ClInclude Include="generators\KGObjectGenerator.h" />
     <ClInclude Include="Filesystem.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="KGXCore.h" />
     <ClInclude Include="parsers\KGMaterialLibraryParser.h" />
     <ClInclude Include="parsers\KGObjectParser.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="generators\KGMaterialLibraryGenerator.cpp" />
     <ClCompile Include="generators\KGObjectGenerator.cpp" />
     <ClCompile Include="Filesystem.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="KGXCore.cpp" />
     <ClCompile Include="parsers\KGMaterialLibraryParser.cpp" />
     <ClCompile Include="parsers\KGObjectParser.cpp" />

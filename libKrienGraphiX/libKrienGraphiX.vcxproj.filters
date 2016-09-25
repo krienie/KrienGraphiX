@@ -114,6 +114,9 @@
     <ClInclude Include="parsers\KGMaterialLibraryParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -193,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="parsers\KGMaterialLibraryParser.cpp">
       <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
