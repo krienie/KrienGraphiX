@@ -85,16 +85,18 @@ namespace kgx { namespace filesystem
 		if ( absFile.empty() )
 			return false;
 
-		std::stringstream ssFile;
-		std::filebuf fb;
-		if ( fb.open( absFile, std::ios::in ) )
+		std::ifstream in( absFile, std::ios::in | std::ios::binary );
+		if ( in )
 		{
-			ssFile << &fb;
-			fb.close();
+			in.seekg( 0, std::ios::end );
+			contents.resize( in.tellg() );
+			in.seekg( 0, std::ios::beg );
+			in.read( &contents[0], contents.size() );
+			in.close();
+			return true;
 		}
 
-		contents = ssFile.str();
-		return true;
+		return false;
 	}
 
 	bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents )
