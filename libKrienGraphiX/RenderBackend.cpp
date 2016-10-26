@@ -1,4 +1,8 @@
 
+#define NOMINMAX
+
+#include <algorithm>
+
 #include "KGXCore.h"
 #include "ConstantBuffer.h"
 
@@ -72,7 +76,7 @@ namespace kgx
 
 			dxDevCont->VSSetShaderResources( realData->startSlot, realData->numViews, realData->views );
 
-			numSRVBoundVS += realData->numViews;
+			numSRVBoundVS = std::max(realData->numViews, numSRVBoundVS);
 		}
 
 		void setPixelShaderSamplers( const void *data )
@@ -89,7 +93,7 @@ namespace kgx
 
 			dxDevCont->PSSetShaderResources( realData->startSlot, realData->numViews, realData->views );
 
-			numSRVBoundPS += realData->numViews;
+			numSRVBoundPS = std::max(realData->numViews, numSRVBoundPS);
 		}
 
 
