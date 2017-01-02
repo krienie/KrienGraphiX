@@ -11,6 +11,7 @@
 
 #include "../Camera.h"
 #include "../Filesystem.h"
+#include "../PhysXManager.h"
 #include "../ResourceManager.h"
 #include "../RenderableObject.h"
 #include "../RenderWindow.h"
@@ -163,19 +164,16 @@ namespace kgx
 			return false;
 		}
 
-		kgx::KGObjectParser::loadKGO( sourceFile, position, DirectX::XMFLOAT3(scale, scale, scale), parentScene );
+		KGObjectParser::loadKGO( sourceFile, position, DirectX::XMFLOAT3(scale, scale, scale), parentScene );
 
+		// construct PhysX filename
+		std::string filename = sourceFile.substr( 0, sourceFile.rfind( ".kgo" ) );
+		std::string physxFilename = filename + "_physx.bin";
 
+		// try to load corresponding PhysX file, if it exists
+		if ( PhysXManager::getInst()->isInit() )
+			PhysXManager::getInst()->loadPhysXCollection( physxFilename );
 
-		/*if ( !renObj )
-			return nullptr;
-
-		// apply settings
-		renObj->setName( name );
-		renObj->setPosition( position.x, position.y, position.z );
-		renObj->setScale( scale );*/
-
-		//TODO: fix
 		return true;
 	}
 

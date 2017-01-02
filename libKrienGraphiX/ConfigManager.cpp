@@ -1,6 +1,4 @@
 
-#include <iostream>
-
 #include "Filesystem.h"
 #include "ConfigManager.h"
 

@@ -1,7 +1,9 @@
 
+#include <iostream>
 #include <d3d11.h>
 
 #include "Camera.h"
+#include "PhysXManager.h"
 #include "PixelShader.h"
 #include "RenderCommand.h"
 #include "RenderBucket.h"
@@ -121,6 +123,19 @@ namespace kgx
 
 	void Scene::render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
+		/*
+		physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC );
+		if( numActors )
+		{
+			std::vector<physx::PxRigidActor*> actors(numActors);
+			m_scene->getActors(physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC, (physx::PxActor**)&actors[0], numActors);
+
+			std::string actorName = actors[0]->getName();
+
+			std::cout << std::endl;
+		}
+		*/
+
 		RenderBucket mainRenderBucket( rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix() );
 
 		std::vector<RenderableObject>::iterator it;
@@ -135,7 +150,12 @@ namespace kgx
 			modelNormalCommand->constantBuffer = shaderProg->getVertexShader()->getConstantBufferPtrByIndex(1);		//TODO: make this part more generic/flexible
 			modelNormalCommand->size           = sizeof(DirectX::XMFLOAT4X4) * 2u;
 			modelNormalCommand->data           = rendercommandpacket::getAuxiliaryMemory( modelNormalCommand );
-			DirectX::XMFLOAT4X4 matrices[2] = { getModelMatrix(*it), getNormalMatrix(*it) };
+
+			DirectX::XMFLOAT4X4 modelMatrix;
+			if ( !PhysXManager::getInst()->getShapeGlobalPosition(it->name, modelMatrix) )
+				modelMatrix = getModelMatrix( *it );
+
+			DirectX::XMFLOAT4X4 matrices[2] = { modelMatrix, getNormalMatrix(*it) };
 			memcpy( modelNormalCommand->data, matrices, sizeof(DirectX::XMFLOAT4X4) * 2u );
 
 			// set material constants and shader resources (textures and such)

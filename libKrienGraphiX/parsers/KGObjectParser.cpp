@@ -131,6 +131,9 @@ namespace kgx
 		for ( it = models.cbegin(); it != models.cend(); ++it )
 		{
 			RenderableObject ro;
+
+			ro.name = it->modelName;
+
 			ro.topology   = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 			ro.meshBuffer = meshBuffer;
 

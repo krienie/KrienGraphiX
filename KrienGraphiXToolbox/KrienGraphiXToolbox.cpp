@@ -14,6 +14,7 @@
 #include <Camera.h>
 #include <RenderableObject.h>
 #include <PixelShader.h>
+#include <PhysXManager.h>
 #include <ConfigManager.h>
 #include <TextureManager.h>
 #include <parsers/KGSceneParser.h>
@@ -27,6 +28,8 @@ namespace
 	const std::string SCENE_FOLDER              = "scenes";
 	const std::string RESOURCE_FOLDER           = "resources";
 	const unsigned int MOUSE_BUFFER_FILTER_SIZE = 10u;
+
+	bool animateScene = false;
 }
 
 
@@ -92,6 +95,9 @@ namespace kgt
 			m_mainCam->moveLeft( speed );
 		if ( m_dKeyDown )
 			m_mainCam->moveRight( speed );
+
+		if ( animateScene )
+			kgx::PhysXManager::getInst()->advance( deltaTime );
 	}
 
 
@@ -168,6 +174,9 @@ namespace kgt
 			case KeyEvent::Key::Key_Return:
 				if ( (evt.modifiers() & KeyEvent::KeyModifiers::Alt) == KeyEvent::KeyModifiers::Alt )
 					m_ui.renderWidget1->toggleFullscreen();
+				break;
+			case KeyEvent::Key::Key_Space:
+				animateScene = !animateScene;
 				break;
 			default:
 				break;

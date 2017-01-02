@@ -321,8 +321,10 @@ namespace kgx
 			{
 				// save index ranges for usemtl flags
 				if ( tempModels.size() >= 1 )
+				{
 					tempModels[tempModels.size() - 1]->indexCount =
-					int( kgData.indices.size() ) - tempModels[tempModels.size() - 1]->startIndex;
+						int( kgData.indices.size() ) - tempModels[tempModels.size() - 1]->startIndex;
+				}
 
 				KgModelData newModel( i->groupName, i->usemtl, int( kgData.indices.size() ), 0 );
 				storeModelData( i->groupName, newModel, &sortedModels, &tempModels );

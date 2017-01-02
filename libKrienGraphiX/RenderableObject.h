@@ -2,6 +2,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <string>
 #include <vector>
 
 #include "Defines.h"
@@ -12,6 +13,8 @@ namespace kgx
 {
 	struct RenderableObject
 	{
+		std::string name;
+
 		D3D11_PRIMITIVE_TOPOLOGY topology;
 		MeshBufferID meshBuffer;
 		
