@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "Defines.h"
-#include "Geometry.h"
 #include "ShaderProgram.h"
 
 
@@ -23,8 +22,6 @@ namespace kgx
 			MeshBufferID addMeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,
 								const VertexInputLayout &inputDescriptor, HRESULT &result );
 			void releaseBuffer( MeshBufferID id );
-
-			const Geometry* getGeometry( GeometryID id ) const;
 
 			Material getMaterial( const std::string &matName );
 			ShaderProgram::ShaderProgramID getDefaultShaderProgram();
@@ -50,7 +47,6 @@ namespace kgx
 			
 			MeshBufferID m_nextBufferID;
 			std::map<MeshBufferID, MeshBuffer> m_meshBuffers;
-			std::map<GeometryID, Geometry> m_geometry;
 			std::map<std::string, Material> m_materials;
 			ShaderProgram::ShaderProgramID m_nextShaderProgramID;
 			ShaderProgram::ShaderProgramID m_defaultShaderProgram;

@@ -36,8 +36,8 @@ namespace kgx
 
 
 	ResourceManager::ResourceManager( ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_geometry(),
-			m_materials(), m_nextShaderProgramID(0u), m_defaultShaderProgram(-1), m_shaderPrograms()
+		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_materials(),
+			m_nextShaderProgramID(0u), m_defaultShaderProgram(-1), m_shaderPrograms()
 	{
 	}
 
@@ -122,9 +122,6 @@ namespace kgx
 
 		m_meshBuffers.insert( std::pair<MeshBufferID, MeshBuffer>(m_nextBufferID, mBuff) );
 
-		// store Geometry for CPU manipulation
-		m_geometry.insert( std::pair<GeometryID, Geometry>(m_nextBufferID, Geometry(vertices, indices, &inputDescriptor)) );
-
 		++m_nextBufferID;
 		result = S_OK;
 
@@ -145,23 +142,7 @@ namespace kgx
 
 			m_meshBuffers.erase(id);
 		}
-
-		m_geometry.erase( id );
 	}
-
-
-	const Geometry* ResourceManager::getGeometry( GeometryID id ) const
-	{
-		std::map<GeometryID, Geometry>::const_iterator it;
-		it = m_geometry.find(id);
-
-		if ( it != m_geometry.cend() )
-			return &(it->second);
-
-		std::cout << "Warning (ResourceManager::getGeometry): geometry with id " << id << " was not found." << std::endl;
-		return nullptr;
-	}
-
 
 	Material ResourceManager::getMaterial( const std::string &matName )
 	{
