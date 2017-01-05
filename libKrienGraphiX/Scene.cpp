@@ -123,19 +123,6 @@ namespace kgx
 
 	void Scene::render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
-		/*
-		physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC );
-		if( numActors )
-		{
-			std::vector<physx::PxRigidActor*> actors(numActors);
-			m_scene->getActors(physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC, (physx::PxActor**)&actors[0], numActors);
-
-			std::string actorName = actors[0]->getName();
-
-			std::cout << std::endl;
-		}
-		*/
-
 		RenderBucket mainRenderBucket( rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix() );
 
 		std::vector<RenderableObject>::iterator it;
@@ -207,8 +194,6 @@ namespace kgx
 
 			texCommand->views = reinterpret_cast<ID3D11ShaderResourceView**>( rendercommandpacket::getAuxiliaryMemory(texCommand) );
 			memcpy( texCommand->views, texViews.data(), sizeof(ID3D11ShaderResourceView*) * texViews.size() );
-
-			
 
 			// bind mesh to IA stage
 			rendercommand::BindMeshToIAStage *bindMeshCommand = mainRenderBucket.appendCommand<rendercommand::BindMeshToIAStage>( texCommand, 0u );

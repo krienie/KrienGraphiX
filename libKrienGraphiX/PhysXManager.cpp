@@ -121,7 +121,6 @@ namespace kgx
 	}
 
 	bool PhysXManager::getShapeGlobalPosition( const std::string &name, DirectX::XMFLOAT4X4 &result ) const
-	//bool PhysXManager::getShapeGlobalPosition(const std::string &name, DirectX::XMFLOAT3 &result) const
 	{
 		if ( !m_isInit || !m_scene )
 		{
@@ -129,12 +128,10 @@ namespace kgx
 			return false;
 		}
 
-		//physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeSelectionFlag::eRIGID_STATIC | physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC );
 		physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC );
 		if ( numActors )
 		{
 			std::vector<physx::PxRigidActor*> actors(numActors);
-			//m_scene->getActors(physx::PxActorTypeSelectionFlag::eRIGID_STATIC | physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC,
 			m_scene->getActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC,
 								(physx::PxActor**)&actors[0], numActors);
 
@@ -143,15 +140,6 @@ namespace kgx
 			{
 				if ( name == (*it)->getName() )
 				{
-					/*const physx::PxMat44 actorPose = (*it)->getGlobalPose();
-
-					result = DirectX::XMFLOAT4X4( actorPose.column0.x, actorPose.column0.y, actorPose.column0.z, actorPose.column0.w,
-												  actorPose.column1.x, actorPose.column1.y, actorPose.column1.z, actorPose.column1.w,
-												  actorPose.column2.x, actorPose.column2.y, actorPose.column2.z, actorPose.column2.w,
-												  0.0f, 0.0f, 0.0f, 1.0f );
-
-					return true;*/
-
 					physx::PxU32 numShapes = (*it)->getNbShapes();
 					std::vector<physx::PxShape*> shapes(numShapes);
 					(*it)->getShapes((physx::PxShape**)&shapes[0], numShapes);
@@ -162,9 +150,7 @@ namespace kgx
 						result = DirectX::XMFLOAT4X4( shapePose.column0.x, shapePose.column0.y, shapePose.column0.z, shapePose.column0.w,
 													  shapePose.column1.x, shapePose.column1.y, shapePose.column1.z, shapePose.column1.w,
 													  shapePose.column2.x, shapePose.column2.y, shapePose.column2.z, shapePose.column2.w,
-													  //0.0f, 0.0f, 0.0f, 1.0f );
 													  shapePose.column3.x, shapePose.column3.y, shapePose.column3.z, shapePose.column3.w);
-						//result = DirectX::XMFLOAT3(shapePose.column3.x, shapePose.column3.y, shapePose.column3.z);
 
 						return true;
 					}
