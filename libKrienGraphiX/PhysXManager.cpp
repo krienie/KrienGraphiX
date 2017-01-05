@@ -37,7 +37,7 @@ namespace kgx
 
 	PhysXManager::PhysXManager()
 		: m_defaultErrorCallback(), m_defaultAllocatorCallback(), m_connection(nullptr), m_foundation(nullptr),
-			m_physics(nullptr), /*m_cooking(nullptr),*/ m_dispatcher(nullptr), m_scene(nullptr),
+			m_physics(nullptr), /*m_cooking(nullptr),*/ m_dispatcher(nullptr), m_scene(nullptr), m_collectionMemory(nullptr),
 			m_isInit(false), m_accumulator(0.0f)
 	{
 		m_foundation = PxCreateFoundation( PX_PHYSICS_VERSION, m_defaultAllocatorCallback, m_defaultErrorCallback );
@@ -99,6 +99,9 @@ namespace kgx
 
 	PhysXManager::~PhysXManager()
 	{
+		if ( m_collectionMemory )
+			free( m_collectionMemory );
+
 		if ( m_connection )
 			m_connection->release();
 
@@ -205,10 +208,9 @@ namespace kgx
 		fseek( fp, 0, SEEK_SET );
 
 		// Allocate aligned memory, load data and deserialize
-		//TODO: fix memory leak...
 		//TODO: convert to C++
-		void* memory    = malloc( fileSize + PX_SERIAL_FILE_ALIGN );
-		void* memory128 = (void*)((size_t( memory ) + PX_SERIAL_FILE_ALIGN)&~(PX_SERIAL_FILE_ALIGN - 1));
+		m_collectionMemory = malloc( fileSize + PX_SERIAL_FILE_ALIGN );
+		void* memory128 = (void*)((size_t( m_collectionMemory ) + PX_SERIAL_FILE_ALIGN)&~(PX_SERIAL_FILE_ALIGN - 1));
 		fread( memory128, 1, fileSize, fp );
 		fclose( fp );
 		physx::PxCollection* collection = physx::PxSerialization::createCollectionFromBinary( memory128, *registry );

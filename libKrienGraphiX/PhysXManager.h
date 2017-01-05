@@ -45,7 +45,7 @@ namespace kgx
 
 			void initScene();
 
-			static PhysXManager* m_inst;
+			static PhysXManager *m_inst;
 
 			physx::PxDefaultErrorCallback m_defaultErrorCallback;
 			physx::PxDefaultAllocator m_defaultAllocatorCallback;
@@ -55,6 +55,7 @@ namespace kgx
 			physx::PxDefaultCpuDispatcher *m_dispatcher;
 			physx::PxScene *m_scene;
 			//physx::PxCooking *m_cooking;
+			void *m_collectionMemory;
 
 			bool m_isInit;
 			float m_accumulator;
