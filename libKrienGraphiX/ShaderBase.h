@@ -20,11 +20,6 @@ namespace kgx
 
 			void updateConstantVariable( const std::string &name, const void *dataPtr );
 
-			typedef std::vector<Texture*>::const_iterator const_textureiterator;
-			const_textureiterator getTextureCBegin() const;
-			const_textureiterator getTextureCEnd() const;
-			void addTexture( Texture *tex );
-
 			virtual void commitChanges();
 			virtual void activate() = 0;
 
@@ -39,11 +34,6 @@ namespace kgx
 
 			std::vector<ConstantBuffer*> m_constBuffers;
 			std::vector<ID3D11Buffer*> m_dxConstBuffers;		// used for setting all the constant buffers in one API call
-
-			//TODO: m_textures might not be necessary, but lets keep it for now..
-			std::vector<Texture*> m_textures;
-			std::vector<ID3D11Resource*> m_texBuffers;
-			std::vector<ID3D11ShaderResourceView*> m_texViews;
 
 			std::string m_target;
 

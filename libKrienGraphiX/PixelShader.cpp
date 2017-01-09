@@ -34,14 +34,6 @@ namespace kgx
 		
 		// set buffers
 		m_dxDevCont->PSSetConstantBuffers(0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data());
-
-		// set textures, if available
-		if ( m_textures.size() > 0u )
-		{
-			ID3D11SamplerState *sampler = TextureManager::getInst()->getDefaultSampler();
-			m_dxDevCont->PSSetSamplers( 0, 1, &sampler );
-			m_dxDevCont->PSSetShaderResources( 0, UINT(m_texViews.size()), m_texViews.data() );
-		}
 	}
 
 

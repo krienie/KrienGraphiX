@@ -17,7 +17,7 @@ namespace kgx
 {
 	ShaderBase::ShaderBase( ID3D11Device *dxDevice, const std::string &target )
 		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_constBuffers(), m_dxConstBuffers(),
-			m_textures(), m_texBuffers(), m_texViews(), m_target(target)
+			m_target(target)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
 	}
@@ -114,24 +114,6 @@ namespace kgx
 					return;
 
 			std::cout << "Warning (ShaderBase::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
-		}
-	}
-
-	ShaderBase::const_textureiterator ShaderBase::getTextureCBegin() const
-	{
-		return m_textures.cbegin();
-	}
-	ShaderBase::const_textureiterator ShaderBase::getTextureCEnd() const
-	{
-		return m_textures.cend();
-	}
-	void ShaderBase::addTexture( Texture *tex )
-	{
-		if ( tex )
-		{
-			m_textures.push_back( tex );
-			m_texBuffers.push_back( tex->getBuffer() );
-			m_texViews.push_back( tex->getResourceView() );
 		}
 	}
 

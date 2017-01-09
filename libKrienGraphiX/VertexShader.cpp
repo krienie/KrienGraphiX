@@ -26,14 +26,6 @@ namespace kgx
 
 		//TODO: create separate commands for binding constant buffers and textures/samplers
 		m_dxDevCont->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
-
-		// set textures, if available
-		if ( m_textures.size() > 0u )
-		{
-			ID3D11SamplerState *sampler = TextureManager::getInst()->getDefaultSampler();
-			m_dxDevCont->VSSetSamplers( 0, 1, &sampler );
-			m_dxDevCont->VSSetShaderResources( 0, UINT( m_texViews.size() ), m_texViews.data() );
-		}
 	}
 
 	VertexInputLayout* VertexShader::getInputLayout()
