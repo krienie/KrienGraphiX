@@ -240,24 +240,10 @@ namespace kgx
 		if ( !m_scene->sweep(sphere, pose, direction, dist, sweepBuff) )
 			return false;
 
-		std::cout << "---------------------begin------------------------" << std::endl;
-
-		if ( sweepBuff.hasBlock )
-		{
-			std::cout << "blocked!" << std::endl;
-			std::cout << "block hitpoint: " << sweepBuff.block.position.x << ", " << sweepBuff.block.position.y << ", " << sweepBuff.block.position.z << std::endl;
-		}
-
-		if ( sweepBuff.hasAnyHits() )
-			std::cout << "AnyHits found" << std::endl;
-
-		std::cout << "NbTouches: " << sweepBuff.getNbTouches() << std::endl;
-		std::cout << "NbAnyHits: " << sweepBuff.getNbAnyHits() << std::endl;
-
 		physx::PxSweepHit sweepHit = sweepBuff.getAnyHit( 0 );
 		hit = DirectX::XMFLOAT3(sweepHit.position.x, sweepHit.position.y, sweepHit.position.z);
 		dist = sweepHit.distance;
-		std::cout << "---------------------end------------------------" << std::endl;
+
 		return true;
 	}
 
