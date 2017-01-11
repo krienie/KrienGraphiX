@@ -195,7 +195,7 @@ namespace kgx
 		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
 		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
 		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_eye );
-		DirectX::XMVECTOR dirVect    = DirectX::XMVectorSubtract(targetVect, eyeVect);
+		DirectX::XMVECTOR dirVect    = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
 
 		DirectX::XMVECTOR rotAxis = DirectX::XMVector3Cross( dirVect, upVect );
 		DirectX::XMMATRIX rotMat  = DirectX::XMMatrixRotationAxis( rotAxis, DirectX::XMConvertToRadians(degrees) );
@@ -217,11 +217,11 @@ namespace kgx
 		DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
 		DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
 		DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_eye );
-		DirectX::XMVECTOR dirVect    = DirectX::XMVector3Normalize( DirectX::XMVectorSubtract(targetVect, eyeVect) );
+		DirectX::XMVECTOR dirVect    = DirectX::XMVectorSubtract(targetVect, eyeVect);
 
 		//TODO: fix assertion error when dirVect == (0.0, -1.0, 0.0) and upVect == (0.0, 1.0, 0.0)
 		DirectX::XMVECTOR rightVect = DirectX::XMVector3Cross( dirVect, upVect );
-		DirectX::XMVECTOR rotAxis   = DirectX::XMVector3Cross( rightVect, dirVect );
+		DirectX::XMVECTOR rotAxis   = DirectX::XMVector3Normalize( DirectX::XMVector3Cross(rightVect, dirVect) );
 		DirectX::XMMATRIX rotMat    = DirectX::XMMatrixRotationAxis( rotAxis, DirectX::XMConvertToRadians(degrees) );
 
 		DirectX::XMVECTOR newTarget = DirectX::XMVectorAdd( DirectX::XMVector3Transform( dirVect, rotMat ), eyeVect );
