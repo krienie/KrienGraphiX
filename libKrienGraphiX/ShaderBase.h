@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+struct ID3D11DeviceContext;
+
 namespace kgx
 {
 	class ConstantBuffer;
@@ -18,10 +20,10 @@ namespace kgx
 			HRESULT loadFromFile( const std::string &filename );
 			HRESULT loadFromSource( const std::string &source, const std::string &entryPoint = "main" );
 
-			void updateConstantVariable( const std::string &name, const void *dataPtr );
+			void activate();
+			virtual void activate( ID3D11DeviceContext *dxContext ) = 0;
 
-			virtual void commitChanges();
-			virtual void activate() = 0;
+			//TODO: remove virtual functions from this class
 
 		protected:
 			ShaderBase( ID3D11Device *dxDevice, const std::string &target );

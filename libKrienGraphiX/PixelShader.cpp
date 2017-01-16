@@ -28,12 +28,12 @@ namespace kgx
 	}
 
 
-	void PixelShader::activate()
+	void PixelShader::activate( ID3D11DeviceContext *dxContext )
 	{
-		m_dxDevCont->PSSetShader(m_pixelShader, 0, 0);
+		dxContext->PSSetShader(m_pixelShader, 0, 0);
 		
 		// set buffers
-		m_dxDevCont->PSSetConstantBuffers(0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data());
+		dxContext->PSSetConstantBuffers(0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data());
 	}
 
 

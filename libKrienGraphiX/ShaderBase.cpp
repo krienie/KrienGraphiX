@@ -100,29 +100,9 @@ namespace kgx
 		return S_OK;
 	}
 
-
-	void ShaderBase::updateConstantVariable( const std::string &name, const void *dataPtr )
+	void ShaderBase::activate()
 	{
-		//TODO: handle cases with duplicate variable names (two buffers, one variable in each buffer with the same name)
-
-		if ( dataPtr )
-		{
-			//TODO: make this a bit more efficient
-			std::vector<ConstantBuffer*>::iterator it;
-			for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-				if ( (*it)->updateVariable( name, dataPtr ) )
-					return;
-
-			std::cout << "Warning (ShaderBase::updateConstantVariable): Variable with name " << name << " was not found. No update done." << std::endl;
-		}
-	}
-
-	void ShaderBase::commitChanges()
-	{
-		// update all buffers if necessary 
-		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-			(*it)->commit();
+		activate( m_dxDevCont );
 	}
 
 	HRESULT ShaderBase::processLoadedShaderBlob( ID3DBlob *shaderSource )
@@ -166,14 +146,6 @@ namespace kgx
 			//TODO: these can be put on the stack
 			ConstantBuffer *cBuff = new ConstantBuffer( m_dxDev, i, shaderBuffDesc.Name );
 			cBuff->create( shaderBuffDesc.Size );
-			for ( UINT j = 0U; j < shaderBuffDesc.Variables; ++j )
-			{
-				ID3D11ShaderReflectionVariable *variableRefl = constBuffReflection->GetVariableByIndex( j );
-				D3D11_SHADER_VARIABLE_DESC shaderVarDesc;
-				variableRefl->GetDesc( &shaderVarDesc );
-
-				cBuff->addVariableDefinition( shaderVarDesc.Name, shaderVarDesc.StartOffset, shaderVarDesc.Size );
-			}
 
 			m_constBuffers.push_back( cBuff );
 			m_dxConstBuffers.push_back( cBuff->getDxBufferPtr() );

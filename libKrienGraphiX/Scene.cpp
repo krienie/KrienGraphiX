@@ -3,27 +3,28 @@
 #include <d3d11.h>
 
 #include "Camera.h"
-#include "PhysXManager.h"
-#include "PixelShader.h"
-#include "RenderCommand.h"
-#include "RenderBucket.h"
-#include "RenderableObject.h"
 #include "ResourceManager.h"
-#include "ShaderProgram.h"
-#include "TextureManager.h"
-#include "VertexShader.h"
+#include "RenderPass.h"
+
+//TODO: temporary
+#include "KGXCore.h"
+
 #include "Scene.h"
 
 namespace kgx
 {
 	Scene::Scene()
-		: m_lightData(), m_nextCamID(0u), m_defaultCamera(nullptr), m_cameras(), m_renderObjects()
+		: m_dxDeferredDevCont(nullptr), m_lightData(), m_nextCamID(0u),
+			m_defaultCamera(nullptr), m_cameras(), m_renderObjects()
 	{
 		m_lightData.ambientLight = DirectX::XMFLOAT4( 0.25f, 0.25f, 0.25f, 1.0f );
 	}
 
 	Scene::~Scene()
 	{
+		if ( m_dxDeferredDevCont )
+			m_dxDeferredDevCont->Release();
+
 		std::map<CameraID, Camera*>::iterator camIt;
 		for ( camIt = m_cameras.begin(); camIt != m_cameras.end(); ++camIt )
 			delete camIt->second;
@@ -123,98 +124,20 @@ namespace kgx
 
 	void Scene::render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
-		RenderBucket mainRenderBucket( rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix() );
-
-		std::vector<RenderableObject>::iterator it;
-		for ( it = m_renderObjects.begin(); it != m_renderObjects.end(); ++it )
+		if ( !m_dxDeferredDevCont )
 		{
-			UINT commandKey = createCommandKey( *it );
-
-			ShaderProgram *shaderProg = ResourceManager::getInst()->getShaderProgram( it->shaderProgram );
-
-			// set model/normal matrix
-			rendercommand::CopyConstantBufferData *modelNormalCommand = mainRenderBucket.addCommand<rendercommand::CopyConstantBufferData>( commandKey, sizeof(DirectX::XMFLOAT4X4) * 2u );
-			modelNormalCommand->constantBuffer = shaderProg->getVertexShader()->getConstantBufferPtrByIndex(1);		//TODO: make this part more generic/flexible
-			modelNormalCommand->size           = sizeof(DirectX::XMFLOAT4X4) * 2u;
-			modelNormalCommand->data           = rendercommandpacket::getAuxiliaryMemory( modelNormalCommand );
-
-			DirectX::XMFLOAT4X4 modelMatrix;
-			if ( !PhysXManager::getInst()->getShapeGlobalPosition(it->name, modelMatrix) )
-				modelMatrix = getModelMatrix( *it );
-
-			DirectX::XMFLOAT4X4 matrices[2] = { modelMatrix, getNormalMatrix(*it) };
-			memcpy( modelNormalCommand->data, matrices, sizeof(DirectX::XMFLOAT4X4) * 2u );
-
-			// set material constants and shader resources (textures and such)
-			rendercommand::CopyConstantBufferData *materialCommand = mainRenderBucket.appendCommand<rendercommand::CopyConstantBufferData>( modelNormalCommand, sizeof(DirectX::XMFLOAT4) * 3u );
-			materialCommand->constantBuffer = shaderProg->getPixelShader()->getConstantBufferPtrByIndex(2);
-			materialCommand->size           = sizeof(DirectX::XMFLOAT4) * 3u;
-			materialCommand->data           = rendercommandpacket::getAuxiliaryMemory( materialCommand );
-
-			int useTextures = static_cast<int>(it->material.diffuseMap >= 0);
-			DirectX::XMFLOAT4 useTextures4;
-			useTextures4.x = static_cast<float>(useTextures);
-
-			DirectX::XMFLOAT4 matData[3] = { it->material.diffuse, it->material.specular, useTextures4 };
-			memcpy( materialCommand->data, matData, sizeof(DirectX::XMFLOAT4) * 3u );
-
-			// set default texture sampler
-			rendercommand::SetPixelShaderSamplers *samplerCommand = mainRenderBucket.appendCommand<rendercommand::SetPixelShaderSamplers>( materialCommand, sizeof(ID3D11SamplerState*) * 1u );
-			samplerCommand->startSlot   = 0u;
-			samplerCommand->numSamplers = 1u;
-
-			samplerCommand->samplers = reinterpret_cast<ID3D11SamplerState**>( rendercommandpacket::getAuxiliaryMemory(samplerCommand) );
-			ID3D11SamplerState *samplers[1] = { TextureManager::getInst()->getDefaultSampler() };
-			memcpy( samplerCommand->samplers, samplers, sizeof(ID3D11SamplerState*) * 1u );
-
-
-			std::vector<Texture::TextureID> textures;
-			if ( it->material.diffuseMap >= 0 )
-				textures.push_back( it->material.diffuseMap );
-			if ( it->material.specularMap >= 0 )
-				textures.push_back( it->material.specularMap );
-			if ( it->material.normalMap >= 0 )
-				textures.push_back( it->material.normalMap );
-
-			// collect all ShaderResourceViews for all used textures
-			std::vector<ID3D11ShaderResourceView*> texViews;
-			texViews.reserve( textures.size() );
-
-			std::vector<Texture::TextureID>::const_iterator texIt;
-			for ( texIt = textures.begin(); texIt != textures.end(); ++texIt )
-			{
-				Texture *texture = TextureManager::getInst()->getTexture( *texIt );
-				texViews.push_back( texture->getResourceView() );		// assumes the texture is always found..
-			}
-
-			// set texture ShaderResourceViews for the pixel shader
-			rendercommand::SetPixelShaderResourceViews *texCommand = mainRenderBucket.appendCommand<rendercommand::SetPixelShaderResourceViews>( samplerCommand, sizeof(ID3D11ShaderResourceView*) * texViews.size() );
-			texCommand->startSlot = 0u;
-			texCommand->numViews  = static_cast<UINT>(texViews.size());
-
-			texCommand->views = reinterpret_cast<ID3D11ShaderResourceView**>( rendercommandpacket::getAuxiliaryMemory(texCommand) );
-			memcpy( texCommand->views, texViews.data(), sizeof(ID3D11ShaderResourceView*) * texViews.size() );
-
-			// bind mesh to IA stage
-			rendercommand::BindMeshToIAStage *bindMeshCommand = mainRenderBucket.appendCommand<rendercommand::BindMeshToIAStage>( texCommand, 0u );
-			bindMeshCommand->primitiveTopology = it->topology;
-			bindMeshCommand->meshBuffer        = it->meshBuffer;
-
-			// draw indexed
-			rendercommand::DrawIndexed *drawCommand = mainRenderBucket.appendCommand<rendercommand::DrawIndexed>( bindMeshCommand, 0u );
-			drawCommand->baseVertex = it->baseVertex;
-			drawCommand->startIndex = it->startIndex;
-			drawCommand->indexCount = it->indexCount;
-
-			//TODO: maybe merge BindMeshToIAStage command into DrawIndexed command
+			//TODO: change this so each worker thread has its own deferred context
+			//		prob move this deferredContext creation to thread implementation
+			// create deferred context
+			ID3D11Device *dxDev = KGXCore::getInst()->getDxDevicePtr();
+			dxDev->CreateDeferredContext( 0, &m_dxDeferredDevCont );
 		}
 
-		mainRenderBucket.submit( m_lightData );
-	}
+		// render objects
+		RenderPass mainRenderBucket( m_dxDeferredDevCont, rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix(),
+									 ResourceManager::getInst()->getDefaultShaderProgram() );
 
-	UINT Scene::createCommandKey( const RenderableObject &obj ) const
-	{
-		// for now, the command key for an RenderableObject is a combination of the ShaderProgramID and the MeshBufferID
-		return (obj.shaderProgram & 0xFFFF) << 16 | (obj.meshBuffer & 0xFFFF);
+		mainRenderBucket.record( m_renderObjects, m_lightData );
+		mainRenderBucket.submit();
 	}
 }

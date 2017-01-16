@@ -17,7 +17,7 @@ namespace kgx
 
 			/** Utility function that returns a direct pointer to the DirectX device */
 			ID3D11Device* getDxDevicePtr() const;
-
+			
 			RenderWindow* createRenderWindow( HWND windowHandle );
 			RenderWindow* getRenderWindow( HWND windowHandle ) const;
 

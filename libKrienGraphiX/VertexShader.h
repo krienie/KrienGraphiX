@@ -14,7 +14,7 @@ namespace kgx
 			VertexShader( ID3D11Device *dxDev, const VertexInputLayout &layout );
 			~VertexShader();
 
-			void activate();
+			void activate( ID3D11DeviceContext *dxContext );
 			VertexInputLayout* getInputLayout();
 
 		protected:

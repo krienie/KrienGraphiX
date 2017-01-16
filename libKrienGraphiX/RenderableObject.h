@@ -24,7 +24,6 @@ namespace kgx
 
 		//TODO: place material data directly in this struct. It is quite pointless to let this live in a separate struct
 		Material material;
-		ShaderProgram::ShaderProgramID shaderProgram;
 		
 		float xPos;
 		float yPos;
@@ -34,6 +33,6 @@ namespace kgx
 		float zScale;
 	};
 
-	DirectX::XMFLOAT4X4 getModelMatrix( RenderableObject &obj );
-	DirectX::XMFLOAT4X4 getNormalMatrix( RenderableObject &obj );
+	DirectX::XMFLOAT4X4 getModelMatrix( const RenderableObject &obj );
+	DirectX::XMFLOAT4X4 getNormalMatrix( const RenderableObject &obj );
 }

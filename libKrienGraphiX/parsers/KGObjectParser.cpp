@@ -141,8 +141,7 @@ namespace kgx
 			ro.startIndex = it->startIndex;
 			ro.baseVertex = 0u;
 
-			ro.material      = ResourceManager::getInst()->getMaterial( it->matName );
-			ro.shaderProgram = ResourceManager::getInst()->getDefaultShaderProgram();
+			ro.material = ResourceManager::getInst()->getMaterial( it->matName );
 
 			ro.xPos   = position.x;
 			ro.yPos   = position.y;

@@ -5,7 +5,7 @@
 
 namespace kgx
 {
-	DirectX::XMFLOAT4X4 getModelMatrix( RenderableObject &obj )
+	DirectX::XMFLOAT4X4 getModelMatrix( const RenderableObject &obj )
 	{
 		//TODO: maybe cache this, if necessary?
 
@@ -19,7 +19,7 @@ namespace kgx
 		return result;
 	}
 
-	DirectX::XMFLOAT4X4 getNormalMatrix( RenderableObject &obj )
+	DirectX::XMFLOAT4X4 getNormalMatrix( const RenderableObject &obj )
 	{
 		//TODO: maybe cache this, if necessary?
 

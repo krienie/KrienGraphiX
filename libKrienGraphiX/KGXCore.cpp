@@ -4,7 +4,6 @@
 #include <DirectXMath.h>
 #include <iostream>
 
-#include "RenderBackend.h"
 #include "RenderWindow.h"
 #include "ConfigManager.h"
 #include "Filesystem.h"
@@ -101,8 +100,7 @@ namespace kgx
 		}
 		dxgiAdapter->Release();
 
-		// init RenderBackend and ResourceManagers
-		renderbackend::setDeviceContext(m_dxDev);
+		// init ResourceManagers
 		ResourceManager::construct(m_dxDev);
 		TextureManager::construct(m_dxDev);
 	}
@@ -114,7 +112,6 @@ namespace kgx
 			delete it->second;
 
 		// destroy managers
-		renderbackend::releaseDeviceContext();
 		ConfigManager::destroy();
 		ResourceManager::destroy();
 		TextureManager::destroy();

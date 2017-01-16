@@ -110,41 +110,20 @@ namespace kgx
 		}
 	}
 
-	void ShaderProgram::updateShaderVar( ShaderType shaderType, const std::string &name, const void *dataPtr )
-	{
-		ShaderBase *shader = getShader( shaderType );
-		if ( shader )
-			shader->updateConstantVariable( name, dataPtr );
-		else std::cout << "Error (ShaderProgram::updateShaderVar): Shader not found. Call ShaderProgram::createShadertypeShader() first." << std::endl;
-	}
-
-	void ShaderProgram::commitAllChanges()
-	{
-		if ( m_vertShader )
-			m_vertShader->commitChanges();
-
-		/*if ( m_hullShader )
-			m_hullShader->commitChanges();*/
-
-		/*if ( m_domainShader )
-			m_domainShader->commitChanges();*/
-
-		/*if ( m_geomShader )
-			m_geomShader->commitChanges();*/
-
-		if ( m_pixShader )
-			m_pixShader->commitChanges();
-	}
 
 	void ShaderProgram::activate()
 	{
+		activate( m_dxDevCont );
+	}
+	void ShaderProgram::activate( ID3D11DeviceContext *dxContext )
+	{
 		// bind shaders to pipeline
 		if ( m_vertShader )
-			m_vertShader->activate();
-		else m_dxDevCont->VSSetShader( nullptr, 0, 0 );		// disable vertex shader
+			m_vertShader->activate( dxContext );
+		else dxContext->VSSetShader( nullptr, 0, 0 );		// disable vertex shader
 
 		if ( m_pixShader )
-			m_pixShader->activate();
-		else m_dxDevCont->PSSetShader( nullptr, 0, 0 );		// disable pixel shader
+			m_pixShader->activate( dxContext );
+		else dxContext->PSSetShader( nullptr, 0, 0 );		// disable pixel shader
 	}
 }

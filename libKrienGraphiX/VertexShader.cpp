@@ -19,13 +19,13 @@ namespace kgx
 			m_shaderSource->Release();
 	}
 
-	void VertexShader::activate()
+	void VertexShader::activate( ID3D11DeviceContext *dxContext )
 	{
-		m_dxDevCont->VSSetShader( m_vertShader, 0, 0 );
-		m_dxDevCont->IASetInputLayout(m_inputLayout.getDxInputLayout(m_dxDev, m_shaderSource));
+		dxContext->VSSetShader( m_vertShader, 0, 0 );
+		dxContext->IASetInputLayout( m_inputLayout.getDxInputLayout( m_dxDev, m_shaderSource ) );
 
 		//TODO: create separate commands for binding constant buffers and textures/samplers
-		m_dxDevCont->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
+		dxContext->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
 	}
 
 	VertexInputLayout* VertexShader::getInputLayout()

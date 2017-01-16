@@ -59,6 +59,8 @@ namespace kgx
 
 			UINT createCommandKey( const RenderableObject &obj ) const;
 
+			ID3D11DeviceContext *m_dxDeferredDevCont;
+
 			LightData m_lightData;
 
 			CameraID m_nextCamID;

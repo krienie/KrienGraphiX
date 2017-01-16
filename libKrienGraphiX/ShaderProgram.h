@@ -46,10 +46,8 @@ namespace kgx
 			//GeometryShader* getGeometryShader() const;
 			PixelShader* getPixelShader() const;
 
-			void updateShaderVar( ShaderType shaderType, const std::string &name,  const void *dataPtr );
-
-			void commitAllChanges();
 			void activate();
+			void activate( ID3D11DeviceContext *dxContext );
 
 		private:
 			// no copying allowed

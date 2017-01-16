@@ -13,7 +13,7 @@ namespace kgx
 			explicit PixelShader( ID3D11Device *dxDev );
 			~PixelShader();
 
-			void activate();
+			void activate( ID3D11DeviceContext *dxContext );
 
 		protected:
 			HRESULT build( ID3DBlob *shaderSource );

@@ -24,10 +24,7 @@
     <ClInclude Include="parsers\KGSceneParser.h" />
     <ClInclude Include="parsers\KGParserDefines.h" />
     <ClInclude Include="PhysXManager.h" />
-    <ClInclude Include="RenderBackend.h" />
-    <ClInclude Include="RenderBucket.h" />
-    <ClInclude Include="RenderCommandPacket.h" />
-    <ClInclude Include="RenderCommand.h" />
+    <ClInclude Include="RenderPass.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderableObject.h" />
@@ -53,10 +50,7 @@
     <ClCompile Include="parsers\KGObjectParser.cpp" />
     <ClCompile Include="parsers\KGSceneParser.cpp" />
     <ClCompile Include="PhysXManager.cpp" />
-    <ClCompile Include="RenderBackend.cpp" />
-    <ClCompile Include="RenderBucket.cpp" />
-    <ClCompile Include="RenderCommand.cpp" />
-    <ClCompile Include="RenderCommandPacket.cpp" />
+    <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderableObject.cpp" />
