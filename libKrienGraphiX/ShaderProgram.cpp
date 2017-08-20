@@ -8,9 +8,8 @@
 
 namespace kgx
 {
-	//TODO: this class might be obsolete now...
 	ShaderProgram::ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name )
-		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_progID(id), m_vertShader(nullptr),
+		: m_dxDev(dxDevice), m_dxDevCont(nullptr), m_name(name), m_progID(id), m_vertShader(nullptr),
 		/*m_hullShader(nullptr), m_domainShader(nullptr), m_geomShader(nullptr),*/ m_pixShader(nullptr)
 	{
 		m_dxDev->GetImmediateContext( &m_dxDevCont );
@@ -33,6 +32,11 @@ namespace kgx
 	}
 
 
+	std::string ShaderProgram::getName() const
+	{
+		return m_name;
+	}
+
 	ShaderProgram::ShaderProgramID ShaderProgram::getID() const
 	{
 		return m_progID;
@@ -41,6 +45,9 @@ namespace kgx
 
 	VertexShader* ShaderProgram::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
 	{
+		if ( m_vertShader )
+			delete m_vertShader;
+
 		m_vertShader = new VertexShader( m_dxDev, layout );
 
 		if ( FAILED(m_vertShader->loadFromFile( filename )) )
@@ -56,6 +63,9 @@ namespace kgx
 
 	PixelShader* ShaderProgram::createPixelShader( const std::string &filename )
 	{
+		if ( m_pixShader )
+			delete m_pixShader;
+
 		m_pixShader = new PixelShader( m_dxDev );
 
 		if ( FAILED(m_pixShader->loadFromFile( filename )) )

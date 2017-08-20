@@ -2,7 +2,7 @@
 #pragma once
 
 #include <d3d11.h>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "Defines.h"
@@ -24,13 +24,14 @@ namespace kgx
 			void releaseBuffer( MeshBufferID id );
 
 			Material getMaterial( const std::string &matName );
-			ShaderProgram::ShaderProgramID getDefaultShaderProgram();
 
+			ShaderProgram* getShaderProgram( const std::string &name ) const;
 			ShaderProgram* getShaderProgram( ShaderProgram::ShaderProgramID id ) const;
-			ShaderProgram* createShaderProgram();
+			ShaderProgram* createShaderProgram( const std::string &name );
+			void releaseShaderProgram( const std::string &name );
 			void releaseShaderProgram( ShaderProgram::ShaderProgramID id );
 
-			void clearResources();
+			void clearResources( bool reloadDefaultShaderPrograms = false );
 
 		private:
 			explicit ResourceManager( ID3D11Device *dxDevice );
@@ -40,16 +41,17 @@ namespace kgx
 			ResourceManager& operator=( const ResourceManager& );
 
 			bool loadMaterials();
+			bool loadDefaultShaderPrograms();
 
 			static ResourceManager* m_inst;
 
 			ID3D11Device *m_dxDev;
 			
 			MeshBufferID m_nextBufferID;
-			std::map<MeshBufferID, MeshBuffer> m_meshBuffers;
-			std::map<std::string, Material> m_materials;
+			std::unordered_map<MeshBufferID, MeshBuffer> m_meshBuffers;
+			std::unordered_map<std::string, Material> m_materials;
 			ShaderProgram::ShaderProgramID m_nextShaderProgramID;
-			ShaderProgram::ShaderProgramID m_defaultShaderProgram;
-			std::map<ShaderProgram::ShaderProgramID, ShaderProgram*> m_shaderPrograms;
+			std::unordered_map<ShaderProgram::ShaderProgramID, ShaderProgram*> m_shaderPrograms;
+			std::unordered_map<std::string, ShaderProgram::ShaderProgramID> m_shaderProgramNames;
 	};
 }

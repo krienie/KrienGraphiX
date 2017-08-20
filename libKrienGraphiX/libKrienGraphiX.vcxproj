@@ -23,6 +23,7 @@
     <ClInclude Include="parsers\KGObjectParser.h" />
     <ClInclude Include="parsers\KGSceneParser.h" />
     <ClInclude Include="parsers\KGParserDefines.h" />
+    <ClInclude Include="parsers\KGShaderProgramsParser.h" />
     <ClInclude Include="PhysXManager.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="ShaderProgram.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="parsers\KGMaterialLibraryParser.cpp" />
     <ClCompile Include="parsers\KGObjectParser.cpp" />
     <ClCompile Include="parsers\KGSceneParser.cpp" />
+    <ClCompile Include="parsers\KGShaderProgramsParser.cpp" />
     <ClCompile Include="PhysXManager.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
@@ -77,6 +79,25 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="shaders\DeferredCompositionPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredCompositionVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredGBufferPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredGBufferVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\ShaderPrograms.kgsp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2C3410EE-9E65-44F0-A6D8-9ACE7134D68C}</ProjectGuid>
@@ -135,6 +156,12 @@
     <Lib>
       <AdditionalDependencies>PhysX3DEBUG_x64.lib;PhysX3CommonDEBUG_x64.lib;PhysX3ExtensionsDEBUG.lib;PhysXVisualDebuggerSDKDEBUG.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)shaders\ShaderPrograms.kgsp $(OutDir)ShaderPrograms.kgsp</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy shader program library to output directory</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

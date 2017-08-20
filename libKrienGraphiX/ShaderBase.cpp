@@ -36,6 +36,9 @@ namespace kgx
 
 	ConstantBuffer* ShaderBase::getConstantBufferPtrByIndex( UINT registerIndex ) const
 	{
+		if ( m_constBuffers.size() == 0u )
+			return nullptr;
+
 		// register indices are assumed to be ascending, starting from 0
 		return m_constBuffers[registerIndex];
 	}

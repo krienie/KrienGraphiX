@@ -46,9 +46,18 @@ namespace kgx
 		DirectX::XMFLOAT4X4 perCamData[2] = { m_viewMatrix, m_projMatrix };
 		vertexPerCamBuffer->copyBufferData( perCamData, sizeof(DirectX::XMFLOAT4X4) * 2u, m_dxDeferredDevCont );
 
+		struct TempLightData
+		{
+			DirectX::XMFLOAT4 ambientLight;
+			Light lights;
+		} tmpLightData;
+
+		tmpLightData.ambientLight = lightData.ambientLight;
+		tmpLightData.lights = lightData.lights[0];
+
 		// set light data
 		ConstantBuffer *pixelLightDataBuffer = shaderProg->getPixelShader()->getConstantBufferPtrByIndex( 0 );
-		pixelLightDataBuffer->copyBufferData( &lightData, sizeof(LightData), m_dxDeferredDevCont );
+		pixelLightDataBuffer->copyBufferData( &tmpLightData, sizeof( TempLightData ), m_dxDeferredDevCont );
 
 		std::vector<RenderableObject>::const_iterator it;
 		for ( it = renderObjects.begin(); it != renderObjects.end(); ++it )

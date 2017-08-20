@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "ResourceManager.h"
 #include "RenderPass.h"
+#include "VertexInputLayout.h"
 
 //TODO: temporary
 #include "KGXCore.h"
@@ -15,9 +16,25 @@ namespace kgx
 {
 	Scene::Scene()
 		: m_dxDeferredDevCont(nullptr), m_lightData(), m_nextCamID(0u),
-			m_defaultCamera(nullptr), m_cameras(), m_renderObjects()
+			m_defaultCamera(nullptr), m_cameras(), m_renderObjects(),
+			shaderProgPass1(-1), shaderProgPass2(-1)
 	{
 		m_lightData.ambientLight = DirectX::XMFLOAT4( 0.25f, 0.25f, 0.25f, 1.0f );
+
+		//TODO: temporary placed here. Need to find a better place for this
+		
+		// render pass 1
+		ShaderProgram *prog = ResourceManager::getInst()->getShaderProgram("ForwardPass");
+		shaderProgPass1 = prog->getID();
+
+		// render pass 2
+		/*prog = ResourceManager::getInst()->createShaderProgram();
+		shaderProgPass2 = prog->getID();
+
+		VertexInputLayout vertInputLayoutPass2;
+		vertInputLayoutPass2.addInputType( VertexInputLayout::Position );
+		prog->createVertexShader( "DeferredCompositionVS.cso", vertInputLayoutPass2 );
+		prog->createPixelShader( "DeferredCompositionPS.cso" );*/
 	}
 
 	Scene::~Scene()
@@ -28,8 +45,6 @@ namespace kgx
 		std::map<CameraID, Camera*>::iterator camIt;
 		for ( camIt = m_cameras.begin(); camIt != m_cameras.end(); ++camIt )
 			delete camIt->second;
-
-		//TODO: release RenderObject data
 	}
 
 
@@ -122,7 +137,8 @@ namespace kgx
 	}
 
 
-	void Scene::render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
+	void Scene::render( Camera *renderCam, const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
+											ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
 		if ( !m_dxDeferredDevCont )
 		{
@@ -133,9 +149,12 @@ namespace kgx
 			dxDev->CreateDeferredContext( 0, &m_dxDeferredDevCont );
 		}
 
+		m_dxDeferredDevCont->RSSetViewports( 1, &vp );
+		m_dxDeferredDevCont->RSSetState( rs );
+
 		// render objects
 		RenderPass mainRenderBucket( m_dxDeferredDevCont, rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix(),
-									 ResourceManager::getInst()->getDefaultShaderProgram() );
+									 shaderProgPass1 );
 
 		mainRenderBucket.record( m_renderObjects, m_lightData );
 		mainRenderBucket.submit();

@@ -108,6 +108,9 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parsers\KGShaderProgramsParser.h">
+      <Filter>Header Files\parsers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceManager.cpp">
@@ -182,6 +185,9 @@
     <ClCompile Include="RenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="parsers\KGShaderProgramsParser.cpp">
+      <Filter>Source Files\parsers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\DefaultPS.hlsl">
@@ -190,5 +196,22 @@
     <FxCompile Include="shaders\DefaultVS.hlsl">
       <Filter>Header Files\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="shaders\DeferredCompositionPS.hlsl">
+      <Filter>Header Files\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredCompositionVS.hlsl">
+      <Filter>Header Files\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredGBufferPS.hlsl">
+      <Filter>Header Files\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\DeferredGBufferVS.hlsl">
+      <Filter>Header Files\shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\ShaderPrograms.kgsp">
+      <Filter>Header Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -100,7 +100,7 @@ namespace kgx
 		}
 		dxgiAdapter->Release();
 
-		// init ResourceManagers
+		// Init ResourceManagers
 		ResourceManager::construct(m_dxDev);
 		TextureManager::construct(m_dxDev);
 	}
@@ -175,7 +175,7 @@ namespace kgx
 	void KGXCore::clearManagers()
 	{
 		filesystem::clearSearchPaths();
-		ResourceManager::getInst()->clearResources();
+		ResourceManager::getInst()->clearResources(true);
 		TextureManager::getInst()->clearTextureResources();
 	}
 

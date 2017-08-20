@@ -9,7 +9,6 @@ namespace kgx
 {
 	class Camera;
 
-	//TODO: voorlopig een renderWindow => later kan dit nog een renderTexture of wat dan ook worden
 	class RenderWindow
 	{
 		public:
@@ -32,8 +31,6 @@ namespace kgx
 			// no copying allowed
 			RenderWindow( const RenderWindow& );
 			RenderWindow& operator=( const RenderWindow& );
-
-			//void enumAdaptersTest();
 
 			struct Viewport
 			{

@@ -33,7 +33,7 @@ namespace kgx
 			float getFarZ() const;
 
 			/** Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline */
-			void renderCurrentView( ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
+			void renderCurrentView( const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
 
 			void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			void moveForward( float dist );

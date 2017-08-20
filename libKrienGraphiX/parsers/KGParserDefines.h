@@ -31,6 +31,17 @@ namespace kgx
 		std::string       normalMap;
 	};
 
+	struct KgShaderProgData
+	{
+		std::string programName;
+		std::string vertexShader;
+		std::string hullShader;
+		std::string domainShader;
+		std::string geometryShader;
+		std::string pixelShader;
+		std::vector<VertexInputLayout::Type> vertLayoutTypes;
+	};
+
 
 	struct KgoData
 	{

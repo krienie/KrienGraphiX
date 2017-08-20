@@ -117,10 +117,11 @@ namespace kgx
 	/**
 	 * Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline
 	 */
-	void Camera::renderCurrentView( ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
+	void Camera::renderCurrentView( const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
+									ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
 		if ( m_parentScene )
-			m_parentScene->render(this, rtv, dsv);
+			m_parentScene->render(this, vp, rs, rtv, dsv);
 	}
 
 

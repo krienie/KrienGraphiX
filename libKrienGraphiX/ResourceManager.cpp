@@ -4,11 +4,13 @@
 
 #include "Filesystem.h"
 #include "ShaderProgram.h"
-#include "ResourceManager.h"
 #include "TextureManager.h"
 #include "VertexInputLayout.h"
 
 #include "parsers\KGMaterialLibraryParser.h"
+#include "parsers\KGShaderProgramsParser.h"
+
+#include "ResourceManager.h"
 
 namespace kgx
 {
@@ -36,9 +38,10 @@ namespace kgx
 
 
 	ResourceManager::ResourceManager( ID3D11Device *dxDevice )
-		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(), m_materials(),
-			m_nextShaderProgramID(0u), m_defaultShaderProgram(-1), m_shaderPrograms()
+		: m_dxDev(dxDevice), m_nextBufferID(0u), m_meshBuffers(),
+			m_materials(), m_nextShaderProgramID(0u), m_shaderPrograms()
 	{
+		loadDefaultShaderPrograms();
 	}
 
 	ResourceManager::~ResourceManager()
@@ -49,7 +52,7 @@ namespace kgx
 
 	MeshBuffer ResourceManager::getMeshBuffer( MeshBufferID id ) const
 	{
-		std::map<MeshBufferID, MeshBuffer>::const_iterator it;
+		std::unordered_map<MeshBufferID, MeshBuffer>::const_iterator it;
 		it = m_meshBuffers.find(id);
 
 		if ( it != m_meshBuffers.cend() )
@@ -130,7 +133,7 @@ namespace kgx
 
 	void ResourceManager::releaseBuffer( MeshBufferID id )
 	{
-		std::map<MeshBufferID, MeshBuffer>::iterator meshIt;
+		std::unordered_map<MeshBufferID, MeshBuffer>::iterator meshIt;
 		meshIt = m_meshBuffers.find(id);
 
 		if ( meshIt != m_meshBuffers.end() )
@@ -148,7 +151,7 @@ namespace kgx
 	{
 		if ( loadMaterials() )
 		{
-			std::map<std::string, Material>::const_iterator it;
+			std::unordered_map<std::string, Material>::const_iterator it;
 			it = m_materials.find( matName );
 
 			if ( it != m_materials.cend() )
@@ -158,63 +161,72 @@ namespace kgx
 		return Material();
 	}
 
-	ShaderProgram::ShaderProgramID ResourceManager::getDefaultShaderProgram()
+	ShaderProgram* ResourceManager::getShaderProgram( const std::string &name ) const
 	{
-		if ( m_defaultShaderProgram >= 0 )
-			return m_defaultShaderProgram;
+		std::unordered_map<std::string, ShaderProgram::ShaderProgramID>::const_iterator it;
+		it = m_shaderProgramNames.find( name );
 
-		ShaderProgram *prog = createShaderProgram();
-		m_defaultShaderProgram = prog->getID();
+		if ( it != m_shaderProgramNames.cend() )
+			return getShaderProgram(it->second);
 
-		VertexInputLayout vertInputLayout;
-		vertInputLayout.addInputType( VertexInputLayout::Position );
-		vertInputLayout.addInputType( VertexInputLayout::TextureCoordinate );
-		vertInputLayout.addInputType( VertexInputLayout::Normal );
-		prog->createVertexShader( "DefaultVS.cso", vertInputLayout );
-
-		prog->createPixelShader( "DefaultPS.cso" );
-
-
-		return m_defaultShaderProgram;
+		return nullptr;
 	}
-
-
 	ShaderProgram* ResourceManager::getShaderProgram( ShaderProgram::ShaderProgramID id ) const
 	{
-		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::const_iterator it;
+		std::unordered_map<ShaderProgram::ShaderProgramID, ShaderProgram*>::const_iterator it;
 		it = m_shaderPrograms.find( id );
 
 		if ( it != m_shaderPrograms.cend() )
 			return it->second;
 
-		std::cout << "Warning (ResourceManager::getShaderProgram): ShaderProgram with id " << id << " was not found." << std::endl;
 		return nullptr;
 	}
 
-	ShaderProgram* ResourceManager::createShaderProgram()
+	ShaderProgram* ResourceManager::createShaderProgram( const std::string &name )
 	{
-		ShaderProgram *newProg = new ShaderProgram( m_dxDev, m_nextShaderProgramID );
+		ShaderProgram *shaderProg = getShaderProgram( name );
+		if ( shaderProg )
+		{
+			std::cout << "Warning (ResourceManager::createShaderProgram): ShaderProgram with name " << name << " already exists." << std::endl;
+			return shaderProg;
+		}
 
-		m_shaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, newProg ) );
+		shaderProg = new ShaderProgram( m_dxDev, m_nextShaderProgramID, name );
+
+		m_shaderPrograms.insert( std::pair<ShaderProgram::ShaderProgramID, ShaderProgram*>( m_nextShaderProgramID, shaderProg ) );
+		m_shaderProgramNames.insert( std::pair<std::string, ShaderProgram::ShaderProgramID>( name, m_nextShaderProgramID ) );
 		++m_nextShaderProgramID;
 
-		return newProg;
+		return shaderProg;
 	}
 
+	void ResourceManager::releaseShaderProgram( const std::string &name )
+	{
+		ShaderProgram *sp = getShaderProgram( name );
+		if ( sp )
+			releaseShaderProgram( sp->getID() );
+	}
 	void ResourceManager::releaseShaderProgram( ShaderProgram::ShaderProgramID id )
 	{
-		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator it;
+		std::unordered_map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator it;
 		it = m_shaderPrograms.find( id );
 
 		if ( it != m_shaderPrograms.end() )
+		{
+			// remove from name-id map
+			m_shaderProgramNames.erase( it->second->getName() );
+
+			// remove from id-pointer map
 			delete it->second;
+			m_shaderPrograms.erase( it );
+		}
 	}
 
 
-	void ResourceManager::clearResources()
+	void ResourceManager::clearResources( bool reloadDefaultShaderPrograms )
 	{
 		// release all vertex- and index buffers
-		std::map<MeshBufferID, MeshBuffer>::iterator bIt;
+		std::unordered_map<MeshBufferID, MeshBuffer>::iterator bIt;
 		for ( bIt = m_meshBuffers.begin(); bIt != m_meshBuffers.end(); ++bIt )
 		{
 			if ( bIt->second.vertBuff )
@@ -229,14 +241,18 @@ namespace kgx
 		// clear all materials
 		m_materials.clear();
 
-		// release all ShaderProgram
-		std::map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator mIt;
-		for ( mIt = m_shaderPrograms.begin(); mIt != m_shaderPrograms.end(); ++mIt )
-			delete mIt->second;
+		// release all ShaderPrograms
+		std::unordered_map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator spIt;
+		for ( spIt = m_shaderPrograms.begin(); spIt != m_shaderPrograms.end(); ++spIt )
+			delete spIt->second;
 		m_shaderPrograms.clear();
+		m_shaderProgramNames.clear();
 
-		m_defaultShaderProgram = -1;
 		m_nextShaderProgramID  = 0u;
+
+		// reload default shader programs if requested
+		if ( reloadDefaultShaderPrograms )
+			loadDefaultShaderPrograms();
 	}
 
 	bool ResourceManager::loadMaterials()
@@ -270,6 +286,32 @@ namespace kgx
 				else mat.normalMap = -1;
 
 				m_materials.insert( std::pair<std::string, Material>(it->first, mat) );
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool ResourceManager::loadDefaultShaderPrograms()
+	{
+		// Parse and load the shader programs
+		std::string shaderProgString;
+		if ( filesystem::openFile( "ShaderPrograms.kgsp", shaderProgString ) )
+		{
+			std::unordered_map<std::string, KgShaderProgData> shaderProgData;
+			KGShaderProgramsParser::parse( shaderProgString, shaderProgData );
+
+			std::unordered_map<std::string, KgShaderProgData>::const_iterator it;
+			for ( it = shaderProgData.cbegin(); it != shaderProgData.cend(); ++it )
+			{
+				ShaderProgram *shaderProg = createShaderProgram( it->first );
+				if ( !it->second.vertexShader.empty() && !it->second.vertLayoutTypes.empty() )
+					shaderProg->createVertexShader( it->second.vertexShader, VertexInputLayout( it->second.vertLayoutTypes ) );
+
+				if ( !it->second.pixelShader.empty() )
+					shaderProg->createPixelShader( it->second.pixelShader );
 			}
 
 			return true;

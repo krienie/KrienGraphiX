@@ -50,7 +50,8 @@ namespace kgx
 			/** Adds a RenderableObject to the scene */
 			void addRenderableObject( const RenderableObject &obj );
 
-			void render( Camera *renderCam, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
+			void render( Camera *renderCam, const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
+											ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
 
 		private:
 			// no copying allowed
@@ -65,6 +66,9 @@ namespace kgx
 
 			CameraID m_nextCamID;
 			Camera *m_defaultCamera;
+
+			INT shaderProgPass1;
+			INT shaderProgPass2;
 
 			std::map<CameraID, Camera*> m_cameras;
 			std::vector<RenderableObject> m_renderObjects;

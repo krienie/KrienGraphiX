@@ -23,8 +23,6 @@ namespace kgx
 			void activate();
 			virtual void activate( ID3D11DeviceContext *dxContext ) = 0;
 
-			//TODO: remove virtual functions from this class
-
 		protected:
 			ShaderBase( ID3D11Device *dxDevice, const std::string &target );
 			virtual ~ShaderBase();

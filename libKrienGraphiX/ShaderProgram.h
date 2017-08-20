@@ -13,7 +13,6 @@ namespace kgx
 	class VertexShader;
 	class PixelShader;
 
-	//TODO: prob convert this class into a struct
 	class ShaderProgram
 	{
 		public:
@@ -28,9 +27,10 @@ namespace kgx
 
 			typedef INT ShaderProgramID;
 
-			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name = "" );
+			ShaderProgram( ID3D11Device *dxDevice, ShaderProgramID id, const std::string &name );
 			virtual ~ShaderProgram();
 
+			std::string getName() const;
 			ShaderProgramID getID() const;
 
 			VertexShader* createVertexShader( const std::string &filename, const VertexInputLayout &layout );
@@ -59,6 +59,7 @@ namespace kgx
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;
 
+			std::string m_name;
 			ShaderProgramID m_progID;
 
 			// shaders

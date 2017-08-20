@@ -16,13 +16,10 @@ namespace kgx
 			ConstantBuffer( ID3D11Device *dxDevice, UINT registerIndex, std::string bufferName );
 			~ConstantBuffer();
 
-			
-
 			UINT getRegisterIndex() const;
 			std::string getName() const;
 			UINT getBufferSize() const;
 			ID3D11Buffer* getDxBufferPtr() const;
-
 
 			HRESULT create( UINT sizeInBytes );
 			void copyBufferData( const void *data, UINT size );

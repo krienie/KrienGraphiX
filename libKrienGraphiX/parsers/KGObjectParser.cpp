@@ -87,7 +87,6 @@ namespace kgx
 			qi::rule<std::string::const_iterator, Skipper> start;
 			qi::rule<std::string::const_iterator, Skipper> vertices, indices;
 			qi::rule<std::string::const_iterator, VertexInputLayout::Type(), Skipper> vertexInputLayout;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> vertexInputLayoutName;
 			qi::rule<std::string::const_iterator, KgModelData(), Skipper> models;
 
 			qi::rule<std::string::const_iterator> comment;

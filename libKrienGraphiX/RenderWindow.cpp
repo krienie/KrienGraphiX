@@ -37,36 +37,6 @@ namespace kgx
 			m_dxDevCont->Release();
 	}
 
-	/*void RenderWindow::enumAdaptersTest()
-	{
-		IDXGIAdapter1 *adapter = nullptr;
-		HRESULT res = m_dxgiFactory->EnumAdapters1( 0u, &adapter );
-
-		DXGI_ADAPTER_DESC1 adapterDesc;
-		ZeroMemory( &adapterDesc, sizeof(DXGI_ADAPTER_DESC1) );
-		adapter->GetDesc1( &adapterDesc );
-
-		UINT i = 0;
-		IDXGIOutput *output;
-		adapter->EnumOutputs( 0u, &output );
-		DXGI_OUTPUT_DESC outputDesc;
-		ZeroMemory( &outputDesc, sizeof(DXGI_OUTPUT_DESC) );
-		output->GetDesc( &outputDesc );
-
-		UINT numModes = 0u;
-		output->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, 0u, &numModes, nullptr );
-		DXGI_MODE_DESC *modes = new DXGI_MODE_DESC[numModes];
-		output->GetDisplayModeList( DXGI_FORMAT_R8G8B8A8_UNORM, 0u, &numModes, modes );
-
-		DXGI_MODE_DESC lastMode = modes[numModes - 1u];
-
-		std::cout << "giggety" << std::endl;
-
-		delete[] modes;
-		output->Release();
-		adapter->Release();
-	}*/
-
 	bool RenderWindow::create( HWND windowHandle )
 	{
 		// create swapchain descriptor
@@ -94,8 +64,6 @@ namespace kgx
 		fullscreenSwapDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
 		fullscreenSwapDesc.Windowed         = TRUE;
 		fullscreenSwapDesc.Scaling          = DXGI_MODE_SCALING_UNSPECIFIED;*/
-
-		//enumAdaptersTest();
 
 		HRESULT res = m_dxgiFactory->CreateSwapChainForHwnd( m_dxDev, windowHandle, &swapDesc, nullptr, nullptr, &m_swapChain );
 
@@ -265,16 +233,12 @@ namespace kgx
 		if ( !m_isInit || !m_curViewport.cam )
 			return;
 
-		//TODO: add support for multiple viewports
-		m_dxDevCont->RSSetViewports( 1, &m_curViewport.dxViewport );
-		m_dxDevCont->RSSetState( m_rasterizer );
-
 		// clear the back buffer
 		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, m_clearColor );
 		// clear the depth-stencil buffer
 		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 
-		m_curViewport.cam->renderCurrentView(m_renderTargetView, m_depthStencilView);
+		m_curViewport.cam->renderCurrentView(m_curViewport.dxViewport, m_rasterizer, m_renderTargetView, m_depthStencilView);
 
 		// flip the back buffer and the front buffer
 		m_swapChain->Present(0, 0);
