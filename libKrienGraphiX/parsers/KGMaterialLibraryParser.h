@@ -13,12 +13,12 @@ namespace kgx
 		public:
 			static bool parse( const std::string &input, std::map<std::string, KgMatData> &outputData );
 
+			// no copying allowed
+			KGMaterialLibraryParser( const KGMaterialLibraryParser& ) = delete;
+			KGMaterialLibraryParser& operator=( const KGMaterialLibraryParser& ) = delete;
+
 		private:
 			KGMaterialLibraryParser();
 			//~KGMaterialLibraryParser();
-
-			// no copying allowed
-			KGMaterialLibraryParser( const KGMaterialLibraryParser& );
-			KGMaterialLibraryParser& operator=(const KGMaterialLibraryParser&);
 	};
 }

@@ -13,13 +13,8 @@
 #include "../Filesystem.h"
 #include "../PhysXManager.h"
 #include "../ResourceManager.h"
-#include "../RenderableObject.h"
 #include "../RenderWindow.h"
 #include "../Scene.h"
-#include "../Texture.h"
-#include "../TextureManager.h"
-#include "../VertexShader.h"
-#include "../PixelShader.h"
 #include "KGObjectParser.h"
 #include "KGSceneParser.h"
 
@@ -55,7 +50,7 @@ namespace kgx
 		{
 			KgsceneGrammar( std::vector<std::string> &renderObjects, std::vector<std::string> &cams,
 							std::vector<std::string> &lights, std::vector<std::string> &renPasses )
-				: KgsceneGrammar::base_type( start )
+				: base_type( start )
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 
@@ -132,7 +127,7 @@ namespace kgx
 		struct RenderObjectGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			RenderObjectGrammar( std::string &name, std::string &source, DirectX::XMFLOAT3 &pos, float &scale )
-				: RenderObjectGrammar::base_type( start )
+				: base_type( start )
 			{
 				objName  = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
 				file     = "source" >> qi::lit("(") >> *~qi::char_('.') >> qi::string(".kgo") >> qi::lit(")");
@@ -194,7 +189,7 @@ namespace kgx
 		{
 			CameraGrammar( std::string &name, float &fov, float &aspect, float &nearZ, float &farZ,
 						   DirectX::XMFLOAT3 &eye, DirectX::XMFLOAT3 &target, DirectX::XMFLOAT3 &up )
-				: CameraGrammar::base_type( start )
+				: base_type( start )
 			{
 				objName = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
 				fieldOfView = "fieldOfView"
@@ -260,7 +255,7 @@ namespace kgx
 		struct LightGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			LightGrammar( std::string &name, bool &isAmb, float &intens, DirectX::XMFLOAT3 &clr, DirectX::XMFLOAT3 &dir )
-						   : LightGrammar::base_type( start )
+						   : base_type( start )
 			{
 				objName   = qi::lit("(") >> *~qi::char_(')') >> qi::lit(")");
 				type      = "type" >> (qi::string("(AMBIENT)")[qi::_val = true]| qi::string("(DIRECTIONAL)")[qi::_val = false]);

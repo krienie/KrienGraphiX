@@ -56,7 +56,7 @@ namespace kgx
 		struct MatLibGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			MatLibGrammar( std::map<std::string, KgMatData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
-				: MatLibGrammar::base_type( start )
+				: base_type( start )
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 

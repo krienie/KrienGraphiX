@@ -7,8 +7,8 @@
 #include "TextureManager.h"
 #include "VertexInputLayout.h"
 
-#include "parsers\KGMaterialLibraryParser.h"
-#include "parsers\KGShaderProgramsParser.h"
+#include "parsers/KGMaterialLibraryParser.h"
+#include "parsers/KGShaderProgramsParser.h"
 
 #include "ResourceManager.h"
 
@@ -109,7 +109,7 @@ namespace kgx
 		if ( FAILED(result) )
 		{
 			vertBuff->Release();
-			vertBuff = NULL;
+			vertBuff = nullptr;
 
 			_com_error error(result);
 			std::cout << "Error (ResourceManager::addMeshBuffer): " << error.ErrorMessage() << std::endl;
