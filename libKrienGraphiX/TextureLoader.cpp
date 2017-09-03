@@ -7,6 +7,11 @@
 
 #include "TextureLoader.h"
 
+namespace
+{
+	bool comIsInit = false;
+}
+
 
 // Most of the code below taken from MSDN How to: Initialize a texture from file
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ff476904(v=vs.85).aspx
@@ -16,11 +21,10 @@ namespace kgx { namespace TextureLoader
 	#define DXGI_1_2_FORMATS
 #endif
 
-
 	template<class T> class ScopedObject
 	{
 	public:
-		explicit ScopedObject( T *p = 0 ) : _pointer(p) {}
+		explicit ScopedObject( T *p = nullptr ) : _pointer(p) {}
 		~ScopedObject()
 		{
 			if ( _pointer )
@@ -36,13 +40,13 @@ namespace kgx { namespace TextureLoader
 		T* operator->() { return _pointer; }
 		T** operator&() { return &_pointer; }
 
-		void Reset(T *p = 0) { if ( _pointer ) { _pointer->Release(); } _pointer = p; }
+		void Reset(T *p = nullptr) { if ( _pointer ) { _pointer->Release(); } _pointer = p; }
 
 		T* get() const { return _pointer; }
 
 	private:
-		ScopedObject(const ScopedObject&);
-		ScopedObject& operator=(const ScopedObject&);
+		ScopedObject(const ScopedObject&) = delete;
+		ScopedObject& operator=(const ScopedObject&) = delete;
         
 		T* _pointer;
 	};
@@ -238,12 +242,12 @@ namespace kgx { namespace TextureLoader
 
 		if ( !comIsInit )
 		{
-			CoInitialize(NULL);
+			CoInitialize(nullptr);
 			comIsInit = true;
 		}
 
 		ScopedObject<IWICBitmapDecoder> decoder;
-		HRESULT res = getWIC()->CreateDecoderFromFilename( file.c_str(), 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder );
+		HRESULT res = getWIC()->CreateDecoderFromFilename( file.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder );
 		if ( FAILED(res) )
 			return res;
 
@@ -344,7 +348,7 @@ namespace kgx { namespace TextureLoader
 				&& tHeight == height )
 		{
 			// No format conversion or resize needed
-			res = frame->CopyPixels( 0, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
+			res = frame->CopyPixels( nullptr, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
 			if ( FAILED(res) )
 				return res;
 		} else if ( tWidth != width || tHeight != height )
@@ -371,7 +375,7 @@ namespace kgx { namespace TextureLoader
 			if ( memcmp( &convertGUID, &pfScaler, sizeof(GUID) ) == 0 )
 			{
 				// No format conversion needed
-				res = scaler->CopyPixels( 0, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
+				res = scaler->CopyPixels( nullptr, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
 				if ( FAILED(res) )
 					return res;
 			} else
@@ -381,11 +385,11 @@ namespace kgx { namespace TextureLoader
 				if ( FAILED(res) )
 					return res;
 
-				res = FC->Initialize( scaler.get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, 0, 0, WICBitmapPaletteTypeCustom );
+				res = FC->Initialize( scaler.get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeCustom );
 				if ( FAILED(res) )
 					return res;
 
-				res = FC->CopyPixels( 0, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
+				res = FC->CopyPixels( nullptr, (UINT)rowPitch, (UINT)imageSize, temp.get() );  
 				if ( FAILED(res) )
 					return res;
 			}
@@ -401,11 +405,11 @@ namespace kgx { namespace TextureLoader
 			if ( FAILED(res) )
 				return res;
 
-			res = FC->Initialize( frame.get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, 0, 0, WICBitmapPaletteTypeCustom );
+			res = FC->Initialize( frame.get(), convertGUID, WICBitmapDitherTypeErrorDiffusion, nullptr, 0, WICBitmapPaletteTypeCustom );
 			if ( FAILED(res) )
 				return res;
 
-			res = FC->CopyPixels( 0, static_cast<UINT>( rowPitch ), static_cast<UINT>( imageSize ), temp.get() );  
+			res = FC->CopyPixels( nullptr, static_cast<UINT>( rowPitch ), static_cast<UINT>( imageSize ), temp.get() );  
 			if ( FAILED(res) )
 				return res;
 		}
@@ -413,7 +417,7 @@ namespace kgx { namespace TextureLoader
 
 		// See if format is supported for auto-gen mipmaps
 		bool autogen = false;
-		if ( dxDevCont != 0 && shaderView != 0 ) // Must have context and shader-view to auto generate mipmaps
+		if ( dxDevCont && shaderView ) // Must have context and shader-view to auto generate mipmaps
 		{
 			UINT fmtSupport = 0;
 			res = dxDev->CheckFormatSupport( format, &fmtSupport );
@@ -443,9 +447,9 @@ namespace kgx { namespace TextureLoader
 
 		ID3D11Texture2D *tex = nullptr;
 		res = dxDev->CreateTexture2D( &desc, autogen ? nullptr : &initData, &tex );
-		if ( SUCCEEDED(res) && tex != 0 )
+		if ( SUCCEEDED(res) && tex )
 		{
-			if (shaderView != 0)
+			if (shaderView)
 			{
 				D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 				memset( &SRVDesc, 0, sizeof( SRVDesc ) );
@@ -462,16 +466,15 @@ namespace kgx { namespace TextureLoader
 
 				if ( autogen )
 				{
-					assert( dxDevCont != 0 );
+					assert( dxDevCont );
 					dxDevCont->UpdateSubresource( tex, 0, nullptr, temp.get(), (UINT)rowPitch, (UINT)imageSize );
 					dxDevCont->GenerateMips( *shaderView );
 				}
 			}
 
-			if (texture != 0)
+			if (texture)
 				*texture = tex;
-			else
-				tex->Release();
+			else tex->Release();
 		}
 
 		return S_OK;
