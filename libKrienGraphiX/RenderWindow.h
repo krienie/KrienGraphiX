@@ -29,12 +29,12 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			RenderWindow( const RenderWindow& );
-			RenderWindow& operator=( const RenderWindow& );
+			RenderWindow( const RenderWindow& ) = delete;
+			RenderWindow& operator=( const RenderWindow& ) = delete;
 
 			struct Viewport
 			{
-				Viewport() : dxViewport(), cam(0) {}
+				Viewport() : dxViewport(), cam(nullptr) {}
 				Viewport( D3D11_VIEWPORT dxView, Camera *camera ) : dxViewport(dxView), cam(camera) { }
 
 				D3D11_VIEWPORT dxViewport;
