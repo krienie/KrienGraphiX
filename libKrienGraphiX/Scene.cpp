@@ -4,8 +4,7 @@
 
 #include "Camera.h"
 #include "ResourceManager.h"
-#include "RenderPass.h"
-#include "VertexInputLayout.h"
+#include "renderpasses/RenderPass.h"
 
 //TODO: temporary
 #include "KGXCore.h"
@@ -16,8 +15,8 @@ namespace kgx
 {
 	Scene::Scene()
 		: m_dxDeferredDevCont(nullptr), m_lightData(), m_nextCamID(0u),
-			m_defaultCamera(nullptr), m_cameras(), m_renderObjects(),
-			shaderProgPass1(-1), shaderProgPass2(-1)
+			m_defaultCamera(nullptr), shaderProgPass1(-1), shaderProgPass2(-1),
+			m_cameras(), m_renderObjects()
 	{
 		m_lightData.ambientLight = DirectX::XMFLOAT4( 0.25f, 0.25f, 0.25f, 1.0f );
 

@@ -19,6 +19,10 @@ namespace kgx
 			Scene();
 			~Scene();
 
+			// no copying allowed
+			Scene( const Scene& ) = delete;
+			Scene& operator=( const Scene& ) = delete;
+
 			typedef UINT CameraID;
 			CameraID createCamera( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
 			CameraID createCamera( float fovY, float aspect, float nearZ, float farZ,
@@ -47,19 +51,12 @@ namespace kgx
 			void setAmbient( float r, float g, float b );
 			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity );
 
-			/** Adds a RenderableObject to the scene */
 			void addRenderableObject( const RenderableObject &obj );
 
 			void render( Camera *renderCam, const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
 											ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
 
 		private:
-			// no copying allowed
-			Scene( const Scene& );
-			Scene& operator=( const Scene& );
-
-			UINT createCommandKey( const RenderableObject &obj ) const;
-
 			ID3D11DeviceContext *m_dxDeferredDevCont;
 
 			LightData m_lightData;
