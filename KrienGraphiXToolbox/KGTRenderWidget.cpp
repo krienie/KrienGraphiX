@@ -57,7 +57,7 @@ namespace kgt
 		setFocusPolicy( Qt::StrongFocus );
 
 		//TODO: might want to force the user to explicitly initialize KGXCore..
-		m_renderWin = kgx::KGXCore::getInst()->createRenderWindow( HWND( winId() ) );
+		m_renderWin = kgx::KGXCore::getInst()->createRenderWindow( HWND(winId()) );
 
 		setMouseTracking( true );
 

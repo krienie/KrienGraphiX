@@ -14,7 +14,7 @@
 
 namespace kgx
 {
-	KGXCore* KGXCore::m_inst = 0;
+	KGXCore* KGXCore::m_inst = nullptr;
 
 	KGXCore* KGXCore::getInst()
 	{
@@ -31,7 +31,7 @@ namespace kgx
 	}
 
 	KGXCore::KGXCore()
-		: m_dxDev(nullptr), m_dxDevCont(nullptr), m_dxgiFactory(nullptr), m_renderWindows()
+		: m_dxDev(nullptr), m_dxDevCont(nullptr), m_dxgiFactory(nullptr), m_renderWindow(nullptr)
 	{
 		// open console when compiling for debugging
 #ifdef _DEBUG
@@ -64,9 +64,9 @@ namespace kgx
 											  D3D_FEATURE_LEVEL_9_3,
 											  D3D_FEATURE_LEVEL_9_1*/ };
 
-		HRESULT res = D3D11CreateDevice( NULL, D3D_DRIVER_TYPE_HARDWARE, NULL,
+		HRESULT res = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
 											creationFlags, featureLevels, ARRAYSIZE(featureLevels),
-											D3D11_SDK_VERSION, &m_dxDev, NULL, &m_dxDevCont );
+											D3D11_SDK_VERSION, &m_dxDev, nullptr, &m_dxDevCont );
 
 		if ( FAILED(res) )
 		{
@@ -75,16 +75,16 @@ namespace kgx
 		}
 
 		// retrieve default DXGIAdaptor
-		IDXGIDevice2 *dxgiDevice = NULL;
-		res = m_dxDev->QueryInterface(__uuidof(IDXGIDevice2), (void **)&dxgiDevice);
+		IDXGIDevice2 *dxgiDevice = nullptr;
+		res = m_dxDev->QueryInterface(__uuidof(IDXGIDevice2), (void**)&dxgiDevice);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error retrieving DXGIDevice2." << std::endl;
 			abort();
 		}
 
-		IDXGIAdapter2 *dxgiAdapter = NULL;
-		res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&dxgiAdapter);
+		IDXGIAdapter2 *dxgiAdapter = nullptr;
+		res = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error retrieving DXGIAdapter2." << std::endl;
@@ -92,7 +92,7 @@ namespace kgx
 		}
 		dxgiDevice->Release();
 
-		res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&m_dxgiFactory);
+		res = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&m_dxgiFactory);
 		if ( FAILED(res) )
 		{
 			std::cout << "Error (KGXCore::KGXCore): Error retrieving DXGIFactory2." << std::endl;

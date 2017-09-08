@@ -29,8 +29,8 @@ namespace kgx
 			~KGXCore();
 
 			// no copying allowed
-			explicit KGXCore( const KGXCore& );
-			KGXCore& operator=( const KGXCore& );
+			KGXCore( const KGXCore& ) = delete;
+			KGXCore& operator=( const KGXCore& ) = delete;
 
 			static KGXCore* m_inst;
 

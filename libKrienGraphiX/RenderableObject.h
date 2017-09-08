@@ -22,7 +22,6 @@ namespace kgx
 		UINT startIndex;
 		UINT baseVertex;
 
-		//TODO: place material data directly in this struct. It is quite pointless to let this live in a separate struct
 		Material material;
 		
 		float xPos;

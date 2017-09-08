@@ -52,7 +52,7 @@ namespace kgx
 	{
 		// construct header string
 		std::stringstream headerStr;
-		headerStr << "// KrienGraphiX Material Library v0.1 - (c)2016 Krien Linnenbank" << std::endl;
+		headerStr << "// KrienGraphiX Material Library v0.1 - (c)2017 Krien Linnenbank" << std::endl;
 		// get local date and time
 		boost::posix_time::time_facet *facet = new boost::posix_time::time_facet( "%d-%b-%Y %H:%M:%S" );
 		headerStr.imbue( std::locale( headerStr.getloc(), facet ) );
