@@ -227,6 +227,16 @@ namespace kgx
 		return m_backBuffWidth / static_cast<float>(m_backBuffHeight);
 	}
 
+	unsigned int RenderWindow::getWidth() const
+	{
+		return m_backBuffWidth;
+	}
+
+	unsigned int RenderWindow::getHeight() const
+	{
+		return m_backBuffHeight;
+	}
+
 
 	void RenderWindow::update()
 	{

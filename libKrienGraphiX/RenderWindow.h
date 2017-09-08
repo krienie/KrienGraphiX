@@ -3,7 +3,6 @@
 
 #include <d3d11.h>
 #include <dxgi1_2.h>
-#include <vector>
 
 namespace kgx
 {
@@ -24,6 +23,8 @@ namespace kgx
 			void setFullscreen( bool active );
 
 			float getAspectRatio() const;
+			unsigned int getWidth() const;
+			unsigned int getHeight() const;
 
 			void update();
 

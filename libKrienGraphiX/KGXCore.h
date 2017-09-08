@@ -3,7 +3,6 @@
 
 #include <d3d11.h>
 #include <dxgi1_2.h>
-#include <map>
 
 namespace kgx
 {
@@ -19,7 +18,7 @@ namespace kgx
 			ID3D11Device* getDxDevicePtr() const;
 			
 			RenderWindow* createRenderWindow( HWND windowHandle );
-			RenderWindow* getRenderWindow( HWND windowHandle ) const;
+			RenderWindow* getRenderWindow() const;
 
 			void clearManagers();
 			void renderFrame();
@@ -38,6 +37,6 @@ namespace kgx
 			ID3D11DeviceContext *m_dxDevCont;
 			IDXGIFactory2 *m_dxgiFactory;
 
-			std::map<HWND, RenderWindow*> m_renderWindows;
+			RenderWindow* m_renderWindow;
 	};
 }

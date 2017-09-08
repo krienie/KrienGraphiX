@@ -107,9 +107,8 @@ namespace kgx
 
 	KGXCore::~KGXCore()
 	{
-		std::map<HWND, RenderWindow*>::iterator it;
-		for ( it = m_renderWindows.begin(); it != m_renderWindows.end(); ++it )
-			delete it->second;
+		if ( m_renderWindow )
+			delete m_renderWindow;
 
 		// destroy managers
 		ConfigManager::destroy();
@@ -143,32 +142,25 @@ namespace kgx
 
 	RenderWindow* KGXCore::createRenderWindow( HWND windowHandle )
 	{
-		std::map<HWND, RenderWindow*>::iterator it = m_renderWindows.find(windowHandle);
-		if ( it != m_renderWindows.end() )
+		if ( m_renderWindow )
 		{
 			std::cout << "Aborted (Environment::createRenderWindow): Window handle " << windowHandle << " already has a RenderWindow bound." << std::endl;
-			return it->second;
+			return m_renderWindow;
 		}
 
-		RenderWindow *renWin = new RenderWindow( m_dxDev, m_dxgiFactory );
-		if ( !renWin->create( windowHandle ) )
+		m_renderWindow = new RenderWindow( m_dxDev, m_dxgiFactory );
+		if ( !m_renderWindow->create( windowHandle ) )
 		{
-			delete renWin;
+			delete m_renderWindow;
 			return nullptr;
 		}
 
-		m_renderWindows.insert( std::pair<HWND, RenderWindow*>(windowHandle, renWin) );
-
-		return renWin;
+		return m_renderWindow;
 	}
 
-	RenderWindow* KGXCore::getRenderWindow( HWND windowHandle ) const
+	RenderWindow* KGXCore::getRenderWindow() const
 	{
-		std::map<HWND, RenderWindow*>::const_iterator it = m_renderWindows.find( windowHandle );
-		if ( it != m_renderWindows.cend() )
-			return it->second;
-
-		return nullptr;
+		return m_renderWindow;
 	}
 
 
@@ -182,8 +174,7 @@ namespace kgx
 
 	void KGXCore::renderFrame()
 	{
-		std::map<HWND, RenderWindow*>::iterator it;
-		for ( it = m_renderWindows.begin(); it != m_renderWindows.end(); ++it )
-			it->second->update();
+		if ( m_renderWindow )
+			m_renderWindow->update();
 	}
 }
