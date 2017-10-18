@@ -1,13 +1,10 @@
 
-#include "ConstantBuffer.h"
-#include "TextureManager.h"
 #include "VertexShader.h"
 
 namespace kgx
 {
-	//TODO: remove static dependency of VertexShader on VertexInputLayout => allow the VIL to change after creation
 	VertexShader::VertexShader( ID3D11Device *dxDev, const VertexInputLayout &layout )
-		: ShaderBase( dxDev, "vs_5_0" ), m_shaderSource( nullptr ), m_vertShader( nullptr ), m_inputLayout( layout )
+		: ShaderBase(dxDev, "vs_5_0"), m_shaderSource(nullptr), m_vertShader(nullptr), m_inputLayout(layout)
 	{
 	}
 
@@ -21,10 +18,9 @@ namespace kgx
 
 	void VertexShader::activate( ID3D11DeviceContext *dxContext )
 	{
-		dxContext->VSSetShader( m_vertShader, 0, 0 );
+		dxContext->VSSetShader( m_vertShader, nullptr, 0 );
 		dxContext->IASetInputLayout( m_inputLayout.getDxInputLayout( m_dxDev, m_shaderSource ) );
 
-		//TODO: create separate commands for binding constant buffers and textures/samplers
 		dxContext->VSSetConstantBuffers( 0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data() );
 	}
 

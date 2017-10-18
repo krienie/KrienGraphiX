@@ -101,7 +101,7 @@ namespace kgx
 
 	void KGMaterialLibraryGenerator::append( const std::vector<KgMatData> &inputData, std::string &matLibString )
 	{
-		std::map<std::string, KgMatData> originalData;
+		std::unordered_map<std::string, KgMatData> originalData;
 		KGMaterialLibraryParser::parse( matLibString, originalData );
 
 		std::map<std::string, KgMatData> combinedData;

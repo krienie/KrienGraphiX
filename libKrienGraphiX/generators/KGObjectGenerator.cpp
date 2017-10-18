@@ -14,7 +14,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
-#include "../KGXCore.h"
 #include "../RenderableObject.h"
 #include "KGObjectGenerator.h"
 
@@ -64,7 +63,7 @@ namespace kgx
 			KgoGram( const std::string &header, const std::vector<VertexInputLayout::Type> &inLayout,
 					 const std::vector<float> &inVerts, const std::vector<UINT> &inIndices,
 					 const std::vector<KgModelData> &inModels )
-					 : KgoGram::base_type( output )
+					 : base_type( output )
 			{
 				inputLayoutType = karma::stream;
 				inputLayout = (inputLayoutType % ", ")[karma::_1 = phx::ref( inLayout )];
@@ -102,10 +101,8 @@ namespace kgx
 			karma::rule<BackInsertIt, KgModelData(), karma::space_type> model;
 		} kgoGram( headerStr.str(), inputData.inputLayout, inputData.vertices, inputData.indices, inputData.models );
 
-
 		BackInsertIt sink( outputString );
-		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
-		std::cout << std::endl;
+		karma::generate_delimited( sink, kgoGram, karma::space );
 	}
 }
 

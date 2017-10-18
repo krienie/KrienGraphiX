@@ -18,7 +18,7 @@ namespace kgx
 
 	KGXCore* KGXCore::getInst()
 	{
-		if ( !KGXCore::m_inst )
+		if ( !m_inst )
 			m_inst = new KGXCore();
 
 		return m_inst;
@@ -26,8 +26,8 @@ namespace kgx
 
 	void KGXCore::destroy()
 	{
-		if ( KGXCore::m_inst )
-			delete KGXCore::m_inst;
+		if ( m_inst )
+			delete m_inst;
 	}
 
 	KGXCore::KGXCore()

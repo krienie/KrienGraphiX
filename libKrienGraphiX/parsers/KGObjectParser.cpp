@@ -62,7 +62,7 @@ namespace kgx
 		{
 			KgoGrammar( std::vector<float> &v, std::vector<UINT> &i, std::vector<VertexInputLayout::Type> &l,
 						std::vector<KgModelData> &m )
-				: KgoGrammar::base_type( start )
+				: base_type( start )
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 

@@ -1,11 +1,8 @@
 
 #pragma once
 
-#include <d3d11.h>
-#include <DirectXMath.h>
 #include <string>
-#include <map>
-#include <vector>
+#include <d3d11.h>
 
 
 namespace kgx
@@ -27,8 +24,8 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			ConstantBuffer( const ConstantBuffer &other );
-			ConstantBuffer& operator=( const ConstantBuffer &rhs );
+			ConstantBuffer( const ConstantBuffer &other ) = delete;
+			ConstantBuffer& operator=( const ConstantBuffer &rhs ) = delete;
 
 			ID3D11Device *m_dxDev;
 			ID3D11DeviceContext *m_dxDevCont;

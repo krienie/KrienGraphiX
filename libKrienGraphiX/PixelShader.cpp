@@ -1,14 +1,10 @@
 
-#include <iostream>
-
-#include "ConstantBuffer.h"
-#include "TextureManager.h"
 #include "PixelShader.h"
 
 namespace kgx
 {
 	PixelShader::PixelShader( ID3D11Device *dxDev )
-		: ShaderBase( dxDev, "ps_5_0" ), m_pixelShader( 0 )//, structBuffers(), bufferUAVs()
+		: ShaderBase(dxDev, "ps_5_0"), m_pixelShader(nullptr)//, structBuffers(), bufferUAVs()
 	{
 	}
 
@@ -30,7 +26,7 @@ namespace kgx
 
 	void PixelShader::activate( ID3D11DeviceContext *dxContext )
 	{
-		dxContext->PSSetShader(m_pixelShader, 0, 0);
+		dxContext->PSSetShader(m_pixelShader, nullptr, 0);
 		
 		// set buffers
 		dxContext->PSSetConstantBuffers(0u, static_cast<UINT>(m_dxConstBuffers.size()), m_dxConstBuffers.data());
@@ -39,7 +35,7 @@ namespace kgx
 
 	HRESULT PixelShader::build( ID3DBlob *shaderSource )
 	{
-		return m_dxDev->CreatePixelShader(shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), NULL, &m_pixelShader);
+		return m_dxDev->CreatePixelShader(shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(), nullptr, &m_pixelShader);
 	}
 
 

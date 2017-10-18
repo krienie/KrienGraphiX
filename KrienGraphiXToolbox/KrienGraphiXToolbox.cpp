@@ -2,21 +2,16 @@
 #define NOMINMAX
 
 #include <iostream>
-#include <sstream>
 
 #include <boost/filesystem.hpp>
 
 #include <qfiledialog.h>
 
 #include <KGXCore.h>
-#include <KGObjectParser.h>
 #include <Filesystem.h>
 #include <Camera.h>
-#include <RenderableObject.h>
-#include <PixelShader.h>
 #include <PhysXManager.h>
 #include <ConfigManager.h>
-#include <TextureManager.h>
 #include <parsers/KGSceneParser.h>
 
 #include "KrienGraphiXToolbox.h"
@@ -45,10 +40,7 @@ namespace kgt
 		m_ui.renderWidget1->addFrameListener( this );
 		m_ui.renderWidget1->addMouseListener( this );
 		m_ui.renderWidget1->addKeyboardListener( this );
-
-		QRect widgetGeom = m_ui.renderWidget1->geometry();
-		float aspectRatio = float(widgetGeom.width()) / widgetGeom.height();
-
+		
 		// reserve space for mouse movement filtering
 		m_mouseXFilterBuffer.reserve(MOUSE_BUFFER_FILTER_SIZE);
 		m_mouseYFilterBuffer.reserve(MOUSE_BUFFER_FILTER_SIZE);
@@ -63,12 +55,12 @@ namespace kgt
 
 		m_ui.renderWidget1->startRendering();
 
-		QObject::connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewScene );
-		QObject::connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openSceneFile );
-		QObject::connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneFile );
-		QObject::connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneAsNewFile );
-		QObject::connect( m_ui.actionSetProjectFolder, &QAction::triggered, this, &KrienGraphiXToolbox::setProjectFolder );
-		QObject::connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
+		connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewScene );
+		connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openSceneFile );
+		connect( m_ui.actionSave, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneFile );
+		connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneAsNewFile );
+		connect( m_ui.actionSetProjectFolder, &QAction::triggered, this, &KrienGraphiXToolbox::setProjectFolder );
+		connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
 	}
 
 	KrienGraphiXToolbox::~KrienGraphiXToolbox()
@@ -215,7 +207,7 @@ namespace kgt
 		bfs::path sceneDirPath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
 		std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr(sceneDirPath.string().c_str()),
 															  tr( "KrienGraphiX Scene File (*.kgscene)" ) ).toStdString();
-		if ( sceneFile.size() <= 0 )
+		if ( sceneFile.empty() )
 			return;
 		
 		// unload current scene

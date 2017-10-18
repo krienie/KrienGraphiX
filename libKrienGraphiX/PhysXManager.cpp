@@ -4,14 +4,13 @@
 
 #include <PxScene.h>
 #include <PxPhysics.h>
-#include <common\PxSerialFramework.h>
-#include <common\PxTolerancesScale.h>
+#include <common/PxSerialFramework.h>
+#include <common/PxTolerancesScale.h>
 //#include <cooking\PxCooking.h>
-#include <extensions\PxExtensionsAPI.h>
-#include <foundation\PxFoundation.h>
-#include <foundation\PxMat44.h>
-#include <pvd\PxVisualDebugger.h>
-
+#include <extensions/PxExtensionsAPI.h>
+#include <foundation/PxFoundation.h>
+#include <foundation/PxMat44.h>
+#include <pvd/PxVisualDebugger.h>
 
 #include "Filesystem.h"
 #include "PhysXManager.h"

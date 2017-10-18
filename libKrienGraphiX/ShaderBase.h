@@ -39,8 +39,8 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			ShaderBase( const ShaderBase& );
-			ShaderBase& operator=(const ShaderBase&);
+			ShaderBase( const ShaderBase& )          = delete;
+			ShaderBase& operator=(const ShaderBase&) = delete;
 
 			HRESULT processLoadedShaderBlob( ID3DBlob *shaderSource );
 	};

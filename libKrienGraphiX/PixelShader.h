@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "ShaderBase.h"
 
 namespace kgx
@@ -13,15 +11,15 @@ namespace kgx
 			explicit PixelShader( ID3D11Device *dxDev );
 			~PixelShader();
 
-			void activate( ID3D11DeviceContext *dxContext );
+			void activate( ID3D11DeviceContext *dxContext ) override;
 
 		protected:
-			HRESULT build( ID3DBlob *shaderSource );
+			HRESULT build( ID3DBlob *shaderSource ) override;
 
 		private:
 			// no copying allowed
-			PixelShader( const PixelShader& );
-			PixelShader& operator=( const PixelShader& );
+			PixelShader( const PixelShader& ) = delete;
+			PixelShader& operator=( const PixelShader& ) = delete;
 
 			//ID3D11Buffer* createUAVBuffer( unsigned int structureStride, unsigned int numStructures, const void *buffData ) const;
 

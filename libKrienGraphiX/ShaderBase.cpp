@@ -9,7 +9,6 @@
 
 #include "ConstantBuffer.h"
 #include "Filesystem.h"
-#include "Texture.h"
 #include "ShaderBase.h"
 
 
@@ -83,7 +82,7 @@ namespace kgx
 
 		ID3DBlob *shaderSource;
 		ID3DBlob *compileErrors;
-		HRESULT res = D3DCompile( source.c_str(), sizeof( source ), NULL, NULL, NULL, entryPoint.c_str(), m_target.c_str(), flags, 0u, &shaderSource, &compileErrors );
+		HRESULT res = D3DCompile( source.c_str(), sizeof( source ), nullptr, nullptr, nullptr, entryPoint.c_str(), m_target.c_str(), flags, 0u, &shaderSource, &compileErrors );
 		if ( FAILED(res)  )
 		{
 			//TODO: parse compile errors

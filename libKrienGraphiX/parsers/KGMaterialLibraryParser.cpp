@@ -3,8 +3,6 @@
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
 #include <comdef.h>
-#include <sstream>
-#include <map>
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -48,14 +46,14 @@ namespace kgx
 	{
 	}*/
 
-	bool KGMaterialLibraryParser::parse( const std::string &input, std::map<std::string, KgMatData> &outputData )
+	bool KGMaterialLibraryParser::parse( const std::string &input, std::unordered_map<std::string, KgMatData> &outputData )
 	{
 		//TODO: output vertexLayoutTypes
 		std::vector<VertexInputLayout::Type> vertLayoutTypes;
 
 		struct MatLibGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
-			MatLibGrammar( std::map<std::string, KgMatData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
+			MatLibGrammar( std::unordered_map<std::string, KgMatData> &shaderProgs, std::vector<VertexInputLayout::Type> &l )
 				: base_type( start )
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];

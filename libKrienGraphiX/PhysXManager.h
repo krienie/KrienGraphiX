@@ -6,9 +6,9 @@
 #include <DirectXMath.h>
 
 #include <PxFiltering.h>
-#include <extensions\PxDefaultAllocator.h>
-#include <extensions\PxDefaultErrorCallback.h>
-#include <physxvisualdebuggersdk\PvdConnection.h>
+#include <extensions/PxDefaultAllocator.h>
+#include <extensions/PxDefaultErrorCallback.h>
+#include <physxvisualdebuggersdk/PvdConnection.h>
 
 namespace physx
 {
