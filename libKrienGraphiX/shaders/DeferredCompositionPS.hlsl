@@ -1,5 +1,14 @@
 
-float4 main() : SV_TARGET
+Texture2D gbuffDiffuseTexture : register(t0);
+SamplerState defaultSampler   : register(s0);
+
+struct PixelInput
 {
-	return float4(0.0f, 1.0f, 1.0f, 1.0f);
+	float4 position : SV_POSITION;
+	float2 texCoord : TEXTURE;
+};
+
+float4 main( PixelInput input ) : SV_TARGET
+{
+	return gbuffDiffuseTexture.Sample( defaultSampler, input.texCoord );
 }

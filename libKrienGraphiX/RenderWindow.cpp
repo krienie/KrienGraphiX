@@ -48,8 +48,8 @@ namespace kgx
 		swapDesc.Stereo = FALSE;
 
 		// If multi-sample antialiasing is being used, all bound render targets and depth buffers must have the same sample counts and quality levels.
-		swapDesc.SampleDesc.Count   = 4;
-		swapDesc.SampleDesc.Quality = D3D11_STANDARD_MULTISAMPLE_PATTERN;
+		swapDesc.SampleDesc.Count   = 1;
+		swapDesc.SampleDesc.Quality = 0; //D3D11_STANDARD_MULTISAMPLE_PATTERN;
 		swapDesc.BufferUsage        = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapDesc.BufferCount        = 2;
 		swapDesc.Scaling            = DXGI_SCALING_STRETCH;
@@ -243,8 +243,9 @@ namespace kgx
 		if ( !m_isInit || !m_curViewport.cam )
 			return;
 
-		// clear the back buffer
-		m_dxDevCont->ClearRenderTargetView( m_renderTargetView, m_clearColor );
+		//NOTE: We do not need to clear the back-buffer here, because we use a deferred rendering pipeline.
+		//      Clearing the gbuffer is done by the GBufferPass.
+
 		// clear the depth-stencil buffer
 		m_dxDevCont->ClearDepthStencilView( m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
 

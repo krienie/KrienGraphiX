@@ -5,14 +5,12 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
-#include <boost/spirit/include/support_iso8859_1.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/filesystem.hpp>
 
 #include "../Camera.h"
 #include "../Filesystem.h"
 #include "../PhysXManager.h"
-#include "../ResourceManager.h"
 #include "../RenderWindow.h"
 #include "../Scene.h"
 #include "KGObjectParser.h"
@@ -41,7 +39,6 @@ namespace kgx
 			return nullptr;
 		}
 
-
 		std::vector<std::string> objects;
 		std::vector<std::string> cameras;
 		std::vector<std::string> lights;
@@ -58,27 +55,16 @@ namespace kgx
 				camera           = "Camera" >> *~qi::char_('}') >> qi::char_('}');
 				light            = "Light" >> *~qi::char_('}') >> qi::char_('}');
 
-				shader = (qi::string("VertexShader") | qi::string("PixelShader")) >> qi::lexeme[ *~qi::char_('}') ] >> qi::char_('}');
-				renderPass = qi::string("RenderPass") >> qi::char_('(') >> *~qi::char_(')') >> qi::char_(')')
-								>> qi::char_('{') >> *shader >> qi::char_('}');
-				renderCore = "RenderCore" >> qi::char_('{')
-								>> *renderPass[phx::push_back( phx::ref(renPasses), qi::_1 )]
-								>> qi::char_('}');
-
-
-				start = *(comment | renderableObject[phx::push_back( phx::ref( renderObjects ), qi::_1 )]
-						   | camera[phx::push_back( phx::ref( cams ), qi::_1 )]
-						   | light[phx::push_back( phx::ref( lights ), qi::_1 )]
-						   | renderCore);
+				start = *(comment 
+						   | renderableObject[phx::push_back( phx::ref(renderObjects), qi::_1 )]
+						   | camera[phx::push_back( phx::ref(cams), qi::_1 )]
+						   | light[phx::push_back( phx::ref(lights), qi::_1 )] );
 			}
 
 			qi::rule<std::string::const_iterator, Skipper> start;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> renderableObject;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> camera;
 			qi::rule<std::string::const_iterator, std::string(), Skipper> light;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> shader;
-			qi::rule<std::string::const_iterator, std::string(), Skipper> renderPass;
-			qi::rule<std::string::const_iterator, Skipper> renderCore;
 			qi::rule<std::string::const_iterator> comment;
 		} kgsGrammar( objects, cameras, lights, renderPasses );
 

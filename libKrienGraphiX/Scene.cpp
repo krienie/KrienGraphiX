@@ -3,10 +3,11 @@
 #include <d3d11.h>
 
 #include "Camera.h"
-#include "ResourceManager.h"
-#include "renderpasses/RenderPass.h"
+#include "RenderWindow.h"
+#include "RenderableObject.h"
+#include "renderpasses/CompositionPass.h"
+#include "renderpasses/GBufferPass.h"
 
-//TODO: temporary
 #include "KGXCore.h"
 
 #include "Scene.h"
@@ -15,29 +16,23 @@ namespace kgx
 {
 	Scene::Scene()
 		: m_dxDeferredDevCont(nullptr), m_lightData(), m_nextCamID(0u),
-			m_defaultCamera(nullptr), shaderProgPass1(-1), shaderProgPass2(-1),
-			m_cameras(), m_renderObjects()
+			m_defaultCamera(nullptr), m_sceneTextures(), m_preparedForRender(false),
+			m_gbufferPass(nullptr), m_compositionPass(nullptr), m_cameras(), m_renderObjects()
 	{
 		m_lightData.ambientLight = DirectX::XMFLOAT4( 0.25f, 0.25f, 0.25f, 1.0f );
-
-		//TODO: temporary placed here. Need to find a better place for this
-		
-		// render pass 1
-		ShaderProgram *prog = ResourceManager::getInst()->getShaderProgram("ForwardPass");
-		shaderProgPass1 = prog->getID();
-
-		// render pass 2
-		/*prog = ResourceManager::getInst()->createShaderProgram();
-		shaderProgPass2 = prog->getID();
-
-		VertexInputLayout vertInputLayoutPass2;
-		vertInputLayoutPass2.addInputType( VertexInputLayout::Position );
-		prog->createVertexShader( "DeferredCompositionVS.cso", vertInputLayoutPass2 );
-		prog->createPixelShader( "DeferredCompositionPS.cso" );*/
 	}
 
 	Scene::~Scene()
 	{
+		if ( m_gbufferPass )
+			delete m_gbufferPass;
+		if ( m_compositionPass )
+			delete m_compositionPass;
+
+		std::vector<RenderableObject*>::iterator renIt;
+		for ( renIt = m_renderObjects.begin(); renIt != m_renderObjects.end(); ++renIt )
+			delete *renIt;
+
 		if ( m_dxDeferredDevCont )
 			m_dxDeferredDevCont->Release();
 
@@ -130,32 +125,49 @@ namespace kgx
 		m_lightData.lights.push_back( { direction, intensity } );
 	}
 
-	void Scene::addRenderableObject( const RenderableObject &obj )
+	void Scene::addRenderableObject( RenderableObject *obj )
 	{
+		// Load all textures in the material
+		Material mat = obj->getMaterial();
+		if ( !mat.diffuseMap.empty() )
+			m_sceneTextures.loadFromDisk( mat.diffuseMap );
+		if ( !mat.normalMap.empty() )
+			m_sceneTextures.loadFromDisk( mat.normalMap );
+		if ( !mat.specularMap.empty() )
+			m_sceneTextures.loadFromDisk( mat.specularMap );
+
 		m_renderObjects.push_back(obj);
 	}
-
 
 	void Scene::render( Camera *renderCam, const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
 											ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
 	{
-		if ( !m_dxDeferredDevCont )
+		if ( !m_preparedForRender )
 		{
 			//TODO: change this so each worker thread has its own deferred context
 			//		prob move this deferredContext creation to thread implementation
 			// create deferred context
 			ID3D11Device *dxDev = KGXCore::getInst()->getDxDevicePtr();
 			dxDev->CreateDeferredContext( 0, &m_dxDeferredDevCont );
+
+			RenderWindow *renderWindow = KGXCore::getInst()->getRenderWindow();
+			m_gbufferPass = new GBufferPass( m_dxDeferredDevCont, dsv, renderCam, renderWindow->getWidth(), renderWindow->getHeight() );
+
+			m_compositionPass = new CompositionPass( m_dxDeferredDevCont, dsv, rtv );
+
+			m_preparedForRender = true;
 		}
 
 		m_dxDeferredDevCont->RSSetViewports( 1, &vp );
 		m_dxDeferredDevCont->RSSetState( rs );
+		m_gbufferPass->record( m_renderObjects, m_lightData, m_sceneTextures );
 
-		// render objects
-		RenderPass mainRenderBucket( m_dxDeferredDevCont, rtv, dsv, renderCam->getViewMatrix(), renderCam->getProjMatrix(),
-									 shaderProgPass1 );
+		m_dxDeferredDevCont->RSSetViewports( 1, &vp );
+		m_dxDeferredDevCont->RSSetState( rs );
+		m_compositionPass->record( m_renderObjects, m_lightData, m_gbufferPass->getTextureLibrary() );
 
-		mainRenderBucket.record( m_renderObjects, m_lightData );
-		mainRenderBucket.submit();
+		// execute render passes
+		m_gbufferPass->submit();
+		m_compositionPass->submit();
 	}
 }

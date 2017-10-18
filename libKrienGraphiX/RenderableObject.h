@@ -3,35 +3,58 @@
 
 #include <d3d11.h>
 #include <string>
-#include <vector>
 
 #include "Defines.h"
-#include "ShaderProgram.h"
 
 
 namespace kgx
 {
-	struct RenderableObject
+	class MeshBuffer;
+
+	class RenderableObject
 	{
-		std::string name;
+		public:
+			RenderableObject( const std::string &name, D3D11_PRIMITIVE_TOPOLOGY topology, MeshBuffer *meshBuffer,
+							  UINT indexCount, UINT startIndex, UINT baseVertex );
+			~RenderableObject();
 
-		D3D11_PRIMITIVE_TOPOLOGY topology;
-		MeshBufferID meshBuffer;
-		
-		UINT indexCount;
-		UINT startIndex;
-		UINT baseVertex;
+			void setPosition( float xPos, float yPos, float zPos );
+			void setScale( float xScale, float yScale, float zScale );
 
-		Material material;
+			std::string getName() const;
+			D3D11_PRIMITIVE_TOPOLOGY getTopology() const;
+			const MeshBuffer* getMeshBuffer() const;
+			UINT getIndexCount() const;
+			UINT getStartIndex() const;
+			UINT getBaseVertex() const;
+			void setMaterial( const Material &material );
+			Material getMaterial() const;
+
+			DirectX::XMFLOAT4X4 getModelMatrix();
+			DirectX::XMFLOAT4X4 getNormalMatrix();
+
+		private:
+			bool m_isDirty;
+
+			std::string m_name;
+
+			D3D11_PRIMITIVE_TOPOLOGY m_topology;
+			MeshBuffer* m_meshBuffer;
 		
-		float xPos;
-		float yPos;
-		float zPos;
-		float xScale;
-		float yScale;
-		float zScale;
+			UINT m_indexCount;
+			UINT m_startIndex;
+			UINT m_baseVertex;
+
+			Material m_material;
+		
+			float m_xPos;
+			float m_yPos;
+			float m_zPos;
+			float m_xScale;
+			float m_yScale;
+			float m_zScale;
+
+			DirectX::XMFLOAT4X4 m_modelMatrix;
+			DirectX::XMFLOAT4X4 m_normalMatrix;
 	};
-
-	DirectX::XMFLOAT4X4 getModelMatrix( const RenderableObject &obj );
-	DirectX::XMFLOAT4X4 getNormalMatrix( const RenderableObject &obj );
 }

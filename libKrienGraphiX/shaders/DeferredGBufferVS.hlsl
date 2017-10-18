@@ -3,7 +3,6 @@ cbuffer PerCameraData : register(b0)
 {
 	matrix<float, 4, 4> kgx_viewMatrix;
 	matrix<float, 4, 4> kgx_projMatrix;
-	//float3 cameraPos;
 };
 
 
@@ -19,8 +18,6 @@ struct PixelInput
 	float4 position : SV_POSITION;
 	float4 normal   : NORMAL;
 	float2 texCoord : TEXTURE;
-	//float3 lightDir : LIGHTDIR;
-	//float3 camDir   : CAMDIR;
 };
 
 PixelInput main( float4 pos : POSITION, float3 tex : TEXCOORD, float3 norm : NORMAL )

@@ -7,18 +7,17 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
-#include <boost/spirit/include/support_iso8859_1.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/filesystem.hpp>
 
 #include "KGParserDefines.h"
+#include "../Filesystem.h"
 #include "../KGXCore.h"
+#include "../MeshBuffer.h"
 #include "../RenderableObject.h"
 #include "../Scene.h"
 #include "../VertexInputLayout.h"
-#include "../Filesystem.h"
-#include "../ResourceManager.h"
-#include "../Texture.h"
+#include "../libraries/MaterialLibrary.h"
 
 #include "KGObjectParser.h"
 
@@ -118,36 +117,24 @@ namespace kgx
 												const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale,
 												Scene *scene )
 	{
-		HRESULT buffCreated = E_FAIL;
 		VertexInputLayout vertLayout( vertLayoutTypes );
-		MeshBufferID meshBuffer = ResourceManager::getInst()->addMeshBuffer( vertices, indices, vertLayout, buffCreated );
-
-		if ( FAILED( buffCreated ) )
+		MeshBuffer *meshBuffer = new MeshBuffer(vertices, indices, vertLayout.getBufferStride());
+		if ( !meshBuffer->isInit() )
+		{
+			delete meshBuffer;
 			return false;
+		}
 
-
+		MaterialLibrary matLibrary;
 		std::vector<KgModelData>::const_iterator it;
 		for ( it = models.cbegin(); it != models.cend(); ++it )
 		{
-			RenderableObject ro;
+			RenderableObject *ro = new RenderableObject( it->modelName, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+														 meshBuffer, it->indexCount, it->startIndex, 0u );
 
-			ro.name = it->modelName;
-
-			ro.topology   = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-			ro.meshBuffer = meshBuffer;
-
-			ro.indexCount = it->indexCount;
-			ro.startIndex = it->startIndex;
-			ro.baseVertex = 0u;
-
-			ro.material = ResourceManager::getInst()->getMaterial( it->matName );
-
-			ro.xPos   = position.x;
-			ro.yPos   = position.y;
-			ro.zPos   = position.z;
-			ro.xScale = scale.x;
-			ro.yScale = scale.y;
-			ro.zScale = scale.z;
+			ro->setMaterial( matLibrary.getMaterial(it->matName) );
+			ro->setPosition( position.x, position.y, position.z );
+			ro->setScale( scale.x, scale.y, scale.z );
 
 			scene->addRenderableObject( ro );
 		}

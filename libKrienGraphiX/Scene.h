@@ -5,13 +5,16 @@
 #include <map>
 #include <vector>
 
+#include "libraries/TextureLibrary.h"
 #include "Defines.h"
-#include "RenderableObject.h"
 
 namespace kgx
 {
 	class Camera;
+	class RenderableObject;
 	class ShaderProgram;
+	class CompositionPass;
+	class GBufferPass;
 
 	class Scene
 	{
@@ -34,7 +37,7 @@ namespace kgx
 			const_cameraiterator getCameraCBegin() const;
 			const_cameraiterator getCameraCEnd() const;
 
-			typedef std::vector<RenderableObject>::const_iterator const_renobjectiterator;
+			typedef std::vector<RenderableObject*>::const_iterator const_renobjectiterator;
 			const_renobjectiterator getRenObjectCBegin() const;
 			const_renobjectiterator getRenObjectCEnd() const;
 
@@ -51,7 +54,7 @@ namespace kgx
 			void setAmbient( float r, float g, float b );
 			void addDirectionalLight( const DirectX::XMFLOAT3 &direction, float intensity );
 
-			void addRenderableObject( const RenderableObject &obj );
+			void addRenderableObject( RenderableObject *obj );
 
 			void render( Camera *renderCam, const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
 											ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
@@ -64,10 +67,13 @@ namespace kgx
 			CameraID m_nextCamID;
 			Camera *m_defaultCamera;
 
-			INT shaderProgPass1;
-			INT shaderProgPass2;
+			TextureLibrary m_sceneTextures;
+
+			bool m_preparedForRender;
+			GBufferPass *m_gbufferPass;
+			CompositionPass *m_compositionPass;
 
 			std::map<CameraID, Camera*> m_cameras;
-			std::vector<RenderableObject> m_renderObjects;
+			std::vector<RenderableObject*> m_renderObjects;
 	};
 }

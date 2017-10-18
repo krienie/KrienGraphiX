@@ -7,8 +7,6 @@
 #include "RenderWindow.h"
 #include "ConfigManager.h"
 #include "Filesystem.h"
-#include "ResourceManager.h"
-#include "TextureManager.h"
 #include "TextureLoader.h"
 #include "KGXCore.h"
 
@@ -99,10 +97,6 @@ namespace kgx
 			abort();
 		}
 		dxgiAdapter->Release();
-
-		// Init ResourceManagers
-		ResourceManager::construct(m_dxDev);
-		TextureManager::construct(m_dxDev);
 	}
 
 	KGXCore::~KGXCore()
@@ -112,8 +106,6 @@ namespace kgx
 
 		// destroy managers
 		ConfigManager::destroy();
-		ResourceManager::destroy();
-		TextureManager::destroy();
 		TextureLoader::closeThread();
 
 		if ( m_dxgiFactory )
@@ -167,8 +159,6 @@ namespace kgx
 	void KGXCore::clearManagers()
 	{
 		filesystem::clearSearchPaths();
-		ResourceManager::getInst()->clearResources(true);
-		TextureManager::getInst()->clearTextureResources();
 	}
 
 

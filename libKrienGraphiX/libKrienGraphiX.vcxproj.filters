@@ -28,11 +28,20 @@
     <Filter Include="Header Files\shaders">
       <UniqueIdentifier>{a45427d9-56a0-4359-b944-a5d309a39281}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\renderpasses">
+      <UniqueIdentifier>{555208b8-30f2-47aa-9adc-09e31f26a7b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderpasses">
+      <UniqueIdentifier>{c38a30e2-de2e-4ee1-98b7-6dc068e62101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libraries">
+      <UniqueIdentifier>{e649c20a-5edc-41c5-b244-a0fe0a82d4f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libraries">
+      <UniqueIdentifier>{4aebbc11-55f6-422e-bcdb-265599e41907}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,9 +78,6 @@
     <ClInclude Include="TextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -105,17 +111,35 @@
     <ClInclude Include="PhysXManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parsers\KGShaderProgramsParser.h">
       <Filter>Header Files\parsers</Filter>
     </ClInclude>
+    <ClInclude Include="renderpasses\RenderPass.h">
+      <Filter>Header Files\renderpasses</Filter>
+    </ClInclude>
+    <ClInclude Include="renderpasses\GBufferPass.h">
+      <Filter>Header Files\renderpasses</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\ShaderProgramLibrary.h">
+      <Filter>Header Files\libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\TextureLibrary.h">
+      <Filter>Header Files\libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\MaterialLibrary.h">
+      <Filter>Header Files\libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="renderpasses\CompositionPass.h">
+      <Filter>Header Files\renderpasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -149,9 +173,6 @@
     <ClCompile Include="TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -182,11 +203,32 @@
     <ClCompile Include="PhysXManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parsers\KGShaderProgramsParser.cpp">
       <Filter>Source Files\parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="renderpasses\RenderPass.cpp">
+      <Filter>Source Files\renderpasses</Filter>
+    </ClCompile>
+    <ClCompile Include="renderpasses\GBufferPass.cpp">
+      <Filter>Source Files\renderpasses</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\ShaderProgramLibrary.cpp">
+      <Filter>Source Files\libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\TextureLibrary.cpp">
+      <Filter>Source Files\libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\MaterialLibrary.cpp">
+      <Filter>Source Files\libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="renderpasses\CompositionPass.cpp">
+      <Filter>Source Files\renderpasses</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
