@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include <d3d11.h>
 #include <string>
 #include <vector>
+#include <d3d11.h>
 
 struct ID3D11DeviceContext;
 

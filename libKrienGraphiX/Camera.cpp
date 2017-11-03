@@ -1,8 +1,6 @@
 
-#include <iostream>
-
-#include "Scene.h"
 #include "Camera.h"
+#include "Scene.h"
 
 namespace kgx
 {
@@ -19,22 +17,9 @@ namespace kgx
 		// create perspective matrix
 		DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovRH( fovY, aspect, m_nearZ, m_farZ );
 		DirectX::XMStoreFloat4x4( &m_projMatrix, tempPersp );
-
-		std::cout << "--- Perspective Matrix ---" << std::endl
-			<< m_projMatrix._11 << ", " << m_projMatrix._12 << ", " << m_projMatrix._13 << ", " << m_projMatrix._14 << std::endl
-			<< m_projMatrix._21 << ", " << m_projMatrix._22 << ", " << m_projMatrix._23 << ", " << m_projMatrix._24 << std::endl
-			<< m_projMatrix._31 << ", " << m_projMatrix._32 << ", " << m_projMatrix._33 << ", " << m_projMatrix._34 << std::endl
-			<< m_projMatrix._41 << ", " << m_projMatrix._42 << ", " << m_projMatrix._43 << ", " << m_projMatrix._44 << std::endl;
-
 		
 		// set camera mPosition and direction
 		lookAt( eye, m_target, up );
-
-		std::cout << "--- View Matrix ---" << std::endl
-			<< m_viewMatrix._11 << ", " << m_viewMatrix._12 << ", " << m_viewMatrix._13 << ", " << m_viewMatrix._14 << std::endl
-			<< m_viewMatrix._21 << ", " << m_viewMatrix._22 << ", " << m_viewMatrix._23 << ", " << m_viewMatrix._24 << std::endl
-			<< m_viewMatrix._31 << ", " << m_viewMatrix._32 << ", " << m_viewMatrix._33 << ", " << m_viewMatrix._34 << std::endl
-			<< m_viewMatrix._41 << ", " << m_viewMatrix._42 << ", " << m_viewMatrix._43 << ", " << m_viewMatrix._44 << std::endl;
 	}
 
 

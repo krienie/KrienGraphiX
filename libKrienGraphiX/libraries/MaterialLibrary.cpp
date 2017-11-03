@@ -1,7 +1,7 @@
 
+#include "MaterialLibrary.h"
 #include "../Filesystem.h"
 #include "../parsers/KGMaterialLibraryParser.h"
-#include "MaterialLibrary.h"
 
 namespace kgx
 {
@@ -35,23 +35,22 @@ namespace kgx
 			std::unordered_map<std::string, KgMatData> materials;
 			KGMaterialLibraryParser::parse( matLibraryString, materials );
 
-			std::unordered_map<std::string, KgMatData>::const_iterator it;
-			for ( it = materials.cbegin(); it != materials.cend(); ++it )
+			for ( auto &material : materials )
 			{
-				Material mat;
-				mat.diffuse = it->second.diffuse;
-				mat.specular = it->second.specular;
+				Material newMat;
+				newMat.diffuse = material.second.diffuse;
+				newMat.specular = material.second.specular;
 
-				if ( it->second.diffuseMap.size() > 0 )
-					mat.diffuseMap = it->second.diffuseMap;
+				if ( material.second.diffuseMap.size() > 0 )
+					newMat.diffuseMap = material.second.diffuseMap;
 
-				if ( it->second.specularMap.size() > 0 )
-					mat.specularMap = it->second.specularMap;
+				if ( material.second.specularMap.size() > 0 )
+					newMat.specularMap = material.second.specularMap;
 
-				if ( it->second.normalMap.size() > 0 )
-					mat.normalMap = it->second.normalMap;
+				if ( material.second.normalMap.size() > 0 )
+					newMat.normalMap = material.second.normalMap;
 
-				m_materials.insert( std::pair<std::string, Material>( it->first, mat ) );
+				m_materials.insert( std::pair<std::string, Material>( material.first, newMat ) );
 			}
 
 			return true;

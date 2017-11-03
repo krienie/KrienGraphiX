@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <QMouseEvent>
-
 namespace kgt
 {
 	class MouseEvent
@@ -68,7 +66,5 @@ namespace kgt
 		protected:
 			MouseListener() {}
 			virtual ~MouseListener() {}
-
-		private:
 	};
 }

@@ -1,6 +1,6 @@
 
-#include "MeshBuffer.h"
 #include "RenderableObject.h"
+#include "MeshBuffer.h"
 
 namespace kgx
 {

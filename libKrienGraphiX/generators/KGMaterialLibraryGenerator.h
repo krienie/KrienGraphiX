@@ -1,10 +1,7 @@
 
 #pragma once
 
-#include <map>
-
 #include "../parsers/KGParserDefines.h"
-
 
 namespace kgx
 {
@@ -20,8 +17,8 @@ namespace kgx
 			//~KGMaterialLibraryGenerator();
 
 			// no copying allowed
-			KGMaterialLibraryGenerator( const KGMaterialLibraryGenerator& );
-			KGMaterialLibraryGenerator& operator=(const KGMaterialLibraryGenerator&);
+			KGMaterialLibraryGenerator( const KGMaterialLibraryGenerator& )          = delete;
+			KGMaterialLibraryGenerator& operator=(const KGMaterialLibraryGenerator&) = delete;
 
 			static std::string float4ToString( const DirectX::XMFLOAT4 &float4 );
 	};

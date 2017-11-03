@@ -2,6 +2,10 @@
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
+#include "KGMaterialLibraryGenerator.h"
+
+#include <DirectXMath.h>
+
 #include <comdef.h>
 #include <sstream>
 
@@ -13,7 +17,6 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
 #include "../parsers/KGMaterialLibraryParser.h"
-#include "KGMaterialLibraryGenerator.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT4,
@@ -61,7 +64,7 @@ namespace kgx
 		struct KgmGram : karma::grammar<BackInsertIt, karma::space_type>
 		{
 			KgmGram( const std::string &header, const std::vector<KgMatData> &inMatData )
-				: KgmGram::base_type( output )
+				: base_type( output )
 			{
 				float4Variable = "(" << karma::no_delimit[karma::double_] << ","
 									 << karma::no_delimit[karma::double_] << ","
@@ -95,7 +98,7 @@ namespace kgx
 
 
 		BackInsertIt sink( output );
-		bool result = karma::generate_delimited( sink, kgoGram, karma::space );
+		generate_delimited( sink, kgoGram, karma::space );
 	}
 
 
@@ -104,7 +107,7 @@ namespace kgx
 		std::unordered_map<std::string, KgMatData> originalData;
 		KGMaterialLibraryParser::parse( matLibString, originalData );
 
-		std::map<std::string, KgMatData> combinedData;
+		std::unordered_map<std::string, KgMatData> combinedData;
 		// combine input and original data and filter out any duplicate materials (filter by name, in favour of the original data)
 		combinedData.insert( originalData.cbegin(), originalData.cend() );
 
@@ -114,7 +117,7 @@ namespace kgx
 
 		// convert map to vector
 		std::vector<KgMatData> combinedVecData;
-		std::map<std::string, KgMatData>::const_iterator convIt;
+		std::unordered_map<std::string, KgMatData>::const_iterator convIt;
 		for ( convIt = combinedData.cbegin(); convIt != combinedData.cend(); ++convIt )
 			combinedVecData.push_back( convIt->second );
 

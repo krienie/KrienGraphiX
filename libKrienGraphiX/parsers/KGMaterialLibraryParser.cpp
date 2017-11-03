@@ -2,14 +2,14 @@
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
+#include "KGMaterialLibraryParser.h"
+
 #include <comdef.h>
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-
-#include "KGMaterialLibraryParser.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT4,
@@ -94,7 +94,7 @@ namespace kgx
 		Skipper skipper = iso8859::space | matLibGrammar.comment;
 
 		std::string::const_iterator f = input.cbegin();
-		bool res = qi::phrase_parse( f, input.cend(), matLibGrammar, skipper );
+		qi::phrase_parse( f, input.cend(), matLibGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != input.cend() )

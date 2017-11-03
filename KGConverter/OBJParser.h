@@ -1,8 +1,8 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <DirectXMath.h>
-#include <map>
 
 #include <KGParserDefines.h>
 
@@ -74,12 +74,12 @@ namespace kgx
 				UINT normIdx;
 				UINT texIdx;
 
-				inline bool operator<(const VertexData &rhs) const
+				bool operator<(const VertexData &rhs) const
 				{
 					return std::tie(posIdx, normIdx, texIdx) < std::tie(rhs.posIdx, rhs.normIdx, rhs.texIdx);
 				}
 
-				inline bool operator==(const VertexData &rhs) const
+				bool operator==(const VertexData &rhs) const
 				{
 					return std::tie(posIdx, normIdx, texIdx) == std::tie(rhs.posIdx, rhs.normIdx, rhs.texIdx);
 				}
@@ -88,7 +88,7 @@ namespace kgx
 			bool parseObj( const std::string &input, ObjParseData &objData );
 			bool parseMtl( const std::string &input, std::vector<ObjMatData> &mtlData );
 			void storeModelData( std::string modelName, KgModelData &data,
-				std::map< std::string, std::vector<KgModelData> > *sortedModels, std::vector<KgModelData*> *tempModels );
+				std::unordered_map< std::string, std::vector<KgModelData> > *sortedModels, std::vector<KgModelData*> *tempModels );
 			void processModelData( const ObjParseData &objData, KgoData &kgData );
 			void convertToMatData( const ObjMatData &objMat, KgMatData &kgMat );
 	};

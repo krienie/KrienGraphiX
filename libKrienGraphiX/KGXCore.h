@@ -21,14 +21,14 @@ namespace kgx
 			RenderWindow* getRenderWindow() const;
 
 			void clearManagers();
-			void renderFrame();
+			void renderFrame() const;
 
 		private:
 			KGXCore();
 			~KGXCore();
 
 			// no copying allowed
-			KGXCore( const KGXCore& ) = delete;
+			KGXCore( const KGXCore& )            = delete;
 			KGXCore& operator=( const KGXCore& ) = delete;
 
 			static KGXCore* m_inst;

@@ -5,7 +5,6 @@
 
 #include "../parsers/KGParserDefines.h"
 
-
 namespace kgx
 {
 	class KGMaterialLibraryParser
@@ -14,7 +13,7 @@ namespace kgx
 			static bool parse( const std::string &input, std::unordered_map<std::string, KgMatData> &outputData );
 
 			// no copying allowed
-			KGMaterialLibraryParser( const KGMaterialLibraryParser& ) = delete;
+			KGMaterialLibraryParser( const KGMaterialLibraryParser& )            = delete;
 			KGMaterialLibraryParser& operator=( const KGMaterialLibraryParser& ) = delete;
 
 		private:

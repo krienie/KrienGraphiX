@@ -3,7 +3,6 @@
 
 #include "../parsers/KGParserDefines.h"
 
-
 namespace kgx
 {
 	class KGObjectGenerator
@@ -16,7 +15,7 @@ namespace kgx
 			//~KGObjectGenerator();
 
 			// no copying allowed
-			KGObjectGenerator( const KGObjectGenerator& );
-			KGObjectGenerator& operator=(const KGObjectGenerator&);
+			KGObjectGenerator( const KGObjectGenerator& )          = delete;
+			KGObjectGenerator& operator=(const KGObjectGenerator&) = delete;
 	};
 }

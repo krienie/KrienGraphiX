@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+
 #include "KGParserDefines.h"
 
 namespace kgx
@@ -17,8 +18,8 @@ namespace kgx
 			//~KGShaderProgramsParser();
 
 			// no copying allowed
-			KGShaderProgramsParser( const KGShaderProgramsParser& );
-			KGShaderProgramsParser& operator=( const KGShaderProgramsParser& );
+			KGShaderProgramsParser( const KGShaderProgramsParser& )            = delete;
+			KGShaderProgramsParser& operator=( const KGShaderProgramsParser& ) = delete;
 
 			static bool parseProgram( std::string &parseString, KgShaderProgData &progData );
 	};

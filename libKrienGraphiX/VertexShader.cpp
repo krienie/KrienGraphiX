@@ -33,6 +33,6 @@ namespace kgx
 	{
 		m_shaderSource = source;
 		m_shaderSource->AddRef();
-		return m_dxDev->CreateVertexShader( m_shaderSource->GetBufferPointer(), m_shaderSource->GetBufferSize(), NULL, &m_vertShader );
+		return m_dxDev->CreateVertexShader( m_shaderSource->GetBufferPointer(), m_shaderSource->GetBufferSize(), nullptr, &m_vertShader );
 	}
 }

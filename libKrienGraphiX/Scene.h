@@ -1,12 +1,13 @@
 
 #pragma once
 
-#include <DirectXMath.h>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
-#include "libraries/TextureLibrary.h"
+#include <DirectXMath.h>
+
 #include "Defines.h"
+#include "libraries/TextureLibrary.h"
 
 namespace kgx
 {
@@ -23,7 +24,7 @@ namespace kgx
 			~Scene();
 
 			// no copying allowed
-			Scene( const Scene& ) = delete;
+			Scene( const Scene& )            = delete;
 			Scene& operator=( const Scene& ) = delete;
 
 			typedef UINT CameraID;
@@ -33,7 +34,7 @@ namespace kgx
 							   const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3( 0.0f, 0.0f, -1.0f ),
 							   const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
 
-			typedef std::map<CameraID, Camera*>::const_iterator const_cameraiterator;
+			typedef std::unordered_map<CameraID, Camera*>::const_iterator const_cameraiterator;
 			const_cameraiterator getCameraCBegin() const;
 			const_cameraiterator getCameraCEnd() const;
 
@@ -73,7 +74,7 @@ namespace kgx
 			GBufferPass *m_gbufferPass;
 			CompositionPass *m_compositionPass;
 
-			std::map<CameraID, Camera*> m_cameras;
+			std::unordered_map<CameraID, Camera*> m_cameras;
 			std::vector<RenderableObject*> m_renderObjects;
 	};
 }

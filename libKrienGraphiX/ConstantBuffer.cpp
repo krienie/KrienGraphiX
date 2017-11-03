@@ -1,7 +1,7 @@
 
-#include <iostream>
-
 #include "ConstantBuffer.h"
+
+#include <iostream>
 
 namespace kgx
 {

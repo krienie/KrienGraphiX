@@ -1,6 +1,6 @@
 
-#include "Filesystem.h"
 #include "ConfigManager.h"
+#include "Filesystem.h"
 
 namespace bpt = boost::property_tree;
 
@@ -18,10 +18,9 @@ namespace kgx
 
 	void ConfigManager::destroy()
 	{
-		if ( ConfigManager::m_inst )
-			delete ConfigManager::m_inst;
+		if ( m_inst )
+			delete m_inst;
 	}
-
 
 	ConfigManager::ConfigManager()
 		: m_iniTree(), m_iniFilePath()

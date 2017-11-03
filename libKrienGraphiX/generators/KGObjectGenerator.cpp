@@ -4,6 +4,8 @@
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
+#include "KGObjectGenerator.h"
+
 #include <comdef.h>
 #include <sstream>
 
@@ -15,7 +17,6 @@
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
 #include "../RenderableObject.h"
-#include "KGObjectGenerator.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	kgx::KgModelData,

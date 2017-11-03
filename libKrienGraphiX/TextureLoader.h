@@ -2,6 +2,8 @@
 #pragma once
 #include <string>
 
+#include <WinDef.h>
+
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;
 struct ID3D11Device;

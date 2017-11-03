@@ -3,13 +3,14 @@
 	#define INITGUID
 #endif
 
+#include "ShaderBase.h"
+
 #include <iostream>
 #include <d3d11shader.h>
 #include <d3dcompiler.h>
 
 #include "ConstantBuffer.h"
 #include "Filesystem.h"
-#include "ShaderBase.h"
 
 
 namespace kgx
@@ -24,9 +25,8 @@ namespace kgx
 
 	ShaderBase::~ShaderBase()
 	{
-		std::vector<ConstantBuffer*>::iterator it;
-		for ( it = m_constBuffers.begin(); it != m_constBuffers.end(); ++it )
-			delete *it;
+		for ( auto &constBuffer : m_constBuffers )
+			delete constBuffer;
 
 		if ( m_dxDevCont )
 			m_dxDevCont->Release();
@@ -45,7 +45,7 @@ namespace kgx
 
 	HRESULT ShaderBase::loadFromFile( const std::string &filename )
 	{
-		std::string shaderFile = filesystem::getFile( filename );
+		std::string shaderFile   = filesystem::getFile( filename );
 		std::wstring wShaderFile = std::wstring( shaderFile.begin(), shaderFile.end() );
 
 		//load shader file

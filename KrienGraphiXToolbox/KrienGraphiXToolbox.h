@@ -1,10 +1,7 @@
 
 #pragma once
 
-#include <QtWidgets/QMainWindow>
-
-#include <Scene.h>
-
+#include "Scene.h"
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"
@@ -20,13 +17,13 @@ namespace kgt
 		explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
 		~KrienGraphiXToolbox();
 
-		void frameUpdate( double deltaTime );
-		void mouseMoved( const MouseEvent &evt );
-		void mousePressed( const MouseEvent &evt );
-		void mouseReleased( const MouseEvent &evt );
-		void wheelEvent( const MouseEvent &evt );
-		void keyPressed( const KeyEvent &evt );
-		void keyReleased( const KeyEvent &evt );
+		void frameUpdate( double deltaTime ) override;
+		void mouseMoved( const MouseEvent &evt ) override;
+		void mousePressed( const MouseEvent &evt ) override;
+		void mouseReleased( const MouseEvent &evt ) override;
+		void wheelEvent( const MouseEvent &evt ) override;
+		void keyPressed( const KeyEvent &evt ) override;
+		void keyReleased( const KeyEvent &evt ) override;
 
 	private slots:
 		void createNewScene();

@@ -1,8 +1,9 @@
 
+#include "RenderPass.h"
+
 #include <d3d11.h>
 
 #include "../KGXCore.h"
-#include "RenderPass.h"
 
 namespace kgx
 {

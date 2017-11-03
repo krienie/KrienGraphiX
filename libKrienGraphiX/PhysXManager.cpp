@@ -1,4 +1,6 @@
 
+#include "PhysXManager.h"
+
 #include <iostream>
 #include <vector>
 
@@ -13,7 +15,6 @@
 #include <pvd/PxVisualDebugger.h>
 
 #include "Filesystem.h"
-#include "PhysXManager.h"
 
 namespace kgx
 {
@@ -29,8 +30,8 @@ namespace kgx
 
 	void PhysXManager::destroy()
 	{
-		if ( PhysXManager::m_inst )
-			delete PhysXManager::m_inst;
+		if ( m_inst )
+			delete m_inst;
 	}
 
 
@@ -135,19 +136,18 @@ namespace kgx
 		{
 			std::vector<physx::PxRigidActor*> actors(numActors);
 			m_scene->getActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC,
-								(physx::PxActor**)&actors[0], numActors);
+								reinterpret_cast<physx::PxActor**>(&actors[0]), numActors);
 
-			std::vector<physx::PxRigidActor*>::const_iterator it;
-			for ( it = actors.cbegin(); it != actors.cend(); ++it )
+			for ( auto &actor : actors )
 			{
-				if ( name == (*it)->getName() )
+				if ( name == actor->getName() )
 				{
-					physx::PxU32 numShapes = (*it)->getNbShapes();
+					physx::PxU32 numShapes = actor->getNbShapes();
 					std::vector<physx::PxShape*> shapes(numShapes);
-					(*it)->getShapes((physx::PxShape**)&shapes[0], numShapes);
+					actor->getShapes(static_cast<physx::PxShape**>(&shapes[0]), numShapes);
 					if ( numShapes )		//TODO: support multiple shapes per actor
 					{
-						const physx::PxMat44 shapePose(physx::PxShapeExt::getGlobalPose(*shapes[0], *(*it)));
+						const physx::PxMat44 shapePose(physx::PxShapeExt::getGlobalPose(*shapes[0], *actor));
 						// Don't get confused. The parameter rows are the matrix's columns
 						result = DirectX::XMFLOAT4X4( shapePose.column0.x, shapePose.column0.y, shapePose.column0.z, shapePose.column0.w,
 													  shapePose.column1.x, shapePose.column1.y, shapePose.column1.z, shapePose.column1.w,
@@ -209,7 +209,7 @@ namespace kgx
 		// Allocate aligned memory, load data and deserialize
 		//TODO: convert to C++
 		m_collectionMemory = malloc( fileSize + PX_SERIAL_FILE_ALIGN );
-		void* memory128 = (void*)((size_t( m_collectionMemory ) + PX_SERIAL_FILE_ALIGN)&~(PX_SERIAL_FILE_ALIGN - 1));
+		void* memory128 = reinterpret_cast<void*>((size_t(m_collectionMemory) + PX_SERIAL_FILE_ALIGN) & ~(PX_SERIAL_FILE_ALIGN - 1));
 		fread( memory128, 1, fileSize, fp );
 		fclose( fp );
 		physx::PxCollection* collection = physx::PxSerialization::createCollectionFromBinary( memory128, *registry );
@@ -222,8 +222,7 @@ namespace kgx
 		return true;
 	}
 
-
-	bool PhysXManager::sphereSweep( const DirectX::XMFLOAT3 &initialPose, const DirectX::XMFLOAT3 &dir, float &dist, DirectX::XMFLOAT3 &hit )
+	bool PhysXManager::sphereSweep( const DirectX::XMFLOAT3 &initialPose, const DirectX::XMFLOAT3 &dir, float &dist, DirectX::XMFLOAT3 &hit ) const
 	{
 		if ( !m_isInit || !m_scene )
 		{
@@ -240,7 +239,7 @@ namespace kgx
 			return false;
 
 		physx::PxSweepHit sweepHit = sweepBuff.getAnyHit( 0 );
-		hit = DirectX::XMFLOAT3(sweepHit.position.x, sweepHit.position.y, sweepHit.position.z);
+		hit  = DirectX::XMFLOAT3(sweepHit.position.x, sweepHit.position.y, sweepHit.position.z);
 		dist = sweepHit.distance;
 
 		return true;

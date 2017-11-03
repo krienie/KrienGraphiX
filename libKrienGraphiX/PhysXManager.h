@@ -27,21 +27,20 @@ namespace kgx
 			static void destroy();
 
 			bool getShapeGlobalPosition( const std::string &name, DirectX::XMFLOAT4X4 &result ) const;
-			//bool getShapeGlobalPosition(const std::string &name, DirectX::XMFLOAT3 &result) const;
 
 			bool isInit() const;
 			bool advance( float timestep );
 			bool loadPhysXCollection( const std::string &file );
 
-			bool sphereSweep( const DirectX::XMFLOAT3 &initialPose, const DirectX::XMFLOAT3 &dir, float &dist, DirectX::XMFLOAT3 &hit );
+			bool sphereSweep( const DirectX::XMFLOAT3 &initialPose, const DirectX::XMFLOAT3 &dir, float &dist, DirectX::XMFLOAT3 &hit ) const;
 
 		private:
 			PhysXManager();
 			~PhysXManager();
 
 			// no copying allowed
-			PhysXManager( const PhysXManager& );
-			PhysXManager& operator=(const PhysXManager&);
+			PhysXManager( const PhysXManager& )          = delete;
+			PhysXManager& operator=(const PhysXManager&) = delete;
 
 			void initScene();
 

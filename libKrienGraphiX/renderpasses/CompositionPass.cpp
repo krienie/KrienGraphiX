@@ -1,7 +1,8 @@
 
+#include "CompositionPass.h"
+
 #include "../ShaderProgram.h"
 #include "../libraries/TextureLibrary.h"
-#include "CompositionPass.h"
 
 namespace kgx
 {

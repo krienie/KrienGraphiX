@@ -3,18 +3,18 @@
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 #endif
 
+#include "KGSceneParser.h"
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 #include <boost/filesystem.hpp>
 
-#include "../Camera.h"
 #include "../Filesystem.h"
 #include "../PhysXManager.h"
 #include "../RenderWindow.h"
 #include "../Scene.h"
 #include "KGObjectParser.h"
-#include "KGSceneParser.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT3,
@@ -71,7 +71,7 @@ namespace kgx
 		Skipper skipper = iso8859::space | kgsGrammar.comment;
 
 		std::string::const_iterator f = kgSceneData.cbegin();
-		bool res = qi::phrase_parse( f, kgSceneData.cend(), kgsGrammar, skipper );
+		qi::phrase_parse( f, kgSceneData.cend(), kgsGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != kgSceneData.cend() )
@@ -84,19 +84,18 @@ namespace kgx
 		Scene *newScene = new Scene();
 
 		// parse RenderableObjects
-		std::vector<std::string>::const_iterator it;
-		for ( it = objects.cbegin(); it != objects.cend(); ++it )
-			if ( !loadRenderObject(*it, newScene) )
+		for ( std::string &objectStr : objects )
+			if ( !loadRenderObject(objectStr, newScene) )
 				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating RenderableObject. Skipping." << std::endl;
 
 		// parse Camera's
-		for ( it = cameras.cbegin(); it != cameras.cend(); ++it )
-			if ( !loadCamera(*it, renderWin, newScene) )
+		for ( std::string &cameraStr : cameras )
+			if ( !loadCamera(cameraStr, renderWin, newScene) )
 				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating camera. Skipping." << std::endl;
 
 		// parse Lights
-		for ( it = lights.cbegin(); it != lights.cend(); ++it )
-			if ( !loadLight(*it, newScene) )
+		for ( std::string &lightStr : lights )
+			if ( !loadLight(lightStr, newScene) )
 				std::cout << "Warning (KGSceneParser::loadKGScene): Error creating light. Skipping." << std::endl;
 
 		return newScene;
@@ -135,7 +134,7 @@ namespace kgx
 		Skipper skipper = iso8859::space;
 
 		std::string::const_iterator f = objString.cbegin();
-		bool res = qi::phrase_parse( f, objString.cend(), kgsGrammar, skipper );
+		qi::phrase_parse( f, objString.cend(), kgsGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != objString.cend() )
@@ -211,7 +210,7 @@ namespace kgx
 		Skipper skipper = iso8859::space;
 
 		std::string::const_iterator f = camString.cbegin();
-		bool res = qi::phrase_parse( f, camString.cend(), camGrammar, skipper );
+		qi::phrase_parse( f, camString.cend(), camGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != camString.cend() )
@@ -222,8 +221,7 @@ namespace kgx
 		}
 
 		// apply settings
-		Scene::CameraID camID = parentScene->createCamera( fov, aspect, nearZ, farZ, eye, target, up );
-		Camera *newCam = parentScene->getCamera( camID );
+		parentScene->createCamera( fov, aspect, nearZ, farZ, eye, target, up );
 
 		return true;
 	}
@@ -266,7 +264,7 @@ namespace kgx
 		Skipper skipper = iso8859::space;
 
 		std::string::const_iterator f = lightString.cbegin();
-		bool res = qi::phrase_parse( f, lightString.cend(), lGrammar, skipper );
+		qi::phrase_parse( f, lightString.cend(), lGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != lightString.cend() )

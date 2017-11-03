@@ -1,11 +1,11 @@
 
+#include "TextureLoader.h"
+
 #include <d3d11.h>
 #include <iostream>
 #include <assert.h>
 #include <wincodec.h>
 #include <memory>
-
-#include "TextureLoader.h"
 
 namespace
 {

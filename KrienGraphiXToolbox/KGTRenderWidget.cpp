@@ -1,18 +1,18 @@
 
+#include "KGTRenderWidget.h"
+
 #include <Windows.h>
 #include <QTimer>
 
-#include <KGXCore.h>
-
+#include "KGXCore.h"
 #include "FrameListener.h"
 #include "KeyboardListener.h"
-#include "KGTRenderWidget.h"
 
 
 namespace kgt
 {
 	KGTRenderWidget::KGTRenderWidget( QWidget *parent, Qt::WindowFlags f )
-		: QWidget(parent, f | Qt::MSWindowsOwnDC), m_isInit(false), m_renderWin(0), m_lastFrameTime(0.0),
+		: QWidget(parent, f | Qt::MSWindowsOwnDC), m_isInit(false), m_renderWin(nullptr), m_lastFrameTime(0.0),
 		m_prevMousePosX( 0.0f ), m_prevMousePosY( 0.0f ), m_frameListeners(), m_mouseListeners(), m_keyboardListeners()
 	{
 		QPalette colourPalette = palette();
@@ -34,16 +34,14 @@ namespace kgt
 		double currentTime = static_cast<double>(timeGetTime());
 		double deltaTime   = (currentTime - m_lastFrameTime) * 0.001;
 
-		std::vector<FrameListener*>::iterator it;
-		for ( it = m_frameListeners.begin(); it != m_frameListeners.end(); ++it )
-			(*it)->frameUpdate( deltaTime );
+		for ( auto &frameListener : m_frameListeners )
+			frameListener->frameUpdate( deltaTime );
 
 		m_renderWin->update();
 
 		m_lastFrameTime = currentTime;
 
 		//TODO: add FPS upper limit
-		//TODO: kijken of dit beter kan.. of iig op een andere manier. Ziet er beetje habby-babby uit...
 		QTimer::singleShot( 0, this, SLOT( startRendering() ) );
 	}
 
@@ -96,19 +94,17 @@ namespace kgt
 
 	QPaintEngine* KGTRenderWidget::paintEngine() const
 	{
-		return 0;
+		return nullptr;
 	}
 
 
 	void KGTRenderWidget::mouseMoveEvent( QMouseEvent *evt )
 	{
-		std::vector<MouseListener*>::iterator it;
-		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
-			(*it)->mouseMoved( createMouseEvent( evt, MouseEvent::ButtonState::None ) );
+		for ( auto &mouseListener : m_mouseListeners )
+			mouseListener->mouseMoved( createMouseEvent(evt, MouseEvent::ButtonState::None) );
 
 		m_prevMousePosX = evt->x();
 		m_prevMousePosY = evt->y();
-
 	}
 
 	void KGTRenderWidget::mousePressEvent( QMouseEvent *evt )
@@ -116,9 +112,8 @@ namespace kgt
 		m_prevMousePosX = evt->x();
 		m_prevMousePosY = evt->y();
 
-		std::vector<MouseListener*>::iterator it;
-		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
-			(*it)->mousePressed( createMouseEvent( evt, MouseEvent::ButtonState::Down ) );
+		for ( auto &mouseListener : m_mouseListeners )
+			mouseListener->mousePressed( createMouseEvent(evt, MouseEvent::ButtonState::Down) );
 	}
 
 	void KGTRenderWidget::mouseReleaseEvent( QMouseEvent *evt )
@@ -126,34 +121,28 @@ namespace kgt
 		m_prevMousePosX = evt->x();
 		m_prevMousePosY = evt->y();
 
-		std::vector<MouseListener*>::iterator it;
-		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
-			(*it)->mouseReleased( createMouseEvent( evt, MouseEvent::ButtonState::Up ) );
+		for ( auto &mouseListener : m_mouseListeners )
+			mouseListener->mouseReleased( createMouseEvent(evt, MouseEvent::ButtonState::Up) );
 	}
 
 	void KGTRenderWidget::wheelEvent( QWheelEvent *evt )
 	{
-		std::vector<MouseListener*>::iterator it;
-		for ( it = m_mouseListeners.begin(); it != m_mouseListeners.end(); ++it )
-			(*it)->wheelEvent( createMouseEvent( evt ) );
+		for ( auto &mouseListener : m_mouseListeners )
+			mouseListener->wheelEvent( createMouseEvent( evt ) );
 	}
 
 	void KGTRenderWidget::keyPressEvent( QKeyEvent *evt )
 	{
 		int mod = evt->modifiers();
-
-		std::vector<KeyboardListener*>::iterator it;
-		for ( it = m_keyboardListeners.begin(); it != m_keyboardListeners.end(); ++it )
-			(*it)->keyPressed( KeyEvent(static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Pressed, static_cast<KeyEvent::KeyModifiers>(mod)) );
+		for ( auto &keyboardListener : m_keyboardListeners )
+			keyboardListener->keyPressed( KeyEvent(static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Pressed, static_cast<KeyEvent::KeyModifiers>(mod)) );
 	}
 
 	void KGTRenderWidget::keyReleaseEvent( QKeyEvent *evt )
 	{
 		int mod = evt->modifiers();
-
-		std::vector<KeyboardListener*>::iterator it;
-		for ( it = m_keyboardListeners.begin(); it != m_keyboardListeners.end(); ++it )
-			(*it)->keyReleased( KeyEvent( static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Released, static_cast<KeyEvent::KeyModifiers>(mod) ) );
+		for ( auto &keyboardListener : m_keyboardListeners )
+			keyboardListener->keyReleased( KeyEvent( static_cast<KeyEvent::Key>(evt->key()), KeyEvent::KeyState::Released, static_cast<KeyEvent::KeyModifiers>(mod) ) );
 	}
 
 	MouseEvent KGTRenderWidget::createMouseEvent( QWheelEvent *qtEvt ) const

@@ -60,8 +60,8 @@ namespace kgx
 			//~ConfigManager();
 
 			// no copying allowed
-			ConfigManager( const ConfigManager& );
-			ConfigManager& operator=(const ConfigManager&);
+			ConfigManager( const ConfigManager& )          = delete;
+			ConfigManager& operator=(const ConfigManager&) = delete;
 
 			static ConfigManager* m_inst;
 

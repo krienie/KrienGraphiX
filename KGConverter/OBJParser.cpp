@@ -3,7 +3,8 @@
 
 #define NOMINMAX
 
-#include <limits>
+#include "OBJParser.h"
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -17,8 +18,6 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/support_iso8859_1.hpp>
-
-#include "OBJParser.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT3,
@@ -155,9 +154,9 @@ namespace kgx
 
 		struct ObjGram : qi::grammar<std::string::const_iterator, ObjParseData(), Skipper>
 		{
-			ObjGram() : ObjGram::base_type(start)
+			ObjGram() : base_type(start)
 			{
-				skipLine = ((qi::lit('#') | qi::lit('s') | qi::lit('o')) >> qi::skip(qi::blank)[*qi::print]);
+				skipLine = (qi::lit('#') | qi::lit('s') | qi::lit('o')) >> qi::skip(qi::blank)[*qi::print];
 				defaultGroup = qi::lit('g') >> qi::skip(qi::blank)[*qi::print];
 
 				auto setMatlib = phx::push_back(phx::bind(&ObjParseData::mtllib, qi::_r1), qi::_1);
@@ -215,7 +214,7 @@ namespace kgx
 	{
 		struct mtlGram : qi::grammar<std::string::const_iterator, std::vector<ObjMatData>(), Skipper>
 		{
-			mtlGram() : mtlGram::base_type(start)
+			mtlGram() : base_type(start)
 			{
 				skipLine = (qi::lit('#') | qi::lit("illum")) >> qi::skip(qi::blank)[*qi::print];
 
@@ -284,9 +283,9 @@ namespace kgx
 	* utility function used for OBJ parsing
 	*/
 	void OBJParser::storeModelData( std::string modelName, KgModelData &data,
-										std::map< std::string, std::vector<KgModelData> > *sortedModels, std::vector<KgModelData*> *tempModels )
+										std::unordered_map<std::string, std::vector<KgModelData>> *sortedModels, std::vector<KgModelData*> *tempModels )
 	{
-		typedef std::map< std::string, std::vector<KgModelData> >::iterator modelIt;
+		typedef std::unordered_map< std::string, std::vector<KgModelData> >::iterator modelIt;
 		modelIt mIt = sortedModels->find(modelName);
 
 		if ( mIt != sortedModels->end() )
@@ -304,20 +303,19 @@ namespace kgx
 
 	void OBJParser::processModelData( const ObjParseData &objData, KgoData &kgData )
 	{
-		std::map<VertexData, UINT> verts;
-		std::map<UINT, VertexData> vertIdices;
+		std::unordered_map<VertexData, UINT> verts;
+		std::unordered_map<UINT, VertexData> vertIdices;
 
 		// these two below are needed to handle duplicate object names
-		std::map< std::string, std::vector<KgModelData> > sortedModels;
+		std::unordered_map< std::string, std::vector<KgModelData> > sortedModels;
 		std::vector<KgModelData*> tempModels;
 
 		UINT maxIdx = 0;
-		std::vector<FaceData>::const_iterator i;
-		for ( i = objData.faces.cbegin(); i != objData.faces.cend(); ++i )
+		for ( auto &face : objData.faces )
 		{
 			//TODO: handle when a mtllib is defined, but not found, also for usemtl's
 
-			if ( i->groupName.size() > 0 || i->usemtl.size() > 0 )		// faces with groupName or usemtl defined indicate a new model
+			if ( face.groupName.size() > 0 || face.usemtl.size() > 0 )		// faces with groupName or usemtl defined indicate a new model
 			{
 				// save index ranges for usemtl flags
 				if ( tempModels.size() >= 1 )
@@ -326,17 +324,18 @@ namespace kgx
 						int( kgData.indices.size() ) - tempModels[tempModels.size() - 1]->startIndex;
 				}
 
-				KgModelData newModel( i->groupName, i->usemtl, int( kgData.indices.size() ), 0 );
-				storeModelData( i->groupName, newModel, &sortedModels, &tempModels );
+				KgModelData newModel( face.groupName, face.usemtl, int( kgData.indices.size() ), 0 );
+				storeModelData( face.groupName, newModel, &sortedModels, &tempModels );
 			}
 
-			std::vector<long>::const_iterator posIt = i->posIdx.cbegin();
-			std::vector<long>::const_iterator texIt = i->texIdx.cbegin();
-			std::vector<long>::const_iterator normIt = i->normIdx.cbegin();
+			std::vector<long>::const_iterator posIt  = face.posIdx.cbegin();
+			std::vector<long>::const_iterator texIt  = face.texIdx.cbegin();
+			std::vector<long>::const_iterator normIt = face.normIdx.cbegin();
 
 			UINT firstIdx = 0u;
-			VertexData firstVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) ); //OBJ indices start at 1 and we need to start at 0, so idx - 1
-			std::map<VertexData, UINT>::iterator vertIt;
+			//OBJ indices start at 1 and we need to start at 0, so idx - 1
+			VertexData firstVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) );
+			std::unordered_map<VertexData, UINT>::iterator vertIt;
 			vertIt = verts.find( firstVert );
 			if ( vertIt == verts.end() )
 			{
@@ -349,8 +348,8 @@ namespace kgx
 			}
 
 			//TODO: add support for concave polygons
-			posIt++; normIt++; texIt++;
-			int faceSize = (int)i->posIdx.size();
+			++posIt; ++normIt; ++texIt;
+			int faceSize = static_cast<int>(face.posIdx.size());
 			for ( int j = 0; j < faceSize - 2; ++j )					// triangulate convex polygon
 			{
 				// add triangle vertices to unique-vertex list
@@ -368,7 +367,7 @@ namespace kgx
 				}
 
 				UINT midVertIdx = 0u;
-				posIt++; normIt++; texIt++;
+				++posIt; ++normIt; ++texIt;
 				VertexData midVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) );
 				vertIt = verts.find( midVert );
 				if ( vertIt == verts.end() )
@@ -402,7 +401,7 @@ namespace kgx
 		// fill outputVerts using the set of FaceData structs.
 		for ( UINT i = 0; i < maxIdx; ++i )
 		{
-			std::map<UINT, VertexData>::const_iterator vIt;
+			std::unordered_map<UINT, VertexData>::const_iterator vIt;
 			vIt = vertIdices.find( i );
 
 			// position coordinates
@@ -422,39 +421,37 @@ namespace kgx
 		}
 
 		// assign correct name to each object
-		std::map< std::string, std::vector<KgModelData> >::iterator mIt;
-		for ( mIt = sortedModels.begin(); mIt != sortedModels.end(); ++mIt )
+		for ( auto &sortedModelPair : sortedModels )
 		{
-			std::vector<KgModelData>::iterator i;
-			if ( mIt->first.size() > 0 )
+			if ( sortedModelPair.first.size() > 0 )
 			{
-				if ( mIt->second.size() == 1 )
+				if ( sortedModelPair.second.size() == 1 )
 				{
-					kgData.models.push_back( mIt->second[0] );
+					kgData.models.push_back( sortedModelPair.second[0] );
 				} else																	//make sure there are no duplicate object names
 				{
 					UINT nameCount = 1;
-					for ( i = mIt->second.begin(); i != mIt->second.end(); ++i )
+					for ( auto &sortedModel : sortedModelPair.second )
 					{
 						std::stringstream ssName;
-						ssName << i->modelName << '_' << nameCount;
+						ssName << sortedModel.modelName << '_' << nameCount;
 						nameCount++;
 
-						i->modelName = ssName.str();
-						kgData.models.push_back( *i );
+						sortedModel.modelName = ssName.str();
+						kgData.models.push_back( sortedModel );
 					}
 				}
 			} else																		//give a name to unnamed objects
 			{
 				UINT unnamedCount = 1;
-				for ( i = mIt->second.begin(); i != mIt->second.end(); ++i )
+				for ( auto &unnamedModel : sortedModelPair.second )
 				{
 					std::stringstream ssName;
 					ssName << "UnnamedObject" << unnamedCount;
 					unnamedCount++;
 
-					i->modelName = ssName.str();
-					kgData.models.push_back( *i );
+					unnamedModel.modelName = ssName.str();
+					kgData.models.push_back( unnamedModel );
 				}
 			}
 		}

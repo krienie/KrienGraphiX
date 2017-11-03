@@ -5,6 +5,8 @@
 
 #pragma warning( disable : 4244 )		// warning C4244: conversion from 'unsigned int' to 'float', possible loss of data. This is intentional.
 
+#include "KGObjectParser.h"
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/fusion/include/std_pair.hpp>
@@ -18,8 +20,6 @@
 #include "../Scene.h"
 #include "../VertexInputLayout.h"
 #include "../libraries/MaterialLibrary.h"
-
-#include "KGObjectParser.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
 	DirectX::XMFLOAT4,
@@ -94,8 +94,7 @@ namespace kgx
 		Skipper skipper = iso8859::space | kgmGrammar.comment;
 
 		std::string::const_iterator f = kgObjectData.cbegin();
-		bool res = qi::phrase_parse( f, kgObjectData.cend(), kgmGrammar, skipper );
-		//TODO: handle res == false
+		qi::phrase_parse( f, kgObjectData.cend(), kgmGrammar, skipper );
 
 		// print everything that hasn't been processed by the parser
 		if ( f != kgObjectData.cend() )
@@ -106,9 +105,8 @@ namespace kgx
 		}
 
 
-		res = addParsedDataToScene( vertices, indices, vertLayoutTypes, models, position, scale, scene );
+		addParsedDataToScene( vertices, indices, vertLayoutTypes, models, position, scale, scene );
 
-		//TODO: handle res == false
 	}
 
 	bool KGObjectParser::addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
@@ -126,13 +124,12 @@ namespace kgx
 		}
 
 		MaterialLibrary matLibrary;
-		std::vector<KgModelData>::const_iterator it;
-		for ( it = models.cbegin(); it != models.cend(); ++it )
+		for ( KgModelData &kgModelData : models )
 		{
-			RenderableObject *ro = new RenderableObject( it->modelName, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-														 meshBuffer, it->indexCount, it->startIndex, 0u );
+			RenderableObject *ro = new RenderableObject( kgModelData.modelName, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+														 meshBuffer, kgModelData.indexCount, kgModelData.startIndex, 0u );
 
-			ro->setMaterial( matLibrary.getMaterial(it->matName) );
+			ro->setMaterial( matLibrary.getMaterial( kgModelData.materialName) );
 			ro->setPosition( position.x, position.y, position.z );
 			ro->setScale( scale.x, scale.y, scale.z );
 

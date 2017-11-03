@@ -2,11 +2,12 @@
 #define BOOST_DATE_TIME_NO_LIB
 #define BOOST_SPIRIT_USE_PHOENIX_V3
 
+#include "KGShaderProgramsParser.h"
+
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 
 #include "../VertexInputLayout.h"
-#include "KGShaderProgramsParser.h"
 
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
@@ -44,7 +45,7 @@ namespace kgx
 		struct ShaderProgGrammar : qi::grammar<std::string::const_iterator, Skipper>
 		{
 			ShaderProgGrammar( KgShaderProgData &progData )
-				: ShaderProgGrammar::base_type( start )
+				: base_type( start )
 			{
 				comment = "//" >> qi::skip( qi::blank )[*qi::print];
 

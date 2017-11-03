@@ -1,6 +1,8 @@
 
 #define _CRT_SECURE_NO_DEPRECATE		//to disable deprecation warnings about freopen()
 
+#include "KGXCore.h"
+
 #include <DirectXMath.h>
 #include <iostream>
 
@@ -8,7 +10,6 @@
 #include "ConfigManager.h"
 #include "Filesystem.h"
 #include "TextureLoader.h"
-#include "KGXCore.h"
 
 namespace kgx
 {
@@ -156,13 +157,14 @@ namespace kgx
 	}
 
 
+	//TODO: rename or remove
 	void KGXCore::clearManagers()
 	{
 		filesystem::clearSearchPaths();
 	}
 
 
-	void KGXCore::renderFrame()
+	void KGXCore::renderFrame() const
 	{
 		if ( m_renderWindow )
 			m_renderWindow->update();

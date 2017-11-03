@@ -9,7 +9,7 @@ namespace kgx
 	class VertexInputLayout
 	{
 		public:
-			enum Type
+			enum class Type
 			{
 				Position,
 				TextureCoordinate,

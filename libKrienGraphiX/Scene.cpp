@@ -1,4 +1,6 @@
 
+#include "Scene.h"
+
 #include <iostream>
 #include <d3d11.h>
 
@@ -9,8 +11,6 @@
 #include "renderpasses/GBufferPass.h"
 
 #include "KGXCore.h"
-
-#include "Scene.h"
 
 namespace kgx
 {
@@ -29,16 +29,14 @@ namespace kgx
 		if ( m_compositionPass )
 			delete m_compositionPass;
 
-		std::vector<RenderableObject*>::iterator renIt;
-		for ( renIt = m_renderObjects.begin(); renIt != m_renderObjects.end(); ++renIt )
-			delete *renIt;
+		for ( auto &renObj : m_renderObjects )
+			delete renObj;
+
+		for ( auto &camera : m_cameras )
+			delete camera.second;
 
 		if ( m_dxDeferredDevCont )
 			m_dxDeferredDevCont->Release();
-
-		std::map<CameraID, Camera*>::iterator camIt;
-		for ( camIt = m_cameras.begin(); camIt != m_cameras.end(); ++camIt )
-			delete camIt->second;
 	}
 
 
@@ -90,7 +88,7 @@ namespace kgx
 
 	Camera* Scene::getCamera( CameraID id ) const
 	{
-		std::map<CameraID, Camera*>::const_iterator it = m_cameras.find( id );
+		std::unordered_map<CameraID, Camera*>::const_iterator it = m_cameras.find( id );
 		if ( it != m_cameras.end() )
 			return it->second;
 

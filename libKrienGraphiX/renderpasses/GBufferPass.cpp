@@ -1,4 +1,6 @@
 
+#include "GBufferPass.h"
+
 #include "../Camera.h"
 #include "../ConstantBuffer.h"
 #include "../MeshBuffer.h"
@@ -7,7 +9,6 @@
 #include "../VertexShader.h"
 #include "../PixelShader.h"
 #include "../PhysXManager.h"
-#include "GBufferPass.h"
 
 namespace kgx
 {

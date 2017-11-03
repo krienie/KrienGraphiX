@@ -13,11 +13,11 @@ namespace kgx
 			static void loadKGO( const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale, Scene *scene );
 
 		private:
-			KGObjectParser() = default;
+			KGObjectParser()  = default;
 			~KGObjectParser() = default;
 
 			// no copying allowed
-			KGObjectParser( const KGObjectParser& ) = delete;
+			KGObjectParser( const KGObjectParser& )          = delete;
 			KGObjectParser& operator=(const KGObjectParser&) = delete;
 
 			static bool addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,

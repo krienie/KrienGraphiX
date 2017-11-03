@@ -1,4 +1,6 @@
 
+#include "ShaderProgramLibrary.h"
+
 #include <d3d11.h>
 #include <iostream>
 #include <string>
@@ -6,7 +8,6 @@
 #include "../KGXCore.h"
 #include "../Filesystem.h"
 #include "../parsers/KGShaderProgramsParser.h"
-#include "ShaderProgramLibrary.h"
 
 namespace kgx
 {
@@ -27,9 +28,8 @@ namespace kgx
 			m_dxDevCont->Release();
 
 		// release all ShaderPrograms
-		std::unordered_map<ShaderProgram::ShaderProgramID, ShaderProgram*>::iterator spIt;
-		for ( spIt = m_shaderPrograms.begin(); spIt != m_shaderPrograms.end(); ++spIt )
-			delete spIt->second;
+		for ( auto &shaderProgPair : m_shaderPrograms )
+			delete shaderProgPair.second;
 	}
 
 	ShaderProgram* ShaderProgramLibrary::getShaderProgram( const std::string &name ) const
@@ -74,8 +74,7 @@ namespace kgx
 	void ShaderProgramLibrary::releaseShaderProgram( const std::string &name )
 	{
 		ShaderProgram *sp = getShaderProgram( name );
-		if ( sp )
-			releaseShaderProgram( sp->getID() );
+		if ( sp ) releaseShaderProgram( sp->getID() );
 	}
 	void ShaderProgramLibrary::releaseShaderProgram( ShaderProgram::ShaderProgramID id )
 	{

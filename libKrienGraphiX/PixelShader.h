@@ -18,7 +18,7 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			PixelShader( const PixelShader& ) = delete;
+			PixelShader( const PixelShader& )            = delete;
 			PixelShader& operator=( const PixelShader& ) = delete;
 
 			//ID3D11Buffer* createUAVBuffer( unsigned int structureStride, unsigned int numStructures, const void *buffData ) const;

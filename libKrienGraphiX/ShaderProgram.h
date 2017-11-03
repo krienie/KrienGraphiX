@@ -1,10 +1,9 @@
 
 #pragma once
 
+#include <string>
+
 #include <d3d11.h>
-
-#include "Defines.h"
-
 
 namespace kgx
 {
@@ -51,8 +50,8 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			ShaderProgram( const ShaderProgram& );
-			ShaderProgram& operator=( const ShaderProgram& );
+			ShaderProgram( const ShaderProgram& )            = delete;
+			ShaderProgram& operator=( const ShaderProgram& ) = delete;
 
 			ShaderBase* getShader( ShaderType shader ) const;
 

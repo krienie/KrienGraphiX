@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <QKeyEvent>
@@ -48,8 +47,6 @@ namespace kgt
 		protected:
 			KeyboardListener() {}
 			virtual ~KeyboardListener() {}
-
-		private:
 	};
 
 }

@@ -1,4 +1,6 @@
 
+#include "TextureLibrary.h"
+
 #include <iostream>
 #include <comdef.h>
 #include <d3d11.h>
@@ -7,7 +9,6 @@
 #include "../Texture.h"
 #include "../TextureLoader.h"
 #include "../RenderTexture.h"
-#include "TextureLibrary.h"
 
 namespace kgx
 {
@@ -37,9 +38,8 @@ namespace kgx
 			m_defaultSampler = nullptr;
 		}
 
-		std::unordered_map<Texture::TextureID, Texture*>::iterator it;
-		for ( it = m_textures.begin(); it != m_textures.end(); ++it )
-			delete it->second;
+		for ( auto &textureIDPair : m_textures )
+			delete textureIDPair.second;
 
 		m_textures.clear();
 		m_textureNames.clear();
@@ -146,7 +146,6 @@ namespace kgx
 		ID3D11Resource *texBuffer = texture;
 		RenderTexture *newTexture = new RenderTexture( m_nextTextureID, texBuffer, shaderResourceView, renderTargetView );
 		m_textures.insert( std::make_pair( m_nextTextureID, newTexture ) );
-
 		++m_nextTextureID;
 
 		return newTexture;
@@ -184,7 +183,7 @@ namespace kgx
 		srvList.clear();
 		srvList.reserve( m_textures.size() );
 
-		for ( auto texture : m_textures )
+		for ( auto &texture : m_textures )
 			srvList.push_back( texture.second->getResourceView() );
 	}
 }

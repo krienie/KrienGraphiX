@@ -1,9 +1,11 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
-#include "../ShaderProgram.h"
+#include <DirectXMath.h>
+
 #include "../VertexInputLayout.h"
 
 typedef unsigned int UINT;
@@ -13,12 +15,12 @@ namespace kgx
 	struct KgModelData
 	{
 		KgModelData( const std::string &mName = "", const std::string &usemtl = "", int start = 0, int count = 0 )
-			: modelName(mName), matName(usemtl), startIndex(start), indexCount(count) {}
+			: modelName(mName), startIndex(start), indexCount(count), materialName(usemtl) {}
 
 		std::string modelName;
 		int startIndex;
 		int indexCount;
-		std::string matName;
+		std::string materialName;
 	};
 
 	struct KgMatData
@@ -48,10 +50,10 @@ namespace kgx
 		KgoData() : inputLayout(), vertices(), indices(), models(), mats() {}
 
 		std::vector<VertexInputLayout::Type> inputLayout;
-		std::vector<float> vertices;
-		std::vector<UINT> indices;
+		std::vector<float>       vertices;
+		std::vector<UINT>        indices;
 		std::vector<KgModelData> models;
-		std::vector<KgMatData> mats;
+		std::vector<KgMatData>   mats;
 	};
 
 	// the streaming operator for VertexInputLayout::Type

@@ -1,8 +1,9 @@
 
+#include "RenderWindow.h"
+
 #include <iostream>
 
 #include "Camera.h"
-#include "RenderWindow.h"
 
 namespace kgx
 {

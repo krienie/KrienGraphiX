@@ -4,7 +4,6 @@
 #include <string>
 #include <d3d11.h>
 
-
 namespace kgx
 {
 	class ConstantBuffer
@@ -24,7 +23,7 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			ConstantBuffer( const ConstantBuffer &other ) = delete;
+			ConstantBuffer( const ConstantBuffer &other )          = delete;
 			ConstantBuffer& operator=( const ConstantBuffer &rhs ) = delete;
 
 			ID3D11Device *m_dxDev;

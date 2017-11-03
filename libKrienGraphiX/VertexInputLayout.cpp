@@ -6,9 +6,8 @@ namespace kgx
 	VertexInputLayout::VertexInputLayout( const std::vector<Type> &inputTypes )
 		: m_inputTypes(), m_inputDescriptor(), m_dxLayout( nullptr ), m_bufferStride( 0U )
 	{
-		std::vector<Type>::const_iterator it;
-		for ( it = inputTypes.begin(); it != inputTypes.end(); ++it )
-			addInputType(*it);
+		for ( const auto &inputType : inputTypes )
+			addInputType( inputType );
 	}
 
 	VertexInputLayout::VertexInputLayout( const VertexInputLayout &other )
@@ -89,6 +88,7 @@ namespace kgx
 	{
 		return m_inputTypes;
 	}
+
 	ID3D11InputLayout* VertexInputLayout::getDxInputLayout( ID3D11Device *dxDevice, ID3DBlob *shaderSource, bool forceRebuild )
 	{
 		if ( m_dxLayout )
@@ -110,10 +110,9 @@ namespace kgx
 		{
 			m_dxLayout = nullptr;
 			return nullptr;
-		} else
-		{
-			return m_dxLayout;
 		}
+		
+		return m_dxLayout;
 	}
 
 

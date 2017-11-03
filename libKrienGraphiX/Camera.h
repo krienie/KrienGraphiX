@@ -42,7 +42,6 @@ namespace kgx
 			void moveRight( float dist );
 			void translate( const DirectX::XMFLOAT3 &deltaPos );
 			//TODO: add support for radians and quaternions
-			//void rotate( float degreesX, float degreesY, float degreesZ );
 			void rotateUp( float degrees );
 			void rotateDown( float degrees );
 			void rotateLeft( float degrees );

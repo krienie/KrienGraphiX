@@ -1,9 +1,10 @@
 
+#include "MeshBuffer.h"
+
+#include <comdef.h>
 #include <iostream>
 
 #include "KGXCore.h"
-#include "MeshBuffer.h"
-#include <comdef.h>
 
 namespace kgx
 {

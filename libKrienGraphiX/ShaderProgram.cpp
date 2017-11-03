@@ -1,10 +1,11 @@
 
+#include "ShaderProgram.h"
+
 #include <iostream>
 
 #include "VertexInputLayout.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
-#include "ShaderProgram.h"
 
 namespace kgx
 {
@@ -130,10 +131,10 @@ namespace kgx
 		// bind shaders to pipeline
 		if ( m_vertShader )
 			m_vertShader->activate( dxContext );
-		else dxContext->VSSetShader( nullptr, 0, 0 );		// disable vertex shader
+		else dxContext->VSSetShader( nullptr, nullptr, 0 );		// disable vertex shader
 
 		if ( m_pixShader )
 			m_pixShader->activate( dxContext );
-		else dxContext->PSSetShader( nullptr, 0, 0 );		// disable pixel shader
+		else dxContext->PSSetShader( nullptr, nullptr, 0 );		// disable pixel shader
 	}
 }

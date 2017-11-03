@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <d3d11.h>
 #include <string>
+#include <d3d11.h>
 
 #include "Defines.h"
 

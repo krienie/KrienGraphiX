@@ -1,12 +1,11 @@
 
+#include "Filesystem.h"
+
 #include <set>
-#include <sstream>
 #include <iostream>
 #include <Windows.h>
 
 #include <boost/filesystem.hpp>
-
-#include "Filesystem.h"
 
 namespace
 {
@@ -18,7 +17,7 @@ namespace kgx { namespace filesystem
 	std::string getCurrentProgramPath()
 	{
 		char result[MAX_PATH];
-		std::string progPath = std::string( result, GetModuleFileName( NULL, result, MAX_PATH ) );
+		std::string progPath = std::string( result, GetModuleFileName(nullptr, result, MAX_PATH ) );
 		return progPath.substr( 0, progPath.find_last_of( "/\\" ) );
 	}
 
@@ -69,7 +68,7 @@ namespace kgx { namespace filesystem
 	{
 		std::string absFile = filename;
 		if ( !boost::filesystem::path(filename).is_absolute() )
-			absFile = filesystem::getAbsolutePath(filename);
+			absFile = getAbsolutePath(filename);
 		if ( absFile.size() == 0 || !boost::filesystem::exists( absFile ) )
 		{
 			std::cout << "Error (Filesystem::openFile): Source file not found." << std::endl;

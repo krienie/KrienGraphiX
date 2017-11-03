@@ -12,7 +12,5 @@ namespace kgt
 		protected:
 			FrameListener() {}
 			virtual ~FrameListener() {}
-
-		private:
 	};
 }

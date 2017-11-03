@@ -1,20 +1,19 @@
 
 #define NOMINMAX
 
+#include "KrienGraphiXToolbox.h"
+
 #include <iostream>
 
 #include <boost/filesystem.hpp>
-
 #include <qfiledialog.h>
 
-#include <KGXCore.h>
-#include <Filesystem.h>
-#include <Camera.h>
-#include <PhysXManager.h>
-#include <ConfigManager.h>
-#include <parsers/KGSceneParser.h>
-
-#include "KrienGraphiXToolbox.h"
+#include "KGXCore.h"
+#include "Filesystem.h"
+#include "Camera.h"
+#include "PhysXManager.h"
+#include "ConfigManager.h"
+#include "parsers/KGSceneParser.h"
 
 namespace bfs = boost::filesystem;
 

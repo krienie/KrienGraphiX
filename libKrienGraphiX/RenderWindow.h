@@ -30,7 +30,7 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			RenderWindow( const RenderWindow& ) = delete;
+			RenderWindow( const RenderWindow& )            = delete;
 			RenderWindow& operator=( const RenderWindow& ) = delete;
 
 			struct Viewport

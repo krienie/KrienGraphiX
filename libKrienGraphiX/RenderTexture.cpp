@@ -1,7 +1,7 @@
 
-#include <d3d11.h>
-
 #include "RenderTexture.h"
+
+#include <d3d11.h>
 
 namespace kgx
 {

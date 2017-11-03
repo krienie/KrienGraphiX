@@ -3,8 +3,7 @@
 
 #include <QWidget>
 
-#include <RenderWindow.h>
-
+#include "RenderWindow.h"
 #include "MouseListener.h"
 
 namespace kgt
@@ -20,7 +19,7 @@ namespace kgt
 		void startRendering();
 
 	public:
-		KGTRenderWidget( QWidget *parent = 0, Qt::WindowFlags f = 0 );
+		KGTRenderWidget( QWidget *parent = nullptr, Qt::WindowFlags f = nullptr );
 		//~KGTRenderWidget();
 
 		void initialize();
@@ -33,16 +32,16 @@ namespace kgt
 		void addKeyboardListener( KeyboardListener *listener );
 
 	protected:
-		QPaintEngine* paintEngine() const;
-		void paintEvent( QPaintEvent *evt ) {}
-		void resizeEvent( QResizeEvent *evt ) {}
-		void focusInEvent( QFocusEvent *evt ) {}
-		void mouseMoveEvent( QMouseEvent *evt );
-		void mousePressEvent( QMouseEvent *evt );
-		void mouseReleaseEvent( QMouseEvent *evt );
-		void wheelEvent( QWheelEvent *evt );
-		void keyPressEvent( QKeyEvent *evt );
-		void keyReleaseEvent( QKeyEvent *evt );
+		QPaintEngine* paintEngine() const override;
+		void paintEvent( QPaintEvent *evt ) override {}
+		void resizeEvent( QResizeEvent *evt ) override {}
+		void focusInEvent( QFocusEvent *evt ) override {}
+		void mouseMoveEvent( QMouseEvent *evt ) override;
+		void mousePressEvent( QMouseEvent *evt ) override;
+		void mouseReleaseEvent( QMouseEvent *evt ) override;
+		void wheelEvent( QWheelEvent *evt ) override;
+		void keyPressEvent( QKeyEvent *evt ) override;
+		void keyReleaseEvent( QKeyEvent *evt ) override;
 
 	private:
 		MouseEvent createMouseEvent( QWheelEvent *qtEvt ) const;

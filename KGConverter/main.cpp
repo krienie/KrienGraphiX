@@ -6,7 +6,6 @@
 #include <boost/filesystem.hpp>
 
 #include "Filesystem.h"
-
 #include "KGMaterialLibraryGenerator.h"
 #include "KGMaterialLibraryParser.h"
 #include "KGObjectGenerator.h"
@@ -22,7 +21,7 @@ void printHelp();
 
 int main( int argc, char* argv[] )
 {
-	std::cout << "-= KrienGraphiX Parser v0.4 - (c)2016 Krien Linnenbank =-" << std::endl << std::endl;
+	std::cout << "-= KrienGraphiX Parser v0.4 - (c)2017 Krien Linnenbank =-" << std::endl << std::endl;
 
 	std::string inDir  = "/";
 	std::string outDir = "/";
@@ -37,16 +36,17 @@ int main( int argc, char* argv[] )
 				++i;
 				inDir = argv[i];
 				continue;
-			} else if ( std::string( argv[i] ) == "--outdir" && i < (argc - 1) )
+			}
+
+			if ( std::string( argv[i] ) == "--outdir" && i < (argc - 1) )
 			{
 				++i;
 				outDir = argv[i];
 				continue;
-			} else
-			{
-				printHelp();
-				return 0;
 			}
+
+			printHelp();
+			return 0;
 		}
 	} else
 	{
@@ -56,7 +56,7 @@ int main( int argc, char* argv[] )
 
 	// create input directory if needed
 	if ( !fs::exists( inDir )
-		 && !fs::create_directories( fs::path( inDir ) ) )
+		 && !fs::create_directories( fs::path(inDir) ) )
 	{
 		std::cout << "Error creating input directory: " << inDir << std::endl;
 		std::cout << "Aborting conversion... Press enter to exit" << std::endl;

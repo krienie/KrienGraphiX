@@ -20,7 +20,7 @@ namespace kgx
 
 		private:
 			// no copying allowed
-			VertexShader( const VertexShader& ) = delete;
+			VertexShader( const VertexShader& )            = delete;
 			VertexShader& operator=( const VertexShader& ) = delete;
 
 			ID3DBlob *m_shaderSource;
