@@ -23,7 +23,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, modelName)
 	(int, startIndex)
 	(int, indexCount)
-	(std::string, matName)
+	(std::string, materialName)
 );
 
 namespace phx   = boost::phoenix;

@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <QNamespace.h>
+
 namespace kgt
 {
 	class MouseEvent

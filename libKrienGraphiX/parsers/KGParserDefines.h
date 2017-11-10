@@ -61,16 +61,16 @@ namespace kgx
 	{
 		switch ( type )
 		{
-			case VertexInputLayout::Position:
+			case VertexInputLayout::Type::Position:
 				os << "Position";
 				break;
-			case VertexInputLayout::TextureCoordinate:
+			case VertexInputLayout::Type::TextureCoordinate:
 				os << "TextureCoordinate";
 				break;
-			case VertexInputLayout::Normal:
+			case VertexInputLayout::Type::Normal:
 				os << "Normal";
 				break;
-			case VertexInputLayout::Tangent:
+			case VertexInputLayout::Type::Tangent:
 				os << "Tangent";
 				break;
 			default:

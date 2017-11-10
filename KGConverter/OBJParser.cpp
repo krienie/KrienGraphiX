@@ -140,9 +140,9 @@ namespace kgx
 
 
 		// register Vertex layout
-		outputData.inputLayout.push_back( kgx::VertexInputLayout::Position );
-		outputData.inputLayout.push_back( kgx::VertexInputLayout::TextureCoordinate );
-		outputData.inputLayout.push_back( kgx::VertexInputLayout::Normal );
+		outputData.inputLayout.push_back( kgx::VertexInputLayout::Type::Position );
+		outputData.inputLayout.push_back( kgx::VertexInputLayout::Type::TextureCoordinate );
+		outputData.inputLayout.push_back( kgx::VertexInputLayout::Type::Normal );
 
 		return true;
 	}
@@ -303,7 +303,7 @@ namespace kgx
 
 	void OBJParser::processModelData( const ObjParseData &objData, KgoData &kgData )
 	{
-		std::unordered_map<VertexData, UINT> verts;
+		std::map<VertexData, UINT> verts;
 		std::unordered_map<UINT, VertexData> vertIdices;
 
 		// these two below are needed to handle duplicate object names
@@ -335,7 +335,7 @@ namespace kgx
 			UINT firstIdx = 0u;
 			//OBJ indices start at 1 and we need to start at 0, so idx - 1
 			VertexData firstVert( std::max(long(0), std::abs(*posIt) - 1), std::max(long(0), std::abs(*normIt) - 1), std::max(long(0), std::abs(*texIt) - 1) );
-			std::unordered_map<VertexData, UINT>::iterator vertIt;
+			std::map<VertexData, UINT>::iterator vertIt;
 			vertIt = verts.find( firstVert );
 			if ( vertIt == verts.end() )
 			{

@@ -34,7 +34,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, modelName)
 	(int, startIndex)
 	(int, indexCount)
-	(std::string, matName)
+	(std::string, materialName)
 );
 
 namespace phx     = boost::phoenix;
@@ -65,10 +65,10 @@ namespace kgx
 			{
 				comment = "//" >> qi::skip(qi::blank)[*qi::print];
 
-				vertexInputLayout = qi::string("Position")[qi::_val = VertexInputLayout::Position]
-									| qi::string("TextureCoordinate")[qi::_val = VertexInputLayout::TextureCoordinate]
-									| qi::string("Normal")[qi::_val = VertexInputLayout::Normal]
-									| qi::string("Tangent")[qi::_val = VertexInputLayout::Tangent];
+				vertexInputLayout = qi::string("Position")[qi::_val = VertexInputLayout::Type::Position]
+									| qi::string("TextureCoordinate")[qi::_val = VertexInputLayout::Type::TextureCoordinate]
+									| qi::string("Normal")[qi::_val = VertexInputLayout::Type::Normal]
+									| qi::string("Tangent")[qi::_val = VertexInputLayout::Type::Tangent];
 				vertices = "Vertices" >> qi::lit("(") >> vertexInputLayout[phx::push_back( phx::ref(l), qi::_1 )] % qi::char_(',') >> ")"
 					>> qi::lit("{") >> *qi::float_[phx::push_back( phx::ref(v), qi::_1 )] >> "}";
 

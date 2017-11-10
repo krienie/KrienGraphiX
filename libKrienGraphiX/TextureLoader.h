@@ -2,7 +2,7 @@
 #pragma once
 #include <string>
 
-#include <WinDef.h>
+#include <windows.h>
 
 struct ID3D11Resource;
 struct ID3D11ShaderResourceView;

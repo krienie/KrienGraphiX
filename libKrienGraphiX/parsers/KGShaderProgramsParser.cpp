@@ -49,10 +49,10 @@ namespace kgx
 			{
 				comment = "//" >> qi::skip( qi::blank )[*qi::print];
 
-				vertexInputLayoutTypes = qi::string( "Position" )[qi::_val = VertexInputLayout::Position]
-					| qi::string( "TextureCoordinate" )[qi::_val = VertexInputLayout::TextureCoordinate]
-					| qi::string( "Normal" )[qi::_val = VertexInputLayout::Normal]
-					| qi::string( "Tangent" )[qi::_val = VertexInputLayout::Tangent];
+				vertexInputLayoutTypes = qi::string( "Position" )[qi::_val = VertexInputLayout::Type::Position]
+					| qi::string( "TextureCoordinate" )[qi::_val = VertexInputLayout::Type::TextureCoordinate]
+					| qi::string( "Normal" )[qi::_val = VertexInputLayout::Type::Normal]
+					| qi::string( "Tangent" )[qi::_val = VertexInputLayout::Type::Tangent];
 
 				inputLayout = qi::lit( "inputlayout" ) >> qi::lit('(')
 					>> vertexInputLayoutTypes[phx::push_back( phx::ref(progData.vertLayoutTypes), qi::_1 )] % qi::char_(',') >> ')';
