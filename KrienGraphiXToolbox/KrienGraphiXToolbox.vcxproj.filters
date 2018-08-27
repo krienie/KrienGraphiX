@@ -41,17 +41,17 @@
     <ClCompile Include="KrienGraphiXToolbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_KrienGraphiXToolbox.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_KrienGraphiXToolbox.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_KrienGraphiXToolbox.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="KGTRenderWidget.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_KrienGraphiXToolbox.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_KrienGraphiXToolbox.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_KGTRenderWidget.cpp">
       <Filter>Generated Files\Debug</Filter>

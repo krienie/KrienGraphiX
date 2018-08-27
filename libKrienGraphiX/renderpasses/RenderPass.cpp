@@ -35,10 +35,12 @@ namespace kgx
 
 	void RenderPass::finishCommandList()
 	{
+		// Release any previously created commandlist
 		if ( m_commandList )
 		{
 			m_commandList->Release();
-		}	m_commandList = nullptr;
+			m_commandList = nullptr;
+		}
 
 		m_dxDeferredDevCont->FinishCommandList( false, &m_commandList );
 		m_dxDeferredDevCont->ClearState();

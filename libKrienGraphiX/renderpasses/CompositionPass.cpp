@@ -43,7 +43,7 @@ namespace kgx
 		dxDeferredDevCont->IASetInputLayout( nullptr );
 		dxDeferredDevCont->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 
-		// draw three times without a vertex buffer
+		// draw three vertices without a vertex buffer
 		dxDeferredDevCont->Draw( 3u, 0u );
 
 		finishCommandList();
