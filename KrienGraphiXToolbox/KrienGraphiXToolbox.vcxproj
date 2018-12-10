@@ -39,12 +39,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>..\libKrienGraphiX;..\libKrienGraphiX\parsers;$(BOOST_DIR);$(PHYSX_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libKrienGraphiX\include;..\libKrienGraphiX\include\kriengraphix;$(BOOST_DIR);$(PHYSX_DIR)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PHYSX_DIR)\Lib\vc14win64;$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IncludePath>..\libKrienGraphiX;..\libKrienGraphiX\parsers;$(BOOST_DIR);$(PHYSX_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath>..\libKrienGraphiX\include;..\libKrienGraphiX\include\kriengraphix;$(BOOST_DIR);$(PHYSX_DIR)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(PHYSX_DIR)\Lib\vc14win64;$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

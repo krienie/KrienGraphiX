@@ -10,7 +10,7 @@ namespace kgt
 			virtual void frameUpdate( double deltaTime ) = 0;
 
 		protected:
-			FrameListener() {}
-			virtual ~FrameListener() {}
+			FrameListener() = default;
+			virtual ~FrameListener() = default;
 	};
 }

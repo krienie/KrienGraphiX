@@ -8,12 +8,12 @@
 #include <boost/filesystem.hpp>
 #include <qfiledialog.h>
 
-#include "KGXCore.h"
-#include "Filesystem.h"
-#include "Camera.h"
-#include "PhysXManager.h"
-#include "ConfigManager.h"
-#include "parsers/KGSceneParser.h"
+#include <kriengraphix/Core/KGXCore.h>
+#include <kriengraphix/Core/PhysXManager.h>
+#include <kriengraphix/Core/ConfigManager.h>
+#include <kriengraphix/IO/Filesystem.h>
+#include <kriengraphix/IO/KGSceneParser.h>
+#include <kriengraphix/Simulation/Camera.h>
 
 namespace bfs = boost::filesystem;
 
@@ -45,12 +45,9 @@ namespace kgt
 		m_mouseYFilterBuffer.reserve(MOUSE_BUFFER_FILTER_SIZE);
 
 		//try and load project directory from KGConfig
-		m_projectDir = kgx::ConfigManager::getInst()->getProperty<std::string>( "projectFolder" );
+		m_projectDir = kgx::ConfigManager::get()->getProperty<std::string>( "projectFolder" );
 		if ( m_projectDir.size() == 0 )
 			setProjectFolder();
-
-		// add project work directory to KGX filesystem
-		kgx::filesystem::addSearchPath( m_projectDir );
 
 		m_ui.renderWidget1->startRendering();
 
@@ -204,15 +201,15 @@ namespace kgt
 	{
 		// get scene filename
 		bfs::path sceneDirPath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
-		std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr(sceneDirPath.string().c_str()),
-															  tr( "KrienGraphiX Scene File (*.kgscene)" ) ).toStdString();
+		std::string sceneFile = QFileDialog::getOpenFileName( this, tr("Open scene file"), tr(sceneDirPath.string().c_str()),
+															  tr("KrienGraphiX Scene File (*.kgscene)") ).toStdString();
 		if ( sceneFile.empty() )
 			return;
 		
 		// unload current scene
 		if ( m_currentScene )
 			delete m_currentScene;
-		kgx::KGXCore::getInst()->clearManagers();
+		kgx::KGXCore::get()->clearManagers();
 
 		// add project work directory to KGX filesystem
 		kgx::filesystem::addSearchPath( m_projectDir );
@@ -252,7 +249,7 @@ namespace kgt
 			kgx::filesystem::removeSearchPath(m_projectDir);
 
 		// save project directory in KG configuration file
-		kgx::ConfigManager::getInst()->setProperty( "projectFolder", selectedDir );
+		kgx::ConfigManager::get()->setProperty( "projectFolder", selectedDir );
 		m_projectDir = selectedDir;
 
 		// create scene folders

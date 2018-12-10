@@ -3,7 +3,8 @@
 
 #include <QWidget>
 
-#include "RenderWindow.h"
+#include <kriengraphix/Core/RenderWindow.h>
+
 #include "MouseListener.h"
 
 namespace kgt

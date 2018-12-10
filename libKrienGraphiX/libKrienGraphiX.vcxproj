@@ -11,111 +11,70 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="ConfigManager.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="Defines.h" />
-    <ClInclude Include="generators\KGMaterialLibraryGenerator.h" />
-    <ClInclude Include="generators\KGObjectGenerator.h" />
-    <ClInclude Include="Filesystem.h" />
-    <ClInclude Include="KGXCore.h" />
-    <ClInclude Include="libraries\MaterialLibrary.h" />
-    <ClInclude Include="libraries\ShaderProgramLibrary.h" />
-    <ClInclude Include="libraries\TextureLibrary.h" />
-    <ClInclude Include="MeshBuffer.h" />
-    <ClInclude Include="parsers\KGMaterialLibraryParser.h" />
-    <ClInclude Include="parsers\KGObjectParser.h" />
-    <ClInclude Include="parsers\KGSceneParser.h" />
-    <ClInclude Include="parsers\KGParserDefines.h" />
-    <ClInclude Include="parsers\KGShaderProgramsParser.h" />
-    <ClInclude Include="PhysXManager.h" />
-    <ClInclude Include="renderpasses\CompositionPass.h" />
-    <ClInclude Include="renderpasses\GBufferPass.h" />
-    <ClInclude Include="renderpasses\RenderPass.h" />
-    <ClInclude Include="RenderTexture.h" />
-    <ClInclude Include="ShaderProgram.h" />
-    <ClInclude Include="PixelShader.h" />
-    <ClInclude Include="RenderableObject.h" />
-    <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="ShaderBase.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureLoader.h" />
-    <ClInclude Include="VertexInputLayout.h" />
-    <ClInclude Include="VertexShader.h" />
+    <ClInclude Include="include\kriengraphix\Core\ConfigManager.h" />
+    <ClInclude Include="include\kriengraphix\Core\KGXCore.h" />
+    <ClInclude Include="include\kriengraphix\Core\PhysXManager.h" />
+    <ClInclude Include="include\kriengraphix\Core\RenderWindow.h" />
+    <ClInclude Include="include\kriengraphix\IO\Filesystem.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGMaterialLibraryGenerator.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGMaterialLibraryParser.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGObjectGenerator.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGObjectParser.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGParserDefines.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGSceneParser.h" />
+    <ClInclude Include="include\kriengraphix\IO\KGShaderProgramsParser.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\ConstantBuffer.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\MaterialLibrary.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\MeshBuffer.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\CompositionPass.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\GBufferPass.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\RenderPass.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\RenderTexture.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\ShaderProgram.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\ShaderProgramLibrary.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\PixelShader.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\ShaderBase.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\VertexShader.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\Texture.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\TextureLibrary.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\TextureLoader.h" />
+    <ClInclude Include="include\kriengraphix\Rendering\VertexInputLayout.h" />
+    <ClInclude Include="include\kriengraphix\Simulation\Camera.h" />
+    <ClInclude Include="include\kriengraphix\Simulation\Defines.h" />
+    <ClInclude Include="include\kriengraphix\Simulation\RenderableObject.h" />
+    <ClInclude Include="include\kriengraphix\Simulation\Scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ConfigManager.cpp" />
-    <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="generators\KGMaterialLibraryGenerator.cpp" />
-    <ClCompile Include="generators\KGObjectGenerator.cpp" />
-    <ClCompile Include="Filesystem.cpp" />
-    <ClCompile Include="KGXCore.cpp" />
-    <ClCompile Include="libraries\MaterialLibrary.cpp" />
-    <ClCompile Include="libraries\ShaderProgramLibrary.cpp" />
-    <ClCompile Include="libraries\TextureLibrary.cpp" />
-    <ClCompile Include="MeshBuffer.cpp" />
-    <ClCompile Include="parsers\KGMaterialLibraryParser.cpp" />
-    <ClCompile Include="parsers\KGObjectParser.cpp" />
-    <ClCompile Include="parsers\KGSceneParser.cpp" />
-    <ClCompile Include="parsers\KGShaderProgramsParser.cpp" />
-    <ClCompile Include="PhysXManager.cpp" />
-    <ClCompile Include="renderpasses\CompositionPass.cpp" />
-    <ClCompile Include="renderpasses\GBufferPass.cpp" />
-    <ClCompile Include="renderpasses\RenderPass.cpp" />
-    <ClCompile Include="RenderTexture.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
-    <ClCompile Include="PixelShader.cpp" />
-    <ClCompile Include="RenderableObject.cpp" />
-    <ClCompile Include="RenderWindow.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="ShaderBase.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureLoader.cpp" />
-    <ClCompile Include="VertexInputLayout.cpp" />
-    <ClCompile Include="VertexShader.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shaders\DefaultPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="shaders\DefaultVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredCompositionPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredCompositionVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredGBufferPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredGBufferVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\ShaderPrograms.kgsp" />
+    <ClCompile Include="src\kriengraphix\Core\ConfigManager.cpp" />
+    <ClCompile Include="src\kriengraphix\Core\KGXCore.cpp" />
+    <ClCompile Include="src\kriengraphix\Core\PhysXManager.cpp" />
+    <ClCompile Include="src\kriengraphix\Core\RenderWindow.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\Filesystem.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGMaterialLibraryGenerator.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGMaterialLibraryParser.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGObjectGenerator.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGObjectParser.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGSceneParser.cpp" />
+    <ClCompile Include="src\kriengraphix\IO\KGShaderProgramsParser.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\ConstantBuffer.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\MaterialLibrary.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\MeshBuffer.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\CompositionPass.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\GBufferPass.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\RenderPass.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\RenderTexture.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\ShaderProgram.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\ShaderProgramLibrary.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\PixelShader.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\ShaderBase.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\VertexShader.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\Texture.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\TextureLibrary.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\TextureLoader.cpp" />
+    <ClCompile Include="src\kriengraphix\Rendering\VertexInputLayout.cpp" />
+    <ClCompile Include="src\kriengraphix\Simulation\Camera.cpp" />
+    <ClCompile Include="src\kriengraphix\Simulation\RenderableObject.cpp" />
+    <ClCompile Include="src\kriengraphix\Simulation\Scene.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2C3410EE-9E65-44F0-A6D8-9ACE7134D68C}</ProjectGuid>
@@ -148,12 +107,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(PHYSX_DIR)\Include;$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\kriengraphix;$(PHYSX_DIR)\Include;$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
     <LibraryPath>$(PHYSX_DIR)\Lib\vc14win64;$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(PHYSX_DIR)\Include;$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\kriengraphix;$(PHYSX_DIR)\Include;$(BOOST_DIR);..\KGConverter;$(IncludePath)</IncludePath>
     <LibraryPath>$(PHYSX_DIR)\Lib\vc14win64;$(BOOST_DIR)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <DirectXMath.h>
 
-#include <KGParserDefines.h>
+#include <IO/KGParserDefines.h>
 
 namespace kgx
 {

@@ -1,5 +1,6 @@
 
 Texture2D gbuffDiffuseTexture : register(t0);
+Texture2D gbuffDepthTexture   : register(t1);
 SamplerState defaultSampler   : register(s0);
 
 struct PixelInput

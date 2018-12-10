@@ -20,11 +20,14 @@ struct PixelInput
 struct PixelOutput
 {
 	float4 diffuse : SV_TARGET0;
+	float4 depth   : SV_TARGET1;
 };
 
 PixelOutput main( PixelInput input )
 {
 	PixelOutput output;
 	output.diffuse = kgx_useTexture ? diffuseTexture.Sample( defaultSampler, input.texCoord ) : kgx_diffuse;
+	float curDepth = input.position.z / input.position.w;
+	output.depth = float4(curDepth, curDepth, curDepth, 1.0);
 	return output;
 }

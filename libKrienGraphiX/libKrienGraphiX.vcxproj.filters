@@ -13,247 +13,231 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\parsers">
-      <UniqueIdentifier>{cc56a9d8-38c6-4417-b318-91603a74c3a1}</UniqueIdentifier>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{3b00db62-2f4f-47e4-9a05-8996539d4f0c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\parsers">
-      <UniqueIdentifier>{64abc991-f1d5-46ab-9708-11f893da34ac}</UniqueIdentifier>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{506b1c24-158c-46b7-99d6-8ae505f0b9b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\generators">
-      <UniqueIdentifier>{9b8907b8-6382-444d-b528-c4487436c217}</UniqueIdentifier>
+    <Filter Include="Header Files\Simulation">
+      <UniqueIdentifier>{9c4a152f-b536-4fa7-899e-b945c788bf96}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\generators">
-      <UniqueIdentifier>{0f9fbef9-0878-4323-9e53-3b631577494d}</UniqueIdentifier>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{2a6e6156-bd75-47cb-aae1-218211418f4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\shaders">
-      <UniqueIdentifier>{a45427d9-56a0-4359-b944-a5d309a39281}</UniqueIdentifier>
+    <Filter Include="Header Files\Rendering\Shaders">
+      <UniqueIdentifier>{1fd15e26-761f-4f2f-9e80-9d1198a3b786}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\renderpasses">
-      <UniqueIdentifier>{555208b8-30f2-47aa-9adc-09e31f26a7b6}</UniqueIdentifier>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{c5d9b1b4-fce0-44a0-946a-df2e83b5ed69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\renderpasses">
-      <UniqueIdentifier>{c38a30e2-de2e-4ee1-98b7-6dc068e62101}</UniqueIdentifier>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{dadb3b72-1277-495c-9dde-6b6223f693de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\libraries">
-      <UniqueIdentifier>{e649c20a-5edc-41c5-b244-a0fe0a82d4f8}</UniqueIdentifier>
+    <Filter Include="Source Files\Simulation">
+      <UniqueIdentifier>{1995a72c-3d0b-4cce-94a1-57546983115e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\libraries">
-      <UniqueIdentifier>{4aebbc11-55f6-422e-bcdb-265599e41907}</UniqueIdentifier>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{cd1bc5f7-9bbe-4ec5-b72c-814a597a8fa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Shaders">
+      <UniqueIdentifier>{1e2b296c-0ef7-4d05-8ba0-98b132c3ed72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Passes">
+      <UniqueIdentifier>{5ea6d4b0-a3e4-4a7a-b794-2a4473d66bfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Passes">
+      <UniqueIdentifier>{4ac1915f-0216-4e26-ae3f-96d62b5f045d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Core\ConfigManager.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="RenderWindow.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Core\KGXCore.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="KGXCore.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Core\PhysXManager.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Core\RenderWindow.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="RenderableObject.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\Filesystem.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="VertexShader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGMaterialLibraryGenerator.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="PixelShader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGMaterialLibraryParser.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Defines.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGObjectGenerator.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="VertexInputLayout.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGObjectParser.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGParserDefines.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderBase.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGSceneParser.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="TextureLoader.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\IO\KGShaderProgramsParser.h">
+      <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\PixelShader.h">
+      <Filter>Header Files\Rendering\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderProgram.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\ShaderBase.h">
+      <Filter>Header Files\Rendering\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGObjectParser.h">
-      <Filter>Header Files\parsers</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Shaders\VertexShader.h">
+      <Filter>Header Files\Rendering\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGSceneParser.h">
-      <Filter>Header Files\parsers</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\CompositionPass.h">
+      <Filter>Header Files\Rendering\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="generators\KGObjectGenerator.h">
-      <Filter>Header Files\generators</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\GBufferPass.h">
+      <Filter>Header Files\Rendering\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGParserDefines.h">
-      <Filter>Header Files\parsers</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Passes\RenderPass.h">
+      <Filter>Header Files\Rendering\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\ConstantBuffer.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Filesystem.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\MaterialLibrary.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="generators\KGMaterialLibraryGenerator.h">
-      <Filter>Header Files\generators</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\MeshBuffer.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGMaterialLibraryParser.h">
-      <Filter>Header Files\parsers</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\RenderTexture.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="PhysXManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\ShaderProgram.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="parsers\KGShaderProgramsParser.h">
-      <Filter>Header Files\parsers</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\ShaderProgramLibrary.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="renderpasses\RenderPass.h">
-      <Filter>Header Files\renderpasses</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\Texture.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="renderpasses\GBufferPass.h">
-      <Filter>Header Files\renderpasses</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\TextureLibrary.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTexture.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\TextureLoader.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\ShaderProgramLibrary.h">
-      <Filter>Header Files\libraries</Filter>
+    <ClInclude Include="include\kriengraphix\Rendering\VertexInputLayout.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\TextureLibrary.h">
-      <Filter>Header Files\libraries</Filter>
+    <ClInclude Include="include\kriengraphix\Simulation\Camera.h">
+      <Filter>Header Files\Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="MeshBuffer.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\kriengraphix\Simulation\Defines.h">
+      <Filter>Header Files\Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\MaterialLibrary.h">
-      <Filter>Header Files\libraries</Filter>
+    <ClInclude Include="include\kriengraphix\Simulation\RenderableObject.h">
+      <Filter>Header Files\Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="renderpasses\CompositionPass.h">
-      <Filter>Header Files\renderpasses</Filter>
+    <ClInclude Include="include\kriengraphix\Simulation\Scene.h">
+      <Filter>Header Files\Simulation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Core\ConfigManager.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="RenderWindow.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Core\KGXCore.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="KGXCore.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Core\PhysXManager.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Core\RenderWindow.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="RenderableObject.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\Filesystem.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="VertexShader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGMaterialLibraryGenerator.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="PixelShader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGMaterialLibraryParser.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="VertexInputLayout.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGObjectGenerator.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGObjectParser.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderBase.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGSceneParser.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="TextureLoader.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\IO\KGShaderProgramsParser.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\CompositionPass.cpp">
+      <Filter>Source Files\Rendering\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderProgram.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\GBufferPass.cpp">
+      <Filter>Source Files\Rendering\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="parsers\KGObjectParser.cpp">
-      <Filter>Source Files\parsers</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Passes\RenderPass.cpp">
+      <Filter>Source Files\Rendering\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="parsers\KGSceneParser.cpp">
-      <Filter>Source Files\parsers</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\PixelShader.cpp">
+      <Filter>Source Files\Rendering\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="generators\KGObjectGenerator.cpp">
-      <Filter>Source Files\generators</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\ShaderBase.cpp">
+      <Filter>Source Files\Rendering\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Shaders\VertexShader.cpp">
+      <Filter>Source Files\Rendering\Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="Filesystem.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\ConstantBuffer.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="generators\KGMaterialLibraryGenerator.cpp">
-      <Filter>Source Files\generators</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\MaterialLibrary.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="parsers\KGMaterialLibraryParser.cpp">
-      <Filter>Source Files\parsers</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\MeshBuffer.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="PhysXManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\RenderTexture.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="parsers\KGShaderProgramsParser.cpp">
-      <Filter>Source Files\parsers</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\ShaderProgram.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="renderpasses\RenderPass.cpp">
-      <Filter>Source Files\renderpasses</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\ShaderProgramLibrary.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="renderpasses\GBufferPass.cpp">
-      <Filter>Source Files\renderpasses</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\Texture.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTexture.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\TextureLibrary.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="libraries\ShaderProgramLibrary.cpp">
-      <Filter>Source Files\libraries</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\TextureLoader.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="libraries\TextureLibrary.cpp">
-      <Filter>Source Files\libraries</Filter>
+    <ClCompile Include="src\kriengraphix\Rendering\VertexInputLayout.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="MeshBuffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\kriengraphix\Simulation\Camera.cpp">
+      <Filter>Source Files\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="libraries\MaterialLibrary.cpp">
-      <Filter>Source Files\libraries</Filter>
+    <ClCompile Include="src\kriengraphix\Simulation\RenderableObject.cpp">
+      <Filter>Source Files\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="renderpasses\CompositionPass.cpp">
-      <Filter>Source Files\renderpasses</Filter>
+    <ClCompile Include="src\kriengraphix\Simulation\Scene.cpp">
+      <Filter>Source Files\Simulation</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shaders\DefaultPS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DefaultVS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredCompositionPS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredCompositionVS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredGBufferPS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\DeferredGBufferVS.hlsl">
-      <Filter>Header Files\shaders</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\ShaderPrograms.kgsp">
-      <Filter>Header Files\shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

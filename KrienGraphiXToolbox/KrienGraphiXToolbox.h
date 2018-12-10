@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "Scene.h"
+#include <kriengraphix/Simulation/Scene.h>
+
 #include "MouseListener.h"
 #include "KeyboardListener.h"
 #include "FrameListener.h"

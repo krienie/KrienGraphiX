@@ -4,7 +4,8 @@
 #include <Windows.h>
 #include <QTimer>
 
-#include "KGXCore.h"
+#include <kriengraphix/Core/KGXCore.h>
+
 #include "FrameListener.h"
 #include "KeyboardListener.h"
 
@@ -55,7 +56,7 @@ namespace kgt
 		setFocusPolicy( Qt::StrongFocus );
 
 		//TODO: might want to force the user to explicitly initialize KGXCore..
-		m_renderWin = kgx::KGXCore::getInst()->createRenderWindow( HWND(winId()) );
+		m_renderWin = kgx::KGXCore::get()->createRenderWindow( HWND(winId()) );
 
 		setMouseTracking( true );
 

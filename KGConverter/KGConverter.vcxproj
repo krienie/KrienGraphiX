@@ -41,11 +41,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/generators;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_DIR);..\libKrienGraphiX\include\kriengraphix;$(IncludePath)</IncludePath>
     <LibraryPath>$(BOOST_DIR)\stage\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(BOOST_DIR);../libKrienGraphiX;../libKrienGraphiX/generators;../libKrienGraphiX/parsers;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_DIR);..\libKrienGraphiX\include\kriengraphix;$(IncludePath)</IncludePath>
     <LibraryPath>$(BOOST_DIR)\stage\lib;$(OutDir);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -75,16 +75,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.cpp" />
-    <ClCompile Include="..\libKrienGraphiX\generators\KGObjectGenerator.cpp" />
-    <ClCompile Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.cpp" />
+    <ClCompile Include="..\libKrienGraphiX\src\kriengraphix\IO\KGMaterialLibraryGenerator.cpp" />
+    <ClCompile Include="..\libKrienGraphiX\src\kriengraphix\IO\KGMaterialLibraryParser.cpp" />
+    <ClCompile Include="..\libKrienGraphiX\src\kriengraphix\IO\KGObjectGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OBJParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\libKrienGraphiX\generators\KGMaterialLibraryGenerator.h" />
-    <ClInclude Include="..\libKrienGraphiX\generators\KGObjectGenerator.h" />
-    <ClInclude Include="..\libKrienGraphiX\parsers\KGMaterialLibraryParser.h" />
+    <ClInclude Include="..\libKrienGraphiX\include\kriengraphix\IO\KGMaterialLibraryGenerator.h" />
+    <ClInclude Include="..\libKrienGraphiX\include\kriengraphix\IO\KGMaterialLibraryParser.h" />
+    <ClInclude Include="..\libKrienGraphiX\include\kriengraphix\IO\KGObjectGenerator.h" />
     <ClInclude Include="OBJParser.h" />
   </ItemGroup>
   <ItemGroup>
