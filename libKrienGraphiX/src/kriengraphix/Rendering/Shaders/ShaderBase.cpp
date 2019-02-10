@@ -48,7 +48,7 @@ namespace kgx
 		std::string shaderFile   = filesystem::getFile( filename );
 		std::wstring wShaderFile = std::wstring( shaderFile.begin(), shaderFile.end() );
 
-		//load shader file
+		// Try to load pre-compiled shader file
 		ID3DBlob *shaderSource;
 		HRESULT res = D3DReadFileToBlob( wShaderFile.c_str(), &shaderSource );
 		if ( FAILED(res) )
@@ -57,6 +57,7 @@ namespace kgx
 			return res;
 		}
 
+		// Try to create all required shader buffers
 		res = processLoadedShaderBlob( shaderSource );
 		if ( FAILED(res) )
 		{
@@ -72,7 +73,6 @@ namespace kgx
 
 	HRESULT ShaderBase::loadFromSource( const std::string &source, const std::string &entryPoint )
 	{
-		//load shader source
 		unsigned int flags = D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR | D3DCOMPILE_WARNINGS_ARE_ERRORS;
 #ifdef _DEBUG
 		flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0;
@@ -117,7 +117,7 @@ namespace kgx
 		}
 
 
-		// setup buffers using the shader reflection
+		// Setup buffers using the shader reflection
 		ID3D11ShaderReflection *reflector;
 		res = D3DReflect( shaderSource->GetBufferPointer(), shaderSource->GetBufferSize(),
 							IID_ID3D11ShaderReflection, (void**)&reflector );

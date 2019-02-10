@@ -6,6 +6,7 @@
 #include <d3d11.h>
 
 #include "Core/KGXCore.h"
+#include "IO/Filesystem.h"
 #include "Rendering/Texture.h"
 #include "Rendering/TextureLoader.h"
 #include "Rendering/RenderTexture.h"
@@ -75,9 +76,16 @@ namespace kgx
 		if ( texture )
 			return texture;
 
+        std::string absFile = filesystem::getFile( file );
+        if ( absFile.empty() )
+        {
+            std::cout << "(TextureLibrary::loadFromDisk) Error: File " << file << " was not found." << std::endl;
+            return false;
+        }
+
 		ID3D11Resource *buffer = nullptr;
 		ID3D11ShaderResourceView *shaderResourceView = nullptr;
-		HRESULT res = TextureLoader::loadAsShaderResource( std::wstring( file.begin(), file.end() ), &buffer, &shaderResourceView, m_dxDev, m_dxDevCont );
+		HRESULT res = TextureLoader::loadAsShaderResource( std::wstring( absFile.begin(), absFile.end() ), &buffer, &shaderResourceView, m_dxDev, m_dxDevCont );
 		if ( FAILED(res) )
 			return nullptr;
 
