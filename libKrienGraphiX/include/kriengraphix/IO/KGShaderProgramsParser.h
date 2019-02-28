@@ -8,19 +8,19 @@
 
 namespace kgx
 {
-	class KGShaderProgramsParser
-	{
-		public:
-			static bool parse( const std::string &inputData, std::unordered_map<std::string, KgShaderProgData> &outputData );
+    class KGShaderProgramsParser
+    {
+        public:
+            static bool parse( const std::string &inputData, std::unordered_map<std::string, KgShaderProgData> &outputData );
 
-		private:
-			KGShaderProgramsParser();
-			//~KGShaderProgramsParser();
+        private:
+            KGShaderProgramsParser();
+            //~KGShaderProgramsParser();
 
-			// no copying allowed
-			KGShaderProgramsParser( const KGShaderProgramsParser& )            = delete;
-			KGShaderProgramsParser& operator=( const KGShaderProgramsParser& ) = delete;
+            // no copying allowed
+            KGShaderProgramsParser( const KGShaderProgramsParser& ) = delete;
+            KGShaderProgramsParser& operator=( const KGShaderProgramsParser& ) = delete;
 
-			static bool parseProgram( std::string &parseString, KgShaderProgData &progData );
-	};
+            static bool parseProgram( std::string &parseString, KgShaderProgData &progData );
+    };
 }

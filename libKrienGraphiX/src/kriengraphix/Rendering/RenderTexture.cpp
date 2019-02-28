@@ -5,20 +5,20 @@
 
 namespace kgx
 {
-	RenderTexture::RenderTexture( TextureID id, ID3D11Resource *buffer, ID3D11ShaderResourceView *shaderResourceView,
-									   ID3D11RenderTargetView *renderTargetView )
-		: Texture(id, buffer, shaderResourceView), m_renderTargetView(renderTargetView)
-	{
-	}
+    RenderTexture::RenderTexture( TextureID id, ID3D11Resource *buffer, ID3D11ShaderResourceView *shaderResourceView,
+                                  ID3D11RenderTargetView *renderTargetView )
+        : Texture( id, buffer, shaderResourceView ), m_renderTargetView( renderTargetView )
+    {
+    }
 
-	RenderTexture::~RenderTexture()
-	{
-		if ( m_renderTargetView )
-			m_renderTargetView->Release();
-	}
+    RenderTexture::~RenderTexture()
+    {
+        if ( m_renderTargetView )
+            m_renderTargetView->Release();
+    }
 
-	ID3D11RenderTargetView* RenderTexture::getRenderTargetView() const
-	{
-		return m_renderTargetView;
-	}
+    ID3D11RenderTargetView* RenderTexture::getRenderTargetView() const
+    {
+        return m_renderTargetView;
+    }
 }

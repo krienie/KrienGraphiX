@@ -7,17 +7,17 @@
 
 namespace kgx
 {
-	class KGMaterialLibraryParser
-	{
-		public:
-			static bool parse( const std::string &input, std::unordered_map<std::string, KgMatData> &outputData );
+    class KGMaterialLibraryParser
+    {
+        public:
+            static bool parse( const std::string &input, std::unordered_map<std::string, KgMatData> &outputData );
 
-			// no copying allowed
-			KGMaterialLibraryParser( const KGMaterialLibraryParser& )            = delete;
-			KGMaterialLibraryParser& operator=( const KGMaterialLibraryParser& ) = delete;
+            // no copying allowed
+            KGMaterialLibraryParser( const KGMaterialLibraryParser& ) = delete;
+            KGMaterialLibraryParser& operator=( const KGMaterialLibraryParser& ) = delete;
 
-		private:
-			KGMaterialLibraryParser();
-			//~KGMaterialLibraryParser();
-	};
+        private:
+            KGMaterialLibraryParser();
+            //~KGMaterialLibraryParser();
+    };
 }

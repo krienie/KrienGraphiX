@@ -10,45 +10,45 @@
 
 namespace kgt
 {
-	class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
-	{
-		Q_OBJECT
+    class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
+    {
+        Q_OBJECT
 
-	public:
-		explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
-		~KrienGraphiXToolbox();
+        public:
+            explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
+            ~KrienGraphiXToolbox();
 
-		void frameUpdate( double deltaTime ) override;
-		void mouseMoved( const MouseEvent &evt ) override;
-		void mousePressed( const MouseEvent &evt ) override;
-		void mouseReleased( const MouseEvent &evt ) override;
-		void wheelEvent( const MouseEvent &evt ) override;
-		void keyPressed( const KeyEvent &evt ) override;
-		void keyReleased( const KeyEvent &evt ) override;
+            void frameUpdate( double deltaTime ) override;
+            void mouseMoved( const MouseEvent &evt ) override;
+            void mousePressed( const MouseEvent &evt ) override;
+            void mouseReleased( const MouseEvent &evt ) override;
+            void wheelEvent( const MouseEvent &evt ) override;
+            void keyPressed( const KeyEvent &evt ) override;
+            void keyReleased( const KeyEvent &evt ) override;
 
-	private slots:
-		void createNewScene();
-		void openSceneFile();
-		void saveSceneFile();
-		void saveSceneAsNewFile();
-		void setProjectFolder();
-		void exitProgram();
+        private slots:
+            void createNewScene();
+            void openSceneFile();
+            void saveSceneFile();
+            void saveSceneAsNewFile();
+            void setProjectFolder();
+            void exitProgram();
 
-	private:
-		Ui::KrienGraphiXToolboxClass m_ui;
+        private:
+            Ui::KrienGraphiXToolboxClass m_ui;
 
-		std::string m_projectDir;
+            std::string m_projectDir;
 
-		kgx::Camera *m_mainCam;
-		kgx::Scene *m_currentScene;
+            kgx::Camera *m_mainCam;
+            kgx::Scene *m_currentScene;
 
-		std::vector<float> m_mouseXFilterBuffer;
-		std::vector<float> m_mouseYFilterBuffer;
+            std::vector<float> m_mouseXFilterBuffer;
+            std::vector<float> m_mouseYFilterBuffer;
 
-		bool m_leftMouseBtnDown;
-		bool m_wKeyDown;
-		bool m_sKeyDown;
-		bool m_aKeyDown;
-		bool m_dKeyDown;
-	};
+            bool m_leftMouseBtnDown;
+            bool m_wKeyDown;
+            bool m_sKeyDown;
+            bool m_aKeyDown;
+            bool m_dKeyDown;
+    };
 }

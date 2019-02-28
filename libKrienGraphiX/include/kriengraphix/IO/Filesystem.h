@@ -3,20 +3,18 @@
 
 #include <string>
 
-namespace kgx
+namespace kgx { namespace filesystem
 {
-	namespace filesystem
-	{
-		void clearSearchPaths();
+    void clearSearchPaths();
 
-		std::string getCurrentProgramPath();
-		std::string getAbsolutePath( const std::string &file );
+    std::string getCurrentProgramPath();
+    std::string getAbsolutePath( const std::string &file );
 
-		void addSearchPath( const std::string &absolutePath );
-		bool removeSearchPath( const std::string &pathToRemove );
+    void addSearchPath( const std::string &absolutePath );
+    bool removeSearchPath( const std::string &pathToRemove );
 
-		std::string getFile( const std::string &filename );
-		bool openFile( const std::string &file, std::string &contents );
-		bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents );
-	};
+    std::string getFile( const std::string &filename );
+    bool openFile( const std::string &file, std::string &contents );
+    bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents );
+}
 }

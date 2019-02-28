@@ -5,17 +5,17 @@
 
 namespace kgx
 {
-	class KGObjectGenerator
-	{
-		public:
-			static void generate( KgoData &inputData, std::string &output );
+    class KGObjectGenerator
+    {
+        public:
+            static void generate( KgoData &inputData, std::string &output );
 
-		private:
-			KGObjectGenerator();
-			//~KGObjectGenerator();
+        private:
+            KGObjectGenerator();
+            //~KGObjectGenerator();
 
-			// no copying allowed
-			KGObjectGenerator( const KGObjectGenerator& )          = delete;
-			KGObjectGenerator& operator=(const KGObjectGenerator&) = delete;
-	};
+            // no copying allowed
+            KGObjectGenerator( const KGObjectGenerator& ) = delete;
+            KGObjectGenerator& operator=( const KGObjectGenerator& ) = delete;
+    };
 }
