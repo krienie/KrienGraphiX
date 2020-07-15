@@ -2,19 +2,19 @@
 // KrienGraphiX Shader Program Library v0.1 - (c)2017 Krien Linnenbank
 // File created: 17-Feb-2017 21:51:40
 
-ShaderProgram( ForwardPass )
-{
-	VertexShader
-	{
-		inputlayout( Position, TextureCoordinate, Normal )
-		source( DefaultVS.cso )
-	}
-
-	PixelShader
-	{
-		source( DefaultPS.cso )
-	}
-}
+//ShaderProgram( ForwardPass )
+//{
+//	VertexShader
+//	{
+//		inputlayout( Position, TextureCoordinate, Normal )
+//		source( DefaultVS.cso )
+//	}
+//
+//	PixelShader
+//	{
+//		source( DefaultPS.cso )
+//	}
+//}
 
 ShaderProgram( DeferredGBuffer )
 {

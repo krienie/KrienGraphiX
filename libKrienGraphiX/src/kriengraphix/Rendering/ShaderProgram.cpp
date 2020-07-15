@@ -46,9 +46,7 @@ namespace kgx
 
     VertexShader* ShaderProgram::createVertexShader( const std::string &filename, const VertexInputLayout &layout )
     {
-        if ( m_vertShader )
-            delete m_vertShader;
-
+        delete m_vertShader;
         m_vertShader = new VertexShader( m_dxDev, layout );
 
         if ( FAILED( m_vertShader->loadFromFile( filename ) ) )
@@ -64,9 +62,7 @@ namespace kgx
 
     PixelShader* ShaderProgram::createPixelShader( const std::string &filename )
     {
-        if ( m_pixShader )
-            delete m_pixShader;
-
+        delete m_pixShader;
         m_pixShader = new PixelShader( m_dxDev );
 
         if ( FAILED( m_pixShader->loadFromFile( filename ) ) )

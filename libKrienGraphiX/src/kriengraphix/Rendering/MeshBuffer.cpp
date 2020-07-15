@@ -13,7 +13,7 @@ namespace kgx
         : m_dxDev( nullptr ), m_isInit( false ), m_vertexBufferStride( vertexBufferStride ),
         m_vertBuff( nullptr ), m_indexBuff( nullptr )
     {
-        if ( vertices.size() <= 0 || indices.size() <= 0 )
+        if (vertices.empty() || indices.empty())
         {
             std::cout << "Error (MeshBuffer::MeshBuffer): Vertices or indices not specified => vector is empty" << std::endl;
             return;

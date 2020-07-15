@@ -34,10 +34,7 @@ namespace kgx
 
     ShaderProgram* ShaderProgramLibrary::getShaderProgram( const std::string &name ) const
     {
-        std::unordered_map<std::string, ShaderProgram::ShaderProgramID>::const_iterator it;
-        it = m_shaderProgramNames.find( name );
-
-        if ( it != m_shaderProgramNames.cend() )
+        if ( const auto it = m_shaderProgramNames.find(name); it != m_shaderProgramNames.cend() )
             return getShaderProgram( it->second );
 
         return nullptr;

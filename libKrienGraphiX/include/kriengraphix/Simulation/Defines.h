@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
+
 #include <DirectXMath.h>
 
 namespace kgx

@@ -10,16 +10,16 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/filesystem.hpp>
 
 #include "Core/KGXCore.h"
+#include "Core/SceneThread.h"
 #include "IO/KGParserDefines.h"
 #include "IO/Filesystem.h"
 #include "Rendering/MeshBuffer.h"
 #include "Rendering/VertexInputLayout.h"
 #include "Rendering/MaterialLibrary.h"
-#include "Simulation/RenderableObject.h"
-#include "Simulation/Scene.h"
+#include "Simulation/SceneObject.h"
+#include "Simulation/MeshComponent.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
     DirectX::XMFLOAT4,
@@ -44,7 +44,7 @@ typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgx
 {
-    void KGObjectParser::loadKGO( const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale, Scene *scene )
+    void KGObjectParser::loadKGO(const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale)
     {
         std::string kgObjectData;
         if ( !filesystem::openFile( kgoFile, kgObjectData ) )
@@ -104,16 +104,13 @@ namespace kgx
             return;
         }
 
-
-        addParsedDataToScene( vertices, indices, vertLayoutTypes, models, position, scale, scene );
-
+        addParsedDataToScene( vertices, indices, vertLayoutTypes, models, position, scale );
     }
 
-    bool KGObjectParser::addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
-                                               std::vector<VertexInputLayout::Type> &vertLayoutTypes,
-                                               std::vector<KgModelData> &models,
-                                               const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale,
-                                               Scene *scene )
+    bool KGObjectParser::addParsedDataToScene(std::vector<float> vertices, std::vector<UINT> &indices,
+                                              std::vector<VertexInputLayout::Type> &vertLayoutTypes,
+                                              std::vector<KgModelData> &models,
+                                              const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale)
     {
         VertexInputLayout vertLayout( vertLayoutTypes );
         MeshBuffer *meshBuffer = new MeshBuffer( vertices, indices, vertLayout.getBufferStride() );
@@ -123,17 +120,42 @@ namespace kgx
             return false;
         }
 
+        SceneThread *sceneThread = KGXCore::get()->getSceneThread();
+
         MaterialLibrary matLibrary;
         for ( KgModelData &kgModelData : models )
         {
-            RenderableObject *ro = new RenderableObject( kgModelData.modelName, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-                                                         meshBuffer, kgModelData.indexCount, kgModelData.startIndex, 0u );
+            // TODO(KL): Create a texture streaming system to load textures while running over multiple frames
+            Material mat = matLibrary.getMaterial(kgModelData.materialName);
+            if (!mat.diffuseMap.empty())
+            {
+                sceneThread->enqueueSingleCommand([mat](Scene *scene)
+                {
+                    scene->getSceneTextures()->loadFromDisk(mat.diffuseMap);
+                });
+            }
+            if (!mat.normalMap.empty())
+            {
+                sceneThread->enqueueSingleCommand([mat](Scene *scene)
+                {
+                    scene->getSceneTextures()->loadFromDisk(mat.normalMap);
+                });
+            }
+            if (!mat.specularMap.empty())
+            {
+                sceneThread->enqueueSingleCommand([mat](Scene *scene)
+                {
+                    scene->getSceneTextures()->loadFromDisk(mat.specularMap);
+                });
+            }
 
-            ro->setMaterial( matLibrary.getMaterial( kgModelData.materialName ) );
-            ro->setPosition( position.x, position.y, position.z );
-            ro->setScale( scale.x, scale.y, scale.z );
+            auto * newSceneObject = new SceneObject(kgModelData.modelName);
+            auto * meshComponent = newSceneObject->addNewComponent<MeshComponent>(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, meshBuffer, kgModelData.indexCount, kgModelData.startIndex, 0u);
+            meshComponent->setMaterial(mat);
+            newSceneObject->setPosition(position.x, position.y, position.z);
+            newSceneObject->setScale(scale.x, scale.y, scale.z);
 
-            scene->addRenderableObject( ro );
+            sceneThread->addSceneObject(newSceneObject);
         }
 
         return true;

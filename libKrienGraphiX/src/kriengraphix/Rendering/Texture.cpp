@@ -6,16 +6,16 @@
 namespace kgx
 {
     Texture::Texture( TextureID id, ID3D11Resource *buffer, ID3D11ShaderResourceView *shaderResourceView )
-        : m_id( id ), m_buffer( buffer ), m_shaderView( shaderResourceView )
+        : m_buffer(buffer), m_shaderView(shaderResourceView), m_id(id)
     {
     }
 
     Texture::~Texture()
     {
-        if ( m_shaderView )
+        if (m_shaderView)
             m_shaderView->Release();
 
-        if ( m_buffer )
+        if (m_buffer)
             m_buffer->Release();
     }
 

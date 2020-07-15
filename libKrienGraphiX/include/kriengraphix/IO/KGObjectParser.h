@@ -5,12 +5,12 @@
 
 namespace kgx
 {
-    class Scene;
+    class SceneThread;
 
     class KGObjectParser
     {
         public:
-            static void loadKGO( const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale, Scene *scene );
+            static void loadKGO(const std::string &kgoFile, const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale);
 
         private:
             KGObjectParser()  = default;
@@ -20,10 +20,9 @@ namespace kgx
             KGObjectParser( const KGObjectParser& ) = delete;
             KGObjectParser& operator=( const KGObjectParser& ) = delete;
 
-            static bool addParsedDataToScene( std::vector<float> vertices, std::vector<UINT> &indices,
-                                              std::vector<VertexInputLayout::Type> &vertLayoutTypes,
-                                              std::vector<KgModelData> &models,
-                                              const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale,
-                                              Scene *scene );
+            static bool addParsedDataToScene(std::vector<float> vertices, std::vector<UINT> &indices,
+                                             std::vector<VertexInputLayout::Type> &vertLayoutTypes,
+                                             std::vector<KgModelData> &models,
+                                             const DirectX::XMFLOAT3 &position, const DirectX::XMFLOAT3 &scale);
     };
 }

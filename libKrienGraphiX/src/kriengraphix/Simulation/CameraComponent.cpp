@@ -1,19 +1,19 @@
 
-#include "Simulation/Camera.h"
+#include "Simulation/CameraComponent.h"
 
 #include "Simulation/Scene.h"
 
 namespace kgx
 {
-    Camera::Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up )
-        : Camera( parentScene, DirectX::XM_PIDIV4, 1.0f, 0.001f, 5000.0f, eye, m_target, up )
+    CameraComponent::CameraComponent(SceneObject *owner, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &m_target, const DirectX::XMFLOAT3 &up)
+        : CameraComponent(owner, DirectX::XM_PIDIV4, 1.0f, 0.001f, 5000.0f, eye, m_target, up)
     {
     }
 
-    Camera::Camera( Scene *parentScene, float fovY, float aspect, float m_nearZ, float m_farZ,
-                    const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
-        : m_parentScene( parentScene ), m_projMatrix(), m_viewMatrix(), m_eye( eye ), m_target( target_ ), m_camUp( up ),
-        m_fov( fovY ), m_aspectRatio( aspect ), m_nearZ( m_nearZ ), m_farZ( m_farZ )
+    CameraComponent::CameraComponent(SceneObject *owner, float fovY, float aspect, float m_nearZ, float m_farZ,
+                    const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up)
+        : SceneObjectComponent(owner), m_projMatrix(), m_viewMatrix(), m_eye(eye), m_target(target), m_camUp(up),
+        m_fov(fovY), m_aspectRatio(aspect), m_nearZ(m_nearZ), m_farZ(m_farZ)
     {
         // create perspective matrix
         DirectX::XMMATRIX tempPersp = DirectX::XMMatrixPerspectiveFovRH( fovY, aspect, m_nearZ, m_farZ );
@@ -23,97 +23,54 @@ namespace kgx
         lookAt( eye, m_target, up );
     }
 
-
-    Camera::Camera( const Camera &other )
-        : m_parentScene( other.m_parentScene ), m_projMatrix( other.m_projMatrix ), m_viewMatrix( other.m_viewMatrix ), m_eye( other.m_eye ),
-        m_target( other.m_target ), m_camUp( other.m_camUp ), m_fov( other.m_fov ), m_aspectRatio( other.m_aspectRatio ), m_nearZ( other.m_nearZ ), m_farZ( other.m_farZ )
-    {
-    }
-
-    /*Camera::~Camera()
-    {
-    }*/
-
-    Camera& Camera::operator=( const Camera &rhs )
-    {
-        if ( this != &rhs )
-        {
-            m_parentScene = rhs.m_parentScene;
-            m_projMatrix  = rhs.m_projMatrix;
-            m_viewMatrix  = rhs.m_viewMatrix;
-            m_eye         = rhs.m_eye;
-            m_target      = rhs.m_target;
-            m_camUp       = rhs.m_camUp;
-            m_fov         = rhs.m_fov;
-            m_aspectRatio = rhs.m_aspectRatio;
-            m_nearZ       = rhs.m_nearZ;
-            m_farZ        = rhs.m_farZ;
-        }
-
-        return *this;
-    }
-
-
-    const DirectX::XMFLOAT4X4& Camera::getProjMatrix() const
+    const DirectX::XMFLOAT4X4& CameraComponent::getProjMatrix() const
     {
         return m_projMatrix;
     }
 
-    const DirectX::XMFLOAT4X4& Camera::getViewMatrix() const
+    const DirectX::XMFLOAT4X4& CameraComponent::getViewMatrix() const
     {
         return m_viewMatrix;
     }
 
-    const DirectX::XMFLOAT3& Camera::getEye() const
+    const DirectX::XMFLOAT3& CameraComponent::getEye() const
     {
         return m_eye;
     }
 
-    const DirectX::XMFLOAT3& Camera::getTarget() const
+    const DirectX::XMFLOAT3& CameraComponent::getTarget() const
     {
         return m_target;
     }
 
-    const DirectX::XMFLOAT3& Camera::getUp() const
+    const DirectX::XMFLOAT3& CameraComponent::getUp() const
     {
         return m_camUp;
     }
 
-    float Camera::getFOV() const
+    float CameraComponent::getFOV() const
     {
         return m_fov;
     }
 
-    float Camera::getAspectRatio() const
+    float CameraComponent::getAspectRatio() const
     {
         return m_aspectRatio;
     }
 
-    float Camera::getNearZ() const
+    float CameraComponent::getNearZ() const
     {
         return m_nearZ;
     }
 
-    float Camera::getFarZ() const
+    float CameraComponent::getFarZ() const
     {
         return m_farZ;
     }
 
-
-    /**
-     * Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline
-     */
-    void Camera::renderCurrentView( const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs,
-                                    ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv )
+    void CameraComponent::lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
     {
-        if ( m_parentScene )
-            m_parentScene->render( this, vp, rs, rtv, dsv );
-    }
-
-
-    void Camera::lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target_, const DirectX::XMFLOAT3 &up )
-    {
-        // create camera view matrix
+        // create CameraComponent view matrix
         DirectX::XMVECTORF32 xmEye    = { eye.x, eye.y, eye.z, 0.0f };
         DirectX::XMVECTORF32 xmTarget = { target_.x, target_.y, target_.z, 0.0f };
         DirectX::XMVECTORF32 xmUp     = { up.x, up.y, up.z, 0.0f };
@@ -126,7 +83,7 @@ namespace kgx
         this->m_camUp = up;
     }
 
-    void Camera::moveForward( float dist )
+    void CameraComponent::moveForward( float dist )
     {
         DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_eye );
         DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
@@ -139,17 +96,17 @@ namespace kgx
         translate( dirFloat3 );
     }
 
-    void Camera::moveBackward( float dist )
+    void CameraComponent::moveBackward( float dist )
     {
         moveForward( -dist );
     }
 
-    void Camera::moveLeft( float dist )
+    void CameraComponent::moveLeft( float dist )
     {
         moveRight( -dist );
     }
 
-    void Camera::moveRight( float dist )
+    void CameraComponent::moveRight( float dist )
     {
         DirectX::XMVECTOR eyeVect    = DirectX::XMLoadFloat3( &m_eye );
         DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
@@ -165,7 +122,7 @@ namespace kgx
         translate( rightFloat3 );
     }
 
-    void Camera::translate( const DirectX::XMFLOAT3 &deltaPos )
+    void CameraComponent::translate( const DirectX::XMFLOAT3 &deltaPos )
     {
 
         DirectX::XMFLOAT3 newPos = DirectX::XMFLOAT3( m_eye.x + deltaPos.x,
@@ -177,7 +134,7 @@ namespace kgx
         lookAt( newPos, newTarget, m_camUp );
     }
 
-    void Camera::rotateUp( float degrees )
+    void CameraComponent::rotateUp( float degrees )
     {
         DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
         DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
@@ -194,12 +151,12 @@ namespace kgx
         lookAt( m_eye, m_target, m_camUp );
     }
 
-    void Camera::rotateDown( float degrees )
+    void CameraComponent::rotateDown( float degrees )
     {
         rotateUp( -degrees );
     }
 
-    void Camera::rotateLeft( float degrees )
+    void CameraComponent::rotateLeft( float degrees )
     {
         DirectX::XMVECTOR upVect     = DirectX::XMLoadFloat3( &m_camUp );
         DirectX::XMVECTOR targetVect = DirectX::XMLoadFloat3( &m_target );
@@ -217,7 +174,7 @@ namespace kgx
         lookAt( m_eye, m_target, m_camUp );
     }
 
-    void Camera::rotateRight( float degrees )
+    void CameraComponent::rotateRight( float degrees )
     {
         rotateLeft( -degrees );
     }

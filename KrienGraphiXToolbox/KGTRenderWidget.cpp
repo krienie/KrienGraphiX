@@ -13,73 +13,31 @@
 namespace kgt
 {
     KGTRenderWidget::KGTRenderWidget( QWidget *parent, Qt::WindowFlags f )
-        : QWidget( parent, f | Qt::MSWindowsOwnDC ), m_isInit( false ), m_renderWin( nullptr ), m_lastFrameTime( 0.0 ),
-        m_prevMousePosX( 0.0f ), m_prevMousePosY( 0.0f ), m_frameListeners(), m_mouseListeners(), m_keyboardListeners()
+        : QWidget( parent, f | Qt::MSWindowsOwnDC ), m_isInit( false ), m_lastFrameTime( 0.0 ),
+        m_prevMousePosX( 0.0f ), m_prevMousePosY( 0.0f ), m_mouseListeners(), m_keyboardListeners()
     {
         QPalette colourPalette = palette();
         colourPalette.setColor( QPalette::Active, QPalette::WindowText, Qt::black );
         colourPalette.setColor( QPalette::Active, QPalette::Window, Qt::black );
         setPalette( colourPalette );
+
+        setAttribute( Qt::WA_PaintOnScreen );
+        setAttribute( Qt::WA_NoSystemBackground );
+        setFocusPolicy( Qt::StrongFocus );
+        setMouseTracking( true );
     }
 
     /*KGTRenderWidget::~KGTRenderWidget()
     {
     }*/
 
-
-    void KGTRenderWidget::startRendering()
-    {
-        if ( !m_isInit )
-            return;
-
-        double currentTime = static_cast<double>(timeGetTime());
-        double deltaTime = (currentTime - m_lastFrameTime) * 0.001;
-
-        for ( auto &frameListener : m_frameListeners )
-            frameListener->frameUpdate( deltaTime );
-
-        m_renderWin->update();
-
-        m_lastFrameTime = currentTime;
-
-        //TODO: add FPS upper limit
-        QTimer::singleShot( 0, this, SLOT( startRendering() ) );
-    }
-
-
-    void KGTRenderWidget::initialize()
-    {
-        setAttribute( Qt::WA_PaintOnScreen );
-        setAttribute( Qt::WA_NoSystemBackground );
-
-        //Accept input focus
-        setFocusPolicy( Qt::StrongFocus );
-
-        //TODO: might want to force the user to explicitly initialize KGXCore..
-        m_renderWin = kgx::KGXCore::get()->createRenderWindow( HWND( winId() ) );
-
-        setMouseTracking( true );
-
-        m_lastFrameTime = static_cast<double>(timeGetTime());
-
-        m_isInit = true;
-    }
-
-
-    kgx::RenderWindow* KGTRenderWidget::getRenderWindow() const
-    {
-        return m_renderWin;
-    }
+    //for ( auto &frameListener : m_frameListeners )
+    //    frameListener->frameUpdate( deltaTime );
 
     void KGTRenderWidget::toggleFullscreen()
     {
-        if ( m_renderWin )
-            m_renderWin->setFullscreen( !m_renderWin->isFullscreen() );
-    }
-
-    void KGTRenderWidget::addFrameListener( FrameListener *listener )
-    {
-        m_frameListeners.push_back( listener );
+        //if ( m_renderWin )
+        //    m_renderWin->setFullscreen( !m_renderWin->isFullscreen() );
     }
 
     void KGTRenderWidget::addMouseListener( MouseListener *listener )

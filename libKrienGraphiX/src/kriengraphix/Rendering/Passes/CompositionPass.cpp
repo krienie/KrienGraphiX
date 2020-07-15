@@ -1,50 +1,72 @@
 
 #include "Rendering/Passes/CompositionPass.h"
 
+#include "Core/RenderThread.h"
+#include "Core/SceneView.h"
 #include "Rendering/ShaderProgram.h"
+#include "Rendering/ShaderProgramLibrary.h"
 #include "Rendering/TextureLibrary.h"
 
 namespace kgx
 {
-    CompositionPass::CompositionPass( ID3D11DeviceContext *deferredDevCont, ID3D11DepthStencilView *dsv, ID3D11RenderTargetView *rtv )
-        : RenderPass( deferredDevCont ), m_shaderProg( nullptr ), m_shaderProgLibrary( true ),
-        m_depthStencilView( dsv ), m_renderTargetView( rtv )
-    {
-        m_shaderProg = m_shaderProgLibrary.getShaderProgram( "DeferredComposition" );
-    }
-
-    CompositionPass::~CompositionPass()
+    CompositionPass::CompositionPass(SceneView *view)
+        : RenderPass(view)
     {
     }
-
-    void CompositionPass::record( const std::vector<RenderableObject*> &renderObjects, const LightData &lightData,
-                                  const TextureLibrary &sceneTextures )
+    void CompositionPass::record(const LightData &lightData, ShaderProgramLibrary &shaderLibrary, TextureLibrary &sceneTextures)
     {
-        ID3D11DeviceContext *dxDeferredDevCont = getDeferredContext();
+        SceneView *view = getSceneView();
+        if (!view)
+        {
+            // Nothing to do if we don't have a valid SceneView
+            return;
+        }
 
-        dxDeferredDevCont->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView );
+        DeferredRenderCommandList *commandList = getCommandList();
+
+        unsigned int tmpW = view->getWidth();
+
+        ID3D11RenderTargetView *rtv = view->getRenderTarget();
+        ID3D11DepthStencilView *dsv = view->getDepthStencil();
+        commandList->record([rtv, dsv](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+            dxDeferredDevCont->OMSetRenderTargets(1, &rtv, dsv);
+        });
 
         // set default texture sampler
         ID3D11SamplerState *samplers[1] = { sceneTextures.getDefaultSampler() };
-        dxDeferredDevCont->PSSetSamplers( 0u, 1u, samplers );
+        commandList->record([samplers](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+            dxDeferredDevCont->PSSetSamplers(0u, 1u, samplers);
+        });
 
         // collect all ShaderResourceViews for all used textures
         std::vector<ID3D11ShaderResourceView*> texViews;
         sceneTextures.getShaderResourceViews( texViews );
 
         // set texture ShaderResourceViews for the pixel shader
-        dxDeferredDevCont->PSSetShaderResources( 0u, static_cast<UINT>(texViews.size()), texViews.data() );
+        commandList->record([texViews](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+            dxDeferredDevCont->PSSetShaderResources(0u, static_cast<UINT>(texViews.size()), texViews.data());
+        });
 
         // bind shaders to pipeline
-        m_shaderProg->activate( dxDeferredDevCont );
+        ShaderProgram *gbuffProg = shaderLibrary.getShaderProgram("DeferredComposition");
+        commandList->record([gbuffProg](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+           gbuffProg->activate(dxDeferredDevCont);
+        });
 
-        dxDeferredDevCont->IASetVertexBuffers( 0, 0, nullptr, nullptr, nullptr );
-        dxDeferredDevCont->IASetIndexBuffer( nullptr, DXGI_FORMAT_R32_UINT, 0 );
-        dxDeferredDevCont->IASetInputLayout( nullptr );
-        dxDeferredDevCont->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
+        commandList->record([](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+            dxDeferredDevCont->IASetVertexBuffers( 0, 0, nullptr, nullptr, nullptr );
+            dxDeferredDevCont->IASetIndexBuffer( nullptr, DXGI_FORMAT_R32_UINT, 0 );
+            dxDeferredDevCont->IASetInputLayout( nullptr );
+            dxDeferredDevCont->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP );
 
-        // draw three vertices without a vertex buffer
-        dxDeferredDevCont->Draw( 3u, 0u );
+            // draw three vertices without a vertex buffer
+            dxDeferredDevCont->Draw( 3u, 0u );
+        });
 
         finishCommandList();
     }

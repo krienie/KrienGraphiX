@@ -8,7 +8,7 @@
 #include <PxFiltering.h>
 #include <extensions/PxDefaultAllocator.h>
 #include <extensions/PxDefaultErrorCallback.h>
-#include <physxvisualdebuggersdk/PvdConnection.h>
+//#include <physxvisualdebuggersdk/PvdConnection.h>
 
 namespace physx
 {
@@ -48,7 +48,7 @@ namespace kgx
 
             physx::PxDefaultErrorCallback m_defaultErrorCallback;
             physx::PxDefaultAllocator m_defaultAllocatorCallback;
-            physx::PxVisualDebuggerConnection *m_connection;
+            //physx::PxVisualDebuggerConnection *m_connection;
             physx::PxFoundation *m_foundation;
             physx::PxPhysics *m_physics;
             physx::PxDefaultCpuDispatcher *m_dispatcher;

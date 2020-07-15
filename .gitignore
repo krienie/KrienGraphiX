@@ -10,3 +10,4 @@ Assets/
 *.suo
 *.VC.db
 *.VC.opendb
+.vs

@@ -1,18 +1,19 @@
 
 #include "IO/Filesystem.h"
 
+#include <filesystem>
 #include <set>
+#include <fstream>
 #include <iostream>
-#include <Windows.h>
 
-#include <boost/filesystem.hpp>
+#include <Windows.h>
 
 namespace
 {
     std::set<std::string> searchPaths;
 }
 
-namespace kgx { namespace filesystem
+namespace kgx::filesystem
 {
     std::string getCurrentProgramPath()
     {
@@ -29,11 +30,11 @@ namespace kgx { namespace filesystem
         std::set<std::string>::const_iterator it;
         for ( it = searchPaths.cbegin(); it != searchPaths.cend(); ++it )
         {
-            boost::filesystem::recursive_directory_iterator dirIt( *it ), eod;
+            std::filesystem::recursive_directory_iterator dirIt( *it ), eod;
             while ( dirIt != eod )
             {
-                boost::filesystem::path curFile = dirIt->path();
-                if ( boost::filesystem::is_regular_file( curFile )
+                std::filesystem::path curFile = dirIt->path();
+                if ( std::filesystem::is_regular_file( curFile )
                         && curFile.filename().string() == file )
                 {
                     return curFile.string();
@@ -49,8 +50,8 @@ namespace kgx { namespace filesystem
 
     void addSearchPath( const std::string &absolutePath )
     {
-        boost::filesystem::path p( absolutePath );
-        if ( boost::filesystem::is_directory( p ) )
+        std::filesystem::path p( absolutePath );
+        if ( std::filesystem::is_directory( p ) )
             searchPaths.insert( absolutePath );
     }
 
@@ -67,9 +68,9 @@ namespace kgx { namespace filesystem
     std::string getFile( const std::string &filename )
     {
         std::string absFile = filename;
-        if ( !boost::filesystem::path( filename ).is_absolute() )
+        if ( !std::filesystem::path( filename ).is_absolute() )
             absFile = getAbsolutePath( filename );
-        if ( absFile.size() == 0 || !boost::filesystem::exists( absFile ) )
+        if (absFile.empty() || !std::filesystem::exists( absFile ) )
         {
             std::cout << "Error (Filesystem::openFile): Source file not found." << std::endl;
             return std::string();
@@ -100,23 +101,23 @@ namespace kgx { namespace filesystem
 
     bool saveFile( const std::string &fileDir, const std::string &fileName, const std::string &contents )
     {
-        if ( !boost::filesystem::is_directory( fileDir ) )
+        if ( !std::filesystem::is_directory( fileDir ) )
         {
             std::cout << "Error (filesytem::saveFile): " << fileDir << " is not a valid directory. Aborting" << std::endl;
             return false;
         }
 
-        boost::filesystem::path dir( fileDir );
-        if ( dir.is_relative() || !boost::filesystem::exists( dir ) && !boost::filesystem::create_directory( dir ) )
+        std::filesystem::path dir( fileDir );
+        if ( dir.is_relative() || !std::filesystem::exists( dir ) && !std::filesystem::create_directory( dir ) )
         {
             std::cout << "Error (filesytem::saveFile): Error creating directory: " << fileDir << " Aborting" << std::endl;
             return false;
         }
 
-        boost::filesystem::path file( fileName );
-        boost::filesystem::path fullPath = dir / file;
+        std::filesystem::path file( fileName );
+        std::filesystem::path fullPath = dir / file;
 
-        if ( boost::filesystem::exists( fullPath ) )
+        if ( std::filesystem::exists( fullPath ) )
             std::cout << "Warning (filesytem::saveFile): File already exists. Overwriting..." << std::endl;
 
         std::ofstream fileOut( fullPath.string() );
@@ -124,5 +125,4 @@ namespace kgx { namespace filesystem
         fileOut.close();
         return true;
     }
-}
 }

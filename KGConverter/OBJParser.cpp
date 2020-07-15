@@ -5,12 +5,11 @@
 
 #include "OBJParser.h"
 
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <map>
-
-#include <boost/filesystem.hpp>
 
 #ifndef BOOST_SPIRIT_USE_PHOENIX_V3
 #define BOOST_SPIRIT_USE_PHOENIX_V3
@@ -26,7 +25,6 @@ BOOST_FUSION_ADAPT_STRUCT(
     (float, z)
 );
 
-namespace bfs     = boost::filesystem;
 namespace phx     = boost::phoenix;
 namespace qi      = boost::spirit::qi;
 namespace iso8859 = boost::spirit::iso8859_1;
@@ -472,9 +470,9 @@ namespace kgx
         kgMat.specular.z = objMat.specClr.z;
         kgMat.specular.w = 1.0f;
 
-        kgMat.diffuseMap = bfs::path( objMat.diffMap ).filename().string();
-        kgMat.specularMap = bfs::path( objMat.specMap ).filename().string();
-        kgMat.normalMap = bfs::path( objMat.bumpMap ).filename().string();
+        kgMat.diffuseMap  = std::filesystem::path( objMat.diffMap ).filename().string();
+        kgMat.specularMap = std::filesystem::path( objMat.specMap ).filename().string();
+        kgMat.normalMap   = std::filesystem::path( objMat.bumpMap ).filename().string();
     }
 }
 
