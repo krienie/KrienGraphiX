@@ -3,32 +3,24 @@
 
 #include <QWidget>
 
-#include <kriengraphix/Core/RenderWindow.h>
+//#include <kriengraphix/Core/RenderWindow.h>
 
 #include "MouseListener.h"
 
 namespace kgt
 {
-    class FrameListener;
     class KeyboardListener;
 
     class KGTRenderWidget : public QWidget
     {
         Q_OBJECT
 
-        public slots:
-            void startRendering();
-
         public:
             KGTRenderWidget( QWidget *parent = nullptr, Qt::WindowFlags f = nullptr );
             //~KGTRenderWidget();
 
-            void initialize();
-            kgx::RenderWindow* getRenderWindow() const;
-
             void toggleFullscreen();
 
-            void addFrameListener( FrameListener *listener );
             void addMouseListener( MouseListener *listener );
             void addKeyboardListener( KeyboardListener *listener );
 
@@ -49,12 +41,11 @@ namespace kgt
             MouseEvent createMouseEvent( QMouseEvent *qtEvt, MouseEvent::ButtonState state ) const;
 
             bool m_isInit;
-            kgx::RenderWindow *m_renderWin;
+            //kgx::RenderWindow *m_renderWin;
             double m_lastFrameTime;
             float m_prevMousePosX;
             float m_prevMousePosY;
 
-            std::vector<FrameListener*> m_frameListeners;
             std::vector<MouseListener*> m_mouseListeners;
             std::vector<KeyboardListener*> m_keyboardListeners;
     };

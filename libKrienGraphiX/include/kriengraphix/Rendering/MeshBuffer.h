@@ -9,7 +9,7 @@ typedef unsigned int UINT;
 
 namespace kgx
 {
-    class MeshBuffer
+    class MeshBuffer final
     {
         public:
             MeshBuffer( const std::vector<float> &vertices, const std::vector<UINT> &indices,

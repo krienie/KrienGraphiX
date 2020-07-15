@@ -1,35 +1,29 @@
 
 #pragma once
 
-#include <vector>
-
-#include "Simulation/RenderableObject.h"
-
-struct ID3D11DeviceContext;
-struct ID3D11CommandList;
+#include "Core/RenderThread.h"
 
 namespace kgx
 {
-    class Camera;
-    class TextureLibrary;
+    class DeferredRenderCommandList;
+    class SceneView;
 
     class RenderPass
     {
         public:
-            explicit RenderPass( ID3D11DeviceContext *deferredDevCont );
-            virtual ~RenderPass();
+            explicit RenderPass(SceneView* view);
+            virtual ~RenderPass() = default;
 
-            virtual void record( const std::vector<RenderableObject*> &renderObjects, const LightData &lightData,
-                                 const TextureLibrary &sceneTextures ) = 0;
             void submit() const;
 
         protected:
-            ID3D11DeviceContext* getDeferredContext() const;
+            [[nodiscard]]
+            SceneView* getSceneView() const;
+            DeferredRenderCommandList* getCommandList();
             void finishCommandList();
 
         private:
-            ID3D11DeviceContext *m_dxDevCont;
-            ID3D11DeviceContext *m_dxDeferredDevCont;
-            ID3D11CommandList *m_commandList;
+            SceneView *m_sceneView;
+            DeferredRenderCommandList m_commandList;
     };
 }

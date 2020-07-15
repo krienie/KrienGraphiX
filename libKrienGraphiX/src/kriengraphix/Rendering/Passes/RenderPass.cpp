@@ -1,48 +1,49 @@
 
 #include "Rendering/Passes/RenderPass.h"
 
+
 #include <d3d11.h>
+#include <iostream>
+
 
 #include "Core/KGXCore.h"
+#include "Core/RenderThread.h"
+#include "Core/SceneView.h"
 
 namespace kgx
 {
-    RenderPass::RenderPass( ID3D11DeviceContext *deferredDevCont )
-        : m_dxDevCont( nullptr ), m_dxDeferredDevCont( deferredDevCont ), m_commandList( nullptr )
+    RenderPass::RenderPass(SceneView* view)
+        : m_sceneView(view), m_commandList(KGXCore::get()->getRenderThread()->getDeferredRenderCommandList())
     {
-        ID3D11Device *dxDev = KGXCore::get()->getDxDevicePtr();
-        dxDev->GetImmediateContext( &m_dxDevCont );
-    }
-
-    RenderPass::~RenderPass()
-    {
-        if ( m_dxDevCont )
-            m_dxDevCont->Release();
-        if ( m_commandList )
-            m_commandList->Release();
+        m_commandList.record([view](ID3D11DeviceContext* dxDeferredDevCont)
+        {
+            D3D11_VIEWPORT viewport = view->getViewport();
+            dxDeferredDevCont->RSSetViewports(1, &viewport);
+            dxDeferredDevCont->RSSetState(view->getRasterizerState());
+        });
     }
 
     void RenderPass::submit() const
     {
-        if ( m_commandList )
-            m_dxDevCont->ExecuteCommandList( m_commandList, false );
+        const long long curFrameNum = KGXCore::get()->getRenderThread()->getFrameNumber();
+        KGXCore::get()->getRenderThread()->enqueueImmediateCommand([this, curFrameNum](ID3D11DeviceContext *dxDevCont)
+        {
+            m_commandList.submit(dxDevCont);
+        });
     }
 
-    ID3D11DeviceContext * RenderPass::getDeferredContext() const
+    SceneView *RenderPass::getSceneView() const
     {
-        return m_dxDeferredDevCont;
+        return m_sceneView;
+    }
+
+    DeferredRenderCommandList *RenderPass::getCommandList()
+    {
+        return &m_commandList;
     }
 
     void RenderPass::finishCommandList()
     {
-        // Release any previously created commandlist
-        if ( m_commandList )
-        {
-            m_commandList->Release();
-            m_commandList = nullptr;
-        }
-
-        m_dxDeferredDevCont->FinishCommandList( false, &m_commandList );
-        m_dxDeferredDevCont->ClearState();
+        m_commandList.finish();
     }
 }

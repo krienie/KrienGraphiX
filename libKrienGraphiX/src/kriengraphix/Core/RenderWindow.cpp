@@ -3,14 +3,15 @@
 
 #include <iostream>
 
-#include "Simulation/Camera.h"
+#include "Core/KGXCore.h"
+#include "Core/SceneThread.h"
 
 namespace kgx
 {
     RenderWindow::RenderWindow( ID3D11Device *dxDevice, IDXGIFactory2 *dxgiFactory )
         : m_dxDev( dxDevice ), m_dxDevCont( nullptr ), m_dxgiFactory( dxgiFactory ), m_swapChain( nullptr ),
-        m_renderTargetView( nullptr ), m_depthStencilView( nullptr ), m_rasterizer( nullptr ),
-        m_curViewport(), m_backBuffWidth( 0U ), m_backBuffHeight( 0U ), m_isInit( false )
+            m_renderTargetView( nullptr ), m_depthStencilView( nullptr ),
+            m_backBuffWidth( 0U ), m_backBuffHeight( 0U ), m_isInit( false )
     {
         m_dxDev->GetImmediateContext( &m_dxDevCont );
 
@@ -27,9 +28,6 @@ namespace kgx
 
         if ( m_depthStencilView )
             m_depthStencilView->Release();
-
-        if ( m_rasterizer )
-            m_rasterizer->Release();
 
         if ( m_renderTargetView )
             m_renderTargetView->Release();
@@ -123,81 +121,8 @@ namespace kgx
             return false;
         }
 
-
-        // Setup the rasterizer
-        D3D11_RASTERIZER_DESC rasterDesc;
-        rasterDesc.AntialiasedLineEnable = false;
-        rasterDesc.CullMode = D3D11_CULL_BACK;		//D3D11_CULL_FRONT, D3D11_CULL_BACK or D3D11_CULL_NONE
-        rasterDesc.DepthBias = 0;
-        rasterDesc.DepthBiasClamp = 0.0f;
-        rasterDesc.DepthClipEnable = true;
-        rasterDesc.FillMode = D3D11_FILL_SOLID;	//D3D11_FILL_WIREFRAME or D3D11_FILL_SOLID
-        rasterDesc.FrontCounterClockwise = false;
-        rasterDesc.MultisampleEnable = true;
-        rasterDesc.ScissorEnable = false;
-        rasterDesc.SlopeScaledDepthBias = 0.0f;
-
-        res = m_dxDev->CreateRasterizerState( &rasterDesc, &m_rasterizer );
-        if ( FAILED( res ) )
-        {
-            m_renderTargetView->Release();
-            m_renderTargetView = nullptr;
-            m_swapChain->Release();
-            m_swapChain = nullptr;
-            std::cout << "Error (RenderWindow::create): Error creating Rasterizer state." << std::endl;
-            return false;
-        }
-
         m_isInit = true;
         return true;
-    }
-
-    void RenderWindow::setViewport( Camera *cam, float topLeftX, float topLeftY, float width, float height )
-    {
-        if ( !m_isInit )
-        {
-            std::cout << "Error (RenderWindow::setViewport): RenderWindow is not initialized. Call RenderWindow::create() first." << std::endl;
-            abort();
-        }
-
-        // initialize viewport
-        D3D11_VIEWPORT dxViewport;
-        ZeroMemory( &dxViewport, sizeof( D3D11_VIEWPORT ) );
-
-        if ( topLeftX + width <= D3D11_VIEWPORT_BOUNDS_MAX )
-        {
-            dxViewport.TopLeftX = topLeftX;
-
-            if ( width < 0.0f )
-                dxViewport.Width = static_cast<float>(m_backBuffWidth);
-            else dxViewport.Width = width;
-
-        } else
-        {
-            std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Clamping viewport." << std::endl;
-            dxViewport.TopLeftX = 0.0f;
-            dxViewport.Width = D3D11_VIEWPORT_BOUNDS_MAX;
-        }
-
-        if ( topLeftY + height <= D3D11_VIEWPORT_BOUNDS_MAX )
-        {
-            dxViewport.TopLeftY = topLeftY;
-
-            if ( height < 0.0f )
-                dxViewport.Height = static_cast<float>(m_backBuffHeight);
-            else dxViewport.Height = height;
-
-        } else
-        {
-            std::cout << "Warning (RenderWindow::addViewport): Viewport out of bounds. Clamping viewport." << std::endl;
-            dxViewport.TopLeftY = 0.0f;
-            dxViewport.Height = D3D11_VIEWPORT_BOUNDS_MAX;
-        }
-
-        dxViewport.MinDepth = D3D11_MIN_DEPTH;
-        dxViewport.MaxDepth = D3D11_MAX_DEPTH;
-
-        m_curViewport = Viewport( dxViewport, cam );
     }
 
     void RenderWindow::setClearColor( float red, float green, float blue )
@@ -238,8 +163,27 @@ namespace kgx
         return m_backBuffHeight;
     }
 
+    ID3D11RenderTargetView* RenderWindow::getRTV() const
+    {
+        return m_renderTargetView;
+    }
 
-    void RenderWindow::update()
+    ID3D11DepthStencilView* RenderWindow::getDSV() const
+    {
+        return m_depthStencilView;
+    }
+
+    void RenderWindow::clear()
+    {
+        m_dxDevCont->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    }
+
+    void RenderWindow::present()
+    {
+        m_swapChain->Present(0, 0);
+    }
+
+    /*void RenderWindow::update()
     {
         if ( !m_isInit || !m_curViewport.cam )
             return;
@@ -254,5 +198,5 @@ namespace kgx
 
         // flip the back buffer and the front buffer
         m_swapChain->Present( 0, 0 );
-    }
+    }*/
 }

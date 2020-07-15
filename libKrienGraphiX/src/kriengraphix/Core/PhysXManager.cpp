@@ -10,9 +10,10 @@
 #include <common/PxTolerancesScale.h>
 //#include <cooking\PxCooking.h>
 #include <extensions/PxExtensionsAPI.h>
-#include <foundation/PxFoundation.h>
+#include <PxFoundation.h>
+#include <PxPhysicsVersion.h>
 #include <foundation/PxMat44.h>
-#include <pvd/PxVisualDebugger.h>
+//#include <pvd/PxVisualDebugger.h>
 
 #include "IO/Filesystem.h"
 
@@ -36,7 +37,7 @@ namespace kgx
 
 
     PhysXManager::PhysXManager()
-        : m_defaultErrorCallback(), m_defaultAllocatorCallback(), m_connection( nullptr ), m_foundation( nullptr ),
+        : m_defaultErrorCallback(), m_defaultAllocatorCallback(), /*m_connection( nullptr ),*/ m_foundation( nullptr ),
         m_physics( nullptr ), /*m_cooking(nullptr),*/ m_dispatcher( nullptr ), m_scene( nullptr ), m_collectionMemory( nullptr ),
         m_isInit( false ), m_accumulator( 0.0f )
     {
@@ -84,13 +85,14 @@ namespace kgx
             return;
         }*/
 
-        if ( m_physics->getPvdConnectionManager() )
+		// TODO: temporarily turned off. Will fix the debugger connection later.
+        /*if ( m_physics->getPvdConnectionManager() )
         {
             m_physics->getVisualDebugger()->setVisualizeConstraints( true );
             m_physics->getVisualDebugger()->setVisualDebuggerFlag( physx::PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true );
             m_physics->getVisualDebugger()->setVisualDebuggerFlag( physx::PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true );
             m_connection = physx::PxVisualDebuggerExt::createConnection( m_physics->getPvdConnectionManager(), "127.0.0.1", 5425, 10 );
-        }
+        }*/
 
         initScene();
 
@@ -102,8 +104,8 @@ namespace kgx
         if ( m_collectionMemory )
             free( m_collectionMemory );
 
-        if ( m_connection )
-            m_connection->release();
+        //if ( m_connection )
+        //    m_connection->release();
 
         if ( m_dispatcher )
             m_dispatcher->release();
@@ -131,11 +133,11 @@ namespace kgx
             return false;
         }
 
-        physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC );
+        const physx::PxU32 numActors = m_scene->getNbActors( physx::PxActorTypeFlag::eRIGID_DYNAMIC );
         if ( numActors )
         {
             std::vector<physx::PxRigidActor*> actors( numActors );
-            m_scene->getActors( physx::PxActorTypeSelectionFlag::eRIGID_DYNAMIC,
+            m_scene->getActors( physx::PxActorTypeFlag::eRIGID_DYNAMIC,
                                 reinterpret_cast<physx::PxActor**>(&actors[0]), numActors );
 
             for ( auto &actor : actors )
@@ -172,7 +174,7 @@ namespace kgx
     {
         m_accumulator += timestep;
 
-        const float stepSize = 1.0f / 60.0f;
+        constexpr float stepSize = 1.0f / 60.0f;
         if ( m_accumulator < stepSize )
             return false;
 

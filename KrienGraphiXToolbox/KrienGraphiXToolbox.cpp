@@ -3,19 +3,15 @@
 
 #include "KrienGraphiXToolbox.h"
 
+#include <filesystem>
 #include <iostream>
 
-#include <boost/filesystem.hpp>
 #include <qfiledialog.h>
 
 #include <kriengraphix/Core/KGXCore.h>
-#include <kriengraphix/Core/PhysXManager.h>
 #include <kriengraphix/Core/ConfigManager.h>
 #include <kriengraphix/IO/Filesystem.h>
 #include <kriengraphix/IO/KGSceneParser.h>
-#include <kriengraphix/Simulation/Camera.h>
-
-namespace bfs = boost::filesystem;
 
 namespace
 {
@@ -30,15 +26,14 @@ namespace
 namespace kgt
 {
     KrienGraphiXToolbox::KrienGraphiXToolbox( QWidget *parent )
-        : QMainWindow( parent ), m_projectDir(), m_mainCam( nullptr ), m_currentScene( nullptr ),
-        m_mouseXFilterBuffer(), m_mouseYFilterBuffer(), m_leftMouseBtnDown( false ), m_wKeyDown( false ), m_sKeyDown( false ),
-        m_aKeyDown( false ), m_dKeyDown( false )
+        : QMainWindow( parent ), m_projectDir(), /*m_mainCam( nullptr ),*/ m_mouseXFilterBuffer(), m_mouseYFilterBuffer(),
+        m_leftMouseBtnDown( false ), m_wKeyDown( false ), m_sKeyDown( false ), m_aKeyDown( false ), m_dKeyDown( false )
     {
-        m_ui.setupUi( this );
-        m_ui.renderWidget1->initialize();
-        m_ui.renderWidget1->addFrameListener( this );
-        m_ui.renderWidget1->addMouseListener( this );
-        m_ui.renderWidget1->addKeyboardListener( this );
+        m_ui.setupUi(this);
+
+        //m_ui.renderWidget1->initialize(  );
+        m_ui.renderWidget1->addMouseListener(this);
+        m_ui.renderWidget1->addKeyboardListener(this);
 
         // reserve space for mouse movement filtering
         m_mouseXFilterBuffer.reserve( MOUSE_BUFFER_FILTER_SIZE );
@@ -46,10 +41,17 @@ namespace kgt
 
         //try and load project directory from KGConfig
         m_projectDir = kgx::ConfigManager::get()->getProperty<std::string>( "projectFolder" );
-        if ( m_projectDir.size() == 0 )
+        if (m_projectDir.empty())
+        {
             setProjectFolder();
+        }
 
-        m_ui.renderWidget1->startRendering();
+        // add project work directories to KGX filesystem
+        kgx::filesystem::addSearchPath( m_projectDir );
+
+        const std::filesystem::path resourcePath = std::filesystem::path(m_projectDir) / RESOURCE_FOLDER;
+        kgx::filesystem::addSearchPath( resourcePath.string() );
+
 
         connect( m_ui.actionNew, &QAction::triggered, this, &KrienGraphiXToolbox::createNewScene );
         connect( m_ui.actionOpen, &QAction::triggered, this, &KrienGraphiXToolbox::openSceneFile );
@@ -57,18 +59,18 @@ namespace kgt
         connect( m_ui.actionSave_as, &QAction::triggered, this, &KrienGraphiXToolbox::saveSceneAsNewFile );
         connect( m_ui.actionSetProjectFolder, &QAction::triggered, this, &KrienGraphiXToolbox::setProjectFolder );
         connect( m_ui.actionExit, &QAction::triggered, this, &KrienGraphiXToolbox::exitProgram );
+
+        // Create render window target and start the main loop
+        kgx::KGXCore::get()->startMainLoop( kgx::KGXCore::get()->createRenderWindow(HWND(m_ui.renderWidget1->winId())) );
     }
 
     KrienGraphiXToolbox::~KrienGraphiXToolbox()
     {
-        if ( m_currentScene )
-            delete m_currentScene;
-
-        kgx::KGXCore::destroy();
+        kgx::KGXCore::shutdown();
     }
 
 
-    void KrienGraphiXToolbox::frameUpdate( double deltaTime )
+    /*void KrienGraphiXToolbox::sceneUpdate( double deltaTime )
     {
         if ( !m_mainCam )
             return;
@@ -83,15 +85,12 @@ namespace kgt
             m_mainCam->moveLeft( speed );
         if ( m_dKeyDown )
             m_mainCam->moveRight( speed );
-
-        if ( animateScene )
-            kgx::PhysXManager::getInst()->advance( deltaTime );
-    }
+    }*/
 
 
     void KrienGraphiXToolbox::mouseMoved( const MouseEvent &evt )
     {
-        if ( m_mainCam && m_leftMouseBtnDown )
+        /*if ( m_mainCam && m_leftMouseBtnDown )
         {
             const float MOVE_WEIGHT_MODIFIER = 0.2f;
             const float MOVE_SPEED_MODIFIER = 1.5f;
@@ -123,7 +122,7 @@ namespace kgt
             // rotate camera with the filtered movement vector
             m_mainCam->rotateRight( filteredX );
             m_mainCam->rotateUp( filteredY );
-        }
+        }*/
     }
 
     void KrienGraphiXToolbox::mousePressed( const MouseEvent &evt )
@@ -200,31 +199,15 @@ namespace kgt
     void KrienGraphiXToolbox::openSceneFile()
     {
         // get scene filename
-        bfs::path sceneDirPath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
-        std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), tr( sceneDirPath.string().c_str() ),
+        std::filesystem::path sceneDirPath = std::filesystem::path(m_projectDir) / SCENE_FOLDER;
+        std::string sceneFile = QFileDialog::getOpenFileName( this, tr( "Open scene file" ), sceneDirPath.string().c_str(),
                                                               tr( "KrienGraphiX Scene File (*.kgscene)" ) ).toStdString();
+
         if ( sceneFile.empty() )
             return;
 
-        // unload current scene
-        if ( m_currentScene )
-            delete m_currentScene;
-        kgx::KGXCore::get()->clearManagers();
-
-        // add project work directory to KGX filesystem
-        kgx::filesystem::addSearchPath( m_projectDir );
-
-
         // parse and load scene file
-        m_currentScene = kgx::KGSceneParser::loadKGScene( sceneFile, m_ui.renderWidget1->getRenderWindow() );
-        if ( m_currentScene && m_currentScene->getDefaultCamera() )
-        {
-            m_mainCam = m_currentScene->getDefaultCamera();
-
-            //TODO: change interface for setting output for a camera below to something like: m_mainCam->setRenderTarget( m_ui.renderWidget1->getRenderWindow() );
-            m_ui.renderWidget1->getRenderWindow()->setViewport( m_mainCam );
-        }
-
+        kgx::KGSceneParser::loadKGScene(sceneFile);
     }
     void KrienGraphiXToolbox::saveSceneFile()
     {
@@ -238,29 +221,36 @@ namespace kgt
     void KrienGraphiXToolbox::setProjectFolder()
     {
         std::string selectedDir = QFileDialog::getExistingDirectory( this, tr( "Select project directory" ), "" ).toStdString();
-        if ( !bfs::is_directory( selectedDir ) )
+        if ( !std::filesystem::is_directory( selectedDir ) )
         {
             std::cout << "Error (KrienGraphiXToolbox::setProjectFolder): Not a valid directory: " << selectedDir << std::endl;
             return;
         }
 
         // remove existing project directory from KGX filesystem, if present
-        if ( m_projectDir.size() > 0 )
+        if (!m_projectDir.empty())
             kgx::filesystem::removeSearchPath( m_projectDir );
 
         // save project directory in KG configuration file
         kgx::ConfigManager::get()->setProperty( "projectFolder", selectedDir );
         m_projectDir = selectedDir;
 
+        // add new project work directory to KGX filesystem
+        kgx::filesystem::addSearchPath( m_projectDir );
+
         // create scene folders
-        bfs::path scenePath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
-        if ( !bfs::exists( scenePath ) )
-            bfs::create_directory( scenePath );
+        std::filesystem::path scenePath = std::filesystem::path(m_projectDir) / SCENE_FOLDER;
+        //bfs::path scenePath = bfs::path( m_projectDir ).append( SCENE_FOLDER );
+        if ( !std::filesystem::exists( scenePath ) )
+            std::filesystem::create_directory( scenePath );
 
         // create resource folder
-        bfs::path resourcePath = bfs::path( m_projectDir ).append( RESOURCE_FOLDER );
-        if ( !bfs::exists( resourcePath ) )
-            bfs::create_directory( resourcePath );
+        //bfs::path resourcePath = bfs::path( m_projectDir ).append( RESOURCE_FOLDER );
+        std::filesystem::path resourcePath = std::filesystem::path(m_projectDir) / RESOURCE_FOLDER;
+        if ( !std::filesystem::exists( resourcePath ) )
+            std::filesystem::create_directory( resourcePath );
+
+        kgx::filesystem::addSearchPath( resourcePath.string() );
     }
 
     void KrienGraphiXToolbox::exitProgram()

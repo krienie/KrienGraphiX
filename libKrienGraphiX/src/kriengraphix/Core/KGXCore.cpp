@@ -3,9 +3,13 @@
 
 #include "Core/KGXCore.h"
 
+#include <chrono>
+
 #include <DirectXMath.h>
 #include <iostream>
 
+#include "Core/SceneThread.h"
+#include "Core/RenderThread.h"
 #include "Core/RenderWindow.h"
 #include "Core/ConfigManager.h"
 #include "IO/Filesystem.h"
@@ -23,23 +27,24 @@ namespace kgx
         return m_inst;
     }
 
-    void KGXCore::destroy()
+    void KGXCore::shutdown()
     {
-        if ( m_inst )
-            delete m_inst;
+        delete m_inst;
     }
 
     KGXCore::KGXCore()
-        : m_dxDev( nullptr ), m_dxDevCont( nullptr ), m_dxgiFactory( nullptr ), m_renderWindow( nullptr )
+        : m_isRunning(false), m_dxDev(nullptr),
+            m_dxgiFactory(nullptr), m_mainClockThread(nullptr),
+            m_renderWindow(nullptr), m_sceneThread(nullptr), m_renderThread(nullptr)
     {
         // open console when compiling for debugging
-#ifdef _DEBUG
+//#ifdef _DEBUG
         AllocConsole();
-        AttachConsole( GetCurrentProcessId() );
+        AttachConsole(GetCurrentProcessId());
 
 #pragma warning(suppress: 6031)
-        freopen( "CON", "w", stdout );					//redirect stdout to the created console
-#endif
+        freopen( "CON", "w", stdout );      //redirect stdout to the created console
+//#endif
 
         // make sure SSE/SSE2 instructions are supported on current hardware
         if ( !DirectX::XMVerifyCPUSupport() )
@@ -61,7 +66,7 @@ namespace kgx
 
         HRESULT res = D3D11CreateDevice( nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
                                          creationFlags, featureLevels, ARRAYSIZE( featureLevels ),
-                                         D3D11_SDK_VERSION, &m_dxDev, nullptr, &m_dxDevCont );
+                                         D3D11_SDK_VERSION, &m_dxDev, nullptr, nullptr );
 
         if ( FAILED( res ) )
         {
@@ -98,8 +103,16 @@ namespace kgx
 
     KGXCore::~KGXCore()
     {
-        if ( m_renderWindow )
-            delete m_renderWindow;
+        if ( m_mainClockThread )
+        {
+            m_isRunning = false;
+            m_mainClockThread->join();
+            delete m_mainClockThread;
+        }
+
+        delete m_sceneThread;
+        delete m_renderThread;
+        delete m_renderWindow;
 
         // destroy managers
         ConfigManager::destroy();
@@ -107,9 +120,6 @@ namespace kgx
 
         if ( m_dxgiFactory )
             m_dxgiFactory->Release();
-        if ( m_dxDevCont )
-            m_dxDevCont->Release();
-
 
         //ID3D11Debug *d3dDebug = nullptr;
         //m_dxDev->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
@@ -133,7 +143,7 @@ namespace kgx
     {
         if ( m_renderWindow )
         {
-            std::cout << "Aborted (Environment::createRenderWindow): Window handle " << windowHandle << " already has a RenderWindow bound." << std::endl;
+            std::cout << "Aborted (KGXCore::createRenderWindow): Window handle " << windowHandle << " already has a RenderWindow bound." << std::endl;
             return m_renderWindow;
         }
 
@@ -152,6 +162,29 @@ namespace kgx
         return m_renderWindow;
     }
 
+    bool KGXCore::isRunning() const
+    {
+        return m_isRunning;
+    }
+
+    void KGXCore::startMainLoop(RenderWindow *renderWindow)
+    {
+        if ( !renderWindow )
+        {
+            std::cout << "Aborted (KGXCore::startMainLoop): A valid RenderWindow has not been created. Please call KGXCore::createRenderWindow() first." << std::endl;
+            return;
+        }
+        
+        // Start all threads and start the main clock when ready
+        m_sceneThread  = new SceneThread();
+        m_renderThread = new RenderThread(m_dxDev);
+        m_prevClockTime   = std::chrono::high_resolution_clock::now();
+        m_mainClockThread = new std::thread( &KGXCore::clockTick, this );
+
+        getSceneThread()->addSceneView(renderWindow);
+
+        m_isRunning = true;
+    }
 
     //TODO: rename or remove
     void KGXCore::clearManagers()
@@ -159,10 +192,37 @@ namespace kgx
         filesystem::clearSearchPaths();
     }
 
-
-    void KGXCore::renderFrame() const
+    SceneThread * KGXCore::getSceneThread() const
     {
-        if ( m_renderWindow )
-            m_renderWindow->update();
+        return m_sceneThread;
+    }
+
+    RenderThread *KGXCore::getRenderThread() const
+    {
+        return m_renderThread;
+    }
+
+    void KGXCore::clockTick()
+    {
+        while (m_isRunning)
+        {
+            std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> deltaTime = currentTime - m_prevClockTime;
+
+            constexpr std::chrono::duration<double> frameLimit(1.0 / 400.0);
+
+            if (deltaTime > frameLimit)
+            {
+                //const long long curFrameNum = getRenderThread()->getFrameNumber();
+                //std::cout << "KGXCore::clockTick: " << curFrameNum << std::endl;
+
+
+                // TODO: add an FPS limit
+
+                m_sceneThread->advance( deltaTime.count() );
+
+                m_prevClockTime = currentTime;
+            }
+        }
     }
 }

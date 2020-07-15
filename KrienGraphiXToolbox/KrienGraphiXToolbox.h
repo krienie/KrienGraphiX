@@ -5,12 +5,11 @@
 
 #include "MouseListener.h"
 #include "KeyboardListener.h"
-#include "FrameListener.h"
 #include "ui_KrienGraphiXToolbox.h"
 
 namespace kgt
 {
-    class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener, FrameListener
+    class KrienGraphiXToolbox : public QMainWindow, MouseListener, KeyboardListener
     {
         Q_OBJECT
 
@@ -18,7 +17,6 @@ namespace kgt
             explicit KrienGraphiXToolbox( QWidget *parent = nullptr );
             ~KrienGraphiXToolbox();
 
-            void frameUpdate( double deltaTime ) override;
             void mouseMoved( const MouseEvent &evt ) override;
             void mousePressed( const MouseEvent &evt ) override;
             void mouseReleased( const MouseEvent &evt ) override;
@@ -39,8 +37,7 @@ namespace kgt
 
             std::string m_projectDir;
 
-            kgx::Camera *m_mainCam;
-            kgx::Scene *m_currentScene;
+            //kgx::Camera *m_mainCam;
 
             std::vector<float> m_mouseXFilterBuffer;
             std::vector<float> m_mouseYFilterBuffer;

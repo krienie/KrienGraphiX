@@ -1,26 +1,24 @@
 
 #pragma once
 
-#include <d3d11.h>
 #include <DirectXMath.h>
+
+#include "Simulation/SceneObjectComponent.h"
 
 namespace kgx
 {
-    class Scene;
-    class ShaderProgram;
-
-    class Camera
+    class CameraComponent : public SceneObjectComponent
     {
         public:
-            Camera( Scene *parentScene, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
-            Camera( Scene *parentScene, float fovY, float aspect, float nearZ, float farZ,
+            CameraComponent(SceneObject *owner, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up);
+            CameraComponent(SceneObject *owner, float fovY, float aspect, float nearZ, float farZ,
                     const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ),
                     const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3( 0.0f, 0.0f, -1.0f ),
-                    const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ) );
-            explicit Camera( const Camera &other );
-            //~Camera();
-
-            Camera& operator=( const Camera &rhs );
+                    const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ));
+            CameraComponent(const CameraComponent &other) noexcept = delete;
+            CameraComponent& operator=(const CameraComponent &rhs) = delete;
+            CameraComponent(CameraComponent &&other) noexcept = delete;
+            CameraComponent&& operator=(CameraComponent &&rhs) = delete;
 
             const DirectX::XMFLOAT4X4& getProjMatrix() const;
             const DirectX::XMFLOAT4X4& getViewMatrix() const;
@@ -32,9 +30,7 @@ namespace kgx
             float getNearZ() const;
             float getFarZ() const;
 
-            /** Renders current camera view. Assumes a viewport has already been assigned to the DirectX pipeline */
-            void renderCurrentView( const D3D11_VIEWPORT &vp, ID3D11RasterizerState *rs, ID3D11RenderTargetView *rtv, ID3D11DepthStencilView *dsv );
-
+            //TODO(KL): Al deze bewegings dingen kunnen in een MovementComponent worden gezet.
             void lookAt( const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up );
             void moveForward( float dist );
             void moveBackward( float dist );
@@ -48,8 +44,6 @@ namespace kgx
             void rotateRight( float degrees );
 
         private:
-            Scene *m_parentScene;
-
             DirectX::XMFLOAT4X4 m_projMatrix;
             DirectX::XMFLOAT4X4 m_viewMatrix;
 

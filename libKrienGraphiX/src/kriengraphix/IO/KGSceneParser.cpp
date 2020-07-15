@@ -8,13 +8,15 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/fusion/include/std_pair.hpp>
-#include <boost/filesystem.hpp>
 
-#include "Core/RenderWindow.h"
+#include "Core/KGXCore.h"
 #include "Core/PhysXManager.h"
+#include "Core/RenderWindow.h"
+#include "Core/SceneThread.h"
 #include "IO/Filesystem.h"
 #include "IO/KGObjectParser.h"
-#include "Simulation/Scene.h"
+#include "Simulation/SceneObject.h"
+#include "Simulation/CameraComponent.h"
 
 BOOST_FUSION_ADAPT_STRUCT(
     DirectX::XMFLOAT3,
@@ -30,13 +32,19 @@ typedef qi::rule<std::string::const_iterator> Skipper;
 
 namespace kgx
 {
-    Scene* KGSceneParser::loadKGScene( const std::string &kgsceneFile, RenderWindow *renderWin )
+    void KGSceneParser::loadKGScene(const std::string &kgsceneFile)
     {
+        if ( !KGXCore::get()->isRunning() )
+        {
+            std::cout << "(KGSceneParser::loadKGScene): Error KGXCore not initialized. Run KGXCore::startMainLoop first." << std::endl;
+            return;
+        }
+
         std::string kgSceneData;
         if ( !filesystem::openFile( kgsceneFile, kgSceneData ) )
         {
             std::cout << "(KGSceneParser::loadKGScene): Error opening kgscene file." << std::endl;
-            return nullptr;
+            return;
         }
 
         std::vector<std::string> objects;
@@ -78,40 +86,39 @@ namespace kgx
         {
             std::string::const_iterator end = std::distance( f, kgSceneData.cend() ) > 100 ? f + 100 : kgSceneData.cend();
             std::cout << std::endl << "KGScene parsing trail: " << std::string( f, end ) << std::endl;
-            return nullptr;
+            return;
         }
-
-        Scene *newScene = new Scene();
 
         // parse RenderableObjects
         for ( std::string &objectStr : objects )
-            if ( !loadRenderObject( objectStr, newScene ) )
+            if ( !loadSceneObject( objectStr ) )
                 std::cout << "Warning (KGSceneParser::loadKGScene): Error creating RenderableObject. Skipping." << std::endl;
 
         // parse Camera's
         for ( std::string &cameraStr : cameras )
-            if ( !loadCamera( cameraStr, renderWin, newScene ) )
+            if ( !loadCamera( cameraStr ) )
                 std::cout << "Warning (KGSceneParser::loadKGScene): Error creating camera. Skipping." << std::endl;
 
         // parse Lights
         for ( std::string &lightStr : lights )
-            if ( !loadLight( lightStr, newScene ) )
+            if ( !loadLight( lightStr ) )
                 std::cout << "Warning (KGSceneParser::loadKGScene): Error creating light. Skipping." << std::endl;
 
-        return newScene;
+        SceneThread *sceneThread = KGXCore::get()->getSceneThread();
+        sceneThread->flush();
     }
 
 
-    bool KGSceneParser::loadRenderObject( const std::string &objString, Scene* parentScene )
+    bool KGSceneParser::loadSceneObject(const std::string &objString)
     {
         std::string name;
         std::string sourceFile;
         DirectX::XMFLOAT3 position( 0.0f, 0.0f, 0.0f );
         float scale = 1.0f;
         //TODO: add rotation
-        struct RenderObjectGrammar : qi::grammar<std::string::const_iterator, Skipper>
+        struct SceneObjectGrammar : qi::grammar<std::string::const_iterator, Skipper>
         {
-            RenderObjectGrammar( std::string &name, std::string &source, DirectX::XMFLOAT3 &pos, float &scale )
+            SceneObjectGrammar( std::string &name, std::string &source, DirectX::XMFLOAT3 &pos, float &scale )
                 : base_type( start )
             {
                 objName = qi::lit( "(" ) >> *~qi::char_( ')' ) >> qi::lit( ")" );
@@ -144,23 +151,23 @@ namespace kgx
             return false;
         }
 
-        KGObjectParser::loadKGO( sourceFile, position, DirectX::XMFLOAT3( scale, scale, scale ), parentScene );
+        KGObjectParser::loadKGO(sourceFile, position, DirectX::XMFLOAT3(scale, scale, scale));
 
         // construct PhysX filename
         std::string filename = sourceFile.substr( 0, sourceFile.rfind( ".kgo" ) );
         std::string physxFilename = filename + "_physx.bin";
 
         // try to load corresponding PhysX file, if it exists
-        if ( PhysXManager::getInst()->isInit() )
-            PhysXManager::getInst()->loadPhysXCollection( physxFilename );
+        //if ( PhysXManager::getInst()->isInit() )
+        //    PhysXManager::getInst()->loadPhysXCollection(physxFilename);
 
         return true;
     }
 
-    bool KGSceneParser::loadCamera( const std::string &camString, RenderWindow *renderWin, Scene* parentScene )
+    bool KGSceneParser::loadCamera( const std::string &camString )
     {
-        if ( !parentScene )
-            return false;
+        //SceneThread *sceneThread = KGXCore::get()->getSceneThread();
+        RenderWindow *renderWin = KGXCore::get()->getRenderWindow();
 
         std::string name;
         float fov = DirectX::XM_PIDIV4;
@@ -215,22 +222,21 @@ namespace kgx
         // print everything that hasn't been processed by the parser
         if ( f != camString.cend() )
         {
-            std::string::const_iterator end = std::distance( f, camString.cend() ) > 100 ? f + 100 : camString.cend();
+            std::string::const_iterator end = std::distance(f, camString.cend()) > 100 ? f + 100 : camString.cend();
             std::cout << std::endl << "Camera parsing trail: " << std::string( f, end ) << std::endl;
             return false;
         }
 
         // apply settings
-        parentScene->createCamera( fov, aspect, nearZ, farZ, eye, target, up );
+        SceneObject *cameraObject = new SceneObject(name);
+        cameraObject->addNewComponent<CameraComponent>(fov, aspect, nearZ, farZ, eye, target, up);
+        KGXCore::get()->getSceneThread()->addSceneObject(cameraObject);
 
         return true;
     }
 
-    bool KGSceneParser::loadLight( const std::string &lightString, Scene *parentScene )
+    bool KGSceneParser::loadLight(const std::string &lightString)
     {
-        if ( !parentScene )
-            return false;
-
         std::string name;
         bool isAmbient = false;
         float intensity = 1.0f;
@@ -276,8 +282,18 @@ namespace kgx
 
         // apply settings
         if ( !isAmbient )
-            parentScene->addDirectionalLight( direction, intensity );
-        else parentScene->setAmbient( color );
+        {
+            KGXCore::get()->getSceneThread()->enqueueSingleCommand([direction, intensity](Scene *scene)
+            {
+                scene->addDirectionalLight(direction, intensity);
+            });
+        } else
+        {
+            KGXCore::get()->getSceneThread()->enqueueSingleCommand([color](Scene *scene)
+            {
+                scene->setAmbient(color);
+            });
+        }
 
         return true;
     }
