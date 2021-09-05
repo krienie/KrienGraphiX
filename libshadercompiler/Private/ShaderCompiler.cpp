@@ -41,9 +41,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
         DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&mCompiler));
     }
 
-    //
-    // Create default include handler. (You can create your own...)
-    //
+    // Create default include handler
     ComPtr<IDxcIncludeHandler> pIncludeHandler;
     mUtils->CreateDefaultIncludeHandler(&pIncludeHandler);
 
@@ -173,7 +171,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
     pResults->GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(&pHash), nullptr);
     if (pHash != nullptr)
     {
-        std::wcout << L"Hash: ";
+        std::wcout << L"Shader hash: ";
         auto * pHashBuf = static_cast<DxcShaderHash*>(pHash->GetBufferPointer());
         for (unsigned char i : pHashBuf->HashDigest)
         {
@@ -203,24 +201,57 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
 
         // Use reflection interface here.
         D3D12_SHADER_DESC shaderDesc;
-        HRESULT res = pReflection->GetDesc(&shaderDesc);
+        res = pReflection->GetDesc(&shaderDesc);
         if (FAILED(res))
         {
             return shader;
         }
 
-        for ( UINT i = 0U; i < shaderDesc.ConstantBuffers; ++i )
+        for ( auto i = 0U; i < shaderDesc.ConstantBuffers; ++i )
         {
             auto * cbReflection = pReflection->GetConstantBufferByIndex(i);
 
-            D3D12_SHADER_BUFFER_DESC shaderBufferDesc;
-            cbReflection->GetDesc(&shaderBufferDesc);
+            D3D12_SHADER_BUFFER_DESC d3dShaderBufferDesc;
+            cbReflection->GetDesc(&d3dShaderBufferDesc);
 
-            // TODO: parse all constant buffers
-            // hash them
-            // save all unique constant buffer descriptions for the entire program
-            // save the used buffers per shader
-            //shaderBufferDesc.Type
+            if (auto it = mProcessedCBuffers.find(d3dShaderBufferDesc.Name); it != mProcessedCBuffers.end())
+            {
+                // We already processed this buffer for a different shader.
+                //TODO(KL): Remove forcing buffer name uniqueness for the entire shader program
+
+                shader.boundConstantBuffers.push_back(it->second);
+                continue;
+            }
+
+            ConstantBufferDescriptor cbDesc;
+            cbDesc.name = d3dShaderBufferDesc.Name;
+            cbDesc.size = d3dShaderBufferDesc.Size;
+
+            for (auto j = 0U; j < d3dShaderBufferDesc.Variables; ++j)
+            {
+                auto * varReflection = cbReflection->GetVariableByIndex(j);
+
+                D3D12_SHADER_VARIABLE_DESC d3dVarDesc;
+                varReflection->GetDesc(&d3dVarDesc);
+
+                BufferVariableDescriptor varDesc;
+                varDesc.name = d3dVarDesc.Name;
+                varDesc.offset = d3dVarDesc.StartOffset;
+                varDesc.size = d3dVarDesc.Size;
+
+                cbDesc.variables.push_back(varDesc);
+            }
+
+            // Parse the buffer register number from the shader reflection
+            D3D12_SHADER_INPUT_BIND_DESC inputDesc;
+            pReflection->GetResourceBindingDescByName(cbDesc.name.c_str(), &inputDesc);
+            cbDesc.bufferRegister = inputDesc.BindPoint;
+
+            mConstantBufferDescriptors.push_back(std::move(cbDesc));
+
+            const auto boundBufferIdx = static_cast<int>(mConstantBufferDescriptors.size() - 1u);
+            mProcessedCBuffers.insert(std::make_pair(cbDesc.name, boundBufferIdx));
+            shader.boundConstantBuffers.push_back(boundBufferIdx);
         }
     }
 

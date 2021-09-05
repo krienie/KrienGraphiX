@@ -41,6 +41,7 @@ void serialize(Archive & ar, kgx::ConstantBufferDescriptor & cbd, [[maybe_unused
 {
     ar & cbd.name;
     ar & cbd.bufferRegister;
+    ar & cbd.size;
     ar & cbd.variables;
 }
 

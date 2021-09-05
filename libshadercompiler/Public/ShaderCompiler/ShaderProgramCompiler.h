@@ -47,6 +47,7 @@ struct ConstantBufferDescriptor
 {
     std::string name;
     unsigned int bufferRegister;
+    unsigned int size;
     std::vector<BufferVariableDescriptor> variables;
 };
 

@@ -8,7 +8,8 @@
 #include <wrl\client.h>
 
 #include <string>
-#include <optional>
+#include <unordered_map>
+#include <vector>
 
 namespace kgx
 {
@@ -20,8 +21,12 @@ public:
     [[nodiscard]]
     CompiledShader compileShader(const std::string & sourceFile, const std::string & target, bool includeDebugInfo);
 
+    std::vector<ConstantBufferDescriptor> getCBufferDescriptors() const { return mConstantBufferDescriptors; }
+
 private:
     Microsoft::WRL::ComPtr<IDxcUtils> mUtils;
     Microsoft::WRL::ComPtr<IDxcCompiler3> mCompiler;
+    std::unordered_map<std::string, int> mProcessedCBuffers;
+    std::vector<ConstantBufferDescriptor> mConstantBufferDescriptors;
 };
 }

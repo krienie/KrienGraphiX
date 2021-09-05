@@ -50,6 +50,8 @@ CompiledShaderProgram ShaderProgramCompiler::compileProgram(const ShaderProgramD
         program.pixelShader = compiler.compileShader(desc.pixelShaderPath, "ps_6_5", true);
     }
 
+    program.constantBuffers = compiler.getCBufferDescriptors();
+
     return program;
 }
 }
