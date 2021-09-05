@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RenderCoreTestWindow</class>
+ <widget class="QMainWindow" name="RenderCoreTestWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>846</width>
+    <height>676</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>RenderCore V2 Test Application</string>
+  </property>
+  <widget class="RenderCore::Test::RcRenderWidget" name="viewportWidget"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RenderCore::Test::RcRenderWidget</class>
+   <extends>QWidget</extends>
+   <header>RcRenderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

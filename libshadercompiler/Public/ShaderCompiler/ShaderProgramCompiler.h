@@ -8,15 +8,18 @@ namespace kgx
 {
 enum class VertexInputElementFormat
 {
-    R_FLOAT,
-    RGB_FLOAT,
-    RGBA_FLOAT,
-    R_INT,
-    RGB_INT,
-    RGBA_INT,
-    R_UINT,
-    RGB_UINT,
-    RGBA_UINT
+    FLOAT,
+    FLOAT2,
+    FLOAT3,
+    FLOAT4,
+    INT,
+    INT2,
+    INT3,
+    INT4,
+    UINT,
+    UINT2,
+    UINT3,
+    UINT4
 };
 
 struct VertexInputElement
@@ -68,15 +71,18 @@ struct CompiledShaderProgram
     std::vector<ConstantBufferDescriptor> constantBuffers;
 };
 
-const VertexInputElement VertexPositionInput = { "POSITION", VertexInputElementFormat::RGB_FLOAT };
-const VertexInputElement VertexTexCoordInput = { "TEXCOORD", VertexInputElementFormat::RGB_FLOAT };
-const VertexInputElement VertexNormalInput   = { "NORMAL",   VertexInputElementFormat::RGB_FLOAT };
-const VertexInputElement VertexTangentInput  = { "TANGENT",  VertexInputElementFormat::RGB_FLOAT };
+const VertexInputElement VertexPositionInput = { "POSITION", VertexInputElementFormat::FLOAT4 };
+const VertexInputElement VertexTexCoordInput = { "TEXCOORD", VertexInputElementFormat::FLOAT2 };
+const VertexInputElement VertexNormalInput   = { "NORMAL",   VertexInputElementFormat::FLOAT3 };
+const VertexInputElement VertexTangentInput  = { "TANGENT",  VertexInputElementFormat::FLOAT3 };
 
 class ShaderProgramCompiler final
 {
 public:
     [[nodiscard]]
     static CompiledShaderProgram compileProgram(const ShaderProgramDescriptor &desc);
+
+private:
+    ShaderProgramCompiler() = default;
 };
 }

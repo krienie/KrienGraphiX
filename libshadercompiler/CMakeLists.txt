@@ -2,8 +2,10 @@
 set(LIB_NAME libshadercompiler)
 
 file(GLOB_RECURSE Src
-        "*.cpp"
-        "*.h")
+        "Private/*.cpp"
+		"Public/*.cpp"
+        "Private/*.h"
+		"Public/*.h")
 
 add_library(${LIB_NAME} STATIC ${Src})
 
@@ -20,3 +22,5 @@ target_link_libraries(${LIB_NAME}
 #ENDIF()
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})
+
+add_subdirectory(Test)

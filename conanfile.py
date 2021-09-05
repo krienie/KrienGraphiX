@@ -21,3 +21,4 @@ class KrienGraphiXConan(ConanFile):
 
     def requirements(self):
         self.requires("boost/1.75.0")
+        self.requires("gtest/1.11.0")
