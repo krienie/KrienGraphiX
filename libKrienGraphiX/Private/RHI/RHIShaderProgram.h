@@ -26,6 +26,8 @@ class RHIShaderProgram
         virtual ~RHIShaderProgram() = default;
 
         //virtual bool compile(const kgx::ShaderProgramDescriptor &desc) = 0;
-        virtual bool loadCompiled(const decltype(kgx::CompiledShader::byteCode) & byteCode, ShaderType type) = 0;
+        virtual bool setVertexInputLayout(/*define*/) = 0;
+        virtual bool loadCompiledShader(const CompiledShader& shaderDesc, ShaderType type) = 0;
+        virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;
 };
 }

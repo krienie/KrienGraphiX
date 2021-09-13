@@ -26,8 +26,6 @@ elseif(MACOSX)
     set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/x64/release)
 endif()
 
-message("BIN_DIR: ${CMAKE_BINARY_DIR}/x64/debug")
-
 file(GLOB_RECURSE TestDataFiles
         "Data/*")
 foreach(F IN LISTS TestDataFiles)

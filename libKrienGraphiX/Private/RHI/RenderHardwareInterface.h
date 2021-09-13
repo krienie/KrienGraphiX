@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "Private/RHI/RHIDescriptors.h"
 #include "Private/RHI/RHISwapChain.h"
 
 #include <memory>
@@ -56,10 +57,7 @@ class RenderHardwareInterface
         virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;
 
         [[nodiscard]]
-        virtual std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice,
-                                                                         const std::string & name,
-                                                                         unsigned int bufferRegister,
-                                                                         unsigned int bufferSize) = 0;
+        virtual std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) = 0;
 
         //[[nodiscard]]
         //virtual std::shared_ptr<RHITexture2D> createTexture2D(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;

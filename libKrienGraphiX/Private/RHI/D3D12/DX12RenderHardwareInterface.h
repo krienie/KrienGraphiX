@@ -46,9 +46,6 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
         std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) override;
 
         [[nodiscard]]
-        std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice,
-                                                                         const std::string & name,
-                                                                         unsigned int bufferRegister,
-                                                                         unsigned int bufferSize) override;
+        std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) override;
 };
 }

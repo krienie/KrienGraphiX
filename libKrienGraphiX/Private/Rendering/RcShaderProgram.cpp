@@ -19,14 +19,14 @@ std::string RcShaderProgram::getName() const
 
 void RcShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & desc)
 {
-    kgx::CompiledShaderProgram csp = kgx::ShaderProgramCompiler::compileProgram(desc);
+    const kgx::CompiledShaderProgram csp = kgx::ShaderProgramCompiler::compileProgram(desc);
 
     using ShaderType = RHI::RHIShaderProgram::ShaderType;
     auto addToProgramIfValid = [this](const kgx::CompiledShader & compiledShader, ShaderType type)
     {
         if (!compiledShader.byteCode.empty())
         {
-            mRHIShaderProgram->loadCompiled(compiledShader.byteCode, type);
+            mRHIShaderProgram->loadCompiledShader(compiledShader.byteCode, compiledShader.boundConstantBuffers, type);
 
             //TODO(KL): add shader resource descriptors (buffers, textures)
         }
@@ -40,6 +40,8 @@ void RcShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & de
     //TODO(KL): add compute shader support
 
     //TODO(KL): handle compile errors from the ShaderProgramCompiler
+
+
 }
 
 //void RcShaderProgram::loadFromFile(const std::string &compiledShaderProgram)

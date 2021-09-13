@@ -21,6 +21,7 @@ public:
     [[nodiscard]]
     CompiledShader compileShader(const std::string & sourceFile, const std::string & target, bool includeDebugInfo);
 
+    [[nodiscard]]
     std::vector<ConstantBufferDescriptor> getCBufferDescriptors() const { return mConstantBufferDescriptors; }
 
 private:

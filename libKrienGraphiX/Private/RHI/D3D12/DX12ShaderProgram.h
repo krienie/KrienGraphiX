@@ -20,28 +20,35 @@ namespace kgx::RHI
         bool init(RHIGraphicsDevice *device) override;
 
         //bool compile(const kgx::ShaderProgramDescriptor &shaderDesc) override;
-        bool loadCompiled(const decltype(kgx::CompiledShader::byteCode) & byteCode, ShaderType type) override;
+        bool loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type) override;
+        bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor> & bufferDescs) override;
 
-        [[nodiscard]] ID3DBlob * getVertexShader() const { return mVertexShader.Get(); }
-        [[nodiscard]] ID3DBlob * getHullShader() const { return mHullShader.Get(); }
-        [[nodiscard]] ID3DBlob * getDomainShader() const { return mDomainShader.Get(); }
-        [[nodiscard]] ID3DBlob * getGeometryShader() const { return mGeometryShader.Get(); }
-        [[nodiscard]] ID3DBlob * getPixelShader() const { return mPixelShader.Get(); }
+        //[[nodiscard]] ID3DBlob* getVertexShader() const { return mVertexShader.blob.Get(); }
+        //[[nodiscard]] ID3DBlob* getHullShader() const { return mHullShader.blob.Get(); }
+        //[[nodiscard]] ID3DBlob* getDomainShader() const { return mDomainShader.blob.Get(); }
+        //[[nodiscard]] ID3DBlob* getGeometryShader() const { return mGeometryShader.blob.Get(); }
+        //[[nodiscard]] ID3DBlob* getPixelShader() const { return mPixelShader.blob.Get(); }
 
     private:
-        bool processShaderBlob(ID3DBlob *shaderBlob);
+        struct DxShader
+        {
+            Microsoft::WRL::ComPtr<ID3DBlob> blob;
+            std::vector<int> boundConstantBuffers;
+        };
 
-        DX12GraphicsDevice * mDxDevice;
+        bool processShaderBlob(ID3DBlob* shaderBlob);
+
+        DX12GraphicsDevice* mDxDevice;
 
         Microsoft::WRL::ComPtr<ID3D12Heap> mConstantBufferHeap;
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvHeap;
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mConstBuffDescHeap;
         std::vector<DX12ConstantBuffer> mConstantBuffers;
         std::vector<D3D12_INPUT_ELEMENT_DESC> mInputDescs;
 
-        Microsoft::WRL::ComPtr<ID3DBlob> mVertexShader;
-        Microsoft::WRL::ComPtr<ID3DBlob> mHullShader;
-        Microsoft::WRL::ComPtr<ID3DBlob> mDomainShader;
-        Microsoft::WRL::ComPtr<ID3DBlob> mGeometryShader;
-        Microsoft::WRL::ComPtr<ID3DBlob> mPixelShader;
+        DxShader mVertexShader;
+        DxShader mHullShader;
+        DxShader mDomainShader;
+        DxShader mGeometryShader;
+        DxShader mPixelShader;
 };
 }

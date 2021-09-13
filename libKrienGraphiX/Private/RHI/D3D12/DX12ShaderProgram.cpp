@@ -1,13 +1,13 @@
 
 #include "DX12ShaderProgram.h"
 
-
-#include <cassert>
-#include <d3dcompiler.h>
-
 #include "DX12GraphicsDevice.h"
+#include "DX12MemoryUtils.h"
+
+#include <d3dcompiler.h>
 #include "d3dx12.h"
 
+#include <cassert>
 #include <iostream>
 
 namespace
@@ -16,23 +16,29 @@ DXGI_FORMAT toDXGIFormat(kgx::VertexInputElementFormat rhiInputElementFormat)
 {
     switch(rhiInputElementFormat)
     {
-        case kgx::VertexInputElementFormat::R_FLOAT:
+        case kgx::VertexInputElementFormat::FLOAT:
             return DXGI_FORMAT_R32_FLOAT;
-        case kgx::VertexInputElementFormat::RGB_FLOAT:
+        case kgx::VertexInputElementFormat::FLOAT2:
+            return DXGI_FORMAT_R32G32_FLOAT;
+        case kgx::VertexInputElementFormat::FLOAT3:
             return DXGI_FORMAT_R32G32B32_FLOAT;
-        case kgx::VertexInputElementFormat::RGBA_FLOAT:
+        case kgx::VertexInputElementFormat::FLOAT4:
             return DXGI_FORMAT_R32G32B32A32_FLOAT;
-        case kgx::VertexInputElementFormat::R_INT:
+        case kgx::VertexInputElementFormat::INT:
             return DXGI_FORMAT_R32_SINT;
-        case kgx::VertexInputElementFormat::RGB_INT:
+        case kgx::VertexInputElementFormat::INT2:
+            return DXGI_FORMAT_R32G32_SINT;
+        case kgx::VertexInputElementFormat::INT3:
             return DXGI_FORMAT_R32G32B32_SINT;
-        case kgx::VertexInputElementFormat::RGBA_INT:
+        case kgx::VertexInputElementFormat::INT4:
             return DXGI_FORMAT_R32G32B32A32_SINT;
-        case kgx::VertexInputElementFormat::R_UINT:
+        case kgx::VertexInputElementFormat::UINT:
             return DXGI_FORMAT_R32_UINT;
-        case kgx::VertexInputElementFormat::RGB_UINT:
+        case kgx::VertexInputElementFormat::UINT2:
+            return DXGI_FORMAT_R32G32_UINT;
+        case kgx::VertexInputElementFormat::UINT3:
             return DXGI_FORMAT_R32G32B32_UINT;
-        case kgx::VertexInputElementFormat::RGBA_UINT:
+        case kgx::VertexInputElementFormat::UINT4:
             return DXGI_FORMAT_R32G32B32A32_UINT;
     }
 
@@ -49,6 +55,10 @@ UINT getDXGISize(DXGI_FORMAT format)
         case DXGI_FORMAT_R32_SINT:
         case DXGI_FORMAT_R32_UINT:
             return 4;
+        case DXGI_FORMAT_R32G32_FLOAT:
+        case DXGI_FORMAT_R32G32_SINT:
+        case DXGI_FORMAT_R32G32_UINT:
+            return 8;
         case DXGI_FORMAT_R32G32B32_FLOAT:
         case DXGI_FORMAT_R32G32B32_SINT:
         case DXGI_FORMAT_R32G32B32_UINT:
@@ -88,7 +98,7 @@ bool DX12ShaderProgram::init(RHIGraphicsDevice* device)
     return true;
 }
 
-bool DX12ShaderProgram::loadCompiled(const decltype(kgx::CompiledShader::byteCode) & byteCode, ShaderType type)
+bool DX12ShaderProgram::loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type)
 {
     auto createAndFillShaderBlob = [](auto byteCode, auto blob)
     {
@@ -99,23 +109,83 @@ bool DX12ShaderProgram::loadCompiled(const decltype(kgx::CompiledShader::byteCod
     switch (type)
     {
         case ShaderType::Vertex:
-            createAndFillShaderBlob(byteCode, mVertexShader);
+            createAndFillShaderBlob(shaderDesc.byteCode, mVertexShader.blob);
+            mVertexShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
             break;
         case ShaderType::Hull:
-            createAndFillShaderBlob(byteCode, mHullShader);
+            createAndFillShaderBlob(shaderDesc.byteCode, mHullShader.blob);
+            mHullShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
             break;
         case ShaderType::Domain:
-            createAndFillShaderBlob(byteCode, mDomainShader);
+            createAndFillShaderBlob(shaderDesc.byteCode, mDomainShader.blob);
+            mDomainShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
             break;
         case ShaderType::Geometry:
-            createAndFillShaderBlob(byteCode, mGeometryShader);
+            createAndFillShaderBlob(shaderDesc.byteCode, mGeometryShader.blob);
+            mGeometryShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
             break;
         case ShaderType::Pixel:
-            createAndFillShaderBlob(byteCode, mPixelShader);
+            createAndFillShaderBlob(shaderDesc.byteCode, mPixelShader.blob);
+            mPixelShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
             break;
     }
 
     return true;
+}
+
+bool DX12ShaderProgram::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
+{
+    const UINT64 bufferHeapSize = [&bufferDescs]
+    {
+        UINT64 totalSize = 0u;
+        for (auto & constBuffDesc : bufferDescs)
+        {
+            const auto alignedConstBufferSize = DX12MemoryUtils::alignTo256Bytes(constBuffDesc.size);
+            totalSize += DX12MemoryUtils::alignTo64KBytes(alignedConstBufferSize);
+        }
+
+        return totalSize;
+    }();
+
+    auto *dxNativeDevice = mDxDevice->getNativeDevice();
+    
+    const CD3DX12_HEAP_DESC heapDesc(bufferHeapSize, D3D12_HEAP_TYPE_UPLOAD, D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
+    dxNativeDevice->CreateHeap(&heapDesc, IID_PPV_ARGS(&mConstantBufferHeap));
+
+    D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
+    cbvHeapDesc.NumDescriptors = static_cast<UINT>(bufferDescs.size());
+    cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    dxNativeDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mConstBuffDescHeap));
+
+    const auto cbvDescriptorSize = dxNativeDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+    CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHandle(mConstBuffDescHeap->GetCPUDescriptorHandleForHeapStart());
+
+    UINT64 heapOffset = 0u;
+    for (const auto & buffDesc : bufferDescs)
+    {
+        // Calculate current heap offset
+        //TODO(KL): Optimize. This is already calculated above.
+        const auto alignedConstBufferSize = DX12MemoryUtils::alignTo256Bytes(buffDesc.size);
+        heapOffset += DX12MemoryUtils::alignTo64KBytes(alignedConstBufferSize);
+
+        // create DX12ConstantBuffer
+        DX12ConstantBufferDescriptor cbDesc
+        {
+            buffDesc.name,
+            buffDesc.bufferRegister,
+            buffDesc.size,
+            mConstantBufferHeap,
+            heapOffset,
+            cbvHandle
+        };
+
+        mConstantBuffers.emplace_back(buffDesc.size, cbDesc);
+        cbvHandle.Offset(1, cbvDescriptorSize);
+    }
+
+    return false;
 }
 
 //void DX12ShaderProgram::loadFromFile(const std::string &blobFile, ShaderType type)

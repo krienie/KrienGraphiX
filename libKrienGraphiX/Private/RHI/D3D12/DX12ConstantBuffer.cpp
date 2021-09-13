@@ -1,28 +1,17 @@
 
 #include "DX12ConstantBuffer.h"
+#include "DX12Descriptors.h"
+#include "DX12GraphicsDevice.h"
+#include "DX12MemoryUtils.h"
 
 #include <cassert>
-
-
-#include "DX12GraphicsDevice.h"
-
-namespace
-{
-unsigned int alignTo256Bytes(unsigned int inSize)
-{
-    const unsigned int alignedSize = ((inSize - 1u) / 256u + 1u) * 256u;
-
-    // Constant buffers must be 256-byte aligned
-    assert(alignedSize % 256 == 0);
-
-    return alignedSize;
-}
-}
+#include <utility>
 
 namespace kgx::RHI
 {
-DX12ConstantBuffer::DX12ConstantBuffer(unsigned int sizeInBytes, CD3DX12_CPU_DESCRIPTOR_HANDLE descHeapHandle)
-    : RHIConstantBuffer(alignTo256Bytes(sizeInBytes)), mCurMapType(MapType::READ_WRITE), mResource(nullptr), mDescHeapHandle(descHeapHandle)
+DX12ConstantBuffer::DX12ConstantBuffer(size_t sizeInBytes, DX12ConstantBufferDescriptor descriptor)
+    : RHIConstantBuffer(DX12MemoryUtils::alignTo256Bytes(sizeInBytes)), mCurMapType(MapType::READ_WRITE), mResource(nullptr),
+    mDescriptor(std::move(descriptor))
 {
 }
 
@@ -37,14 +26,17 @@ bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
 
     auto * nativeDevice = dxDevice->getNativeDevice();
 
+    D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize());
+    const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap, mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
+
     // Create committed resource for the constant buffer data to live in
-    const HRESULT res = nativeDevice->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer(bufferSize()),
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&mResource));
+    //const HRESULT res = nativeDevice->CreateCommittedResource(
+    //    &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+    //    D3D12_HEAP_FLAG_NONE,
+    //    &CD3DX12_RESOURCE_DESC::Buffer(bufferSize()),
+    //    D3D12_RESOURCE_STATE_GENERIC_READ,
+    //    nullptr,
+    //    IID_PPV_ARGS(&mResource));
 
     if (FAILED(res))
     {
@@ -54,8 +46,8 @@ bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
     // Describe and create a constant buffer view.
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
     cbvDesc.BufferLocation = mResource->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = bufferSize();
-    nativeDevice->CreateConstantBufferView(&cbvDesc, mDescHeapHandle);
+    cbvDesc.SizeInBytes = static_cast<UINT>(bufferSize());
+    nativeDevice->CreateConstantBufferView(&cbvDesc, mDescriptor.descriptorHandle);
 
     return true;
 }

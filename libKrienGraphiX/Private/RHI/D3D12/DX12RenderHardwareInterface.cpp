@@ -90,10 +90,7 @@ std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthS
     return std::move(depthStencilBuffer);
 }
 
-std::unique_ptr<RHIConstantBuffer> DX12RenderHardwareInterface::createConstantBuffer(RHIGraphicsDevice * graphicsDevice,
-                                                                                      const std::string & name,
-                                                                                      unsigned int bufferRegister,
-                                                                                      unsigned int bufferSize)
+std::unique_ptr<RHIConstantBuffer> DX12RenderHardwareInterface::createConstantBuffer(RHIGraphicsDevice * graphicsDevice, RHIConstantBufferDescriptor cbDescriptor)
 {
     return std::unique_ptr<RHIConstantBuffer>();
 }
