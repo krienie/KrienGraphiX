@@ -36,7 +36,7 @@ namespace kgx::RHI
             std::vector<int> boundConstantBuffers;
         };
 
-        bool processShaderBlob(ID3DBlob* shaderBlob);
+        bool createRootSignature();
 
         DX12GraphicsDevice* mDxDevice;
 

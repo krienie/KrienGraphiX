@@ -188,6 +188,25 @@ bool DX12ShaderProgram::loadConstantBuffers(const std::vector<ConstantBufferDesc
     return false;
 }
 
+bool DX12ShaderProgram::createRootSignature()
+{
+    auto *dxNativeDevice = mDxDevice->getNativeDevice();
+
+    D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
+
+    featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+
+    if (FAILED(dxNativeDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+    {
+        // Fallback to older version
+        featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
+    }
+
+
+
+    return false;
+}
+
 //void DX12ShaderProgram::loadFromFile(const std::string &blobFile, ShaderType type)
 //{
 //    std::wstring wShaderFile = std::wstring( blobFile.begin(), blobFile.end() );
@@ -245,25 +264,4 @@ bool DX12ShaderProgram::loadConstantBuffers(const std::vector<ConstantBufferDesc
 
     return true;
 }*/
-
-bool DX12ShaderProgram::processShaderBlob(ID3DBlob *)
-{
-    auto * nativeDevice = mDxDevice->getNativeDevice();
-
-    return false;
-
-    // Create and commit resource to store the data in
-    //HRESULT res = nativeDevice->CreateCommittedResource(
-    //        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-    //        D3D12_HEAP_FLAG_NONE,
-    //        &CD3DX12_RESOURCE_DESC::Buffer(constantBufferSize),
-    //        D3D12_RESOURCE_STATE_GENERIC_READ,
-    //        nullptr,
-    //        IID_PPV_ARGS(&mConstantBuffer));
-    //
-    //if (FAILED(res))
-    //{
-    //    return false;
-    //}
-}
 }
