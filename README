@@ -1,12 +1,4 @@
-Requirements
+Redesign in progress for supporting DirectX 12 and other API's.
+See branch dx12.
 
-QT - 5.7.* binaries
-Visual Studio Add-in 2.0.0 for Qt5 MSVC 2015
-build latest boost (1.60.0 / 1.63.0)
-
-get physx(3.3) source - build it. 
-
-add BOOST_DIR env var to boost directory 
-add PHYSX_DIR env var to physx directory 
-
-set default Visual Studio QT version
+More to come later.
