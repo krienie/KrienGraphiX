@@ -15,12 +15,6 @@ target_link_libraries(${LIB_NAME}
                             dxc
                             CONAN_PKG::boost)
 
-#IF (WIN32)
-#    target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib)
-#ELSE()
-#    # TODO(KL): other platforms
-#ENDIF()
-
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})
 
 add_subdirectory(Test)

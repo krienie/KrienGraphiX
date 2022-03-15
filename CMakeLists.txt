@@ -29,20 +29,15 @@ else()
     add_compile_options(-Wextra -Werror -Wunused-parameter)
 endif()
 
-
-# Conan setup
-conan_cmake_run(
-            CONANFILE conanfile.py
-            BASIC_SETUP CMAKE_TARGETS
-            BUILD missing cascade
-            )
-
+conan_cmake_run(REQUIRES boost/1.78.0 gtest/1.11.0
+                BASIC_SETUP CMAKE_TARGETS
+                BUILD missing
+                REMOTE conan-center)
 
 add_subdirectory(dxc)
 add_subdirectory(libshadercompiler)
 add_subdirectory(shadercompiler)
 add_subdirectory(libkriengraphix)
-#add_subdirectory(test)
 
 
 # Footnotes:
