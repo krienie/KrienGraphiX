@@ -7,6 +7,7 @@ include(cmake/functions.cmake)
 project(KrienGraphiX CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+add_definitions(-D_UNICODE -DUNICODE)
 
 if (MSVC)
     #Visual studio shouldn't introduce macros for min /max
@@ -38,6 +39,7 @@ add_subdirectory(dxc)
 add_subdirectory(libshadercompiler)
 add_subdirectory(shadercompiler)
 add_subdirectory(libkriengraphix)
+add_subdirectory(KGToolbox)
 
 
 # Footnotes:
