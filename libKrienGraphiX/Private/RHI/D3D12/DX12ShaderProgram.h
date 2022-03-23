@@ -20,6 +20,7 @@ namespace kgx::RHI
         bool init(RHIGraphicsDevice *device) override;
 
         //bool compile(const kgx::ShaderProgramDescriptor &shaderDesc) override;
+        bool setVertexInputLayout(/*define*/) override;
         bool loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type) override;
         bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor> & bufferDescs) override;
 

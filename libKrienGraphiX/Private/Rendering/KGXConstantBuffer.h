@@ -12,11 +12,11 @@ namespace kgx::Rendering
 {
 using ConstantBufferDescriptor = kgx::ConstantBufferDescriptor;
 
-class RcConstantBuffer final
+class KGXConstantBuffer final
 {
     public:
-        RcConstantBuffer(const ConstantBufferDescriptor & descriptor);
-        ~RcConstantBuffer() = default;
+        KGXConstantBuffer(const ConstantBufferDescriptor & descriptor);
+        ~KGXConstantBuffer() = default;
 
         [[nodiscard]] std::string name() const;
 

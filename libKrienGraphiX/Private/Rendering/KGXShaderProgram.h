@@ -7,21 +7,21 @@
 
 #include <ShaderCompiler/ShaderProgramCompiler.h>
 
-#include "Private/Rendering/RcShaderParameter.h"
+#include "Private/Rendering/KGXShaderParameter.h"
 #include "Private/RHI/RHIConstantBuffer.h"
 #include "Private/RHI/RHIShaderProgram.h"
 
 namespace kgx::Rendering
 {
-class RcShaderProgram
+class KGXShaderProgram
 {
     public:
         using InputElementFormat = kgx::VertexInputElementFormat;
         using VertexInputElement = kgx::VertexInputElement;
         using ShaderProgramDescriptor = kgx::ShaderProgramDescriptor;
 
-        RcShaderProgram(std::string name);
-        virtual ~RcShaderProgram() = default;
+        KGXShaderProgram(std::string name);
+        virtual ~KGXShaderProgram() = default;
 
         [[nodiscard]] std::string getName() const;
 
@@ -39,6 +39,6 @@ class RcShaderProgram
         std::unique_ptr<RHI::RHIShaderProgram> mRHIShaderProgram;
 
         std::vector<RHI::RHIConstantBuffer> mRHIConstantBuffers;
-        std::vector<RcShaderParameter> mShaderParameters;
+        std::vector<KGXShaderParameter> mShaderParameters;
 };
 }

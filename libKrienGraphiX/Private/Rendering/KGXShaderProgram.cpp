@@ -1,5 +1,5 @@
 
-#include "Private/Rendering/RcShaderProgram.h"
+#include "Private/Rendering/KGXShaderProgram.h"
 
 #include <ShaderCompiler/ShaderProgramCompiler.h>
 
@@ -7,17 +7,17 @@
 
 namespace kgx::Rendering
 {
-RcShaderProgram::RcShaderProgram(std::string name)
+KGXShaderProgram::KGXShaderProgram(std::string name)
     : mName(std::move(name)), mRHIShaderProgram(core::RenderCore::get()->getRHI()->createShaderProgram())
 {
 }
 
-std::string RcShaderProgram::getName() const
+std::string KGXShaderProgram::getName() const
 {
     return mName;
 }
 
-void RcShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & desc)
+void KGXShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & desc)
 {
     const kgx::CompiledShaderProgram csp = kgx::ShaderProgramCompiler::compileProgram(desc);
 
@@ -26,7 +26,7 @@ void RcShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & de
     {
         if (!compiledShader.byteCode.empty())
         {
-            mRHIShaderProgram->loadCompiledShader(compiledShader.byteCode, compiledShader.boundConstantBuffers, type);
+            mRHIShaderProgram->loadCompiledShader(compiledShader, type);
 
             //TODO(KL): add shader resource descriptors (buffers, textures)
         }
@@ -44,7 +44,7 @@ void RcShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & de
 
 }
 
-//void RcShaderProgram::loadFromFile(const std::string &compiledShaderProgram)
+//void KGXShaderProgram::loadFromFile(const std::string &compiledShaderProgram)
 //{
 //    //mRHIShaderProgram->loadFromFile(shaderFile, type);
 //}

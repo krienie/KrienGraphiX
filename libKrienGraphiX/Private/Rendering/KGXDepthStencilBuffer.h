@@ -7,11 +7,11 @@
 
 namespace kgx::Rendering
 {
-class RcDepthStencilBuffer final
+class KGXDepthStencilBuffer final
 {
     public:
-        RcDepthStencilBuffer(unsigned int width, unsigned int height);
-        ~RcDepthStencilBuffer() = default;
+        KGXDepthStencilBuffer(unsigned int width, unsigned int height);
+        ~KGXDepthStencilBuffer() = default;
 
     private:
         std::unique_ptr<RHI::RHIDepthStencilBuffer> mRHIDepthStencilBuffer;

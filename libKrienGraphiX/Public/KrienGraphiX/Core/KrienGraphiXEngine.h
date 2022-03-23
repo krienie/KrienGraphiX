@@ -1,14 +1,19 @@
 
 #pragma once
 
+#include <Windows.h>
+
+namespace kgx::core
+{
+class RenderWindow;
+}
+
 class KrienGraphiXEngine final
 {
-    public:
-        KrienGraphiXEngine();
-        ~KrienGraphiXEngine();
+public:
+    KrienGraphiXEngine();
+    ~KrienGraphiXEngine();
 
-        //RenderWindow* createRenderWindow( HWND windowHandle );
-        //RenderWindow* getRenderWindow() const;
-
-        void render();
+    kgx::core::RenderWindow* createRenderWindow( HWND windowHandle );
+    //RenderWindow* getRenderWindow() const;
 };

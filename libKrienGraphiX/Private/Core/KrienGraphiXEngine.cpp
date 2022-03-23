@@ -16,7 +16,9 @@ KrienGraphiXEngine::~KrienGraphiXEngine()
     RenderCore::shutdown();
 }
 
-void KrienGraphiXEngine::render()
+//TODO(KL): Temporary maybe_unused
+RenderWindow* KrienGraphiXEngine::createRenderWindow([[maybe_unused]] HWND windowHandle)
 {
-    RenderCore::get()->render();
+    // Create window
+    return nullptr;
 }

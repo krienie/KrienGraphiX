@@ -98,6 +98,11 @@ bool DX12ShaderProgram::init(RHIGraphicsDevice* device)
     return true;
 }
 
+bool DX12ShaderProgram::setVertexInputLayout()
+{
+    return false;
+}
+
 bool DX12ShaderProgram::loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type)
 {
     auto createAndFillShaderBlob = [](auto byteCode, auto blob)

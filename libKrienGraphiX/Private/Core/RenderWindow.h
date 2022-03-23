@@ -9,11 +9,11 @@ namespace kgx::core
 {
 typedef RHI::WinHandle WinHandle;
 
-class RcRenderWindow final
+class RenderWindow final
 {
     public:
-        RcRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
-        ~RcRenderWindow() = default;
+        RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
+        ~RenderWindow() = default;
 
     private:
         std::unique_ptr<RHI::RHISwapChain> mRHISwapChain;

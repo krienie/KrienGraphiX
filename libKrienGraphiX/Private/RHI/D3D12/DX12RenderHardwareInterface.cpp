@@ -57,7 +57,10 @@ std::unique_ptr<RHIShaderProgram> DX12RenderHardwareInterface::createShaderProgr
     return std::make_unique<DX12ShaderProgram>();
 }
 
-std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState(RHIGraphicsDevice * graphicsDevice)
+
+
+//TODO(KL): Temporary maybe_unused
+std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState([[maybe_unused]] RHIGraphicsDevice * graphicsDevice)
 {
     auto pipelineState = std::make_unique<DX12GraphicsPipelineState>();
     //if (!pipelineState->init(graphicsDevice))
@@ -90,7 +93,8 @@ std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthS
     return std::move(depthStencilBuffer);
 }
 
-std::unique_ptr<RHIConstantBuffer> DX12RenderHardwareInterface::createConstantBuffer(RHIGraphicsDevice * graphicsDevice, RHIConstantBufferDescriptor cbDescriptor)
+//TODO(KL): Temporary maybe_unused
+std::unique_ptr<RHIConstantBuffer> DX12RenderHardwareInterface::createConstantBuffer([[maybe_unused]] RHIGraphicsDevice * graphicsDevice, [[maybe_unused]] RHIConstantBufferDescriptor cbDescriptor)
 {
     return std::unique_ptr<RHIConstantBuffer>();
 }

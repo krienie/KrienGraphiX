@@ -43,7 +43,7 @@ RenderCore::RenderCore()
 #ifdef WIN32
     mRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
 #else
-    static_assert(false, "Only Windows 10 (DirectX 12) is currently supported");
+    static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
 #endif
 
     mGraphicsDevice = mRHI->createGraphicsDevice();
@@ -64,14 +64,4 @@ RHI::RenderHardwareInterface * RenderCore::getRHI() const
 {
     return mRHI.get();
 }
-
-void RenderCore::render()
-{
-    mRenderThread.enqueueRenderCommand([]()
-    {
-        // RenderJob
-        // method->render();
-    });
-}
-
 }

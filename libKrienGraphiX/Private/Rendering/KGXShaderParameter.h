@@ -5,13 +5,13 @@
 
 namespace kgx::Rendering
 {
-    class RcShaderProgram;
+    class KGXShaderProgram;
 
-    class RcShaderParameter final
+    class KGXShaderParameter final
 {
     public:
-        RcShaderParameter(std::string name, unsigned int size, unsigned int offset, int bufferIndex, RcShaderProgram *parentShaderProgram);
-        ~RcShaderParameter() = default;
+        KGXShaderParameter(std::string name, unsigned int size, unsigned int offset, int bufferIndex, KGXShaderProgram *parentShaderProgram);
+        ~KGXShaderParameter() = default;
 
         [[nodiscard]] std::string getName() const;
         [[nodiscard]] unsigned int getSizeInBytes() const;
@@ -23,6 +23,6 @@ namespace kgx::Rendering
         unsigned int mSizeInBytes;
         unsigned int mOffset;
         int mBufferIndex;
-        RcShaderProgram *mParentShaderProgram;
+        KGXShaderProgram *mParentShaderProgram;
 };
 }

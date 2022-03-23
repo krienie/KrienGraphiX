@@ -37,7 +37,7 @@ void RenderThread::enqueueRenderCommand(RenderCommand cmd)
 
 void RenderThread::flush()
 {
-    //TODO(KL): This only makes sure the render commands are fired. Implement an actual GPU fence as well
+    //TODO(KL): This only makes sure the render commands are fired. Implement an actual GPU fence as well (As a command itself that blocks)
 
     std::unique_lock<std::mutex> lock(mEnqueueMutex);
     mCvFinished.wait(lock, [this](){ return mCommands.empty() && mNumBusyThreads == 0u; });

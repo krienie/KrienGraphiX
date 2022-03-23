@@ -18,9 +18,7 @@ class DX12GraphicsPipelineState final : public RHIGraphicsPipelineState
 
         [[nodiscard]]
         ID3D12PipelineState * getPipelineState() const;
-
-        void setShaderProgram(RHIShaderProgram * shaderProgram) override;
-
+        
     private:
         Microsoft::WRL::ComPtr<ID3D12PipelineState> mPipelineState;
 };

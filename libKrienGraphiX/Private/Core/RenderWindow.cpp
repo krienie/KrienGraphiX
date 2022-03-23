@@ -1,12 +1,12 @@
 
-#include "RcRenderWindow.h"
+#include "RenderWindow.h"
 
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "RenderCore.h"
 
 namespace kgx::core
 {
-RcRenderWindow::RcRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
+RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
     : mRHISwapChain(nullptr)
 {
     auto * renderEngine = RenderCore::get();

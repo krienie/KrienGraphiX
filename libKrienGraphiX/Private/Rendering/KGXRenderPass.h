@@ -5,13 +5,13 @@
 
 #include "Private/RHI/RHIGraphicsCommandList.h"
 
-namespace kgx::RenderMethods
+namespace kgx::Rendering
 {
-class RenderPass
+class KGXRenderPass
 {
     public:
-        RenderPass();
-        virtual ~RenderPass() = default;
+        KGXRenderPass();
+        virtual ~KGXRenderPass() = default;
 
         virtual void preRenderSetup() = 0;
         virtual void update() = 0;

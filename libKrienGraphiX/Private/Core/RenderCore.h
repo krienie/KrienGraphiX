@@ -28,8 +28,6 @@ class RenderCore final
             //RenderWindow* createRenderWindow( HWND windowHandle );
             //RenderWindow* getRenderWindow() const;
 
-            void render();
-
         private:
             RenderCore();
             ~RenderCore() = default;

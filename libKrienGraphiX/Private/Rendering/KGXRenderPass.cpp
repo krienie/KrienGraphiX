@@ -1,14 +1,14 @@
 
-#include "RenderPass.h"
+#include "KGXRenderPass.h"
 
 #include "Private/Core/RenderCore.h"
 
-namespace kgx::RenderMethods
+namespace kgx::Rendering
 {
-RenderPass::RenderPass()
+KGXRenderPass::KGXRenderPass()
     : mCommandList(nullptr)
 {
-    auto * renderEngine = core::RenderCore::get();
+    const auto* renderEngine = core::RenderCore::get();
     mCommandList = renderEngine->getRHI()->createGraphicsCommandList(renderEngine->getGraphicsDevicePtr(), nullptr);
 }
 }

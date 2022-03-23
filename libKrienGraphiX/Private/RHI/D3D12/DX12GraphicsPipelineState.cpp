@@ -10,7 +10,8 @@ DX12GraphicsPipelineState::DX12GraphicsPipelineState()
     : RHIGraphicsPipelineState(), mPipelineState(nullptr)
 {}
 
-bool DX12GraphicsPipelineState::construct(RHIGraphicsDevice * device)
+//TODO(KL): Temporary maybe_unused
+bool DX12GraphicsPipelineState::construct([[maybe_unused]] RHIGraphicsDevice * device)
 {
     //auto * dxShaderProgram = dynamic_cast<DX12ShaderProgram*>(shaderProgram);
     //if (dxShaderProgram == nullptr)
@@ -27,15 +28,15 @@ ID3D12PipelineState * DX12GraphicsPipelineState::getPipelineState() const
     return mPipelineState.Get();
 }
 
-void DX12GraphicsPipelineState::setShaderProgram(RHIShaderProgram * shaderProgram)
-{
-    ID3D12RootSignature                *pRootSignature;       // uit shaderprogram
-    D3D12_SHADER_BYTECODE              VS;                    // uit shaderprogram
-    D3D12_SHADER_BYTECODE              PS;                    // uit shaderprogram
-    D3D12_SHADER_BYTECODE              DS;                    // uit shaderprogram
-    D3D12_SHADER_BYTECODE              HS;                    // uit shaderprogram
-    D3D12_SHADER_BYTECODE              GS;                    // uit shaderprogram
-    D3D12_INPUT_LAYOUT_DESC            InputLayout;           // uit shaderprogram
-}
+//void DX12GraphicsPipelineState::setShaderProgram(RHIShaderProgram * shaderProgram)
+//{
+//    ID3D12RootSignature                *pRootSignature;       // uit shaderprogram
+//    D3D12_SHADER_BYTECODE              VS;                    // uit shaderprogram
+//    D3D12_SHADER_BYTECODE              PS;                    // uit shaderprogram
+//    D3D12_SHADER_BYTECODE              DS;                    // uit shaderprogram
+//    D3D12_SHADER_BYTECODE              HS;                    // uit shaderprogram
+//    D3D12_SHADER_BYTECODE              GS;                    // uit shaderprogram
+//    D3D12_INPUT_LAYOUT_DESC            InputLayout;           // uit shaderprogram
+//}
 
 } // namespace kgx::RHI

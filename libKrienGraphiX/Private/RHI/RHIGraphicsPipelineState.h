@@ -33,6 +33,7 @@ typedef struct D3D12_GRAPHICS_PIPELINE_STATE_DESC {
   D3D12_PIPELINE_STATE_FLAGS         Flags;                 // Unsupported. Always set to NONE.
 } D3D12_GRAPHICS_PIPELINE_STATE_DESC;
      */
+
 class RHIGraphicsPipelineState
 {
 public:

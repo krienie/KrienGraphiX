@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include "Private/RHI/RHICommandQueue.h"
 #include "Private/RHI/RHIDescriptors.h"
+#include "Private/RHI/RHIGraphicsDevice.h"
 #include "Private/RHI/RHISwapChain.h"
 
 #include <memory>
@@ -9,11 +11,9 @@
 
 namespace kgx::RHI
 {
-class RHICommandQueue;
 class RHIConstantBuffer;
 class RHIDepthStencilBuffer;
 class RHIGraphicsCommandList;
-class RHIGraphicsDevice;
 class RHIGraphicsPipelineState;
 class RHIShaderProgram;
 class RHITexture2D;

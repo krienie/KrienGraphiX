@@ -27,7 +27,7 @@ bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
     auto * nativeDevice = dxDevice->getNativeDevice();
 
     D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize());
-    const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap, mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
+    const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap.Get(), mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
 
     // Create committed resource for the constant buffer data to live in
     //const HRESULT res = nativeDevice->CreateCommittedResource(
