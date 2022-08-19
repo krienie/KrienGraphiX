@@ -11,4 +11,6 @@ file(GLOB_RECURSE Resources
 
 add_executable(${EXE_NAME} WIN32 ${Src} ${Resources})
 
+target_link_libraries(${EXE_NAME} PRIVATE libkriengraphix)
+
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Resource Files" FILES ${Resources})

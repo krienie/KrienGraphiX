@@ -4,18 +4,13 @@
 #include "framework.h"
 #include "KGToolbox.h"
 
-#define MAX_LOADSTRING 100
+namespace
+{
+kgt::KGToolboxApp* KGToolboxPtr = nullptr;
+}
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
-// Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -24,111 +19,125 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
 
-    // TODO: Place code here.
+    // Enable run-time memory check for debug builds.
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
 
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_KGTOOLBOX, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+    kgt::KGToolboxApp KGTApp(hInstance, 1024, 768);
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
-    
-    MSG msg;
+    KGToolboxPtr = &KGTApp;
 
-    // Main message loop:
-    while(true)
-    {
-        if (PeekMessage(&msg, nullptr,  0, 0, PM_REMOVE)) 
-        { 
-            if (msg.message == WM_QUIT)
-            {
-                break;
-            }
+    return KGTApp.Run();
+}
 
-            TranslateMessage(&msg);
-            DispatchMessage(&msg); 
-        }
-        else
+namespace kgt
+{
+KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, int initialWindowWidth, int initialWindowHeight)
+    : mHInstance(hInstance), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
+{
+    // Init main window
+    auto windowHandle = InitWin32Window();
+
+    // Startup KGX
+    //TODO(KL): Startup KGX
+}
+
+int KGToolboxApp::Run()
+{
+    MSG msg = {nullptr};
+ 
+	//mTimer.Reset();
+
+	while(msg.message != WM_QUIT)
+	{
+		// If there are Window messages then process them.
+		if(PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
+		{
+            TranslateMessage( &msg );
+            DispatchMessage( &msg );
+		}
+		// Otherwise, do animation/game stuff.
+		else
         {
-            //TODO(KL): render :)
+            //TODO(KL): call all active RenderWindows
+			//mTimer.Tick();
+            //
+			//if( !mAppPaused )
+			//{
+			//	CalculateFrameStats();
+			//	Update(mTimer);	
+            //    Draw(mTimer);
+			//}
+			//else
+			{
+				Sleep(100);
+			}
         }
     }
 
-    return (int) msg.wParam;
+	return static_cast<int>(msg.wParam);
 }
 
-
-
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
+HWND KGToolboxApp::InitWin32Window() const
 {
-    WNDCLASSEXW wcex;
+    auto loadResourceWString = [this](int resourceId)
+    {
+        constexpr int maxLoadStringSize = 100;
+        std::wstring resourceString;
+        resourceString.resize(maxLoadStringSize);
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+        LoadStringW(mHInstance, resourceId, resourceString.data(), maxLoadStringSize);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_KGTOOLBOX));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_KGTOOLBOX);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+        return resourceString;
+    };
 
-    return RegisterClassExW(&wcex);
+    const std::wstring windowTitle = loadResourceWString(IDS_APP_TITLE);
+    const std::wstring windowClass = loadResourceWString(IDC_KGTOOLBOX);
+
+    WNDCLASSEXW wndClassEx;
+    wndClassEx.cbSize = sizeof(WNDCLASSEX);
+    wndClassEx.style          = CS_HREDRAW | CS_VREDRAW;
+    wndClassEx.lpfnWndProc    = MainWndProc;
+    wndClassEx.cbClsExtra     = 0;
+    wndClassEx.cbWndExtra     = 0;
+    wndClassEx.hInstance      = mHInstance;
+    wndClassEx.hIcon          = LoadIcon(mHInstance, MAKEINTRESOURCE(IDI_KGTOOLBOX));
+    wndClassEx.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+    wndClassEx.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
+    wndClassEx.lpszMenuName   = MAKEINTRESOURCEW(IDC_KGTOOLBOX);
+    wndClassEx.lpszClassName  = windowClass.c_str();
+    wndClassEx.hIconSm        = LoadIcon(wndClassEx.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    
+	if( !RegisterClassExW(&wndClassEx) )
+	{
+		MessageBox(0, L"RegisterClass Failed.", 0, 0);
+		return false;
+	}
+
+	// Compute window rectangle dimensions based on requested client area dimensions.
+	RECT clientRect = { 0, 0, mClientWidth, mClientHeight };
+    AdjustWindowRect(&clientRect, WS_OVERLAPPEDWINDOW, false);
+	const int width  = clientRect.right - clientRect.left;
+	const int height = clientRect.bottom - clientRect.top;
+    
+	const auto windowHandle = CreateWindow(wndClassEx.lpszClassName, windowTitle.c_str(), 
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, mHInstance, nullptr); 
+	if( !windowHandle )
+	{
+		MessageBox(0, L"CreateWindow Failed.", nullptr, 0);
+		return nullptr;
+	}
+
+	ShowWindow(windowHandle, SW_SHOW);
+	UpdateWindow(windowHandle);
+
+	return windowHandle;
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-   hInst = hInstance; // Store instance handle in our global variable
-
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
-   if (!hWnd)
-   {
-      return FALSE;
-   }
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
-}
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT KGToolboxApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -139,7 +148,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+                DialogBox(mHInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
@@ -149,14 +158,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
+    //case WM_PAINT:
+    //    {
+    //        PAINTSTRUCT ps;
+    //        HDC hdc = BeginPaint(hWnd, &ps);
+    //        // TODO: Add any drawing code that uses hdc here...
+    //        EndPaint(hWnd, &ps);
+    //    }
+    //    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -165,11 +174,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
+}
+
+LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    return KGToolboxPtr->MsgProc(hWnd, message, wParam, lParam);
+}
 
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
+
     switch (message)
     {
     case WM_INITDIALOG:
@@ -181,6 +197,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
         }
+        break;
+
+    default:
         break;
     }
     return (INT_PTR)FALSE;

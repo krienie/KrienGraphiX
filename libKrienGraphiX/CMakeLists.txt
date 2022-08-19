@@ -11,7 +11,7 @@ target_include_directories(${LIB_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT
 target_link_libraries(${LIB_NAME} PRIVATE libshadercompiler)
 
 IF (WIN32)
-    target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib)
+    target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib dxgi.lib D3DCompiler.lib)
 ELSE()
     # TODO(KL): other platforms
 ENDIF()

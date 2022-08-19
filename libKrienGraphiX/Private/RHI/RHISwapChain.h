@@ -5,12 +5,12 @@
 
 #include <memory>
 
+#include "KrienGraphiX/Core/KGXDefinitions.h"
+
 namespace kgx::RHI
 {
 class RHICommandQueue;
 class RHIGraphicsDevice;
-
-typedef unsigned int * WinHandle;
 
 class RHISwapChain
 {

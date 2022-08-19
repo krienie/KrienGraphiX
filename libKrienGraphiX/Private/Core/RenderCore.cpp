@@ -46,6 +46,8 @@ RenderCore::RenderCore()
     static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
 #endif
 
+    //TODO(KL): Check if mRHI has been properly created
+
     mGraphicsDevice = mRHI->createGraphicsDevice();
     mCommandQueue   = mRHI->createCommandQueue(mGraphicsDevice.get());
 }
