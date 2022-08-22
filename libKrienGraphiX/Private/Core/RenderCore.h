@@ -41,5 +41,8 @@ private:
     std::unique_ptr<RHI::RenderHardwareInterface> mRHI;
     std::unique_ptr<RHI::RHIGraphicsDevice> mGraphicsDevice;
     std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
+
+    //TODO(KL): For now we have one commandlist. Later this will be one CommandList per RenderPass manager
+    std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
 };
 }

@@ -2,6 +2,8 @@
 //
 
 #include "framework.h"
+#include <string>
+
 #include "KGToolbox.h"
 
 namespace
@@ -35,14 +37,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 namespace kgt
 {
-KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, int initialWindowWidth, int initialWindowHeight)
+KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth, unsigned int initialWindowHeight)
     : mHInstance(hInstance), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
 {
     // Init main window
     auto windowHandle = InitWin32Window();
 
     // Startup KGX
-    //TODO(KL): Startup KGX
+    mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, 1024, 768);
 }
 
 int KGToolboxApp::Run()
@@ -69,7 +71,7 @@ int KGToolboxApp::Run()
 			//{
 			//	CalculateFrameStats();
 			//	Update(mTimer);	
-            //    Draw(mTimer);
+            //  Draw(mTimer);
 			//}
 			//else
 			{
@@ -114,11 +116,11 @@ HWND KGToolboxApp::InitWin32Window() const
 	if( !RegisterClassExW(&wndClassEx) )
 	{
 		MessageBox(0, L"RegisterClass Failed.", 0, 0);
-		return false;
+		return nullptr;
 	}
 
 	// Compute window rectangle dimensions based on requested client area dimensions.
-	RECT clientRect = { 0, 0, mClientWidth, mClientHeight };
+	RECT clientRect = { 0, 0, static_cast<long>(mClientWidth), static_cast<long>(mClientHeight) };
     AdjustWindowRect(&clientRect, WS_OVERLAPPEDWINDOW, false);
 	const int width  = clientRect.right - clientRect.left;
 	const int height = clientRect.bottom - clientRect.top;

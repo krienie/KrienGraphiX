@@ -40,7 +40,7 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
         std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) override;
 
         [[nodiscard]]
-        std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHIGraphicsPipelineState *pipelineState) override;
+        std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
 
         [[nodiscard]]
         std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) override;

@@ -50,7 +50,7 @@ void RenderThread::processRenderCommands()
         // wait for commands to show up
         std::unique_lock<std::mutex> lock(mEnqueueMutex);
         mCvCommand.wait(lock, [this]() { return !mRunning || !mCommands.empty(); });
-        if (!mCommands.empty())
+        if (mRunning && !mCommands.empty())
         {
             ++mNumBusyThreads;
 

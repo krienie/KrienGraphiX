@@ -1,6 +1,7 @@
 
 #include "KrienGraphiX/Core/KrienGraphiXEngine.h"
 
+#include "KrienGraphiX/Core/RenderWindow.h"
 #include "Private/Core/RenderCore.h"
 
 using namespace kgx::core;
@@ -16,9 +17,7 @@ KrienGraphiXEngine::~KrienGraphiXEngine()
     RenderCore::shutdown();
 }
 
-//TODO(KL): Temporary maybe_unused
-RenderWindow* KrienGraphiXEngine::createRenderWindow([[maybe_unused]] HWND windowHandle)
+std::shared_ptr<RenderWindow> KrienGraphiXEngine::createRenderWindow(HWND windowHandle, int initialWindowWidth, int initialWindowHeight) const
 {
-    // Create window
-    return nullptr;
+    return std::make_shared<RenderWindow>(reinterpret_cast<kgx::WinHandle>(windowHandle), initialWindowWidth, initialWindowHeight);
 }

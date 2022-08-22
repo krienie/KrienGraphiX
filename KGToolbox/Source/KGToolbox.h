@@ -10,7 +10,7 @@ namespace kgt
 class KGToolboxApp final
 {
 public:
-    KGToolboxApp(HINSTANCE hInstance, int initialWindowWidth, int initialWindowHeight);
+    KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
     KGToolboxApp(const KGToolboxApp& rhs) = delete;
     KGToolboxApp& operator=(const KGToolboxApp& rhs) = delete;
     ~KGToolboxApp() = default;
@@ -23,9 +23,10 @@ private:
     HWND InitWin32Window() const;
 
     HINSTANCE mHInstance = nullptr;
-    int mClientWidth;
-	int mClientHeight;
+    unsigned int mClientWidth;
+	unsigned int mClientHeight;
 
     KrienGraphiXEngine mKgxEngine;
+    std::shared_ptr<kgx::core::RenderWindow> mRenderWindow;
 };
 }

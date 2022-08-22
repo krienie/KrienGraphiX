@@ -1,23 +1,20 @@
 
 #pragma once
 
-#include "Private/RHI/RHICommandQueue.h"
-#include "Private/RHI/RHIDescriptors.h"
-#include "Private/RHI/RHIGraphicsDevice.h"
-#include "Private/RHI/RHISwapChain.h"
+#include "RHICommandQueue.h"
+#include "RHIConstantBuffer.h"
+#include "RHIDepthStencilBuffer.h"
+#include "RHIDescriptors.h"
+#include "RHIGraphicsCommandList.h"
+#include "RHIGraphicsDevice.h"
+#include "RHIGraphicsPipelineState.h"
+#include "RHIShaderProgram.h"
+#include "RHISwapChain.h"
 
 #include <memory>
-#include <string>
 
 namespace kgx::RHI
 {
-class RHIConstantBuffer;
-class RHIDepthStencilBuffer;
-class RHIGraphicsCommandList;
-class RHIGraphicsPipelineState;
-class RHIShaderProgram;
-class RHITexture2D;
-
 class RenderHardwareInterface
 {
     public:
@@ -51,7 +48,7 @@ class RenderHardwareInterface
         virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) = 0;
 
         [[nodiscard]]
-        virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHIGraphicsPipelineState *pipelineState) = 0;
+        virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
 
         [[nodiscard]]
         virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;

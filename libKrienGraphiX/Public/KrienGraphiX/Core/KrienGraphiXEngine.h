@@ -2,7 +2,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <Windows.h>
 
 namespace kgx::core
@@ -16,9 +15,8 @@ public:
     KrienGraphiXEngine();
     ~KrienGraphiXEngine();
 
-    kgx::core::RenderWindow* createRenderWindow( HWND windowHandle );
-    //RenderWindow* getRenderWindow() const;
+    std::shared_ptr<kgx::core::RenderWindow> createRenderWindow(HWND windowHandle, int initialWindowWidth, int initialWindowHeight) const;
 
 private:
-    //std::shared_ptr<kgx::core::RenderWindow> 
+    std::shared_ptr<kgx::core::RenderWindow> mRenderWindow;
 };

@@ -9,6 +9,6 @@ KGXRenderPass::KGXRenderPass()
     : mCommandList(nullptr)
 {
     const auto* renderEngine = core::RenderCore::get();
-    mCommandList = renderEngine->getRHI()->createGraphicsCommandList(renderEngine->getGraphicsDevicePtr(), nullptr);
+    //mCommandList = renderEngine->getRHI()->createGraphicsCommandList(renderEngine->getGraphicsDevicePtr(), nullptr);
 }
 }

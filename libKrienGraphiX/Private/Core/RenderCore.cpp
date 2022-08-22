@@ -5,6 +5,7 @@
 #include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
 #endif
 
+#include <cassert>
 #include <iostream>
 
 namespace kgx::core
@@ -38,7 +39,7 @@ void RenderCore::shutdown()
 }
 
 RenderCore::RenderCore()
-    : mRenderThread(), mRHI(nullptr), mGraphicsDevice(nullptr)
+    : mRenderThread(), mRHI(nullptr), mGraphicsDevice(nullptr), mCommandList(nullptr)
 {
 #ifdef WIN32
     mRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
@@ -46,10 +47,11 @@ RenderCore::RenderCore()
     static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
 #endif
 
-    //TODO(KL): Check if mRHI has been properly created
+    assert(mRHI);
 
     mGraphicsDevice = mRHI->createGraphicsDevice();
     mCommandQueue   = mRHI->createCommandQueue(mGraphicsDevice.get());
+    mCommandList    = mRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
 }
 
 RHI::RHIGraphicsDevice * RenderCore::getGraphicsDevicePtr() const

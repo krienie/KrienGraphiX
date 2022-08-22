@@ -9,7 +9,7 @@ namespace kgx::core
 RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
     : mRHISwapChain(nullptr)
 {
-    auto * renderEngine = RenderCore::get();
+    const auto* renderEngine = RenderCore::get();
     
     mRHISwapChain = renderEngine->getRHI()->createSwapChain(
         renderEngine->getGraphicsDevicePtr(),

@@ -71,10 +71,10 @@ std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGra
     return std::move(pipelineState);
 }
 
-std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHIGraphicsPipelineState* pipelineState)
+std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
 {
     auto graphicsCommandList = std::make_unique<DX12GraphicsCommandList>();
-    if (graphicsCommandList->init(graphicsDevice, pipelineState))
+    if (graphicsCommandList->init(graphicsDevice, commandQueue, pipelineState))
     {
         return nullptr;
     }

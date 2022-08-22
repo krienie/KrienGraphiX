@@ -80,7 +80,7 @@ DX12GraphicsDevice::DX12GraphicsDevice()
 
 DX12GraphicsDevice::~DX12GraphicsDevice()
 {
-    mResidencyManager.Destroy();
+    //mResidencyManager.Destroy();
 }
 
 bool DX12GraphicsDevice::init()
@@ -115,7 +115,8 @@ bool DX12GraphicsDevice::init()
 
     res = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&mDevice));
 
-    mResidencyManager.Initialize(mDevice.Get(), 0, mHardwareAdapter.Get(), residencyManagerLatency);
+    //TODO(KL): Use residency manager for something usefull...
+    //mResidencyManager.Initialize(mDevice.Get(), 0, mHardwareAdapter.Get(), residencyManagerLatency);
 
     return SUCCEEDED(res);
 }

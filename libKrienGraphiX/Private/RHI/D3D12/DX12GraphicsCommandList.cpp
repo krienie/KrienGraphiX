@@ -1,6 +1,9 @@
 
 #include "DX12GraphicsCommandList.h"
 
+#include <cassert>
+
+#include "DX12CommandQueue.h"
 #include "DX12DepthStencilBuffer.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
@@ -8,27 +11,16 @@
 namespace kgx::RHI
 {
 DX12GraphicsCommandList::DX12GraphicsCommandList()
-    : RHIGraphicsCommandList(), mCommandList(nullptr), mCommandAllocator(nullptr)
+    : RHIGraphicsCommandList(), mCommandList(nullptr)
 {
 }
 
-bool DX12GraphicsCommandList::init(RHIGraphicsDevice *device, RHIGraphicsPipelineState * initialState)
+bool DX12GraphicsCommandList::init(RHIGraphicsDevice *device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState * initialState)
 {
     auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
+    assert(dxDevice);
 
     auto * nativeDevice = dxDevice->getNativeDevice();
-
-    // For now, each CommandList has its own CommandAllocator
-    HRESULT res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
-    if (FAILED(res))
-    {
-        return false;
-    }
 
     ID3D12PipelineState * nativeInitialState = nullptr;
 
@@ -38,7 +30,10 @@ bool DX12GraphicsCommandList::init(RHIGraphicsDevice *device, RHIGraphicsPipelin
         nativeInitialState = dxPipelineState->getPipelineState();
     }
 
-    res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
+    auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
+    assert(dxCommandQueue);
+
+    HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
     return SUCCEEDED(res);
 }
 
@@ -50,11 +45,6 @@ void DX12GraphicsCommandList::close()
 ID3D12CommandList * DX12GraphicsCommandList::getCommandList() const
 {
     return mCommandList.Get();
-}
-
-ID3D12CommandAllocator * DX12GraphicsCommandList::getCommandAllocator() const
-{
-    return mCommandAllocator.Get();
 }
 
 void DX12GraphicsCommandList::clearDepthStencilView(RHIDepthStencilBuffer *dsv /*, clearFlags, depth, stencil*/)

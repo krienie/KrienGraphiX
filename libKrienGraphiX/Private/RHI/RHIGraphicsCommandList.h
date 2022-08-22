@@ -5,6 +5,7 @@ namespace kgx::RHI
 {
 class RHIDepthStencilBuffer;
 class RHIGraphicsDevice;
+class RHICommandQueue;
 class RHIGraphicsPipelineState;
 
 class RHIGraphicsCommandList
@@ -13,7 +14,7 @@ class RHIGraphicsCommandList
         virtual ~RHIGraphicsCommandList() = default;
 
         //TODO(KL): allow setting an initial pipeline state
-        virtual bool init(RHIGraphicsDevice *device, RHIGraphicsPipelineState * initialState) = 0;
+        virtual bool init(RHIGraphicsDevice *device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState * initialState) = 0;
         virtual void close() = 0;
 
         virtual void clearDepthStencilView(RHIDepthStencilBuffer *dsv/*, clearFlags, depth, stencil*/) = 0;

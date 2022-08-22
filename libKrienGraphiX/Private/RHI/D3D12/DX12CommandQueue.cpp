@@ -8,13 +8,14 @@
 namespace kgx::RHI
 {
 DX12CommandQueue::DX12CommandQueue()
-    : RHICommandQueue(), mCommandQueue(nullptr)
+    : RHICommandQueue(), mCommandQueue(nullptr), mCommandAllocator(nullptr)
 {
 }
 
-bool DX12CommandQueue::init(RHIGraphicsDevice *device)
+bool DX12CommandQueue::init(RHIGraphicsDevice* device)
 {
-    auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
+    //TODO(KL): Think of a way to remove all these dynamic_casts...
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
     {
         // This should never happen
@@ -25,14 +26,26 @@ bool DX12CommandQueue::init(RHIGraphicsDevice *device)
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-    const HRESULT res = dxDevice->getNativeDevice()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
+    auto* nativeDevice = dxDevice->getNativeDevice();
+
+    HRESULT res = nativeDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
+    if (FAILED(res))
+    {
+        return false;
+    }
+
+    res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
+    if (FAILED(res))
+    {
+        return false;
+    }
 
     return SUCCEEDED(res);
 }
 
 void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
-    auto * dxCommandList = dynamic_cast<DX12GraphicsCommandList*>(commandList);
+    auto* dxCommandList = dynamic_cast<DX12GraphicsCommandList*>(commandList);
     if (dxCommandList == nullptr)
     {
         // This should never happen
@@ -43,9 +56,13 @@ void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
     mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);
 }
 
-ID3D12CommandQueue * DX12CommandQueue::getNativeCommandQueue() const
+ID3D12CommandQueue* DX12CommandQueue::getNativeCommandQueue() const
 {
     return mCommandQueue.Get();
 }
 
+ID3D12CommandAllocator* DX12CommandQueue::getNativeCommandAllocator() const
+{
+    return mCommandAllocator.Get();
+}
 } // namespace kgx::RHI

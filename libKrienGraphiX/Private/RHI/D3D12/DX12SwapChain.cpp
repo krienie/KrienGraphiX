@@ -53,7 +53,7 @@ bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQu
     ComPtr<IDXGISwapChain1> swapChain;
 
     HRESULT res = nativeFactory->CreateSwapChainForHwnd(
-        nativeCommandQueue,        // Swap chain needs the queue so that it can force a flush on it.
+        nativeCommandQueue,
         reinterpret_cast<HWND>(windowHandle),
         &swapChainDesc,
         nullptr,
