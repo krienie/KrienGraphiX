@@ -18,5 +18,25 @@ RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned 
         width,
         height,
         2); // Front- and back-buffer
+
+    mViewport = {0, 0, width, height, 0.0f, 1.0f};
+}
+
+void RenderWindow::draw()
+{
+    const auto* renderCore = RenderCore::get();
+
+    //TODO(KL): Move this to KGXRenderer
+    renderCore->getRHI()->beginFrame(renderCore->getGraphicsCommandQueuePtr());
+
+    auto* commandList = renderCore->getGraphicsCommandListPtr();
+
+    commandList->reset(renderCore->getGraphicsCommandQueuePtr());
+    
+    commandList->setViewport(mViewport);
+
+
+
+    renderCore->getRHI()->endFrame();
 }
 }

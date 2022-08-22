@@ -22,12 +22,10 @@ public:
     RenderCore(RenderCore&&) noexcept                 = delete;
     RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
-    [[nodiscard]] RHI::RHIGraphicsDevice * getGraphicsDevicePtr() const;
-    [[nodiscard]] RHI::RHICommandQueue * getGraphicsCommandQueuePtr() const;
+    [[nodiscard]] RHI::RHIGraphicsDevice* getGraphicsDevicePtr() const;
+    [[nodiscard]] RHI::RHICommandQueue* getGraphicsCommandQueuePtr() const;
+    [[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
     [[nodiscard]] RHI::RenderHardwareInterface* getRHI() const;
-
-    //RenderWindow* createRenderWindow( HWND windowHandle );
-    //RenderWindow* getRenderWindow() const;
 
 private:
     RenderCore();

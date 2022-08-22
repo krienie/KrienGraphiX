@@ -64,6 +64,11 @@ RHI::RHICommandQueue * RenderCore::getGraphicsCommandQueuePtr() const
     return mCommandQueue.get();
 }
 
+RHI::RHIGraphicsCommandList* RenderCore::getGraphicsCommandListPtr() const
+{
+    return mCommandList.get();
+}
+
 RHI::RenderHardwareInterface * RenderCore::getRHI() const
 {
     return mRHI.get();

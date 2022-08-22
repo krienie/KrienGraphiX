@@ -9,9 +9,24 @@
 #include "DX12ShaderProgram.h"
 #include "DX12SwapChain.h"
 
+#include <cassert>
+
 namespace kgx::RHI
 {
 //TODO(KL): log errors when any of these inits fail
+
+void DX12RenderHardwareInterface::beginFrame(RHICommandQueue* commandQueue)
+{
+    auto* dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
+    assert(dxCommandQueue);
+
+    dxCommandQueue->getNativeCommandAllocator()->Reset();
+}
+
+void DX12RenderHardwareInterface::endFrame()
+{
+    //TODO(KL): For now flush
+}
 
 std::unique_ptr<RHIGraphicsDevice> DX12RenderHardwareInterface::createGraphicsDevice()
 {

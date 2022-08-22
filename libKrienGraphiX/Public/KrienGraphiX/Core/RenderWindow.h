@@ -1,8 +1,6 @@
 
 #pragma once
 
-//#include "Private/RHI/RHISwapChain.h"
-
 #include <memory>
 
 #include "KGXDefinitions.h"
@@ -20,7 +18,12 @@ public:
     RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
     ~RenderWindow() = default;
 
+    void draw();
+
+    //TODO(KL): implement resize
+
 private:
     std::unique_ptr<RHI::RHISwapChain> mRHISwapChain;
+    KGXViewport mViewport;
 };
 }

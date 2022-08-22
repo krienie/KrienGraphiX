@@ -15,7 +15,11 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
         ~DX12GraphicsCommandList() override = default;
 
         bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
+
         void close() override;
+        void reset(RHICommandQueue* commandQueue) override;
+
+        void setViewport(const KGXViewport &viewport) override;
 
         [[nodiscard]]
         ID3D12CommandList * getCommandList() const;

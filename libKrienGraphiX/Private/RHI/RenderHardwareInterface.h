@@ -26,6 +26,9 @@ class RenderHardwareInterface
         RenderHardwareInterface(RenderHardwareInterface&&) noexcept                 = delete;
         RenderHardwareInterface& operator=(RenderHardwareInterface&&) noexcept      = delete;
 
+        virtual void beginFrame(RHICommandQueue* commandQueue) = 0;
+        virtual void endFrame() = 0;
+
         [[nodiscard]]
         virtual std::unique_ptr<RHIGraphicsDevice>  createGraphicsDevice() = 0;
 

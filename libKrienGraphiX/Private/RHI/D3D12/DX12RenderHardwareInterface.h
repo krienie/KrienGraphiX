@@ -18,6 +18,9 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
         DX12RenderHardwareInterface(DX12RenderHardwareInterface&&) noexcept                 = delete;
         DX12RenderHardwareInterface& operator=(DX12RenderHardwareInterface&&) noexcept      = delete;
 
+        void beginFrame(RHICommandQueue* commandQueue) override;
+        void endFrame() override;
+
         [[nodiscard]]
         std::unique_ptr<RHIGraphicsDevice> createGraphicsDevice() override;
 

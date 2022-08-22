@@ -42,6 +42,31 @@ void DX12GraphicsCommandList::close()
     mCommandList->Close();
 }
 
+void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue)
+{
+    auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
+    assert(dxCommandQueue);
+
+    mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nullptr);
+}
+
+void DX12GraphicsCommandList::setViewport(const KGXViewport& viewport)
+{
+    const D3D12_VIEWPORT dxViewport =
+    {
+        static_cast<float>(viewport.topLeftX),
+        static_cast<float>(viewport.topLeftY),
+        static_cast<float>(viewport.width),
+        static_cast<float>(viewport.height),
+        viewport.minDepth,
+        viewport.maxDepth
+    };
+    mCommandList->RSSetViewports(1u, &dxViewport);
+
+    const D3D12_RECT scissorRect = { viewport.topLeftX, viewport.topLeftY, viewport.width, viewport.height };
+    mCommandList->RSSetScissorRects(1u, &scissorRect);
+}
+
 ID3D12CommandList * DX12GraphicsCommandList::getCommandList() const
 {
     return mCommandList.Get();
