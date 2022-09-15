@@ -17,7 +17,7 @@ public:
 
     int Run();
 
-    LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
     HWND InitWin32Window() const;

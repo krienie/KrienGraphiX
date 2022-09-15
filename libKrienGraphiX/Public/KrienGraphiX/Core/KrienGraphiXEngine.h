@@ -15,7 +15,7 @@ public:
     KrienGraphiXEngine();
     ~KrienGraphiXEngine();
 
-    std::shared_ptr<kgx::core::RenderWindow> createRenderWindow(HWND windowHandle, int initialWindowWidth, int initialWindowHeight) const;
+    std::shared_ptr<kgx::core::RenderWindow> createRenderWindow(HWND windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const;
 
 private:
     std::shared_ptr<kgx::core::RenderWindow> mRenderWindow;

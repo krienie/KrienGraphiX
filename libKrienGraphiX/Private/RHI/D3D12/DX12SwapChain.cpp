@@ -11,18 +11,14 @@ using Microsoft::WRL::ComPtr;
 namespace kgx::RHI
 {
 DX12SwapChain::DX12SwapChain(UINT width, UINT height)
-    : RHISwapChain(),
-      mSwapChain(nullptr),
-      //mRtvHeap(nullptr),
-      //mRenderTargets(),
-      mWidth(width),
-      mHeight(height)
+    : RHISwapChain(), mSwapChain(nullptr), mRtvHeap(nullptr),
+        mWidth(width), mHeight(height)
 {
 }
 
-bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQueue, WinHandle windowHandle, unsigned int frameCount)
+bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount)
 {
-    auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
     {
         // This should never happen
@@ -33,7 +29,7 @@ bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQu
 
     // Describe and create the swap chain.
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-    swapChainDesc.BufferCount = frameCount;
+    swapChainDesc.BufferCount = bufferCount;
     swapChainDesc.Width = mWidth;
     swapChainDesc.Height = mHeight;
     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -77,14 +73,12 @@ bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQu
 
     auto * nativeDevice = dxDevice->getNativeDevice();
 
-    ComPtr<ID3D12DescriptorHeap> rtvHeap;
-
     // Create descriptor heap for the backbuffer RTV's
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-    rtvHeapDesc.NumDescriptors = frameCount;
+    rtvHeapDesc.NumDescriptors = bufferCount;
     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    res = nativeDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&rtvHeap));
+    res = nativeDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&mRtvHeap));
     if ((FAILED(res)))
     {
         return false;
@@ -93,11 +87,11 @@ bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQu
     //TODO(KL): maybe store this descriptor size in RHITexture2D...
     const UINT rtvDescriptorSize = nativeDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-    std::vector<ComPtr<ID3D12Resource>> buffers(frameCount);
+    std::vector<ComPtr<ID3D12Resource>> buffers(bufferCount);
 
     // Create render target resources
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(rtvHeap->GetCPUDescriptorHandleForHeapStart());
-    for (UINT i = 0u; i < frameCount; ++i)
+    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(mRtvHeap->GetCPUDescriptorHandleForHeapStart());
+    for (UINT i = 0u; i < bufferCount; ++i)
     {
         res = mSwapChain->GetBuffer(i, IID_PPV_ARGS(&buffers[i]));
         if ((FAILED(res)))
@@ -108,20 +102,20 @@ bool DX12SwapChain::init(RHIGraphicsDevice * device, RHICommandQueue * commandQu
         nativeDevice->CreateRenderTargetView(buffers[i].Get(), nullptr, rtvHandle);
         rtvHandle.Offset(1, rtvDescriptorSize);
 
-        mRenderTargets.push_back(std::make_shared<DX12Texture2D>(buffers[i], rtvHeap, mWidth, mHeight, 1u, 1u, PixelFormat::R8G8B8A8));
+        mBuffers.push_back(std::make_shared<DX12Texture2D>(buffers[i], mRtvHeap, i, D3D12_RESOURCE_STATE_PRESENT, mWidth, mHeight, 1u, 1u, PixelFormat::R8G8B8A8));
     }
 
     return SUCCEEDED(res);
 }
 
-unsigned int DX12SwapChain::getFrameIndex() const
+std::shared_ptr<RHITexture2D> DX12SwapChain::getCurrentBuffer() const
 {
-    return mSwapChain->GetCurrentBackBufferIndex();
+    return mBuffers[mSwapChain->GetCurrentBackBufferIndex()];
 }
 
-std::weak_ptr<RHITexture2D> DX12SwapChain::getBuffer(unsigned int idx) const
+void DX12SwapChain::present()
 {
-    return mRenderTargets[idx];
+    mSwapChain->Present(0, 0);
 }
 
 }

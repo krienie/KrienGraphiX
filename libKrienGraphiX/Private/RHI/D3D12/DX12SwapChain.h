@@ -19,19 +19,17 @@ class DX12SwapChain : public RHISwapChain
         DX12SwapChain(UINT width, UINT height);
         ~DX12SwapChain() override = default;
 
-        bool init(RHIGraphicsDevice *device, RHICommandQueue * commandQueue, WinHandle windowHandle, unsigned int frameCount) override;
+        bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount) override;
 
         [[nodiscard]]
-        unsigned int getFrameIndex() const override;
-
-        [[nodiscard]]
-        std::weak_ptr<RHITexture2D> getBuffer(unsigned int idx) const override;
+        std::shared_ptr<RHITexture2D> getCurrentBuffer() const override;
+        
+        void present() override;
 
     private:
         Microsoft::WRL::ComPtr<IDXGISwapChain3> mSwapChain;
-        //Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
-        //std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> mRenderTargets;
-        std::vector<std::shared_ptr<DX12Texture2D>> mRenderTargets;
+        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap;
+        std::vector<std::shared_ptr<DX12Texture2D>> mBuffers;
 
         UINT mWidth;
         UINT mHeight;

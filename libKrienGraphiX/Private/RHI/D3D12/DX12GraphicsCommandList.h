@@ -14,15 +14,15 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
         DX12GraphicsCommandList();
         ~DX12GraphicsCommandList() override = default;
 
+        [[nodiscard]]
+        ID3D12GraphicsCommandList* getCommandList() const { return mCommandList.Get(); }
+
         bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
         void close() override;
         void reset(RHICommandQueue* commandQueue) override;
 
         void setViewport(const KGXViewport &viewport) override;
-
-        [[nodiscard]]
-        ID3D12CommandList * getCommandList() const;
 
         void clearDepthStencilView(RHIDepthStencilBuffer *dsv /*, clearFlags, depth, stencil*/) override;
         void clearRenderTargetView(/*RHIRenderTargetView *rtv, const float colorRGBA[4]*/) override;

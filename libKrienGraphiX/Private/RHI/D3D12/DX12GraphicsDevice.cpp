@@ -121,22 +121,22 @@ bool DX12GraphicsDevice::init()
     return SUCCEEDED(res);
 }
 
-ID3D12Device * DX12GraphicsDevice::getNativeDevice() const
+ID3D12Device* DX12GraphicsDevice::getNativeDevice() const
 {
     return mDevice.Get();
 }
 
-IDXGIFactory4 * DX12GraphicsDevice::getNativeFactory() const
+IDXGIFactory4* DX12GraphicsDevice::getNativeFactory() const
 {
     return mFactory.Get();
 }
 
-IDXGIAdapter1 * DX12GraphicsDevice::getNativeHardwareAdapter() const
+IDXGIAdapter1* DX12GraphicsDevice::getNativeHardwareAdapter() const
 {
     return mHardwareAdapter.Get();
 }
 
-D3DX12Residency::ResidencyManager * DX12GraphicsDevice::getResidencyManager()
+D3DX12Residency::ResidencyManager* DX12GraphicsDevice::getResidencyManager()
 {
     return &mResidencyManager;
 }

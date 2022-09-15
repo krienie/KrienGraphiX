@@ -15,7 +15,7 @@ DX12GraphicsCommandList::DX12GraphicsCommandList()
 {
 }
 
-bool DX12GraphicsCommandList::init(RHIGraphicsDevice *device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState * initialState)
+bool DX12GraphicsCommandList::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
     auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     assert(dxDevice);
@@ -30,10 +30,16 @@ bool DX12GraphicsCommandList::init(RHIGraphicsDevice *device, RHICommandQueue* c
         nativeInitialState = dxPipelineState->getPipelineState();
     }
 
-    auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
+    const auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
     assert(dxCommandQueue);
 
-    HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
+    const HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
+    if (SUCCEEDED(res))
+    {
+        // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
+        mCommandList->Close();
+    }
+
     return SUCCEEDED(res);
 }
 
@@ -63,13 +69,8 @@ void DX12GraphicsCommandList::setViewport(const KGXViewport& viewport)
     };
     mCommandList->RSSetViewports(1u, &dxViewport);
 
-    const D3D12_RECT scissorRect = { viewport.topLeftX, viewport.topLeftY, viewport.width, viewport.height };
+    const D3D12_RECT scissorRect = { viewport.topLeftX, viewport.topLeftY, static_cast<long>(viewport.width), static_cast<long>(viewport.height) };
     mCommandList->RSSetScissorRects(1u, &scissorRect);
-}
-
-ID3D12CommandList * DX12GraphicsCommandList::getCommandList() const
-{
-    return mCommandList.Get();
 }
 
 void DX12GraphicsCommandList::clearDepthStencilView(RHIDepthStencilBuffer *dsv /*, clearFlags, depth, stencil*/)

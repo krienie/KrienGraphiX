@@ -8,7 +8,6 @@
 
 namespace kgx::core
 {
-
 class RenderCore final
 {
 public:
@@ -23,9 +22,8 @@ public:
     RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
     [[nodiscard]] RHI::RHIGraphicsDevice* getGraphicsDevicePtr() const;
-    [[nodiscard]] RHI::RHICommandQueue* getGraphicsCommandQueuePtr() const;
+    [[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
     [[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
-    [[nodiscard]] RHI::RenderHardwareInterface* getRHI() const;
 
 private:
     RenderCore();
@@ -35,8 +33,7 @@ private:
     static int mRefCount;
 
     RenderThread mRenderThread;
-
-    std::unique_ptr<RHI::RenderHardwareInterface> mRHI;
+    
     std::unique_ptr<RHI::RHIGraphicsDevice> mGraphicsDevice;
     std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
 

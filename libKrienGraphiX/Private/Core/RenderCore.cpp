@@ -39,27 +39,27 @@ void RenderCore::shutdown()
 }
 
 RenderCore::RenderCore()
-    : mRenderThread(), mRHI(nullptr), mGraphicsDevice(nullptr), mCommandList(nullptr)
+    : mRenderThread(), mGraphicsDevice(nullptr), mCommandList(nullptr)
 {
 #ifdef WIN32
-    mRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
+    RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
 #else
     static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
 #endif
 
-    assert(mRHI);
+    assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
 
-    mGraphicsDevice = mRHI->createGraphicsDevice();
-    mCommandQueue   = mRHI->createCommandQueue(mGraphicsDevice.get());
-    mCommandList    = mRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
+    mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
+    mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
+    mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
 }
 
-RHI::RHIGraphicsDevice * RenderCore::getGraphicsDevicePtr() const
+RHI::RHIGraphicsDevice* RenderCore::getGraphicsDevicePtr() const
 {
     return mGraphicsDevice.get();
 }
 
-RHI::RHICommandQueue * RenderCore::getGraphicsCommandQueuePtr() const
+RHI::RHICommandQueue* RenderCore::getCommandQueuePtr() const
 {
     return mCommandQueue.get();
 }
@@ -67,10 +67,5 @@ RHI::RHICommandQueue * RenderCore::getGraphicsCommandQueuePtr() const
 RHI::RHIGraphicsCommandList* RenderCore::getGraphicsCommandListPtr() const
 {
     return mCommandList.get();
-}
-
-RHI::RenderHardwareInterface * RenderCore::getRHI() const
-{
-    return mRHI.get();
 }
 }

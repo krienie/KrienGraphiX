@@ -40,6 +40,8 @@ bool DX12CommandQueue::init(RHIGraphicsDevice* device)
         return false;
     }
 
+    nativeDevice->CreateFence(mCurrentFence, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
+
     return SUCCEEDED(res);
 }
 
@@ -54,6 +56,24 @@ void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 
     ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
     mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);
+}
+
+void DX12CommandQueue::flushQueue()
+{
+    ++mCurrentFence;
+    
+    mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+
+	// Wait for fence event if needed
+    if(mFence->GetCompletedValue() < mCurrentFence)
+	{
+        const HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
+
+        mFence->SetEventOnCompletion(mCurrentFence, eventHandle);
+
+		WaitForSingleObject(eventHandle, INFINITE);
+        CloseHandle(eventHandle);
+	}
 }
 
 ID3D12CommandQueue* DX12CommandQueue::getNativeCommandQueue() const

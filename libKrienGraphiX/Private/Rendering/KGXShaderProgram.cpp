@@ -8,7 +8,7 @@
 namespace kgx::Rendering
 {
 KGXShaderProgram::KGXShaderProgram(std::string name)
-    : mName(std::move(name)), mRHIShaderProgram(core::RenderCore::get()->getRHI()->createShaderProgram())
+    : mName(std::move(name))//, mRHIShaderProgram(core::RenderCore::get()->getRHI()->createShaderProgram())
 {
 }
 

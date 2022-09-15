@@ -1,10 +1,10 @@
-// KGToolbox.cpp : Defines the entry point for the application.
-//
 
 #include "framework.h"
 #include <string>
 
 #include "KGToolbox.h"
+
+#include "KrienGraphiX/Core/RenderWindow.h"
 
 namespace
 {
@@ -44,7 +44,7 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
     auto windowHandle = InitWin32Window();
 
     // Startup KGX
-    mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, 1024, 768);
+    mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, mClientWidth, mClientHeight);
 }
 
 int KGToolboxApp::Run()
@@ -69,13 +69,12 @@ int KGToolboxApp::Run()
             //
 			//if( !mAppPaused )
 			//{
-			//	CalculateFrameStats();
 			//	Update(mTimer);	
-            //  Draw(mTimer);
+            mRenderWindow->draw();
 			//}
 			//else
 			{
-				Sleep(100);
+				//Sleep(100);
 			}
         }
     }
@@ -160,14 +159,6 @@ LRESULT KGToolboxApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
             }
         }
         break;
-    //case WM_PAINT:
-    //    {
-    //        PAINTSTRUCT ps;
-    //        HDC hdc = BeginPaint(hWnd, &ps);
-    //        // TODO: Add any drawing code that uses hdc here...
-    //        EndPaint(hWnd, &ps);
-    //    }
-    //    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

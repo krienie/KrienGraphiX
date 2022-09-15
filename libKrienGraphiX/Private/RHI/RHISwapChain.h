@@ -20,9 +20,8 @@ class RHISwapChain
         virtual bool init(RHIGraphicsDevice *device, RHICommandQueue * commandQueue, WinHandle windowHandle, unsigned int frameCount) = 0;
 
         [[nodiscard]]
-        virtual unsigned int getFrameIndex() const = 0;
-
-        [[nodiscard]]
-        virtual std::weak_ptr<RHITexture2D> getBuffer(unsigned int idx) const = 0;
+        virtual std::shared_ptr<RHITexture2D> getCurrentBuffer() const = 0;
+        
+        virtual void present() = 0;
 };
 }

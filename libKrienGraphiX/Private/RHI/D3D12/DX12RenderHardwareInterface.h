@@ -18,8 +18,8 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
         DX12RenderHardwareInterface(DX12RenderHardwareInterface&&) noexcept                 = delete;
         DX12RenderHardwareInterface& operator=(DX12RenderHardwareInterface&&) noexcept      = delete;
 
-        void beginFrame(RHICommandQueue* commandQueue) override;
-        void endFrame() override;
+        void beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) override;
+        void endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) override;
 
         [[nodiscard]]
         std::unique_ptr<RHIGraphicsDevice> createGraphicsDevice() override;
@@ -36,11 +36,11 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
             unsigned int height,
             unsigned int frameCount) override;
 
-        [[nodiscard]]
-        std::unique_ptr<RHIShaderProgram> createShaderProgram() override;
+        //[[nodiscard]]
+        //std::unique_ptr<RHIShaderProgram> createShaderProgram() override;
 
-        [[nodiscard]]
-        std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) override;
+        //[[nodiscard]]
+        //std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) override;
 
         [[nodiscard]]
         std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
@@ -48,7 +48,7 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
         [[nodiscard]]
         std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) override;
 
-        [[nodiscard]]
-        std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) override;
+        //[[nodiscard]]
+        //std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) override;
 };
 }
