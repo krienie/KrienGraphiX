@@ -48,16 +48,16 @@ class RenderHardwareInterface
         //virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) = 0;
 
         [[nodiscard]]
-        virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
+        virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
 
         [[nodiscard]]
-        virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;
+        virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) = 0;
 
         //[[nodiscard]]
         //virtual std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) = 0;
 
         //[[nodiscard]]
-        //virtual std::shared_ptr<RHITexture2D> createTexture2D(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;
+        //virtual std::unique_ptr<RHITexture2D> createTexture2D(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;
 };
 
 inline std::unique_ptr<RenderHardwareInterface> PlatformRHI = nullptr;

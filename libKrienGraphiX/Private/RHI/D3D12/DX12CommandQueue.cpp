@@ -1,6 +1,8 @@
 
 #include "DX12CommandQueue.h"
 
+#include <cassert>
+
 #include "DX12GraphicsDevice.h"
 #include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/D3D12/DX12GraphicsCommandList.h"
@@ -16,11 +18,7 @@ bool DX12CommandQueue::init(RHIGraphicsDevice* device)
 {
     //TODO(KL): Think of a way to remove all these dynamic_casts...
     auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
+    assert(dxDevice);
 
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
@@ -48,11 +46,7 @@ bool DX12CommandQueue::init(RHIGraphicsDevice* device)
 void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
     auto* dxCommandList = dynamic_cast<DX12GraphicsCommandList*>(commandList);
-    if (dxCommandList == nullptr)
-    {
-        // This should never happen
-        return;
-    }
+    assert(dxCommandList);
 
     ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
     mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);
@@ -65,7 +59,7 @@ void DX12CommandQueue::flushQueue()
     mCommandQueue->Signal(mFence.Get(), mCurrentFence);
 
 	// Wait for fence event if needed
-    if(mFence->GetCompletedValue() < mCurrentFence)
+    if (mFence->GetCompletedValue() < mCurrentFence)
 	{
         const HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
 

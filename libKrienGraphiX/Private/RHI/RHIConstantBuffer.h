@@ -41,7 +41,7 @@ class RHIConstantBuffer
         size_t bufferSize() const { return mBufferSize; }
 
         [[nodiscard]]
-        virtual void * map(MapType type) = 0;
+        virtual void* map(MapType type) = 0;
         virtual void unmap() = 0;
 
     private:

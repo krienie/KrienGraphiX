@@ -2,7 +2,11 @@
 #pragma once
 
 #include <d3d12.h>
+#include <vector>
 #include <wrl\client.h>
+
+#include "DX12ResourceView.h"
+#include "Private/RHI/RHIResource.h"
 
 namespace kgx::RHI
 {
@@ -18,10 +22,13 @@ public:
     [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> getResource() const { return mResource; }
     [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Heap> getHeap() const { return mHeap; }
 
-private:
-    D3D12_RESOURCE_STATES mCurrentState;
-
+protected:
     Microsoft::WRL::ComPtr<ID3D12Resource> mResource;
     Microsoft::WRL::ComPtr<ID3D12Heap> mHeap;
+
+private:
+    D3D12_RESOURCE_STATES mCurrentState;
 };
+
+D3D12_RESOURCE_FLAGS toDx12ResourceFlags(RHIResource::CreationFlags flags);
 }

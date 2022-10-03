@@ -70,15 +70,15 @@ std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue
 }
 
 std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
-    RHIGraphicsDevice * device,
-    RHICommandQueue * commandQueue,
+    RHIGraphicsDevice* device,
+    RHICommandQueue* commandQueue,
     WinHandle windowHandle,
     unsigned int width,
     unsigned int height,
     unsigned int frameCount)
 {
     auto swapChain = std::make_unique<DX12SwapChain>(width, height);
-    if (!swapChain->init(device, commandQueue, windowHandle, frameCount))
+    if (!swapChain->init(device, commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
     {
         return nullptr;
     }
@@ -116,13 +116,12 @@ std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraph
     return std::move(graphicsCommandList);
 }
 
-std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice * graphicsDevice, unsigned int width, unsigned int height)
+std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
 {
-    auto depthStencilBuffer = std::make_unique<DX12DepthStencilBuffer>(width, height);
-    if (!depthStencilBuffer->init(graphicsDevice))
-    {
-        return nullptr;
-    }
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(graphicsDevice);
+    assert(dxDevice);
+    
+    auto depthStencilBuffer = std::make_unique<DX12DepthStencilBuffer>(dxDevice, descriptor);
 
     return std::move(depthStencilBuffer);
 }

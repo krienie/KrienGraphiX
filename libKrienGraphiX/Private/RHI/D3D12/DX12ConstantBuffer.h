@@ -26,7 +26,7 @@ class DX12ConstantBuffer final : public RHIConstantBuffer
 
         bool init(RHIGraphicsDevice *device) override;
 
-        void * map(MapType type) override;
+        void* map(MapType type) override;
         void unmap() override;
 
         void copyBufferData(const void* data, unsigned int sizeInBytes);

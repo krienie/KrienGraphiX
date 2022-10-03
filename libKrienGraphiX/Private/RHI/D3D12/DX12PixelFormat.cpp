@@ -1,0 +1,99 @@
+#include "DX12PixelFormat.h"
+
+namespace kgx::RHI
+{
+DXGI_FORMAT toDxgiPixelFormat(RHIPixelFormat inFormat)
+{
+    switch (inFormat)
+    {
+    case RHIPixelFormat::R32G32B32A32_typeless:
+        return DXGI_FORMAT_R32G32B32A32_TYPELESS;
+    case RHIPixelFormat::R32G32B32A32_float:
+        return DXGI_FORMAT_R32G32B32A32_FLOAT;
+    case RHIPixelFormat::R32G32B32A32_uint:
+        return DXGI_FORMAT_R32G32B32A32_UINT;
+    case RHIPixelFormat::R32G32B32A32_sint:
+        return DXGI_FORMAT_R32G32B32A32_SINT;
+    case RHIPixelFormat::R32G32B32_typeless:
+        return DXGI_FORMAT_R32G32B32_TYPELESS;
+    case RHIPixelFormat::R32G32B32_float:
+        return DXGI_FORMAT_R32G32B32_FLOAT;
+    case RHIPixelFormat::R32G32B32_uint:
+        return DXGI_FORMAT_R32G32B32_UINT;
+    case RHIPixelFormat::R32G32B32_sint:
+        return DXGI_FORMAT_R32G32B32_SINT;
+    case RHIPixelFormat::R16G16B16A16_typeless:
+        return DXGI_FORMAT_R16G16B16A16_TYPELESS;
+    case RHIPixelFormat::R16G16B16A16_float:
+        return DXGI_FORMAT_R16G16B16A16_FLOAT;
+    case RHIPixelFormat::R16G16B16A16_unorm:
+        return DXGI_FORMAT_R16G16B16A16_UNORM;
+    case RHIPixelFormat::R16G16B16A16_uint:
+        return DXGI_FORMAT_R16G16B16A16_UINT;
+    case RHIPixelFormat::R16G16B16A16_snorm:
+        return DXGI_FORMAT_R16G16B16A16_SNORM;
+    case RHIPixelFormat::R16G16B16A16_sint:
+        return DXGI_FORMAT_R16G16B16A16_SINT;
+    case RHIPixelFormat::R32G32_typeless:
+        return DXGI_FORMAT_R32G32_TYPELESS;
+    case RHIPixelFormat::R32G32_float:
+        return DXGI_FORMAT_R32G32_FLOAT;
+    case RHIPixelFormat::R32G32_uint:
+        return DXGI_FORMAT_R32G32_UINT;
+    case RHIPixelFormat::R32G32_sint:
+        return DXGI_FORMAT_R32G32_SINT;
+    case RHIPixelFormat::R24G8_typeless:
+        return DXGI_FORMAT_R24G8_TYPELESS;
+    case RHIPixelFormat::D24_unorm_S8_uint:
+        return DXGI_FORMAT_D24_UNORM_S8_UINT;
+    case RHIPixelFormat::R24_unorm_X8_typeless:
+        return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    case RHIPixelFormat::X24_typeless_G8_uint:
+        return DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+    case RHIPixelFormat::R10G10B10A2_typeless:
+        return DXGI_FORMAT_R10G10B10A2_TYPELESS;
+    case RHIPixelFormat::R10G10B10A2_unorm:
+        return DXGI_FORMAT_R10G10B10A2_UNORM;
+    case RHIPixelFormat::R10G10B10A2_uint:
+        return DXGI_FORMAT_R10G10B10A2_UINT;
+    case RHIPixelFormat::R11G11B10_float:
+        return DXGI_FORMAT_R11G11B10_FLOAT;
+    case RHIPixelFormat::R8G8B8A8_typeless:
+        return DXGI_FORMAT_R8G8B8A8_TYPELESS;
+    case RHIPixelFormat::R8G8B8A8_unorm:
+        return DXGI_FORMAT_R8G8B8A8_UNORM;
+    case RHIPixelFormat::R8G8B8A8_unorm_srgb:
+        return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    case RHIPixelFormat::R8G8B8A8_uint:
+        return DXGI_FORMAT_R8G8B8A8_UINT;
+    case RHIPixelFormat::R8G8B8A8_snorm:
+        return DXGI_FORMAT_R8G8B8A8_SNORM;
+    case RHIPixelFormat::R8G8B8A8_sint:
+        return DXGI_FORMAT_R8G8B8A8_SINT;
+    case RHIPixelFormat::R16G16_typeless:
+        return DXGI_FORMAT_R16G16_TYPELESS;
+    case RHIPixelFormat::R16G16_float:
+        return DXGI_FORMAT_R16G16_FLOAT;
+    case RHIPixelFormat::R16G16_unorm:
+        return DXGI_FORMAT_R16G16_UNORM;
+    case RHIPixelFormat::R16G16_uint:
+        return DXGI_FORMAT_R16G16_UINT;
+    case RHIPixelFormat::R16G16_snorm:
+        return DXGI_FORMAT_R16G16_SNORM;
+    case RHIPixelFormat::R16G16_sint:
+        return DXGI_FORMAT_R16G16_SINT;
+    case RHIPixelFormat::R32_typeless:
+        return DXGI_FORMAT_R32_TYPELESS;
+    case RHIPixelFormat::D32_float:
+        return DXGI_FORMAT_D32_FLOAT;
+    case RHIPixelFormat::R32_float:
+        return DXGI_FORMAT_R32_FLOAT;
+    case RHIPixelFormat::R32_uint:
+        return DXGI_FORMAT_R32_UINT;
+    case RHIPixelFormat::R32_sint:
+        return DXGI_FORMAT_R32_SINT;
+    default:
+        return DXGI_FORMAT_UNKNOWN;
+    }
+}
+}

@@ -1,10 +1,14 @@
 
 #include "DX12SwapChain.h"
 
+#include <cassert>
+
 #include "DX12CommandQueue.h"
 #include "DX12GraphicsDevice.h"
+#include "DX12PixelFormat.h"
 #include "DX12Texture2D.h"
 #include "d3dx12.h"
+#include "DX12Descriptors.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -16,35 +20,27 @@ DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 {
 }
 
-bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount)
+bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
     auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
+    assert(dxDevice);
 
-    auto * nativeFactory = dxDevice->getNativeFactory();
+    auto* nativeFactory = dxDevice->getNativeFactory();
 
     // Describe and create the swap chain.
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
     swapChainDesc.BufferCount = bufferCount;
     swapChainDesc.Width = mWidth;
     swapChainDesc.Height = mHeight;
-    swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    swapChainDesc.Format = toDxgiPixelFormat(pixelFormat);
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     swapChainDesc.SampleDesc.Count = 1;
 
-    auto * dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
-    if (dxCommandQueue == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
+    auto* dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
+    assert(dxCommandQueue);
 
-    auto * nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
+    auto* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
 
     ComPtr<IDXGISwapChain1> swapChain;
 
@@ -71,7 +67,7 @@ bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueu
         return false;
     }
 
-    auto * nativeDevice = dxDevice->getNativeDevice();
+    auto* nativeDevice = dxDevice->getNativeDevice();
 
     // Create descriptor heap for the backbuffer RTV's
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
@@ -84,7 +80,7 @@ bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueu
         return false;
     }
 
-    //TODO(KL): maybe store this descriptor size in RHITexture2D...
+    //TODO(KL): maybe store this descriptor size in DX12ResourceView
     const UINT rtvDescriptorSize = nativeDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
     std::vector<ComPtr<ID3D12Resource>> buffers(bufferCount);
@@ -102,15 +98,32 @@ bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueu
         nativeDevice->CreateRenderTargetView(buffers[i].Get(), nullptr, rtvHandle);
         rtvHandle.Offset(1, rtvDescriptorSize);
 
-        mBuffers.push_back(std::make_shared<DX12Texture2D>(buffers[i], mRtvHeap, i, D3D12_RESOURCE_STATE_PRESENT, mWidth, mHeight, 1u, 1u, PixelFormat::R8G8B8A8));
+        DX12Texture2DDescriptor desc =
+        {
+            {
+                {0, 0, 0, 0},
+                pixelFormat,
+                mWidth,
+                mHeight
+            },
+            buffers[i],
+            mRtvHeap,
+            static_cast<int>(i),
+            D3D12_RESOURCE_STATE_PRESENT
+        };
+
+        // Register the created D3D12 resources
+        auto newBuffer = std::make_shared<DX12Texture2D>(dxDevice, desc);
+        newBuffer->addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::RTV, newBuffer));
+        mBuffers.push_back(std::move(newBuffer));
     }
 
     return SUCCEEDED(res);
 }
 
-std::shared_ptr<RHITexture2D> DX12SwapChain::getCurrentBuffer() const
+RHITexture2D* DX12SwapChain::getCurrentBuffer() const
 {
-    return mBuffers[mSwapChain->GetCurrentBackBufferIndex()];
+    return mBuffers[mSwapChain->GetCurrentBackBufferIndex()].get();
 }
 
 void DX12SwapChain::present()

@@ -2,8 +2,10 @@
 #pragma once
 
 #include "Private/RHI/RHIDepthStencilBuffer.h"
+#include "DX12Texture2D.h"
 
 #include <D3D12.h>
+#include <memory>
 #include <wrl\client.h>
 
 namespace kgx::RHI
@@ -11,19 +13,16 @@ namespace kgx::RHI
 class DX12DepthStencilBuffer : public RHIDepthStencilBuffer
 {
     public:
-        DX12DepthStencilBuffer(UINT width, UINT height);
+        DX12DepthStencilBuffer(DX12GraphicsDevice* dxDevice, const RHITexture2DDescriptor& descriptor);
         ~DX12DepthStencilBuffer() override = default;
+        
+        [[nodiscard]] D3D12_RESOURCE_STATES getCurrentState() const;
+        [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> getResource() const;
+        [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Heap> getHeap() const;
 
-        bool init(RHIGraphicsDevice *device) override;
+        [[nodiscard]] virtual RHIResourceView* getDepthStencilView() const;
 
-        ID3D12DescriptorHeap * getDescriptorHeap() const;
-        ID3D12Resource * getResource() const;
-
-    private:
-        Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvDescriptorHeap;
-        Microsoft::WRL::ComPtr<ID3D12Resource> mDepthStencil;
-
-        UINT mWidth;
-        UINT mHeight;
+private:
+        std::shared_ptr<DX12Texture2D> mTexture;
 };
 }

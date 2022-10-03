@@ -1,11 +1,14 @@
 
 #pragma once
 
+#include <cstdint>
+
+#include "RHIResourceView.h"
 #include "KrienGraphiX/Core/KGXDefinitions.h"
 
 namespace kgx::RHI
 {
-class RHIDepthStencilBuffer;
+class RHIResourceView;
 class RHIGraphicsDevice;
 class RHICommandQueue;
 class RHIGraphicsPipelineState;
@@ -22,10 +25,8 @@ class RHIGraphicsCommandList
 
         virtual void setViewport(const KGXViewport& viewport) = 0;
 
-        virtual void clearDepthStencilView(RHIDepthStencilBuffer* dsv/*, clearFlags, depth, stencil*/) = 0;
-        virtual void clearRenderTargetView(/*RHIRenderTargetView* rtv, const float colorRGBA[4]*/) = 0;
+        virtual void clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil) = 0;
+        virtual void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) = 0;
         //TODO(KL): add other commandList methods
-
-        //TODO(KL): implement ResidencySets for D3D12
 };
 }

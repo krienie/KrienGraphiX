@@ -10,14 +10,30 @@ RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned 
     : mRHISwapChain(nullptr), mViewport{0, 0, width, height, 0.0f, 1.0f}
 {
     const auto* renderEngine = RenderCore::get();
-    
-    mRHISwapChain = RHI::PlatformRHI->createSwapChain(
-        renderEngine->getGraphicsDevicePtr(),
+
+    auto* rhiDevice = renderEngine->getGraphicsDevicePtr();
+
+    using namespace RHI;
+    mRHISwapChain = PlatformRHI->createSwapChain(
+        rhiDevice,
         renderEngine->getCommandQueuePtr(),
         windowHandle,
         width,
         height,
         2); // Front- and back-buffer
+
+
+    const RHITexture2DDescriptor texDesc =
+        {
+        RHIClearValue{1.0, 0, 0, 0},
+        RHIPixelFormat::D24_unorm_S8_uint,
+        width,
+        height,
+        1, 1,
+        RHIResource::DepthStencil
+        };
+
+    mDepthStencil = PlatformRHI->createDepthStencilBuffer(rhiDevice, texDesc);
 }
 
 void RenderWindow::draw()
@@ -28,18 +44,23 @@ void RenderWindow::draw()
 
     //TODO(KL): Move this to KGXRenderer
     const auto frameRenderTarget = mRHISwapChain->getCurrentBuffer();
-    RHI::PlatformRHI->beginFrame(commandList, frameRenderTarget.get());
+    RHI::PlatformRHI->beginFrame(commandList, frameRenderTarget);
     
     commandList->setViewport(mViewport);
 
+    //TODO(KL): temporary fixed clear color
+    static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
+
     // Clear the back buffer and depth buffer.
-	//mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
-	//mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	commandList->clearRenderTargetView(mRHISwapChain->getCurrentBufferRTV(), lightSteelBlue);
+	commandList->clearDepthStencilView(mDepthStencil->getResourceViewByType(RHI::RHIResourceView::DSV).get(),
+                                        static_cast<RHI::RHIResourceView::DepthStencilFlags>(RHI::RHIResourceView::DepthClear |
+                                            RHI::RHIResourceView::StencilClear), 1.0f, 0);
 	
     // Specify the buffers we are going to render to.
 	//mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
-    RHI::PlatformRHI->endFrame(commandList, frameRenderTarget.get());
+    RHI::PlatformRHI->endFrame(commandList, frameRenderTarget);
 
     renderCore->getCommandQueuePtr()->executeCommandList(commandList);
 

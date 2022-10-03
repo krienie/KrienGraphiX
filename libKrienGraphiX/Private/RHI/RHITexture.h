@@ -1,20 +1,24 @@
 
 #pragma once
 
-#include "Private/RHI/PixelFormat.h"
+#include "RHIResource.h"
+#include "RHIPixelFormat.h"
+#include "RHIResource.h"
 
 namespace kgx::RHI
 {
 class RHIGraphicsDevice;
 
-class RHITexture
+class RHITexture : public RHIResource
 {
     public:
-        RHITexture(unsigned int numMips, unsigned int numSamples, PixelFormat format)
-            : mNumMips(numMips), mNumSamples(numSamples), mFormat(format)
-        {}
+        RHITexture(CreationFlags flags, unsigned int numMips, unsigned int numSamples, RHIPixelFormat pixelFormat)
+            : RHIResource(flags), mNumMips(numMips), mNumSamples(numSamples), mPixelFormat(pixelFormat)
+        {
+            //TODO(KL): CreationFlags::None for now
+        }
 
-        virtual ~RHITexture() = default;
+        ~RHITexture() override = default;
         
         [[nodiscard]]
         unsigned int numMips() const { return mNumMips; }
@@ -23,11 +27,11 @@ class RHITexture
         unsigned int numSamples() const { return mNumSamples; }
 
         [[nodiscard]]
-        PixelFormat format() const { return mFormat; }
+        RHIPixelFormat pixelFormat() const { return mPixelFormat; }
 
     private:
         unsigned int mNumMips;
         unsigned int mNumSamples;
-        PixelFormat mFormat;
+        RHIPixelFormat mPixelFormat;
 };
 }

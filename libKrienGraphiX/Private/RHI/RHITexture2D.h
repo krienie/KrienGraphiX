@@ -2,6 +2,7 @@
 #pragma once
 
 #include "RHITexture.h"
+#include "RHIDescriptors.h"
 
 namespace kgx::RHI
 {
@@ -10,11 +11,11 @@ class RHIGraphicsDevice;
 class RHITexture2D : public RHITexture
 {
     public:
-        RHITexture2D(unsigned int width, unsigned int height, unsigned int numMips, unsigned int numSamples, PixelFormat format)
-            : RHITexture(numMips, numSamples, format), mWidth(width), mHeight(height)
+        RHITexture2D(RHITexture2DDescriptor descriptor)
+            : RHITexture(descriptor.flags, descriptor.numMips, descriptor.numSamples, descriptor.pixelFormat), mWidth(descriptor.width), mHeight(descriptor.height)
         {}
 
-        virtual ~RHITexture2D() = default;
+        ~RHITexture2D() override = default;
 
         [[nodiscard]]
         unsigned int width() const { return mWidth; }

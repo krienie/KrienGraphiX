@@ -7,6 +7,7 @@
 
 namespace kgx::RHI
 {
+class RHIDepthStencilBuffer;
 class RHISwapChain;
 }
 
@@ -24,6 +25,10 @@ public:
 
 private:
     std::unique_ptr<RHI::RHISwapChain> mRHISwapChain;
+
+    //TODO(KL): Temporarily here. Move to KDXRenderer
+    std::unique_ptr<RHI::RHIDepthStencilBuffer> mDepthStencil;
+
     KGXViewport mViewport;
 };
 }

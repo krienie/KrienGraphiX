@@ -8,6 +8,21 @@
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
 
+namespace
+{
+D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::RHIResourceView::DepthStencilFlags flags)
+{
+    using DepthStencilFlags = kgx::RHI::RHIResourceView::DepthStencilFlags;
+
+    assert(flags & DepthStencilFlags::DepthClear | flags & DepthStencilFlags::StencilClear);
+
+    D3D12_CLEAR_FLAGS dxClearFlags = flags & DepthStencilFlags::DepthClear ? D3D12_CLEAR_FLAG_DEPTH : static_cast<D3D12_CLEAR_FLAGS>(0);
+    dxClearFlags |= flags & DepthStencilFlags::StencilClear ? D3D12_CLEAR_FLAG_STENCIL : static_cast<D3D12_CLEAR_FLAGS>(0);
+
+    return dxClearFlags;
+}
+}
+
 namespace kgx::RHI
 {
 DX12GraphicsCommandList::DX12GraphicsCommandList()
@@ -73,19 +88,20 @@ void DX12GraphicsCommandList::setViewport(const KGXViewport& viewport)
     mCommandList->RSSetScissorRects(1u, &scissorRect);
 }
 
-void DX12GraphicsCommandList::clearDepthStencilView(RHIDepthStencilBuffer *dsv /*, clearFlags, depth, stencil*/)
+void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
-    auto * dxDsv = dynamic_cast<DX12DepthStencilBuffer*>(dsv);
-    if (dxDsv != nullptr)
-    {
-        const auto heapStart = dxDsv->getDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-        mCommandList->ClearDepthStencilView(heapStart, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    }
+    auto* dxDsv = dynamic_cast<DX12ResourceView*>(dsv);
+    assert(dxDsv && dxDsv->getViewType() == RHIResourceView::DSV);
+    
+    mCommandList->ClearDepthStencilView(dxDsv->getViewHandle(), toDxClearFlags(clearFlags), depth, stencil, 0, nullptr);
 }
 
-void DX12GraphicsCommandList::clearRenderTargetView()
+void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4])
 {
-    //mCommandList->ClearRenderTargetView();
+    auto* dxRtv = dynamic_cast<DX12ResourceView*>(rtv);
+    assert(dxRtv && dxRtv->getViewType() == RHIResourceView::RTV);
+
+    mCommandList->ClearRenderTargetView(dxRtv->getViewHandle(), colorRGBA, 0, nullptr);
 }
 
 } // namespace kgx::RHI

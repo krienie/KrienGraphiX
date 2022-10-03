@@ -1,23 +1,40 @@
 
 #include "DX12Texture2D.h"
 
+#include <cassert>
+
 #include "DX12GraphicsDevice.h"
-
-#include <utility>
-
-#include "d3dx12Residency.h"
-
-using Microsoft::WRL::ComPtr;
+#include "DX12Descriptors.h"
+#include "DX12PixelFormat.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx::RHI
 {
-//TODO(KL): Create constructor for placed texture resource
-//TODO(KL): Create Texture2D descriptor to reduce the amount of parameters
-
-DX12Texture2D::DX12Texture2D(ComPtr<ID3D12Resource> textureResource, ComPtr<ID3D12DescriptorHeap> descriptorHeap, int heapOffset, D3D12_RESOURCE_STATES initialState,
-                                unsigned int width, unsigned int height, unsigned int numMips, unsigned int numSamples, PixelFormat format)
-    : RHITexture2D(width, height, numMips, numSamples, format), DX12Resource(textureResource, nullptr, initialState),
-        mTextureResource(std::move(textureResource)), mDescriptorHeap(std::move(descriptorHeap)), mDescriptorHeapOffset(heapOffset)
+DX12Texture2D::DX12Texture2D(DX12GraphicsDevice* dxDevice, const DX12Texture2DDescriptor& descriptor)
+    : RHITexture2D(descriptor), DX12Resource(descriptor.textureResource, nullptr, descriptor.initialState)
 {
+    // Create the texture resource if it does not exist yet using the information in the passed texture descriptor
+    if (!descriptor.textureResource)
+    {
+        //TODO(KL): Create constructor for placed texture resource
+
+        ID3D12Device * nativeDevice = dxDevice->getNativeDevice();
+
+        const DXGI_FORMAT dxPixelFormat = toDxgiPixelFormat(descriptor.pixelFormat);
+
+        //TODO(KL): Set sample quality
+
+        const D3D12_CLEAR_VALUE clearValue = toDx12ClearValue(descriptor.pixelFormat, descriptor.clearValue);
+        const D3D12_RESOURCE_FLAGS resourceFlags = toDx12ResourceFlags(descriptor.flags);
+
+        // Create the actual texture resource, including a heap for it to live in
+        HRESULT res = nativeDevice->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Tex2D(dxPixelFormat, width(), height(), 1, static_cast<UINT16>(numMips()), numSamples(), 0, resourceFlags),
+            descriptor.initialState,
+            &clearValue,
+            IID_PPV_ARGS(&mResource));
+    }
 }
 }

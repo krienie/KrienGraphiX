@@ -24,8 +24,8 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
 
         void setViewport(const KGXViewport &viewport) override;
 
-        void clearDepthStencilView(RHIDepthStencilBuffer *dsv /*, clearFlags, depth, stencil*/) override;
-        void clearRenderTargetView(/*RHIRenderTargetView *rtv, const float colorRGBA[4]*/) override;
+        void clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil) override;
+        void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) override;
 
     private:
         Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
