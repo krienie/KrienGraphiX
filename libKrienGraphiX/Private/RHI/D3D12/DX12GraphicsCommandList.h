@@ -24,6 +24,8 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
 
         void setViewport(const KGXViewport &viewport) override;
 
+        void setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView) override;
+
         void clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil) override;
         void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) override;
 

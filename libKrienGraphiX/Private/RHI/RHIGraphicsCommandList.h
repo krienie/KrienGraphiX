@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include "RHIResourceView.h"
 #include "KrienGraphiX/Core/KGXDefinitions.h"
@@ -24,6 +25,8 @@ class RHIGraphicsCommandList
         virtual void reset(RHICommandQueue* commandQueue) = 0;
 
         virtual void setViewport(const KGXViewport& viewport) = 0;
+
+        virtual void setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView) = 0;
 
         virtual void clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil) = 0;
         virtual void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) = 0;

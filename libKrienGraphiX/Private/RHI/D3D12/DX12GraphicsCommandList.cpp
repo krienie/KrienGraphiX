@@ -88,6 +88,32 @@ void DX12GraphicsCommandList::setViewport(const KGXViewport& viewport)
     mCommandList->RSSetScissorRects(1u, &scissorRect);
 }
 
+void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView)
+{
+    auto* dxDsv = dynamic_cast<const DX12ResourceView*>(depthStencilView);
+    assert(dxDsv && dxDsv->getViewType() == RHIResourceView::DSV);
+
+    auto toCPUDescriptorHandleArray = [](const std::vector<RHIResourceView*>& renderTargetViews)
+    {
+        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> cpuDescriptorHandles(renderTargetViews.size());
+        for (uint8_t i = 0u; i < static_cast<uint8_t>(renderTargetViews.size()); ++i)
+        {
+            auto dxRtv = dynamic_cast<DX12ResourceView*>(renderTargetViews[i]);
+            //TODO(KL): Create concrete classes of all views, so these checks are not necessary anymore
+            assert(dxRtv && dxRtv->getViewType() == RHIResourceView::RTV);
+
+            cpuDescriptorHandles[i] = dxRtv->getViewHandle();
+        }
+
+        return cpuDescriptorHandles;
+    };
+
+    const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvCpuHandles = toCPUDescriptorHandleArray(renderTargetViews);
+    const D3D12_CPU_DESCRIPTOR_HANDLE dsvCpuHandle = dxDsv->getViewHandle();
+
+    mCommandList->OMSetRenderTargets(static_cast<UINT>(rtvCpuHandles.size()), rtvCpuHandles.data(), false, &dsvCpuHandle);
+}
+
 void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
     auto* dxDsv = dynamic_cast<DX12ResourceView*>(dsv);

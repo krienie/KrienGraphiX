@@ -91,9 +91,6 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 //    return std::make_unique<DX12ShaderProgram>();
 //}
 
-
-
-//TODO(KL): Temporary maybe_unused
 //std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState([[maybe_unused]] RHIGraphicsDevice * graphicsDevice)
 //{
 //    auto pipelineState = std::make_unique<DX12GraphicsPipelineState>();

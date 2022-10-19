@@ -51,14 +51,17 @@ void RenderWindow::draw()
     //TODO(KL): temporary fixed clear color
     static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 
+    auto backBufferRtv = mRHISwapChain->getCurrentBufferRTV();
+    auto depthStencilView = mDepthStencil->getResourceViewByType(RHI::RHIResourceView::DSV).get();
+
     // Clear the back buffer and depth buffer.
-	commandList->clearRenderTargetView(mRHISwapChain->getCurrentBufferRTV(), lightSteelBlue);
-	commandList->clearDepthStencilView(mDepthStencil->getResourceViewByType(RHI::RHIResourceView::DSV).get(),
-                                        static_cast<RHI::RHIResourceView::DepthStencilFlags>(RHI::RHIResourceView::DepthClear |
-                                            RHI::RHIResourceView::StencilClear), 1.0f, 0);
+	commandList->clearRenderTargetView(backBufferRtv, lightSteelBlue);
+	commandList->clearDepthStencilView(depthStencilView,
+                                        static_cast<RHI::RHIResourceView::DepthStencilFlags>(RHI::RHIResourceView::DepthClear | RHI::RHIResourceView::StencilClear),
+                                       1.0f, 0);
 	
     // Specify the buffers we are going to render to.
-	//mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+	commandList->setRenderTargets({backBufferRtv}, depthStencilView);
 
     RHI::PlatformRHI->endFrame(commandList, frameRenderTarget);
 
