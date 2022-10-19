@@ -15,12 +15,13 @@ public:
     KGToolboxApp& operator=(const KGToolboxApp& rhs) = delete;
     ~KGToolboxApp() = default;
 
-    int Run();
+    int run();
 
-    LRESULT MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
-    HWND InitWin32Window() const;
+    HWND initWindow() const;
+    void updateWindowTitle(double deltaTime);
 
     HINSTANCE mHInstance = nullptr;
     unsigned int mClientWidth;
@@ -28,5 +29,10 @@ private:
 
     KrienGraphiXEngine mKgxEngine;
     std::shared_ptr<kgx::core::RenderWindow> mRenderWindow;
+
+    // Frame time data
+    double mSecondsPerCount;
+	double mDeltaTime;
+    __int64 mPrevTime;
 };
 }

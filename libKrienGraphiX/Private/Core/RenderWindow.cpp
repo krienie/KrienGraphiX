@@ -7,7 +7,7 @@
 namespace kgx::core
 {
 RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
-    : mRHISwapChain(nullptr), mViewport{0, 0, width, height, 0.0f, 1.0f}
+    : mWindowHandle(windowHandle), mRHISwapChain(nullptr), mViewport{0, 0, width, height, 0.0f, 1.0f}
 {
     const auto* renderEngine = RenderCore::get();
 
@@ -17,7 +17,7 @@ RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned 
     mRHISwapChain = PlatformRHI->createSwapChain(
         rhiDevice,
         renderEngine->getCommandQueuePtr(),
-        windowHandle,
+        mWindowHandle,
         width,
         height,
         2); // Front- and back-buffer

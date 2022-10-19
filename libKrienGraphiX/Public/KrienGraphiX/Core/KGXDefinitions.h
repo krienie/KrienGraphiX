@@ -3,7 +3,7 @@
 
 namespace kgx
 {
-typedef unsigned int * WinHandle;
+typedef unsigned int* WinHandle;
 
 struct KGXViewport
 {

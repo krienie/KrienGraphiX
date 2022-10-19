@@ -1,6 +1,7 @@
 
 #include "framework.h"
 #include <string>
+#include <sstream>
 
 #include "KGToolbox.h"
 
@@ -9,6 +10,17 @@
 namespace
 {
 kgt::KGToolboxApp* KGToolboxPtr = nullptr;
+
+std::wstring loadResourceWString(HINSTANCE hInstance, int resourceId)
+{
+    constexpr int maxLoadStringSize = 100;
+    std::wstring resourceString;
+    resourceString.resize(maxLoadStringSize);
+
+    LoadStringW(hInstance, resourceId, resourceString.data(), maxLoadStringSize);
+
+    return resourceString;
+};
 }
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -32,7 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     KGToolboxPtr = &KGTApp;
 
-    return KGTApp.Run();
+    return KGTApp.run();
 }
 
 namespace kgt
@@ -40,63 +52,51 @@ namespace kgt
 KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth, unsigned int initialWindowHeight)
     : mHInstance(hInstance), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
 {
+    __int64 countsPerSec;
+	QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&countsPerSec));
+	mSecondsPerCount = 1.0 / static_cast<double>(countsPerSec);
+
     // Init main window
-    auto windowHandle = InitWin32Window();
+    auto windowHandle = initWindow();
 
     // Startup KGX
     mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, mClientWidth, mClientHeight);
 }
 
-int KGToolboxApp::Run()
+int KGToolboxApp::run()
 {
     MSG msg = {nullptr};
- 
-	//mTimer.Reset();
 
+    __int64 curTime;
+    QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&curTime));
+    mPrevTime = curTime;
+ 
 	while(msg.message != WM_QUIT)
 	{
-		// If there are Window messages then process them.
 		if(PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
 		{
             TranslateMessage( &msg );
             DispatchMessage( &msg );
 		}
-		// Otherwise, do animation/game stuff.
 		else
         {
-            //TODO(KL): call all active RenderWindows
-			//mTimer.Tick();
-            //
-			//if( !mAppPaused )
-			//{
-			//	Update(mTimer);	
+	        QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&curTime));
+
+	        mDeltaTime = static_cast<double>(curTime - mPrevTime) * mSecondsPerCount;
+	        mPrevTime = curTime;
+
+            updateWindowTitle(mDeltaTime);
             mRenderWindow->draw();
-			//}
-			//else
-			{
-				//Sleep(100);
-			}
         }
     }
 
 	return static_cast<int>(msg.wParam);
 }
 
-HWND KGToolboxApp::InitWin32Window() const
+HWND KGToolboxApp::initWindow() const
 {
-    auto loadResourceWString = [this](int resourceId)
-    {
-        constexpr int maxLoadStringSize = 100;
-        std::wstring resourceString;
-        resourceString.resize(maxLoadStringSize);
-
-        LoadStringW(mHInstance, resourceId, resourceString.data(), maxLoadStringSize);
-
-        return resourceString;
-    };
-
-    const std::wstring windowTitle = loadResourceWString(IDS_APP_TITLE);
-    const std::wstring windowClass = loadResourceWString(IDC_KGTOOLBOX);
+    const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
+    const std::wstring windowClass = loadResourceWString(mHInstance, IDC_KGTOOLBOX);
 
     WNDCLASSEXW wndClassEx;
     wndClassEx.cbSize = sizeof(WNDCLASSEX);
@@ -138,7 +138,34 @@ HWND KGToolboxApp::InitWin32Window() const
 	return windowHandle;
 }
 
-LRESULT KGToolboxApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void KGToolboxApp::updateWindowTitle(double deltaTime)
+{
+    static int frameCount = 0;
+    static double timeElapsed = 0.0;
+
+    timeElapsed += deltaTime;
+    ++frameCount;
+
+    if (timeElapsed >= 1.0)
+    {
+        const float fps = static_cast<float>(frameCount);
+        const float mspf = 1000.0f / fps;
+
+        const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
+
+        std::wstringstream wss;
+        wss << windowTitle.c_str() << L"    fps: " << std::to_wstring(fps);
+        wss << L"   mspf: " << std::to_wstring(mspf);
+        auto newTitle = wss.str();
+
+        SetWindowText(reinterpret_cast<HWND>(mRenderWindow->getWinHandle()), wss.str().c_str());
+
+        frameCount = 0;
+        timeElapsed -= 1.0;
+    }
+}
+
+LRESULT KGToolboxApp::msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
@@ -171,7 +198,7 @@ LRESULT KGToolboxApp::MsgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    return KGToolboxPtr->MsgProc(hWnd, message, wParam, lParam);
+    return KGToolboxPtr->msgProc(hWnd, message, wParam, lParam);
 }
 
 // Message handler for about box.
