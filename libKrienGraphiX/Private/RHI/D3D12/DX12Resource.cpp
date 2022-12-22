@@ -12,7 +12,8 @@ DX12Resource::DX12Resource(Microsoft::WRL::ComPtr<ID3D12Resource> resourcePtr, M
 
 void DX12Resource::transitionToState(DX12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState)
 {
-    commandList->getCommandList()->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mResource.Get(), mCurrentState, newState));
+    const auto transition = CD3DX12_RESOURCE_BARRIER::Transition(mResource.Get(), mCurrentState, newState);
+    commandList->getCommandList()->ResourceBarrier(1, &transition);
 
     //TODO(KL): Maybe call this pending state as the cmdlist hasn't been executed yet?
     //TODO(KL): Or find a way to properly sync this to the cmdlist (events/fences?)

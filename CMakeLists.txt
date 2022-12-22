@@ -6,7 +6,7 @@ include(cmake/functions.cmake)
 
 project(KrienGraphiX CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 add_definitions(-D_UNICODE -DUNICODE)
 
 if (MSVC)

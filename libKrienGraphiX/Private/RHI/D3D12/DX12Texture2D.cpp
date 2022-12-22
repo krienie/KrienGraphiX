@@ -18,7 +18,7 @@ DX12Texture2D::DX12Texture2D(DX12GraphicsDevice* dxDevice, const DX12Texture2DDe
     {
         //TODO(KL): Create constructor for placed texture resource
 
-        ID3D12Device * nativeDevice = dxDevice->getNativeDevice();
+        ID3D12Device* nativeDevice = dxDevice->getNativeDevice();
 
         const DXGI_FORMAT dxPixelFormat = toDxgiPixelFormat(descriptor.pixelFormat);
 
@@ -28,10 +28,12 @@ DX12Texture2D::DX12Texture2D(DX12GraphicsDevice* dxDevice, const DX12Texture2DDe
         const D3D12_RESOURCE_FLAGS resourceFlags = toDx12ResourceFlags(descriptor.flags);
 
         // Create the actual texture resource, including a heap for it to live in
-        HRESULT res = nativeDevice->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+        const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
+        const auto resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(dxPixelFormat, width(), height(), 1, static_cast<UINT16>(numMips()), numSamples(), 0, resourceFlags);
+        nativeDevice->CreateCommittedResource(
+            &heapProperties,
             D3D12_HEAP_FLAG_NONE,
-            &CD3DX12_RESOURCE_DESC::Tex2D(dxPixelFormat, width(), height(), 1, static_cast<UINT16>(numMips()), numSamples(), 0, resourceFlags),
+            &resourceDesc,
             descriptor.initialState,
             &clearValue,
             IID_PPV_ARGS(&mResource));
