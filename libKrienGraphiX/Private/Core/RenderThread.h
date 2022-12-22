@@ -32,7 +32,7 @@ class RenderThread final
         void processRenderCommands();
 
         bool mRunning;
-        std::vector<std::thread> mThreadPool;
+        std::vector<std::thread> mThreadList;
         std::mutex mEnqueueMutex;
 
         std::deque<std::function<void()>> mCommands;

@@ -22,10 +22,10 @@ RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned 
         height,
         2); // Front- and back-buffer
 
-
     const RHITexture2DDescriptor texDesc =
         {
-        RHIClearValue{1.0, 0, 0, 0},
+        // depth clear = 1.0f, stencil clear = 0
+        RHIClearValue{.depthClear = RHIClearValue::DepthClear{1.0f, 0}},
         RHIPixelFormat::D24_unorm_S8_uint,
         width,
         height,

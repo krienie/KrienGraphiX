@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "resource.h"
-
 #include <KrienGraphiX/Core/KrienGraphiXEngine.h>
 
 namespace kgt
@@ -32,7 +30,7 @@ private:
 
     // Frame time data
     double mSecondsPerCount;
-	double mDeltaTime;
-    __int64 mPrevTime;
+	double mDeltaTime = 0.0;
+    __int64 mPrevTime = 0;
 };
 }

@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "KGToolbox.h"
+#include "Resource.h"
 
 #include "KrienGraphiX/Core/RenderWindow.h"
 
@@ -57,7 +58,7 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
 	mSecondsPerCount = 1.0 / static_cast<double>(countsPerSec);
 
     // Init main window
-    auto windowHandle = initWindow();
+    const HWND windowHandle = initWindow();
 
     // Startup KGX
     mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, mClientWidth, mClientHeight);
@@ -114,7 +115,7 @@ HWND KGToolboxApp::initWindow() const
     
 	if( !RegisterClassExW(&wndClassEx) )
 	{
-		MessageBox(0, L"RegisterClass Failed.", 0, 0);
+		MessageBox(0, L"RegisterClass Failed.", nullptr, 0);
 		return nullptr;
 	}
 
@@ -148,7 +149,7 @@ void KGToolboxApp::updateWindowTitle(double deltaTime)
 
     if (timeElapsed >= 1.0)
     {
-        const float fps = static_cast<float>(frameCount);
+        const auto fps = static_cast<float>(frameCount);
         const float mspf = 1000.0f / fps;
 
         const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
@@ -171,9 +172,9 @@ LRESULT KGToolboxApp::msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
     {
     case WM_COMMAND:
         {
-            int wmId = LOWORD(wParam);
+            int messageId = LOWORD(wParam);
             // Parse the menu selections:
-            switch (wmId)
+            switch (messageId)
             {
             case IDM_ABOUT:
                 DialogBox(mHInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);

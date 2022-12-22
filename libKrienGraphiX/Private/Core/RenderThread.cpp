@@ -7,10 +7,10 @@ RenderThread::RenderThread()
     : mRunning(true), mNumBusyThreads(0u)
 {
     const unsigned int numThreads = std::thread::hardware_concurrency();
-    mThreadPool.reserve(numThreads);
+    mThreadList.reserve(numThreads);
     for (unsigned int i = 0u; i < numThreads; ++i)
     {
-        mThreadPool.emplace_back(&RenderThread::processRenderCommands, this);
+        mThreadList.emplace_back(&RenderThread::processRenderCommands, this);
     }
 }
 
@@ -22,7 +22,7 @@ RenderThread::~RenderThread()
         mCvCommand.notify_all();
     }
 
-    for (auto &thread : mThreadPool)
+    for (auto &thread : mThreadList)
     {
         thread.join();
     }
@@ -48,7 +48,7 @@ void RenderThread::processRenderCommands()
     do
     {
         // wait for commands to show up
-        std::unique_lock<std::mutex> lock(mEnqueueMutex);
+        std::unique_lock lock(mEnqueueMutex);
         mCvCommand.wait(lock, [this]() { return !mRunning || !mCommands.empty(); });
         if (mRunning && !mCommands.empty())
         {
