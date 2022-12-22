@@ -22,6 +22,7 @@ private:
     void updateWindowTitle(double deltaTime);
 
     HINSTANCE mHInstance = nullptr;
+    HWND mWindowHandle = nullptr;
     unsigned int mClientWidth;
 	unsigned int mClientHeight;
 

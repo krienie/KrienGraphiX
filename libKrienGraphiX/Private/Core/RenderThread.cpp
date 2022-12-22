@@ -1,71 +1,60 @@
 
 #include "RenderThread.h"
 
+#ifdef WIN32
+#include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
+#endif
+
+#include <cassert>
+
+#include "CommandThread.h"
+
+#include <utility>
+
 namespace kgx::core
 {
 RenderThread::RenderThread()
-    : mRunning(true), mNumBusyThreads(0u)
+    : mCommandThread(std::make_unique<CommandThread>(1)),
+        mGraphicsDevice(nullptr),
+        mCommandList(nullptr)
 {
-    const unsigned int numThreads = std::thread::hardware_concurrency();
-    mThreadList.reserve(numThreads);
-    for (unsigned int i = 0u; i < numThreads; ++i)
-    {
-        mThreadList.emplace_back(&RenderThread::processRenderCommands, this);
-    }
+#ifdef WIN32
+    RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
+#else
+    static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
+#endif
+
+    assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
+
+    mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
+    mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
+    mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
 }
 
-RenderThread::~RenderThread()
+RHI::RHIGraphicsDevice* RenderThread::getGraphicsDevicePtr() const
 {
-    {
-        std::unique_lock<std::mutex> lock(mEnqueueMutex);
-        mRunning = false;
-        mCvCommand.notify_all();
-    }
-
-    for (auto &thread : mThreadList)
-    {
-        thread.join();
-    }
+    return mGraphicsDevice.get();
 }
 
-void RenderThread::enqueueRenderCommand(RenderCommand cmd)
+RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
 {
-    std::lock_guard<std::mutex> lock(mEnqueueMutex);
-    mCommands.emplace_back(std::move(cmd));
-    mCvCommand.notify_one();
+    return mCommandQueue.get();
 }
 
-void RenderThread::flush()
+RHI::RHIGraphicsCommandList* RenderThread::getGraphicsCommandListPtr() const
 {
-    //TODO(KL): This only makes sure the render commands are fired. Implement an actual GPU fence as well (As a command itself that blocks)
-
-    std::unique_lock<std::mutex> lock(mEnqueueMutex);
-    mCvFinished.wait(lock, [this](){ return mCommands.empty() && mNumBusyThreads == 0u; });
+    return mCommandList.get();
 }
 
-void RenderThread::processRenderCommands()
+void RenderThread::enqueueCommand(RenderCommand cmd) const
 {
-    do
-    {
-        // wait for commands to show up
-        std::unique_lock lock(mEnqueueMutex);
-        mCvCommand.wait(lock, [this]() { return !mRunning || !mCommands.empty(); });
-        if (mRunning && !mCommands.empty())
-        {
-            ++mNumBusyThreads;
-
-            auto cmd = mCommands.front();
-            mCommands.pop_front();
-
-            // Run the command
-            lock.unlock();
-            cmd();
-            lock.lock();
-
-            --mNumBusyThreads;
-            mCvFinished.notify_one();
-        }
-    } while (mRunning);
+    //TODO(KL): encapsulate a lambda here to be able to include things like the commandlist
+    
+    mCommandThread->enqueueCommand(std::move(cmd));
 }
 
+void RenderThread::flush() const
+{
+    mCommandThread->flush();
+}
 }

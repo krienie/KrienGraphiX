@@ -1,16 +1,16 @@
 
 #pragma once
 
-#include <condition_variable>
-#include <deque>
-#include <mutex>
-#include <thread>
-
-#include <vector>
 #include <functional>
+#include <memory>
+
+#include "Private/RHI/RHIGraphicsCommandList.h"
+#include "Private/RHI/RHIGraphicsDevice.h"
+#include "Private/RHI/RHISwapChain.h"
 
 namespace kgx::core
 {
+class CommandThread;
 
 class RenderThread final
 {
@@ -18,26 +18,27 @@ class RenderThread final
         using RenderCommand = std::function<void()>;
 
         RenderThread();
-        ~RenderThread();
+        ~RenderThread() = default;
 
         RenderThread(const RenderThread&) noexcept            = delete;
         RenderThread(RenderThread&&) noexcept                 = delete;
         RenderThread& operator=(const RenderThread&) noexcept = delete;
         RenderThread& operator=(RenderThread&&) noexcept      = delete;
 
-        void enqueueRenderCommand(RenderCommand cmd);
-        void flush();
+        [[nodiscard]] RHI::RHIGraphicsDevice* getGraphicsDevicePtr() const;
+        [[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
+        [[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
+
+        void enqueueCommand(RenderCommand cmd) const;
+        void flush() const;
 
     private:
-        void processRenderCommands();
+        std::unique_ptr<CommandThread> mCommandThread;
 
-        bool mRunning;
-        std::vector<std::thread> mThreadList;
-        std::mutex mEnqueueMutex;
-
-        std::deque<std::function<void()>> mCommands;
-        std::condition_variable mCvCommand;
-        std::condition_variable mCvFinished;
-        unsigned int mNumBusyThreads;
+        std::unique_ptr<RHI::RHIGraphicsDevice> mGraphicsDevice;
+        std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
+        
+        //TODO(KL): For now we have one commandlist. Later this will be one CommandList per RenderPass manager
+        std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
 };
 }

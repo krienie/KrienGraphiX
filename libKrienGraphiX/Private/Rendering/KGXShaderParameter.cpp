@@ -3,7 +3,7 @@
 
 #include "Private/Core/RenderCore.h"
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
 KGXShaderParameter::KGXShaderParameter(std::string name, unsigned int size, unsigned int offset, int bufferIndex, KGXShaderProgram *parentShaderProgram)
     : mName(std::move(name)), mSizeInBytes(size), mOffset(offset), mBufferIndex(bufferIndex), mParentShaderProgram(parentShaderProgram)

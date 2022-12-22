@@ -5,10 +5,9 @@
 
 #include "KGXDefinitions.h"
 
-namespace kgx::RHI
+namespace kgx::rendering
 {
-class RHIDepthStencilBuffer;
-class RHISwapChain;
+class KGXRenderWindow;
 }
 
 namespace kgx::core
@@ -19,20 +18,13 @@ public:
     RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
     ~RenderWindow() = default;
 
-    [[nodiscard]] WinHandle getWinHandle() const { return mWindowHandle; }
+    [[nodiscard]] WinHandle getWinHandle() const;
 
     void draw();
-
+    
     //TODO(KL): implement resize
 
 private:
-    WinHandle mWindowHandle;
-
-    std::unique_ptr<RHI::RHISwapChain> mRHISwapChain;
-
-    //TODO(KL): Temporarily here. Move to KGXRenderer
-    std::unique_ptr<RHI::RHIDepthStencilBuffer> mDepthStencil;
-
-    KGXViewport mViewport;
+    std::shared_ptr<rendering::KGXRenderWindow> mKGXRenderWindow;
 };
 }

@@ -58,10 +58,10 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
 	mSecondsPerCount = 1.0 / static_cast<double>(countsPerSec);
 
     // Init main window
-    const HWND windowHandle = initWindow();
+    mWindowHandle = initWindow();
 
     // Startup KGX
-    mRenderWindow = mKgxEngine.createRenderWindow(windowHandle, mClientWidth, mClientHeight);
+    mRenderWindow = mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
 }
 
 int KGToolboxApp::run()
@@ -159,7 +159,7 @@ void KGToolboxApp::updateWindowTitle(double deltaTime)
         wss << L"   mspf: " << std::to_wstring(mspf);
         auto newTitle = wss.str();
 
-        SetWindowText(reinterpret_cast<HWND>(mRenderWindow->getWinHandle()), wss.str().c_str());
+        SetWindowText(mWindowHandle, wss.str().c_str());
 
         frameCount = 0;
         timeElapsed -= 1.0;

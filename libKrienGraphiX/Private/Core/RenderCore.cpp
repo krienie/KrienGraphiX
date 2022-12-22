@@ -2,11 +2,10 @@
 #include "RenderCore.h"
 
 #ifdef WIN32
-#include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
+#ifdef _DEBUG
+#include <Windows.h>
 #endif
-
-#include <cassert>
-#include <iostream>
+#endif
 
 namespace kgx::core
 {
@@ -38,34 +37,33 @@ void RenderCore::shutdown()
     }
 }
 
+RenderThread* RenderCore::getRenderThreadPtr() const
+{
+    return mRenderThread.get();
+}
+
 RenderCore::RenderCore()
-    : mRenderThread(), mGraphicsDevice(nullptr), mCommandList(nullptr)
+    : mSceneThread(1), mRenderThread(std::make_unique<RenderThread>())
 {
 #ifdef WIN32
-    RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
-#else
-    static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
+#ifdef _DEBUG
+        // open console when compiling for debugging
+        AllocConsole();
+        AttachConsole(GetCurrentProcessId());
+
+#pragma warning(push)
+#pragma warning(disable : 4996) // 'freopen': This function or variable may be unsafe
+        freopen( "CON", "w", stdout );
+        freopen( "CON", "w", stderr );
+#pragma warning(pop)
+#endif
 #endif
 
-    assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
+    mFrameTimer = std::make_unique<Timer>(500, []()
+    {
+        //static int frameCounter = 0;
 
-    mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
-    mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
-    mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
-}
 
-RHI::RHIGraphicsDevice* RenderCore::getGraphicsDevicePtr() const
-{
-    return mGraphicsDevice.get();
-}
-
-RHI::RHICommandQueue* RenderCore::getCommandQueuePtr() const
-{
-    return mCommandQueue.get();
-}
-
-RHI::RHIGraphicsCommandList* RenderCore::getGraphicsCommandListPtr() const
-{
-    return mCommandList.get();
+    });
 }
 }

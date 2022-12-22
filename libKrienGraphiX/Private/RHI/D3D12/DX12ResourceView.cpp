@@ -51,7 +51,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE DX12ResourceView::getViewHandle() const
 
 void DX12ResourceView::createView()
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(core::RenderCore::get()->getGraphicsDevicePtr());
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(core::RenderCore::get()->getRenderThreadPtr()->getGraphicsDevicePtr());
     auto* nativeDevice = dxDevice->getNativeDevice();
 
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc;

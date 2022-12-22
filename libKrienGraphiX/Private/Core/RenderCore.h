@@ -1,10 +1,12 @@
 
 #pragma once
 
+#include "Private/Core/CommandThread.h"
 #include "Private/Core/RenderThread.h"
-#include "Private/RHI/RenderHardwareInterface.h"
 
 #include <memory>
+
+#include "Timer.h"
 
 namespace kgx::core
 {
@@ -21,9 +23,8 @@ public:
     RenderCore(RenderCore&&) noexcept                 = delete;
     RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
-    [[nodiscard]] RHI::RHIGraphicsDevice* getGraphicsDevicePtr() const;
-    [[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
-    [[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
+    //[[nodiscard]] SceneThread* getSceneThreadPtr() const;
+    [[nodiscard]] RenderThread* getRenderThreadPtr() const;
 
 private:
     RenderCore();
@@ -32,12 +33,9 @@ private:
     static RenderCore* mInst;
     static int mRefCount;
 
-    RenderThread mRenderThread;
-    
-    std::unique_ptr<RHI::RHIGraphicsDevice> mGraphicsDevice;
-    std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
-
-    //TODO(KL): For now we have one commandlist. Later this will be one CommandList per RenderPass manager
-    std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
+    std::unique_ptr<Timer> mFrameTimer;
+    CommandThread mSceneThread;
+    std::unique_ptr<RenderThread> mRenderThread;
+    //CommandThread mThreadPool; Not really needed for now
 };
 }

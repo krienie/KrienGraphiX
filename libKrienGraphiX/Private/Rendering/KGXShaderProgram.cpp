@@ -5,7 +5,7 @@
 
 #include "Private/Core/RenderCore.h"
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
 KGXShaderProgram::KGXShaderProgram(std::string name)
     : mName(std::move(name))//, mRHIShaderProgram(core::RenderCore::get()->getRHI()->createShaderProgram())

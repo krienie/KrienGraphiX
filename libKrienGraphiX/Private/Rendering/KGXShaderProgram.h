@@ -11,7 +11,7 @@
 #include "Private/RHI/RHIConstantBuffer.h"
 #include "Private/RHI/RHIShaderProgram.h"
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
 class KGXShaderProgram
 {

@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
     class KGXShaderProgram;
 

@@ -22,7 +22,7 @@ void DX12RenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList
 {
     const auto* renderCore = core::RenderCore::get();
 
-    auto* commandQueue = renderCore->getCommandQueuePtr();
+    auto* commandQueue = renderCore->getRenderThreadPtr()->getCommandQueuePtr();
 
     auto* dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
     assert(dxCommandQueue);

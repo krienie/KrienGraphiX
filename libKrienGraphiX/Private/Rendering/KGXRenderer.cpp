@@ -3,7 +3,7 @@
 
 #include "Private/Core/RenderCore.h"
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
     /*
      * mRenderThread.enqueueRenderCommand([]()

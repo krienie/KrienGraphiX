@@ -5,7 +5,7 @@
 
 #include "Private/RHI/RHIGraphicsCommandList.h"
 
-namespace kgx::Rendering
+namespace kgx::rendering
 {
 class KGXRenderer
 {
