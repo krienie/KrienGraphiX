@@ -17,10 +17,16 @@ Timer::Timer(int intervalMilliSeconds, OnCompletedEvent onCompleted)
 
 Timer::~Timer()
 {
+    stop();
+}
+
+void Timer::stop()
+{
     if (mWorkerThread)
     {
         mIsRunning = false;
         mWorkerThread->join();
+        mWorkerThread.reset();
     }
 }
 
@@ -42,7 +48,8 @@ void Timer::timerTick()
 
         if (mPrevEvent + mIntervalMilliSeconds < now)
         {
-            mOnCompletedEvent();
+            const float deltaTimeSeconds = static_cast<float>(now - mPrevEvent) / 1000.0f;
+            mOnCompletedEvent(deltaTimeSeconds);
             mPrevEvent = now;
         }
     }

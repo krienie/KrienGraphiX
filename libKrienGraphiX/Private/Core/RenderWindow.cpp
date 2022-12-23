@@ -1,6 +1,7 @@
 
-#include "KrienGraphiX/Core/RenderWindow.h"
+#include "RenderWindow.h"
 
+#include "RenderCore.h"
 #include "Private/Rendering/KGXRenderWindow.h"
 
 using namespace kgx::rendering;
@@ -18,8 +19,11 @@ WinHandle RenderWindow::getWinHandle() const
     return mKGXRenderWindow->getWinHandle();
 }
 
-void RenderWindow::draw()
+void RenderWindow::draw() const
 {
-    mKGXRenderWindow->draw();
+    RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
+    {
+        mKGXRenderWindow->draw();
+    });
 }
 }

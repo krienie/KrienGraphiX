@@ -11,10 +11,12 @@ namespace kgx::core
 class Timer final
 {
 public:
-    using OnCompletedEvent = std::function<void()>;
+    using OnCompletedEvent = std::function<void(float deltaTime)>;
 
     Timer(int intervalMilliseconds, OnCompletedEvent onCompleted);
     ~Timer();
+
+    void stop();
 
     Timer(const Timer&) noexcept            = delete;
     Timer& operator=(const Timer&) noexcept = delete;

@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "KGXDefinitions.h"
+#include "KrienGraphiX/Core/KGXDefinitions.h"
 
 namespace kgx::rendering
 {
@@ -20,7 +20,7 @@ public:
 
     [[nodiscard]] WinHandle getWinHandle() const;
 
-    void draw();
+    void draw() const;
     
     //TODO(KL): implement resize
 

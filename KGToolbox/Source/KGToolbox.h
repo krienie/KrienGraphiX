@@ -19,7 +19,7 @@ public:
 
 private:
     HWND initWindow() const;
-    void updateWindowTitle(double deltaTime);
+    void updateWindowTitle(float deltaTime);
 
     HINSTANCE mHInstance = nullptr;
     HWND mWindowHandle = nullptr;
@@ -27,11 +27,5 @@ private:
 	unsigned int mClientHeight;
 
     KrienGraphiXEngine mKgxEngine;
-    std::shared_ptr<kgx::core::RenderWindow> mRenderWindow;
-
-    // Frame time data
-    double mSecondsPerCount;
-	double mDeltaTime = 0.0;
-    __int64 mPrevTime = 0;
 };
 }

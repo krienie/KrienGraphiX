@@ -1,13 +1,7 @@
 
 #pragma once
 
-#include <memory>
-#include <Windows.h>
-
-namespace kgx::core
-{
-class RenderWindow;
-}
+#include "KGXDefinitions.h"
 
 class KrienGraphiXEngine final
 {
@@ -15,5 +9,6 @@ public:
     KrienGraphiXEngine();
     ~KrienGraphiXEngine();
 
-    std::shared_ptr<kgx::core::RenderWindow> createRenderWindow(HWND windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const;
+    bool createRenderWindow(kgx::WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const;
+    void addSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const;
 };

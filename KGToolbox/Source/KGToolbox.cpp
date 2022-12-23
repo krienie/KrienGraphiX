@@ -6,8 +6,6 @@
 #include "KGToolbox.h"
 #include "Resource.h"
 
-#include "KrienGraphiX/Core/RenderWindow.h"
-
 namespace
 {
 kgt::KGToolboxApp* KGToolboxPtr = nullptr;
@@ -53,24 +51,20 @@ namespace kgt
 KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth, unsigned int initialWindowHeight)
     : mHInstance(hInstance), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
 {
-    __int64 countsPerSec;
-	QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&countsPerSec));
-	mSecondsPerCount = 1.0 / static_cast<double>(countsPerSec);
-
     // Init main window
     mWindowHandle = initWindow();
 
     // Startup KGX
-    mRenderWindow = mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
+    mKgxEngine.createRenderWindow(reinterpret_cast<kgx::WinHandle>(mWindowHandle), mClientWidth, mClientHeight);
+    mKgxEngine.addSceneUpdateDelegate([this](float deltaTime)
+    {
+        updateWindowTitle(deltaTime);
+    });
 }
 
 int KGToolboxApp::run()
 {
     MSG msg = {nullptr};
-
-    __int64 curTime;
-    QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&curTime));
-    mPrevTime = curTime;
  
 	while(msg.message != WM_QUIT)
 	{
@@ -79,16 +73,6 @@ int KGToolboxApp::run()
             TranslateMessage( &msg );
             DispatchMessage( &msg );
 		}
-		else
-        {
-	        QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&curTime));
-
-	        mDeltaTime = static_cast<double>(curTime - mPrevTime) * mSecondsPerCount;
-	        mPrevTime = curTime;
-
-            updateWindowTitle(mDeltaTime);
-            mRenderWindow->draw();
-        }
     }
 
 	return static_cast<int>(msg.wParam);
@@ -139,15 +123,15 @@ HWND KGToolboxApp::initWindow() const
 	return windowHandle;
 }
 
-void KGToolboxApp::updateWindowTitle(double deltaTime)
+void KGToolboxApp::updateWindowTitle(float deltaTime)
 {
     static int frameCount = 0;
-    static double timeElapsed = 0.0;
+    static float timeElapsed = 0.0;
 
     timeElapsed += deltaTime;
     ++frameCount;
 
-    if (timeElapsed >= 1.0)
+    if (timeElapsed >= 1.0f)
     {
         const auto fps = static_cast<float>(frameCount);
         const float mspf = 1000.0f / fps;
@@ -155,14 +139,13 @@ void KGToolboxApp::updateWindowTitle(double deltaTime)
         const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
 
         std::wstringstream wss;
-        wss << windowTitle.c_str() << L"    fps: " << std::to_wstring(fps);
-        wss << L"   mspf: " << std::to_wstring(mspf);
-        auto newTitle = wss.str();
+        wss << windowTitle.c_str() << L"    fps: " << std::to_wstring(static_cast<int>(fps));
+        wss << L"   mspf: " << std::to_wstring(std::lroundf(mspf));
 
         SetWindowText(mWindowHandle, wss.str().c_str());
 
         frameCount = 0;
-        timeElapsed -= 1.0;
+        timeElapsed -= 1.0f;
     }
 }
 

@@ -1,6 +1,8 @@
 
 #include "RenderCore.h"
 
+#include "RenderWindow.h"
+
 #ifdef WIN32
 #ifdef _DEBUG
 #include <Windows.h>
@@ -37,13 +39,33 @@ void RenderCore::shutdown()
     }
 }
 
+SceneThread* RenderCore::getSceneThreadPtr() const
+{
+    return mSceneThread.get();
+}
+
 RenderThread* RenderCore::getRenderThreadPtr() const
 {
     return mRenderThread.get();
 }
 
+bool RenderCore::createRenderWindow(WinHandle windowHandle, unsigned initialWindowWidth, unsigned initialWindowHeight)
+{
+    std::lock_guard lock(mRenderWindowMutex);
+
+    if (const auto it = mRenderWindows.find(windowHandle); it != mRenderWindows.end())
+    {
+        // RenderWindow with handle windowHandle already exists. Just exit here
+        //TODO(KL): log error
+        return false;
+    }
+
+    mRenderWindows[windowHandle] = std::make_shared<RenderWindow>(windowHandle, initialWindowWidth, initialWindowHeight);
+    return true;
+}
+
 RenderCore::RenderCore()
-    : mSceneThread(1), mRenderThread(std::make_unique<RenderThread>())
+    : mSceneThread(std::make_unique<SceneThread>()), mRenderThread(std::make_unique<RenderThread>())
 {
 #ifdef WIN32
 #ifdef _DEBUG
@@ -59,11 +81,21 @@ RenderCore::RenderCore()
 #endif
 #endif
 
-    mFrameTimer = std::make_unique<Timer>(500, []()
+    mSceneThread->addPostSceneUpdateDelegate([this]()
     {
-        //static int frameCounter = 0;
-
-
+        std::lock_guard lock(mRenderWindowMutex);
+        for (auto [_, renderWindow]: mRenderWindows)
+        {
+            renderWindow->draw();
+        }
     });
+
+    mSceneThread->start();
+}
+
+RenderCore::~RenderCore()
+{
+    // Make sure the SceneThread is stopped before we destruct everything else
+    mSceneThread.reset();
 }
 }
