@@ -22,9 +22,10 @@ Timer::~Timer()
 
 void Timer::stop()
 {
+    mIsRunning = false;
+
     if (mWorkerThread)
     {
-        mIsRunning = false;
         mWorkerThread->join();
         mWorkerThread.reset();
     }

@@ -15,10 +15,7 @@ SceneThread::SceneThread()
 SceneThread::~SceneThread()
 {
     // Make sure the frame time is stopped before we destruct everything else
-    if (mFrameTimer)
-    {
-        mFrameTimer->stop();
-    }
+    mFrameTimer.reset();
 }
 
 void SceneThread::start()

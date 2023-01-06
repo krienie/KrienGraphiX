@@ -31,6 +31,11 @@ RenderThread::RenderThread()
     mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
 }
 
+RenderThread::~RenderThread()
+{
+    mCommandThread.reset();
+}
+
 RHI::RHIGraphicsDevice* RenderThread::getGraphicsDevicePtr() const
 {
     return mGraphicsDevice.get();

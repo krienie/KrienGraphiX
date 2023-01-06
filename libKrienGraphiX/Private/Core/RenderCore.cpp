@@ -97,5 +97,6 @@ RenderCore::~RenderCore()
 {
     // Make sure the SceneThread is stopped before we destruct everything else
     mSceneThread.reset();
+    mRenderThread.reset();
 }
 }

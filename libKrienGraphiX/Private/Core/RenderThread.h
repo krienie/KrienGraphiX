@@ -18,7 +18,7 @@ class RenderThread final
         using RenderCommand = std::function<void()>;
 
         RenderThread();
-        ~RenderThread() = default;
+        ~RenderThread();
 
         RenderThread(const RenderThread&) noexcept            = delete;
         RenderThread(RenderThread&&) noexcept                 = delete;
