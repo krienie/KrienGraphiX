@@ -4,29 +4,26 @@
 #include "DX12GraphicsDevice.h"
 #include "DX12MemoryUtils.h"
 
-#include <cassert>
-#include <utility>
-
 namespace kgx::RHI
 {
 DX12ConstantBuffer::DX12ConstantBuffer(size_t sizeInBytes, DX12ConstantBufferDescriptor descriptor)
-    : RHIConstantBuffer(DX12MemoryUtils::alignTo256Bytes(sizeInBytes)), mCurMapType(MapType::READ_WRITE), mResource(nullptr),
+    : RHIConstantBuffer(DX12MemoryUtils::alignTo256Bytes(sizeInBytes)), mResource(nullptr),
     mDescriptor(std::move(descriptor))
 {
 }
 
 bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
 {
-    auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
     {
         // This should never happen
         return false;
     }
 
-    auto * nativeDevice = dxDevice->getNativeDevice();
+    auto* nativeDevice = dxDevice->getNativeDevice();
 
-    D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize());
+    const D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize());
     const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap.Get(), mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
 
     if (FAILED(res))
@@ -42,15 +39,15 @@ bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
 
     return true;
 }
-
-void* DX12ConstantBuffer::map(MapType type)
+    
+void* DX12ConstantBuffer::mapImpl(MapType type)
 {
-    void * dataPtr;
-    mCurMapType = type;
+    void* dataPtr;
 
-    if (type == MapType::WRITE_ONLY)
+    // Write only
+    if ((type | MapType::WRITE) == MapType::WRITE)
     {
-        CD3DX12_RANGE readRange(0, 0);
+        const CD3DX12_RANGE readRange(0, 0);
         mResource->Map(0, &readRange, &dataPtr);
     } else
     {
@@ -61,24 +58,15 @@ void* DX12ConstantBuffer::map(MapType type)
     return dataPtr;
 }
 
-void DX12ConstantBuffer::unmap()
+void DX12ConstantBuffer::unmapImpl()
 {
-    if (mCurMapType == MapType::READ_ONLY)
+    if ((currentMappedType() | MapType::READ) == MapType::READ)
     {
-        CD3DX12_RANGE writeRange(0, 0);
+        const CD3DX12_RANGE writeRange(0, 0);
         mResource->Unmap(0, &writeRange);
     } else
     {
         mResource->Unmap(0, nullptr);
     }
-}
-
-void DX12ConstantBuffer::copyBufferData(const void* data, unsigned int sizeInBytes)
-{
-    assert(sizeInBytes <= bufferSize());
-
-    void* dataBegin = map(MapType::WRITE_ONLY);
-    memcpy(dataBegin, data, sizeInBytes);
-    unmap();
 }
 }

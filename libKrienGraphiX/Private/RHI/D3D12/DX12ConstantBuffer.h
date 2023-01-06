@@ -25,14 +25,11 @@ class DX12ConstantBuffer final : public RHIConstantBuffer
         DX12ConstantBuffer & operator=(DX12ConstantBuffer &&) noexcept = default;
 
         bool init(RHIGraphicsDevice *device) override;
-
-        void* map(MapType type) override;
-        void unmap() override;
-
-        void copyBufferData(const void* data, unsigned int sizeInBytes);
-
+        
     private:
-        MapType mCurMapType;
+        void* mapImpl(MapType type) override;
+        void unmapImpl() override;
+        
         Microsoft::WRL::ComPtr<ID3D12Resource> mResource;
         DX12ConstantBufferDescriptor mDescriptor;
 };
