@@ -1,42 +1,36 @@
 
-#include "Private/ShaderCompiler.h"
+#include "ShaderCompiler/ShaderCompiler.h"
 
 #include <dxc/d3d12shader.h>
 #include <dxc/dxcapi.h>
-#include <wrl\client.h>
+#include <wrl/client.h>
 
 #include <filesystem>
 #include <iostream>
-#include <optional>
 #include <sstream>
 
 
+using namespace Microsoft::WRL;
+
 namespace
 {
-
+ComPtr<IDxcUtils> mUtils = nullptr;
+ComPtr<IDxcCompiler3> mCompiler = nullptr;
 }
-
-using namespace Microsoft::WRL;
 
 namespace kgx
 {
-ShaderCompiler::ShaderCompiler()
-    : mUtils(nullptr), mCompiler(nullptr)
-{
-}
-
-CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, const std::string & target, bool includeDebugInfo)
+bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader)
 {
     if (!std::filesystem::exists(sourceFile))
     {
-        return CompiledShader();
+        OutCompiledShader = CompiledShader();
+        return false;
     }
 
     if (!mUtils || !mCompiler)
     {
-        // 
         // Create compiler and utils.
-        //
         DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&mUtils));
         DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&mCompiler));
     }
@@ -47,9 +41,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
 
     const std::filesystem::path fileName = std::filesystem::path(sourceFile).filename();
 
-    //
     // COMMAND LINE: dxc myshader.hlsl -E main -T ps_6_0 -Zi -D MYDEFINE=1 -Fo myshader.bin -Fd myshader.pdb -Qstrip_reflect
-    //
     const std::wstring wSourceFile(sourceFile.cbegin(), sourceFile.cend());
     const std::wstring wTarget(target.cbegin(), target.cend());
 
@@ -79,16 +71,15 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
 
         compileArgs.push_back(pdbSs.str().c_str());
     }
-
-    //
+    
     // Open source file.
-    //
     ComPtr<IDxcBlobEncoding> pSource = nullptr;
     HRESULT res = mUtils->LoadFile(wSourceFile.c_str(), nullptr, &pSource);
     if (FAILED(res))
     {
         std::cout << "ShaderCompiler::compileShader: failed to load file " << sourceFile << std::endl;
-        return CompiledShader();
+        OutCompiledShader = CompiledShader();
+        false;
     }
 
     DxcBuffer Source;
@@ -97,9 +88,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
     Source.Encoding = DXC_CP_ACP; // Assume BOM says UTF8 or UTF16 or this is ANSI text.
 
 
-    //
     // Compile it with specified arguments.
-    //
     ComPtr<IDxcResult> pResults;
     mCompiler->Compile(
         &Source,                                  // Source buffer.
@@ -109,9 +98,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
         IID_PPV_ARGS(&pResults)                   // Compiler output status, buffer, and errors.
     );
 
-    //
     // Print errors if present.
-    //
     ComPtr<IDxcBlobUtf8> pErrors = nullptr;
     pResults->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&pErrors), nullptr);
     // Note that d3dcompiler would return null if no errors or warnings are present.  
@@ -121,23 +108,20 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
         std::wcout << L"Warnings and Errors: " << pErrors->GetStringPointer() << std::endl;
     }
 
-    //
     // Quit if the compilation failed.
-    //
     HRESULT hrStatus;
     pResults->GetStatus(&hrStatus);
     if (FAILED(hrStatus))
     {
         std::wcout << L"Compilation Failed" << std::endl;
-        return CompiledShader();
+        OutCompiledShader = CompiledShader();
+        return false;
     }
 
 
     CompiledShader shader;
 
-    //
     // Save shader binary.
-    //
     ComPtr<IDxcBlob> pShader = nullptr;
     ComPtr<IDxcBlobUtf16> pShaderName = nullptr;
     pResults->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&pShader), &pShaderName);
@@ -147,26 +131,17 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
         std::memcpy(shader.byteCode.data(), pShader->GetBufferPointer(), pShader->GetBufferSize());
     }
 
-    //
     // Save pdb.
-    //
     ComPtr<IDxcBlob> pPDB = nullptr;
     ComPtr<IDxcBlobUtf16> pPDBName = nullptr;
     pResults->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pPDB), &pPDBName);
     {
-        //FILE* fp = NULL;
-        //_wfopen_s(&fp, pPDBName->GetStringPointer(), L"wb");
-        //fwrite(pPDB->GetBufferPointer(), pPDB->GetBufferSize(), 1, fp);
-        //fclose(fp);
-
         // Note that if you don't specify -Fd, a pdb name will be automatically generated. Use this file name to save the pdb so that PIX can find it quickly.
         shader.pdb.resize(pPDB->GetBufferSize());
         std::memcpy(shader.pdb.data(), pPDB->GetBufferPointer(), pPDB->GetBufferSize());
     }
 
-    //
     // Print hash.
-    //
     ComPtr<IDxcBlob> pHash = nullptr;
     pResults->GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(&pHash), nullptr);
     if (pHash != nullptr)
@@ -181,9 +156,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
     }
 
 
-    //
     // Get separate reflection.
-    //
     ComPtr<IDxcBlob> pReflectionData;
     pResults->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(&pReflectionData), nullptr);
     if (pReflectionData != nullptr)
@@ -204,7 +177,9 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
         res = pReflection->GetDesc(&shaderDesc);
         if (FAILED(res))
         {
-            return shader;
+            std::wcout << L"Shader reflection failed." << std::endl;
+            OutCompiledShader = std::move(shader);
+            return false;
         }
 
         for ( auto i = 0U; i < shaderDesc.ConstantBuffers; ++i )
@@ -213,16 +188,7 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
 
             D3D12_SHADER_BUFFER_DESC d3dShaderBufferDesc;
             cbReflection->GetDesc(&d3dShaderBufferDesc);
-
-            if (auto it = mProcessedCBuffers.find(d3dShaderBufferDesc.Name); it != mProcessedCBuffers.end())
-            {
-                // We already processed this buffer for a different shader.
-                //TODO(KL): Remove forcing buffer name uniqueness for the entire shader program
-
-                shader.boundConstantBuffers.push_back(it->second);
-                continue;
-            }
-
+            
             ConstantBufferDescriptor cbDesc;
             cbDesc.name = d3dShaderBufferDesc.Name;
             cbDesc.size = d3dShaderBufferDesc.Size;
@@ -246,15 +212,13 @@ CompiledShader ShaderCompiler::compileShader(const std::string & sourceFile, con
             D3D12_SHADER_INPUT_BIND_DESC inputDesc;
             pReflection->GetResourceBindingDescByName(cbDesc.name.c_str(), &inputDesc);
             cbDesc.bufferRegister = inputDesc.BindPoint;
-
-            mConstantBufferDescriptors.push_back(std::move(cbDesc));
-
-            const auto boundBufferIdx = static_cast<int>(mConstantBufferDescriptors.size() - 1u);
-            mProcessedCBuffers.insert(std::make_pair(cbDesc.name, boundBufferIdx));
-            shader.boundConstantBuffers.push_back(boundBufferIdx);
+            
+            shader.constantBuffers.push_back(std::move(cbDesc));
         }
     }
 
-    return shader;
+    OutCompiledShader = std::move(shader);
+
+    return true;
 }
 }

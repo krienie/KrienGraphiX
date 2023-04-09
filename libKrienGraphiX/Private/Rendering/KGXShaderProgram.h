@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <ShaderCompiler/ShaderProgramCompiler.h>
+#include <ShaderCompiler/ShaderCompiler.h>
 
 #include "Private/Rendering/KGXShaderParameter.h"
 #include "Private/RHI/RHIConstantBuffer.h"
@@ -18,14 +18,13 @@ class KGXShaderProgram
     public:
         using InputElementFormat = kgx::VertexInputElementFormat;
         using VertexInputElement = kgx::VertexInputElement;
-        using ShaderProgramDescriptor = kgx::ShaderProgramDescriptor;
 
         KGXShaderProgram(std::string name);
         virtual ~KGXShaderProgram() = default;
 
         [[nodiscard]] std::string getName() const;
 
-        void loadFromDescriptor(const kgx::ShaderProgramDescriptor & desc);
+        void loadFromFile(const std::string& pathToShaderFile);
 
         //void loadFromFile(const std::string &compiledShaderProgram);
 

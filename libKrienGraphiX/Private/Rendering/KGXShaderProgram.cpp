@@ -1,7 +1,7 @@
 
 #include "Private/Rendering/KGXShaderProgram.h"
 
-#include <ShaderCompiler/ShaderProgramCompiler.h>
+#include <ShaderCompiler/ShaderCompiler.h>
 
 #include "Private/Core/RenderCore.h"
 
@@ -17,9 +17,11 @@ std::string KGXShaderProgram::getName() const
     return mName;
 }
 
-void KGXShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & desc)
+void KGXShaderProgram::loadFromFile(const std::string& pathToShaderFile)
 {
-    const kgx::CompiledShaderProgram csp = kgx::ShaderProgramCompiler::compileProgram(desc);
+    //const kgx::CompiledShaderProgram csp = kgx::ShaderProgramCompiler::compileProgram(desc);
+    kgx::CompiledShader compiledShader;
+    bool success = kgx::ShaderCompiler::compileShader(pathToShaderFile, "TODO", true, compiledShader);
 
     using ShaderType = RHI::RHIShaderProgram::ShaderType;
     auto addToProgramIfValid = [this](const kgx::CompiledShader & compiledShader, ShaderType type)
@@ -32,11 +34,11 @@ void KGXShaderProgram::loadFromDescriptor(const kgx::ShaderProgramDescriptor & d
         }
     };
 
-    addToProgramIfValid(csp.vertexShader, ShaderType::Vertex);
-    addToProgramIfValid(csp.hullShader, ShaderType::Hull);
-    addToProgramIfValid(csp.domainShader, ShaderType::Domain);
-    addToProgramIfValid(csp.geometryShader, ShaderType::Geometry);
-    addToProgramIfValid(csp.pixelShader, ShaderType::Pixel);
+    //addToProgramIfValid(csp.vertexShader, ShaderType::Vertex);
+    //addToProgramIfValid(csp.hullShader, ShaderType::Hull);
+    //addToProgramIfValid(csp.domainShader, ShaderType::Domain);
+    //addToProgramIfValid(csp.geometryShader, ShaderType::Geometry);
+    //addToProgramIfValid(csp.pixelShader, ShaderType::Pixel);
     //TODO(KL): add compute shader support
 
     //TODO(KL): handle compile errors from the ShaderProgramCompiler

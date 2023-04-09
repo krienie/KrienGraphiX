@@ -13,7 +13,6 @@ target_include_directories(${EXE_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT
 target_link_libraries(${EXE_NAME} PRIVATE libshadercompiler)
 
 # Shader files are compiled during runtime of shadercompiler. This removes build errors of wrongly set settings on the shader files.
-# TODO(KL): Alternatively, we can detect the different kinds of shader files and set the correct compilation settings via CMake, so we can compile in VS, which can be convenient during development.
 set_property(SOURCE ${HlslSrc} PROPERTY VS_SETTINGS "ExcludedFromBuild=true")
 
 if(MSVC)

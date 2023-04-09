@@ -103,7 +103,7 @@ bool DX12ShaderProgram::setVertexInputLayout()
     return false;
 }
 
-bool DX12ShaderProgram::loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type)
+bool DX12ShaderProgram::loadCompiledShader([[maybe_unused]] const CompiledShader& shaderDesc, [[maybe_unused]] ShaderType type)
 {
     auto createAndFillShaderBlob = [](auto byteCode, auto blob)
     {
@@ -111,29 +111,29 @@ bool DX12ShaderProgram::loadCompiledShader(const CompiledShader & shaderDesc, Sh
         memcpy(blob->GetBufferPointer(), byteCode.data(), byteCode.size());
     };
 
-    switch (type)
-    {
-        case ShaderType::Vertex:
-            createAndFillShaderBlob(shaderDesc.byteCode, mVertexShader.blob);
-            mVertexShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-            break;
-        case ShaderType::Hull:
-            createAndFillShaderBlob(shaderDesc.byteCode, mHullShader.blob);
-            mHullShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-            break;
-        case ShaderType::Domain:
-            createAndFillShaderBlob(shaderDesc.byteCode, mDomainShader.blob);
-            mDomainShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-            break;
-        case ShaderType::Geometry:
-            createAndFillShaderBlob(shaderDesc.byteCode, mGeometryShader.blob);
-            mGeometryShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-            break;
-        case ShaderType::Pixel:
-            createAndFillShaderBlob(shaderDesc.byteCode, mPixelShader.blob);
-            mPixelShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-            break;
-    }
+    //switch (type)
+    //{
+    //    case ShaderType::Vertex:
+    //        createAndFillShaderBlob(shaderDesc.byteCode, mVertexShader.blob);
+    //        mVertexShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
+    //        break;
+    //    case ShaderType::Hull:
+    //        createAndFillShaderBlob(shaderDesc.byteCode, mHullShader.blob);
+    //        mHullShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
+    //        break;
+    //    case ShaderType::Domain:
+    //        createAndFillShaderBlob(shaderDesc.byteCode, mDomainShader.blob);
+    //        mDomainShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
+    //        break;
+    //    case ShaderType::Geometry:
+    //        createAndFillShaderBlob(shaderDesc.byteCode, mGeometryShader.blob);
+    //        mGeometryShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
+    //        break;
+    //    case ShaderType::Pixel:
+    //        createAndFillShaderBlob(shaderDesc.byteCode, mPixelShader.blob);
+    //        mPixelShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
+    //        break;
+    //}
 
     return true;
 }

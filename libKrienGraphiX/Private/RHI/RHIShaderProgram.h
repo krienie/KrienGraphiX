@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <ShaderCompiler/ShaderProgramCompiler.h>
+#include <ShaderCompiler/ShaderCompiler.h>
 
 namespace kgx::RHI
 {

@@ -34,6 +34,10 @@ foreach(F IN LISTS TestDataFiles)
     configure_file(${F} ${CMAKE_BINARY_DIR}/x64/Release/TestData/${fileName} COPYONLY)
 endforeach()
 
+target_sources(${EXE_NAME} PUBLIC ${TestDataFiles})
+source_group(Shaders FILES ${TestDataFiles})
+# Don't try to compile any TestData files
+set_property(SOURCE ${TestDataFiles} PROPERTY VS_SETTINGS "ExcludedFromBuild=true")
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})
 
