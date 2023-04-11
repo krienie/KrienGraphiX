@@ -13,6 +13,7 @@ struct RHIConstantBufferDescriptor
     std::string name;
     unsigned int bufferRegister;
     unsigned int bufferSize;
+    RHIResource::CreationFlags flags = RHIResource::None;
 };
 
 struct RHIClearValue final

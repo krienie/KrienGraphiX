@@ -4,42 +4,50 @@
 #include "DX12GraphicsDevice.h"
 #include "DX12MemoryUtils.h"
 
-namespace kgx::RHI
+namespace
 {
-DX12ConstantBuffer::DX12ConstantBuffer(size_t sizeInBytes, DX12ConstantBufferDescriptor descriptor)
-    : RHIConstantBuffer(DX12MemoryUtils::alignTo256Bytes(sizeInBytes)), mResource(nullptr),
-    mDescriptor(std::move(descriptor))
+kgx::RHI::RHIConstantBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIConstantBufferDescriptor& descriptor)
 {
+    kgx::RHI::RHIConstantBufferDescriptor alignedDesc = descriptor;
+    alignedDesc.bufferSize = static_cast<unsigned>(kgx::RHI::DX12MemoryUtils::alignTo256Bytes(alignedDesc.bufferSize));
+
+    return alignedDesc;
+}
 }
 
-bool DX12ConstantBuffer::init(RHIGraphicsDevice* device)
+namespace kgx::RHI
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
+DX12ConstantBuffer::DX12ConstantBuffer(DX12GraphicsDevice* dxDevice, const RHIConstantBufferDescriptor& descriptor)
+    : RHIConstantBuffer(getAlignedBufferDescriptor(descriptor)),
+        DX12Resource(nullptr, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ)
+    , mDescriptor(descriptor)
+{
+    ID3D12Device* nativeDevice = dxDevice->getNativeDevice();
 
-    auto* nativeDevice = dxDevice->getNativeDevice();
-
+    const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_UPLOAD);
     const D3D12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufferSize());
-    const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap.Get(), mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
+    HRESULT res = nativeDevice->CreateCommittedResource(
+            &heapProperties,
+            D3D12_HEAP_FLAG_NONE,
+            &resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(&mResource));
+    
+    //TODO(KL): Add below optimisation later to allow the creation of one big heap where all ConstantBuffers of the frame live in
+    //const HRESULT res = nativeDevice->CreatePlacedResource(mDescriptor.heap.Get(), mDescriptor.heapOffset, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&mResource));
 
     if (FAILED(res))
     {
-        return false;
+        return;
     }
 
-    // Describe and create a constant buffer view.
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-    cbvDesc.BufferLocation = mResource->GetGPUVirtualAddress();
-    cbvDesc.SizeInBytes = static_cast<UINT>(bufferSize());
-    nativeDevice->CreateConstantBufferView(&cbvDesc, mDescriptor.descriptorHandle);
+    map(MapType::READ_WRITE);
 
-    return true;
+    constexpr bool IsShaderVisible = true;
+    addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::CBV, std::shared_ptr<DX12ConstantBuffer>(this), IsShaderVisible));
 }
-    
+
 void* DX12ConstantBuffer::mapImpl(MapType type)
 {
     void* dataPtr;

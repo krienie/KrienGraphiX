@@ -12,13 +12,6 @@
 
 namespace kgx::RHI
 {
-struct DX12ConstantBufferDescriptor : RHIConstantBufferDescriptor
-{
-    Microsoft::WRL::ComPtr<ID3D12Heap> heap;
-    UINT64 heapOffset;
-    CD3DX12_CPU_DESCRIPTOR_HANDLE descriptorHandle;
-};
-
 struct DX12Texture2DDescriptor : RHITexture2DDescriptor
 {
     Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = nullptr;

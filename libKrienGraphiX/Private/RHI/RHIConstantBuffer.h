@@ -4,18 +4,13 @@
 #include <unordered_map>
 #include <string>
 
+#include "RHIDescriptors.h"
+
 namespace kgx::RHI
 {
 class RHIGraphicsDevice;
 
-struct RHIBufferVariable
-{
-    std::string name;
-    unsigned int offset;
-    unsigned int size;
-};
-
-class RHIConstantBuffer
+class RHIConstantBuffer : public RHIResource
 {
 public:
     enum MapType : uint8_t
@@ -25,20 +20,21 @@ public:
         READ_WRITE = READ | WRITE
     };
 
-    RHIConstantBuffer(size_t sizeInBytes);
-    virtual ~RHIConstantBuffer() = default;
-    RHIConstantBuffer(RHIConstantBuffer &) = delete;
-    RHIConstantBuffer(RHIConstantBuffer &&) noexcept = default;
-    RHIConstantBuffer & operator=(RHIConstantBuffer &) = delete;
-    RHIConstantBuffer & operator=(RHIConstantBuffer &&) noexcept = default;
-
-    virtual bool init(RHIGraphicsDevice *device) = 0;
+    RHIConstantBuffer(const RHIConstantBufferDescriptor& cbDesc);
+    virtual ~RHIConstantBuffer();
+    RHIConstantBuffer(RHIConstantBuffer&) = delete;
+    RHIConstantBuffer(RHIConstantBuffer&&) noexcept = default;
+    RHIConstantBuffer& operator=(RHIConstantBuffer&) = delete;
+    RHIConstantBuffer& operator=(RHIConstantBuffer&&) noexcept = default;
 
     [[nodiscard]]
     std::string name() const { return mBufferName; }
 
     [[nodiscard]]
     size_t bufferSize() const { return mBufferSize; }
+
+    [[nodiscard]]
+    size_t bufferRegister() const { return mRegister; }
 
     [[nodiscard]]
     void* mappedDataPtr() const { return mMappedDataPtr; }

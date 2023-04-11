@@ -25,7 +25,8 @@ DX12DepthStencilBuffer::DX12DepthStencilBuffer(DX12GraphicsDevice* dxDevice, con
         };
 
     mTexture = std::make_shared<DX12Texture2D>(dxDevice, desc);
-    addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::DSV, mTexture));
+    constexpr bool isShaderVisible = false;
+    addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::DSV, mTexture, isShaderVisible));
 }
 
 D3D12_RESOURCE_STATES DX12DepthStencilBuffer::getCurrentState() const
@@ -38,12 +39,6 @@ ComPtr<ID3D12Resource> DX12DepthStencilBuffer::getResource() const
 {
     assert(mTexture);
     return mTexture->getResource();
-}
-
-ComPtr<ID3D12Heap> DX12DepthStencilBuffer::getHeap() const
-{
-    assert(mTexture);
-    return mTexture->getHeap();
 }
 
 RHIResourceView* DX12DepthStencilBuffer::getDepthStencilView() const

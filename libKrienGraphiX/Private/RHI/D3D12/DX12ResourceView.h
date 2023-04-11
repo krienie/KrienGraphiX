@@ -31,8 +31,7 @@ public:
     //};
 
     //TODO(KL): Add customization options for typeless resources
-    DX12ResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource);
-    DX12ResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource, Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap, int descriptorOffset);
+    DX12ResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource, bool isShaderVisible);
 
     DX12ResourceView(const DX12ResourceView& rhs) = default;
     DX12ResourceView(DX12ResourceView&& rhs) = default;
@@ -42,7 +41,7 @@ public:
     [[nodiscard]] D3D12_CPU_DESCRIPTOR_HANDLE getViewHandle() const;
 
 private:
-    void createView();
+    void createView(bool isShaderVisible);
 
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDescriptorHeap;
 

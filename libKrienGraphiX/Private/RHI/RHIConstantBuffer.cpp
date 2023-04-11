@@ -6,9 +6,14 @@
 
 namespace kgx::RHI
 {
-RHIConstantBuffer::RHIConstantBuffer(size_t sizeInBytes)
-    : mBufferSize(sizeInBytes)
+RHIConstantBuffer::RHIConstantBuffer(const RHIConstantBufferDescriptor& cbDesc)
+    : RHIResource(cbDesc.flags), mBufferName(cbDesc.name), mBufferSize(cbDesc.bufferSize), mRegister(cbDesc.bufferRegister)
 {
+}
+
+RHIConstantBuffer::~RHIConstantBuffer()
+{
+    unmap();
 }
 
 void* RHIConstantBuffer::map(MapType type)
@@ -26,7 +31,7 @@ void RHIConstantBuffer::unmap()
     if (mMappedDataPtr)
     {
         unmapImpl();
-        mCurrentMappedType = static_cast<uint8_t>(0u);
+        mCurrentMappedType = 0u;
         mMappedDataPtr = nullptr;
     }
 }

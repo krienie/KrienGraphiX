@@ -18,7 +18,6 @@ class DX12DepthStencilBuffer : public RHIDepthStencilBuffer
         
         [[nodiscard]] D3D12_RESOURCE_STATES getCurrentState() const;
         [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Resource> getResource() const;
-        [[nodiscard]] Microsoft::WRL::ComPtr<ID3D12Heap> getHeap() const;
 
         [[nodiscard]] virtual RHIResourceView* getDepthStencilView() const;
 
