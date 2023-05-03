@@ -18,10 +18,10 @@ class DX12ConstantBuffer final : public RHIConstantBuffer, public DX12Resource
         DX12ConstantBuffer(DX12GraphicsDevice* dxDevice, const RHIConstantBufferDescriptor& descriptor);
         ~DX12ConstantBuffer() override = default;
 
-        DX12ConstantBuffer(DX12ConstantBuffer &) = delete;
-        DX12ConstantBuffer(DX12ConstantBuffer &&) noexcept = default;
-        DX12ConstantBuffer & operator=(DX12ConstantBuffer &) = delete;
-        DX12ConstantBuffer & operator=(DX12ConstantBuffer &&) noexcept = default;
+        DX12ConstantBuffer(DX12ConstantBuffer&) = delete;
+        DX12ConstantBuffer(DX12ConstantBuffer&&) noexcept = default;
+        DX12ConstantBuffer& operator=(DX12ConstantBuffer&) = delete;
+        DX12ConstantBuffer& operator=(DX12ConstantBuffer&&) noexcept = default;
         
     private:
         void* mapImpl(MapType type) override;

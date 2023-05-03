@@ -10,81 +10,16 @@
 #include <cassert>
 #include <iostream>
 
-namespace
-{
-DXGI_FORMAT toDXGIFormat(kgx::VertexInputElementFormat rhiInputElementFormat)
-{
-    switch(rhiInputElementFormat)
-    {
-        case kgx::VertexInputElementFormat::FLOAT:
-            return DXGI_FORMAT_R32_FLOAT;
-        case kgx::VertexInputElementFormat::FLOAT2:
-            return DXGI_FORMAT_R32G32_FLOAT;
-        case kgx::VertexInputElementFormat::FLOAT3:
-            return DXGI_FORMAT_R32G32B32_FLOAT;
-        case kgx::VertexInputElementFormat::FLOAT4:
-            return DXGI_FORMAT_R32G32B32A32_FLOAT;
-        case kgx::VertexInputElementFormat::INT:
-            return DXGI_FORMAT_R32_SINT;
-        case kgx::VertexInputElementFormat::INT2:
-            return DXGI_FORMAT_R32G32_SINT;
-        case kgx::VertexInputElementFormat::INT3:
-            return DXGI_FORMAT_R32G32B32_SINT;
-        case kgx::VertexInputElementFormat::INT4:
-            return DXGI_FORMAT_R32G32B32A32_SINT;
-        case kgx::VertexInputElementFormat::UINT:
-            return DXGI_FORMAT_R32_UINT;
-        case kgx::VertexInputElementFormat::UINT2:
-            return DXGI_FORMAT_R32G32_UINT;
-        case kgx::VertexInputElementFormat::UINT3:
-            return DXGI_FORMAT_R32G32B32_UINT;
-        case kgx::VertexInputElementFormat::UINT4:
-            return DXGI_FORMAT_R32G32B32A32_UINT;
-    }
-
-    return DXGI_FORMAT_FORCE_UINT;
-}
-
-UINT getDXGISize(DXGI_FORMAT format)
-{
-    using namespace kgx::RHI;
-
-    switch(format)
-    {
-        case DXGI_FORMAT_R32_FLOAT:
-        case DXGI_FORMAT_R32_SINT:
-        case DXGI_FORMAT_R32_UINT:
-            return 4;
-        case DXGI_FORMAT_R32G32_FLOAT:
-        case DXGI_FORMAT_R32G32_SINT:
-        case DXGI_FORMAT_R32G32_UINT:
-            return 8;
-        case DXGI_FORMAT_R32G32B32_FLOAT:
-        case DXGI_FORMAT_R32G32B32_SINT:
-        case DXGI_FORMAT_R32G32B32_UINT:
-            return 12;
-        case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        case DXGI_FORMAT_R32G32B32A32_SINT:
-        case DXGI_FORMAT_R32G32B32A32_UINT:
-            return 16;
-        default:
-            //Unknown format size. Extend this switch-case to support other DXGI_FORMAT's
-            assert(false);
-    }
-
-    return 0u;
-}
-
-}
+#include "DX12VertexLayout.h"
 
 namespace kgx::RHI
 {
 DX12Shader::DX12Shader()
-    : RHIShader(), mDxDevice(nullptr), mConstantBuffers(), mInputDescs()
+    : RHIShader(), mDxDevice(nullptr), mConstantBuffers(), mInputLayoutDesc()
 {
 }
 
-bool DX12ShaderProgram::init(RHIGraphicsDevice* device)
+bool DX12Shader::init(RHIGraphicsDevice* device, [[maybe_unused]] const CompiledShader& compiledShader, [[maybe_unused]] ShaderType type)
 {
     auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
@@ -98,12 +33,16 @@ bool DX12ShaderProgram::init(RHIGraphicsDevice* device)
     return true;
 }
 
-bool DX12ShaderProgram::setVertexInputLayout()
+void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout)
 {
-    return false;
+    //TODO(KL): DX12VertexLayout can prob be just a static method if it's only used like this
+    DX12VertexLayout dxVertexLayout;
+    dxVertexLayout.setFromInputElementVector(vertexInputLayout);
+
+    mInputLayoutDesc = dxVertexLayout.getDX12VertexLayout();
 }
 
-bool DX12ShaderProgram::loadCompiledShader([[maybe_unused]] const CompiledShader& shaderDesc, [[maybe_unused]] ShaderType type)
+bool DX12Shader::loadCompiledShader([[maybe_unused]] const CompiledShader& shaderDesc, [[maybe_unused]] ShaderType type)
 {
     auto createAndFillShaderBlob = [](auto byteCode, auto blob)
     {
@@ -138,7 +77,7 @@ bool DX12ShaderProgram::loadCompiledShader([[maybe_unused]] const CompiledShader
     return true;
 }
 
-bool DX12ShaderProgram::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
+bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
 {
     //const UINT64 bufferHeapSize = [&bufferDescs]
     //{
@@ -184,14 +123,14 @@ bool DX12ShaderProgram::loadConstantBuffers(const std::vector<ConstantBufferDesc
             RHIResource::ShaderResource
         };
 
-        mConstantBuffers.emplace_back(buffDesc.size, cbDesc);
-        cbvHandle.Offset(1, cbvDescriptorSize);
+        //mConstantBuffers.emplace_back(buffDesc.size, cbDesc);
+        //cbvHandle.Offset(1, cbvDescriptorSize);
     }
 
     return false;
 }
 
-bool DX12ShaderProgram::createRootSignature()
+bool DX12Shader::createRootSignature()
 {
     auto *dxNativeDevice = mDxDevice->getNativeDevice();
 

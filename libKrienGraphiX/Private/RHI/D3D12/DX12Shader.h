@@ -17,10 +17,10 @@ namespace kgx::RHI
         DX12Shader();
         ~DX12Shader() override = default;
 
-        bool init(RHIGraphicsDevice *device) override;
+        bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) override;
 
         //bool compile(const kgx::ShaderProgramDescriptor &shaderDesc) override;
-        bool setVertexInputLayout(/*define*/) override;
+        void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;
         bool loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type) override;
         bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor> & bufferDescs) override;
 
@@ -42,7 +42,7 @@ namespace kgx::RHI
         DX12GraphicsDevice* mDxDevice;
         
         std::vector<DX12ConstantBuffer> mConstantBuffers;
-        std::vector<D3D12_INPUT_ELEMENT_DESC> mInputDescs;
+        std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 
         DxShader mVertexShader;
         DxShader mHullShader;

@@ -21,12 +21,12 @@ class RHIShader
             //Compute
         };
 
-        virtual bool init(RHIGraphicsDevice *device, const CompiledShader& compiledShader, ShaderType type) = 0;
+        virtual bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) = 0;
 
         virtual ~RHIShader() = default;
 
         //virtual bool compile(const kgx::ShaderProgramDescriptor &desc) = 0;
-        virtual bool setVertexInputLayout(/*define*/) = 0;
+        virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
         virtual bool loadCompiledShader(const CompiledShader& shaderDesc, ShaderType type) = 0;
         virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;
 };
