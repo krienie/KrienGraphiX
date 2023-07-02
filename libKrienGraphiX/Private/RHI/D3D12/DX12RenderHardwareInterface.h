@@ -36,19 +36,13 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
             unsigned int height,
             unsigned int frameCount) override;
 
-        //[[nodiscard]]
-        //std::unique_ptr<RHIShaderProgram> createShaderProgram() override;
-
-        //[[nodiscard]]
-        //std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) override;
+        [[nodiscard]]
+        std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
 
         [[nodiscard]]
         std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
 
         [[nodiscard]]
         std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) override;
-
-        //[[nodiscard]]
-        //std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) override;
 };
 }

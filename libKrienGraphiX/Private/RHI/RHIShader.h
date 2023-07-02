@@ -16,18 +16,24 @@ class RHIShader
             Hull,
             Domain,
             Geometry,
-            Pixel
+            Pixel,
             //TODO(KL): add compute shader support
             //Compute
+
+            Unassigned
         };
 
-        virtual bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) = 0;
-
         virtual ~RHIShader() = default;
+        RHIShader(RHIShader& rhs) = default;
+        RHIShader(RHIShader&& rhs) = default;
+        RHIShader& operator=(const RHIShader& rhs) = default;
+        RHIShader& operator=(RHIShader&& rhs) = default;
 
-        //virtual bool compile(const kgx::ShaderProgramDescriptor &desc) = 0;
+        virtual bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) = 0;
+    
         virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
-        virtual bool loadCompiledShader(const CompiledShader& shaderDesc, ShaderType type) = 0;
+
+    protected:
         virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;
 };
 }

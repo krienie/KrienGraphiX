@@ -6,7 +6,7 @@
 #include "DX12DepthStencilBuffer.h"
 #include "DX12GraphicsCommandList.h"
 #include "DX12GraphicsPipelineState.h"
-#include "DX12ShaderProgram.h"
+#include "DX12Shader.h"
 #include "DX12SwapChain.h"
 
 #include <cassert>
@@ -86,21 +86,16 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
     return std::move(swapChain);
 }
 
-//std::unique_ptr<RHIShaderProgram> DX12RenderHardwareInterface::createShaderProgram()
-//{
-//    return std::make_unique<DX12ShaderProgram>();
-//}
+std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type)
+{
+    auto newShader = std::make_unique<DX12Shader>();
+    if (!newShader->init(graphicsDevice, compiledShader, type))
+    {
+        return nullptr;
+    }
 
-//std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState([[maybe_unused]] RHIGraphicsDevice * graphicsDevice)
-//{
-//    auto pipelineState = std::make_unique<DX12GraphicsPipelineState>();
-//    //if (!pipelineState->init(graphicsDevice))
-//    //{
-//    //    return nullptr;
-//    //}
-//
-//    return std::move(pipelineState);
-//}
+    return std::move(newShader);
+}
 
 std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
 {
@@ -122,10 +117,4 @@ std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthS
 
     return std::move(depthStencilBuffer);
 }
-
-//TODO(KL): Temporary maybe_unused
-//std::unique_ptr<RHIConstantBuffer> DX12RenderHardwareInterface::createConstantBuffer([[maybe_unused]] RHIGraphicsDevice * graphicsDevice, [[maybe_unused]] RHIConstantBufferDescriptor cbDescriptor)
-//{
-//    return std::unique_ptr<RHIConstantBuffer>();
-//}
 }

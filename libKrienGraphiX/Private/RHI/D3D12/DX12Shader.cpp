@@ -19,7 +19,7 @@ DX12Shader::DX12Shader()
 {
 }
 
-bool DX12Shader::init(RHIGraphicsDevice* device, [[maybe_unused]] const CompiledShader& compiledShader, [[maybe_unused]] ShaderType type)
+bool DX12Shader::init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type)
 {
     auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
@@ -30,7 +30,19 @@ bool DX12Shader::init(RHIGraphicsDevice* device, [[maybe_unused]] const Compiled
 
     mDxDevice = dxDevice;
 
-    return true;
+    mShaderType = type;
+
+    // Load the compiled shader
+    D3DCreateBlob(compiledShader.byteCode.size(), &mLoadedShaderBlob);
+    memcpy(mLoadedShaderBlob->GetBufferPointer(), compiledShader.byteCode.data(), compiledShader.byteCode.size());
+
+    const bool success = loadConstantBuffers(compiledShader.constantBuffers);
+    if (!success)
+    {
+        return false;
+    }
+
+    return createRootSignature(compiledShader);
 }
 
 void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout)
@@ -42,78 +54,11 @@ void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& ver
     mInputLayoutDesc = dxVertexLayout.getDX12VertexLayout();
 }
 
-bool DX12Shader::loadCompiledShader([[maybe_unused]] const CompiledShader& shaderDesc, [[maybe_unused]] ShaderType type)
-{
-    auto createAndFillShaderBlob = [](auto byteCode, auto blob)
-    {
-        D3DCreateBlob(byteCode.size(), &blob);
-        memcpy(blob->GetBufferPointer(), byteCode.data(), byteCode.size());
-    };
-
-    //switch (type)
-    //{
-    //    case ShaderType::Vertex:
-    //        createAndFillShaderBlob(shaderDesc.byteCode, mVertexShader.blob);
-    //        mVertexShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-    //        break;
-    //    case ShaderType::Hull:
-    //        createAndFillShaderBlob(shaderDesc.byteCode, mHullShader.blob);
-    //        mHullShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-    //        break;
-    //    case ShaderType::Domain:
-    //        createAndFillShaderBlob(shaderDesc.byteCode, mDomainShader.blob);
-    //        mDomainShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-    //        break;
-    //    case ShaderType::Geometry:
-    //        createAndFillShaderBlob(shaderDesc.byteCode, mGeometryShader.blob);
-    //        mGeometryShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-    //        break;
-    //    case ShaderType::Pixel:
-    //        createAndFillShaderBlob(shaderDesc.byteCode, mPixelShader.blob);
-    //        mPixelShader.boundConstantBuffers = shaderDesc.boundConstantBuffers;
-    //        break;
-    //}
-
-    return true;
-}
-
+//TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers te zetten. Verplaatsen naar RenderPass?
 bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
 {
-    //const UINT64 bufferHeapSize = [&bufferDescs]
-    //{
-    //    UINT64 totalSize = 0u;
-    //    for (auto & constBuffDesc : bufferDescs)
-    //    {
-    //        const auto alignedConstBufferSize = DX12MemoryUtils::alignTo256Bytes(constBuffDesc.size);
-    //        totalSize += DX12MemoryUtils::alignTo64KBytes(alignedConstBufferSize);
-    //    }
-    //
-    //    return totalSize;
-    //}();
-
-    //auto *dxNativeDevice = mDxDevice->getNativeDevice();
-    //
-    //const CD3DX12_HEAP_DESC heapDesc(bufferHeapSize, D3D12_HEAP_TYPE_UPLOAD, D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT, D3D12_HEAP_FLAG_ALLOW_ONLY_BUFFERS);
-    //dxNativeDevice->CreateHeap(&heapDesc, IID_PPV_ARGS(&mConstantBufferHeap));
-    //
-    //D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc = {};
-    //cbvHeapDesc.NumDescriptors = static_cast<UINT>(bufferDescs.size());
-    //cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    //cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    //dxNativeDevice->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&mConstBuffDescHeap));
-    //
-    //const auto cbvDescriptorSize = dxNativeDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-    //
-    //CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHandle(mConstBuffDescHeap->GetCPUDescriptorHandleForHeapStart());
-
-    //UINT64 heapOffset = 0u;
     for (const auto & buffDesc : bufferDescs)
     {
-        // Calculate current heap offset
-        //TODO(KL): Optimize. This is already calculated above.
-        const auto alignedConstBufferSize = DX12MemoryUtils::alignTo256Bytes(buffDesc.size);
-        //heapOffset += DX12MemoryUtils::alignTo64KBytes(alignedConstBufferSize);
-
         // create DX12ConstantBuffer
         RHIConstantBufferDescriptor cbDesc
         {
@@ -122,15 +67,14 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
             buffDesc.size,
             RHIResource::ShaderResource
         };
-
-        //mConstantBuffers.emplace_back(buffDesc.size, cbDesc);
-        //cbvHandle.Offset(1, cbvDescriptorSize);
+        
+        mConstantBuffers.emplace_back(mDxDevice, cbDesc);
     }
 
-    return false;
+    return true;
 }
 
-bool DX12Shader::createRootSignature()
+bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 {
     auto *dxNativeDevice = mDxDevice->getNativeDevice();
 
@@ -144,66 +88,38 @@ bool DX12Shader::createRootSignature()
         featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
     }
 
+    //TODO(KL): Actually do something with the root signature feature data
 
+    // Only supporting CBV's for now, so we only need 1 root parameter slot
+    std::vector<CD3DX12_ROOT_PARAMETER> rootParameterSlots(1);
 
-    return false;
-}
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
 
-//void DX12ShaderProgram::loadFromFile(const std::string &blobFile, ShaderType type)
-//{
-//    std::wstring wShaderFile = std::wstring( blobFile.begin(), blobFile.end() );
-//
-//    // Try to load pre-compiled shader file
-//    ID3DBlob *shaderSource;
-//    HRESULT res = D3DReadFileToBlob( wShaderFile.c_str(), &shaderSource );
-//    if ( FAILED( res ) )
-//    {
-//        std::cout << "Error (RcShaderProgram::loadFromBlob): Error loading shader source " << wShaderFile.c_str() << std::endl;
-//        return;
-//    }
-//
-//
-//}
+    CD3DX12_DESCRIPTOR_RANGE cbvTable;
+    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, compiledShader.constantBuffers.size(), 0);
+    rootParameterSlots[0].InitAsDescriptorTable(1, &cbvTable);
 
-/*bool DX12ShaderProgram::compile(const kgx::ShaderProgramDescriptor &shaderDesc)
-{
-    // Create Input Layout
-    UINT byteOffset = 0u;
-    mInputDescs.reserve(shaderDesc.InputLayout.size());
-    for (const auto & inputDesc : shaderDesc.InputLayout)
+    rootSigDesc.Init(rootParameterSlots.size(), rootParameterSlots.data(), 0, nullptr,
+                     D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+    // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+    Microsoft::WRL::ComPtr<ID3DBlob> serializedRootSig = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+    D3D12SerializeRootSignature(&rootSigDesc, featureData.HighestVersion,
+                                             serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+
+    if (errorBlob != nullptr)
     {
-        const auto dxgiFormat = toDXGIFormat(inputDesc.format);
-        mInputDescs.push_back(
-            {inputDesc.semanticName.c_str(), 0u, dxgiFormat, 0u, byteOffset, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0u});
-
-        byteOffset += getDXGISize(dxgiFormat);
+        OutputDebugStringA(static_cast<char*>(errorBlob->GetBufferPointer()));
+        return false;
     }
 
-    auto loadShaderBlob = [](const std::string &filePath, Microsoft::WRL::ComPtr<ID3DBlob> &dest)
-    {
-        if (!filePath.empty())
-        {
-            return;
-        }
+    const HRESULT result = dxNativeDevice->CreateRootSignature(
+        0,
+        serializedRootSig->GetBufferPointer(),
+        serializedRootSig->GetBufferSize(),
+        IID_PPV_ARGS(&mRootSignature));
 
-        const std::wstring wShaderFile = std::wstring(filePath.begin(), filePath.end());
-        HRESULT res = D3DReadFileToBlob(wShaderFile.c_str(), &dest);
-        if ( FAILED( res ) )
-        {
-            //std::cout << "Error (RcShaderProgram::loadFromBlob): Error loading shader source " << wShaderFile.c_str() << std::endl;
-            //TODO(KL): log error
-        }
-
-        //TODO(KL): call processShaderBlob to create all constant buffers and resource views
-    };
-
-    // Try to load all shaders
-    loadShaderBlob(shaderDesc.VertexShaderPath, mVertexShader);
-    loadShaderBlob(shaderDesc.HullShaderPath, mHullShader);
-    loadShaderBlob(shaderDesc.DomainShaderPath, mDomainShader);
-    loadShaderBlob(shaderDesc.GeometryShaderPath, mGeometryShader);
-    loadShaderBlob(shaderDesc.PixelShaderPath, mPixelShader);
-
-    return true;
-}*/
+    return SUCCEEDED(result);
+}
 }

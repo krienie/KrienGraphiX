@@ -6,6 +6,7 @@
 #include "RHIDepthStencilBuffer.h"
 #include "RHIGraphicsCommandList.h"
 #include "RHIGraphicsDevice.h"
+#include "RHIShader.h"
 #include "RHISwapChain.h"
 
 #include <memory>
@@ -41,23 +42,14 @@ public:
         unsigned int height,
         unsigned int frameCount) = 0;
 
-    //[[nodiscard]]
-    //virtual std::unique_ptr<RHIShaderProgram> createShaderProgram() = 0;
-
-    //[[nodiscard]]
-    //virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice *graphicsDevice) = 0;
+    [[nodiscard]]
+    virtual std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type) = 0;
     
     [[nodiscard]]
     virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
 
     [[nodiscard]]
     virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) = 0;
-
-    //[[nodiscard]]
-    //virtual std::unique_ptr<RHIConstantBuffer> createConstantBuffer(RHIGraphicsDevice *graphicsDevice, RHIConstantBufferDescriptor cbDescriptor) = 0;
-
-    //[[nodiscard]]
-    //virtual std::unique_ptr<RHITexture2D> createTexture2D(RHIGraphicsDevice *graphicsDevice, unsigned int width, unsigned int height) = 0;
 };
 
 inline std::unique_ptr<RenderHardwareInterface> PlatformRHI = nullptr;

@@ -9,45 +9,39 @@
 
 namespace kgx::RHI
 {
-    class DX12GraphicsDevice;
+class DX12GraphicsDevice;
 
-    class DX12Shader : public RHIShader
+class DX12Shader : public RHIShader
 {
     public:
         DX12Shader();
         ~DX12Shader() override = default;
+        DX12Shader(DX12Shader& rhs) = default;
+        DX12Shader(DX12Shader&& rhs) = default;
+        DX12Shader& operator=(const DX12Shader& rhs) = default;
+        DX12Shader& operator=(DX12Shader&& rhs) = default;
+
 
         bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) override;
-
-        //bool compile(const kgx::ShaderProgramDescriptor &shaderDesc) override;
+        
         void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;
-        bool loadCompiledShader(const CompiledShader & shaderDesc, ShaderType type) override;
+
+        [[nodiscard]] ID3DBlob* getShaderByteCode() const { return mLoadedShaderBlob.Get(); }
+        [[nodiscard]] ID3D12RootSignature* getRootSignature() const { return mRootSignature.Get(); }
+
+    protected:
         bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor> & bufferDescs) override;
 
-        //[[nodiscard]] ID3DBlob* getVertexShader() const { return mVertexShader.blob.Get(); }
-        //[[nodiscard]] ID3DBlob* getHullShader() const { return mHullShader.blob.Get(); }
-        //[[nodiscard]] ID3DBlob* getDomainShader() const { return mDomainShader.blob.Get(); }
-        //[[nodiscard]] ID3DBlob* getGeometryShader() const { return mGeometryShader.blob.Get(); }
-        //[[nodiscard]] ID3DBlob* getPixelShader() const { return mPixelShader.blob.Get(); }
-
     private:
-        struct DxShader
-        {
-            Microsoft::WRL::ComPtr<ID3DBlob> blob;
-            std::vector<int> boundConstantBuffers;
-        };
-
-        bool createRootSignature();
+        bool createRootSignature(const CompiledShader& compiledShader);
 
         DX12GraphicsDevice* mDxDevice;
         
         std::vector<DX12ConstantBuffer> mConstantBuffers;
         std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 
-        DxShader mVertexShader;
-        DxShader mHullShader;
-        DxShader mDomainShader;
-        DxShader mGeometryShader;
-        DxShader mPixelShader;
+        Microsoft::WRL::ComPtr<ID3DBlob> mLoadedShaderBlob;
+        Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
+        ShaderType mShaderType = ShaderType::Unassigned;
 };
 }
