@@ -9,11 +9,11 @@ namespace kgx::rendering
 {
 class KGXRenderer
 {
-    public:
-        KGXRenderer();
-        ~KGXRenderer() = default;
+public:
+    KGXRenderer();
+    ~KGXRenderer() = default;
 
-    private:
-        std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
+private:
+    std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
 };
 }

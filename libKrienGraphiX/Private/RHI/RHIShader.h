@@ -23,6 +23,7 @@ class RHIShader
             Unassigned
         };
 
+        RHIShader() = default;
         virtual ~RHIShader() = default;
         RHIShader(RHIShader& rhs) = default;
         RHIShader(RHIShader&& rhs) = default;
