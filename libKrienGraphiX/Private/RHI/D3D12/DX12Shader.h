@@ -21,7 +21,6 @@ class DX12Shader : public RHIShader
         DX12Shader& operator=(const DX12Shader& rhs) = default;
         DX12Shader& operator=(DX12Shader&& rhs) = default;
 
-
         bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) override;
         
         void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;

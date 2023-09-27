@@ -2,7 +2,6 @@
 #include "DX12GraphicsPipelineState.h"
 
 #include "DX12GraphicsDevice.h"
-#include "DX12ShaderProgram.h"
 
 namespace kgx::RHI
 {

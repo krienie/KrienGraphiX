@@ -22,8 +22,10 @@ public:
 
     enum DepthStencilFlags
     {
-        DepthClear,
-        StencilClear
+        DepthClear = 1,
+        StencilClear = 2,
+
+        DepthStencilClear = DepthClear | StencilClear
     };
 
     RHIResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource) : mViewType(type), mViewedResource(viewedResource) {}

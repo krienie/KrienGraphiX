@@ -113,8 +113,9 @@ bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueu
         };
 
         // Register the created D3D12 resources
+        constexpr bool isShaderVisible = false;
         auto newBuffer = std::make_shared<DX12Texture2D>(dxDevice, desc);
-        newBuffer->addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::RTV, newBuffer));
+        newBuffer->addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::RTV, newBuffer, isShaderVisible));
         mBuffers.push_back(std::move(newBuffer));
     }
 

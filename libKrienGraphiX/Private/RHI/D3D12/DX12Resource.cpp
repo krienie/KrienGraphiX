@@ -12,6 +12,12 @@ DX12Resource::DX12Resource(Microsoft::WRL::ComPtr<ID3D12Resource> resourcePtr, M
 
 void DX12Resource::transitionToState(DX12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState)
 {
+    if (mCurrentState == newState)
+    {
+        // Do nothing
+        return;
+    }
+
     const auto transition = CD3DX12_RESOURCE_BARRIER::Transition(mResource.Get(), mCurrentState, newState);
     commandList->getCommandList()->ResourceBarrier(1, &transition);
 

@@ -8,8 +8,6 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Private/Rendering/KGXShaderCache.h"
-
 namespace kgx::core
 {
 class RenderWindow;
@@ -45,6 +43,5 @@ private:
 
     std::mutex mRenderWindowMutex;
     std::unordered_map<WinHandle, std::shared_ptr<RenderWindow>> mRenderWindows;
-    rendering::KGXShaderCache mShaderCache;
 };
 }

@@ -96,10 +96,10 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
 
     CD3DX12_DESCRIPTOR_RANGE cbvTable;
-    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, compiledShader.constantBuffers.size(), 0);
+    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, static_cast<UINT>(compiledShader.constantBuffers.size()), 0);
     rootParameterSlots[0].InitAsDescriptorTable(1, &cbvTable);
 
-    rootSigDesc.Init(rootParameterSlots.size(), rootParameterSlots.data(), 0, nullptr,
+    rootSigDesc.Init(static_cast<UINT>(rootParameterSlots.size()), rootParameterSlots.data(), 0, nullptr,
                      D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
     // create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer

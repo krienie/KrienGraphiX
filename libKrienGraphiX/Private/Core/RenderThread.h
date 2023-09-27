@@ -4,6 +4,8 @@
 #include <functional>
 #include <memory>
 
+#include "Private/Rendering/KGXShaderCache.h"
+
 #include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/RHIGraphicsDevice.h"
 #include "Private/RHI/RHISwapChain.h"
@@ -40,5 +42,7 @@ class RenderThread final
         
         //TODO(KL): For now we have one commandlist. Later this will be one CommandList per RenderPass manager
         std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
+
+        std::unique_ptr<rendering::KGXShaderCache> mShaderCache;
 };
 }

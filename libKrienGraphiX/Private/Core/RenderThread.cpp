@@ -16,7 +16,8 @@ namespace kgx::core
 RenderThread::RenderThread()
     : mCommandThread(std::make_unique<CommandThread>(1)),
         mGraphicsDevice(nullptr),
-        mCommandList(nullptr)
+        mCommandList(nullptr),
+        mShaderCache(nullptr)
 {
 #ifdef WIN32
     RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
@@ -29,6 +30,8 @@ RenderThread::RenderThread()
     mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
     mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
     mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
+
+    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get());
 }
 
 RenderThread::~RenderThread()

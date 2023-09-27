@@ -60,6 +60,7 @@ bool RenderCore::createRenderWindow(WinHandle windowHandle, unsigned initialWind
         return false;
     }
 
+    //TODO(KL): Perhaps only allow one active RenderWindow for now
     mRenderWindows[windowHandle] = std::make_shared<RenderWindow>(windowHandle, initialWindowWidth, initialWindowHeight);
     return true;
 }
