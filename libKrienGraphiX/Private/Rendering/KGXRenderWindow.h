@@ -5,6 +5,7 @@
 
 #include "KrienGraphiX/Core/KGXDefinitions.h"
 
+#include "Private/Core/PrivateDefinitions.h"
 #include "Private/RHI/RHIDepthStencilBuffer.h"
 #include "Private/RHI/RHISwapChain.h"
 
@@ -30,6 +31,6 @@ private:
     //TODO(KL): Temporarily here. Move to KGXRenderer
     std::unique_ptr<RHI::RHIDepthStencilBuffer> mDepthStencil;
 
-    KGXViewport mViewport;
+    core::KGXViewport mViewport;
 };
 }

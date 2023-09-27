@@ -15,7 +15,6 @@ class RHITexture : public RHIResource
         RHITexture(CreationFlags flags, unsigned int numMips, unsigned int numSamples, RHIPixelFormat pixelFormat)
             : RHIResource(flags), mNumMips(numMips), mNumSamples(numSamples), mPixelFormat(pixelFormat)
         {
-            //TODO(KL): CreationFlags::None for now
         }
 
         ~RHITexture() override = default;

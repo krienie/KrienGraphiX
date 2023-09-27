@@ -7,7 +7,6 @@ namespace kgx::RHI
 {
 class RHIGraphicsDevice;
 
-//TODO(KL): Is this class really needed?
 class RHIDepthStencilBuffer : public RHITexture2D
 {
 public:

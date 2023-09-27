@@ -8,7 +8,7 @@
 
 namespace kgx::rendering
 {
-KGXRenderer::KGXRenderer(const KGXViewport& Viewport, RHI::RHITexture2D* OutputRenderTarget, RHI::RHIDepthStencilBuffer* DepthStencil)
+KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHITexture2D* OutputRenderTarget, RHI::RHIDepthStencilBuffer* DepthStencil)
     : mViewport(Viewport), mOutputRenderTarget(OutputRenderTarget), mDepthStencil(DepthStencil)
 {
     assert(mOutputRenderTarget != nullptr);
@@ -28,8 +28,8 @@ void KGXRenderer::RenderFrame()
     //TODO(KL): temporary fixed clear color
     static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 
-    auto backBufferRtv = mOutputRenderTarget->getResourceViewByType(RHI::RHIResourceView::RTV).get();
-    auto depthStencilView = mDepthStencil->getResourceViewByType(RHI::RHIResourceView::DSV).get();
+    RHI::RHIResourceView* backBufferRtv = mOutputRenderTarget->getResourceViewByType(RHI::RHIResourceView::RTV).get();
+    RHI::RHIResourceView* depthStencilView = mDepthStencil->getResourceViewByType(RHI::RHIResourceView::DSV).get();
 
     // Clear the back buffer and depth buffer.
     commandList->clearRenderTargetView(backBufferRtv, lightSteelBlue);

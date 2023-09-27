@@ -21,7 +21,7 @@ DX12Shader::DX12Shader()
 
 bool DX12Shader::init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type)
 {
-    auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     if (dxDevice == nullptr)
     {
         // This should never happen
@@ -52,6 +52,11 @@ void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& ver
     dxVertexLayout.setFromInputElementVector(vertexInputLayout);
 
     mInputLayoutDesc = dxVertexLayout.getDX12VertexLayout();
+}
+
+const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() const
+{
+    return mInputLayoutDesc;
 }
 
 //TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers te zetten. Verplaatsen naar RenderPass?

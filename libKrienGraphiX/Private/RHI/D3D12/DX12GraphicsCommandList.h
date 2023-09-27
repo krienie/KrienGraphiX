@@ -20,9 +20,11 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
         bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
         void close() override;
-        void reset(RHICommandQueue* commandQueue) override;
+        void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
-        void setViewport(const KGXViewport &viewport) override;
+        void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
+
+        void setViewport(const core::KGXViewport &viewport) override;
 
         void setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView) override;
 
@@ -30,6 +32,6 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
         void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) override;
 
     private:
-        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> mCommandList;
+        Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
 };
 }

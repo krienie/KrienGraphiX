@@ -32,17 +32,17 @@ DX12GraphicsCommandList::DX12GraphicsCommandList()
 
 bool DX12GraphicsCommandList::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
-    auto * dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
+    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     assert(dxDevice);
 
-    auto * nativeDevice = dxDevice->getNativeDevice();
+    auto* nativeDevice = dxDevice->getNativeDevice();
 
-    ID3D12PipelineState * nativeInitialState = nullptr;
+    ID3D12PipelineState* nativeInitialState = nullptr;
 
-    auto * dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(initialState);
+    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(initialState);
     if (dxPipelineState != nullptr)
     {
-        nativeInitialState = dxPipelineState->getPipelineState();
+        nativeInitialState = dxPipelineState->getPSO();
     }
 
     const auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
@@ -63,15 +63,35 @@ void DX12GraphicsCommandList::close()
     mCommandList->Close();
 }
 
-void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue)
+void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
     auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
     assert(dxCommandQueue);
 
-    mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nullptr);
+    ID3D12PipelineState* nativeInitialState = nullptr;
+
+    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(initialState);
+    if (dxPipelineState != nullptr)
+    {
+        nativeInitialState = dxPipelineState->getPSO();
+    }
+
+    mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nativeInitialState);
 }
 
-void DX12GraphicsCommandList::setViewport(const KGXViewport& viewport)
+void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
+{
+    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(pipelineState);
+    assert(dxPipelineState);
+
+    if (dxPipelineState != nullptr)
+    {
+        ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
+        mCommandList->SetPipelineState(nativePipelineState);
+    }
+}
+
+void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
 {
     const D3D12_VIEWPORT dxViewport =
     {

@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "RHIResourceView.h"
-#include "KrienGraphiX/Core/KGXDefinitions.h"
+#include "Private/Core/PrivateDefinitions.h"
 
 namespace kgx::RHI
 {
@@ -22,9 +22,11 @@ class RHIGraphicsCommandList
         virtual bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
         virtual void close() = 0;
 
-        virtual void reset(RHICommandQueue* commandQueue) = 0;
+        virtual void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) = 0;
 
-        virtual void setViewport(const KGXViewport& viewport) = 0;
+        virtual void setPipelineState(RHIGraphicsPipelineState* pipelineState) = 0;
+
+        virtual void setViewport(const core::KGXViewport& viewport) = 0;
 
         virtual void setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView) = 0;
 

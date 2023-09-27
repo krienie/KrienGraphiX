@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <unordered_map>
 
 #include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/RHIShader.h"

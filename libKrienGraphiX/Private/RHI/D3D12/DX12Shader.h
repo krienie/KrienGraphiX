@@ -24,6 +24,7 @@ class DX12Shader : public RHIShader
         bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) override;
         
         void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;
+        const std::vector<D3D12_INPUT_ELEMENT_DESC>& getVertexInputLayout() const;
 
         [[nodiscard]] ID3DBlob* getShaderByteCode() const { return mLoadedShaderBlob.Get(); }
         [[nodiscard]] ID3D12RootSignature* getRootSignature() const { return mRootSignature.Get(); }

@@ -10,16 +10,16 @@ namespace kgx::RHI
 {
 class DX12GraphicsPipelineState final : public RHIGraphicsPipelineState
 {
-    public:
-        DX12GraphicsPipelineState();
-        ~DX12GraphicsPipelineState() override = default;
+public:
+    DX12GraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc);
+    ~DX12GraphicsPipelineState() override = default;
 
-        bool construct(RHIGraphicsDevice *device) override;
+    bool create(RHIGraphicsDevice* device) override;
 
-        [[nodiscard]]
-        ID3D12PipelineState * getPipelineState() const;
-        
-    private:
-        Microsoft::WRL::ComPtr<ID3D12PipelineState> mPipelineState;
+    [[nodiscard]]
+    ID3D12PipelineState* getPSO() const;
+    
+private:
+    Microsoft::WRL::ComPtr<ID3D12PipelineState> mPipelineState;
 };
 }
