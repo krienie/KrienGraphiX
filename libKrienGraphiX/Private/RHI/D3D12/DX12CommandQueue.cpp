@@ -16,15 +16,12 @@ DX12CommandQueue::DX12CommandQueue()
 
 bool DX12CommandQueue::init(RHIGraphicsDevice* device)
 {
-    //TODO(KL): Think of a way to remove all these dynamic_casts...
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    assert(dxDevice);
 
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-    auto* nativeDevice = dxDevice->getNativeDevice();
+    auto* nativeDevice = static_cast<DX12GraphicsDevice*>(device)->getNativeDevice();
 
     HRESULT res = nativeDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
     if (FAILED(res))
@@ -45,8 +42,7 @@ bool DX12CommandQueue::init(RHIGraphicsDevice* device)
 
 void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
-    auto* dxCommandList = dynamic_cast<DX12GraphicsCommandList*>(commandList);
-    assert(dxCommandList);
+    auto* dxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
 
     ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
     mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);

@@ -10,6 +10,12 @@ set(CMAKE_CXX_STANDARD 20)
 add_definitions(-D_UNICODE -DUNICODE)
 
 if (MSVC)
+    # Remove exceptions an RTTI flags from the compile options and add the no-versions of them
+    string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    string(REPLACE "/GR" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    add_compile_options(/EHsc-) # No exceptions
+    add_compile_options(/GR-) # No RTTI
+
     #Visual studio shouldn't introduce macros for min /max
     add_definitions(-DNOMINMAX)
 
@@ -17,17 +23,8 @@ if (MSVC)
     add_compile_options(/MP /W3 /WX)
     add_compile_options(/we4018 /we4245 /we4388 /we4389) # See [2]
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
-
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    add_compile_options(
-        -Wno-nested-anon-types
-        -Wno-gnu-anonymous-struct
-        -Wno-extra-semi # We have a bunch of these, don't want to fix them now.
-        -Wno-gnu-zero-variadic-macro-arguments # Used by google-mock
-        -Werror
-        -pedantic)
 else()
-    add_compile_options(-Wextra -Werror -Wunused-parameter)
+    message( FATAL_ERROR "Only MSVC is supported." )
 endif()
 
 conan_cmake_run(REQUIRES boost/1.78.0 gtest/1.11.0

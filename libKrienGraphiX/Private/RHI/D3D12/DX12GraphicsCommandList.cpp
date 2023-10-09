@@ -32,21 +32,16 @@ DX12GraphicsCommandList::DX12GraphicsCommandList()
 
 bool DX12GraphicsCommandList::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    assert(dxDevice);
-
-    auto* nativeDevice = dxDevice->getNativeDevice();
+    auto* nativeDevice = static_cast<DX12GraphicsDevice*>(device)->getNativeDevice();
 
     ID3D12PipelineState* nativeInitialState = nullptr;
 
-    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(initialState);
-    if (dxPipelineState != nullptr)
+    if (initialState != nullptr)
     {
-        nativeInitialState = dxPipelineState->getPSO();
+        nativeInitialState = static_cast<DX12GraphicsPipelineState*>(initialState)->getPSO();
     }
-
-    const auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
-    assert(dxCommandQueue);
+    
+    const auto dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
 
     const HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
     if (SUCCEEDED(res))
@@ -65,30 +60,25 @@ void DX12GraphicsCommandList::close()
 
 void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
-    auto dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
-    assert(dxCommandQueue);
+    auto dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
 
     ID3D12PipelineState* nativeInitialState = nullptr;
 
-    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(initialState);
-    if (dxPipelineState != nullptr)
+    if (initialState != nullptr)
     {
+        auto* dxPipelineState = static_cast<DX12GraphicsPipelineState*>(initialState);
         nativeInitialState = dxPipelineState->getPSO();
     }
+    
 
     mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nativeInitialState);
 }
 
 void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
 {
-    auto* dxPipelineState = dynamic_cast<DX12GraphicsPipelineState*>(pipelineState);
-    assert(dxPipelineState);
-
-    if (dxPipelineState != nullptr)
-    {
-        ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
-        mCommandList->SetPipelineState(nativePipelineState);
-    }
+    auto* dxPipelineState = static_cast<DX12GraphicsPipelineState*>(pipelineState);
+    ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
+    mCommandList->SetPipelineState(nativePipelineState);
 }
 
 void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
@@ -110,25 +100,18 @@ void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
 
 void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView)
 {
-    auto* dxDsv = dynamic_cast<const DX12ResourceView*>(depthStencilView);
-    assert(dxDsv && dxDsv->getViewType() == RHIResourceView::DSV);
+    auto* dxDsv = static_cast<const DX12ResourceView*>(depthStencilView);
+    assert(dxDsv->getViewType() == RHIResourceView::DSV);
 
-    auto toCPUDescriptorHandleArray = [](const std::vector<RHIResourceView*>& renderTargetViews)
+    std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvCpuHandles(renderTargetViews.size());
+    for (uint8_t i = 0u; i < static_cast<uint8_t>(renderTargetViews.size()); ++i)
     {
-        std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> cpuDescriptorHandles(renderTargetViews.size());
-        for (uint8_t i = 0u; i < static_cast<uint8_t>(renderTargetViews.size()); ++i)
-        {
-            auto dxRtv = dynamic_cast<DX12ResourceView*>(renderTargetViews[i]);
-            //TODO(KL): Create concrete classes of all views, so these checks are not necessary anymore
-            assert(dxRtv && dxRtv->getViewType() == RHIResourceView::RTV);
+        auto dxRtv = static_cast<DX12ResourceView*>(renderTargetViews[i]);
+        assert(dxRtv->getViewType() == RHIResourceView::RTV);
 
-            cpuDescriptorHandles[i] = dxRtv->getViewHandle();
-        }
+        rtvCpuHandles[i] = dxRtv->getViewHandle();
+    }
 
-        return cpuDescriptorHandles;
-    };
-
-    const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvCpuHandles = toCPUDescriptorHandleArray(renderTargetViews);
     const D3D12_CPU_DESCRIPTOR_HANDLE dsvCpuHandle = dxDsv->getViewHandle();
 
     mCommandList->OMSetRenderTargets(static_cast<UINT>(rtvCpuHandles.size()), rtvCpuHandles.data(), false, &dsvCpuHandle);
@@ -136,16 +119,16 @@ void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView
 
 void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
-    auto* dxDsv = dynamic_cast<DX12ResourceView*>(dsv);
-    assert(dxDsv && dxDsv->getViewType() == RHIResourceView::DSV);
+    auto* dxDsv = static_cast<DX12ResourceView*>(dsv);
+    assert(dxDsv->getViewType() == RHIResourceView::DSV);
     
     mCommandList->ClearDepthStencilView(dxDsv->getViewHandle(), toDxClearFlags(clearFlags), depth, stencil, 0, nullptr);
 }
 
 void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4])
 {
-    auto* dxRtv = dynamic_cast<DX12ResourceView*>(rtv);
-    assert(dxRtv && dxRtv->getViewType() == RHIResourceView::RTV);
+    auto* dxRtv = static_cast<DX12ResourceView*>(rtv);
+    assert(dxRtv->getViewType() == RHIResourceView::RTV);
 
     mCommandList->ClearRenderTargetView(dxRtv->getViewHandle(), colorRGBA, 0, nullptr);
 }

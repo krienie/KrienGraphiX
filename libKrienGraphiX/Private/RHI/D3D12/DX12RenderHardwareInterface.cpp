@@ -24,25 +24,19 @@ void DX12RenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList
 
     auto* commandQueue = renderCore->getRenderThreadPtr()->getCommandQueuePtr();
 
-    auto* dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
-    assert(dxCommandQueue);
-
+    auto* dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
     dxCommandQueue->getNativeCommandAllocator()->Reset();
 
     commandList->reset(commandQueue);
 
-    auto* dxTexture2D = dynamic_cast<DX12Texture2D*>(renderTarget);
-    assert(dxTexture2D);
-
-    dxTexture2D->transitionToState(dynamic_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
+    auto* dxTexture2D = static_cast<DX12Texture2D*>(renderTarget);
+    dxTexture2D->transitionToState(static_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
 }
 
 void DX12RenderHardwareInterface::endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-    auto* dxTexture2D = dynamic_cast<DX12Texture2D*>(renderTarget);
-    assert(dxTexture2D);
-
-    dxTexture2D->transitionToState(dynamic_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_PRESENT);
+    auto* dxTexture2D = static_cast<DX12Texture2D*>(renderTarget);
+    dxTexture2D->transitionToState(static_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_PRESENT);
 
     commandList->close();
 }
@@ -110,9 +104,7 @@ std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraph
 
 std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(graphicsDevice);
-    assert(dxDevice);
-    
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
     auto depthStencilBuffer = std::make_unique<DX12DepthStencilBuffer>(dxDevice, descriptor);
 
     return std::move(depthStencilBuffer);
