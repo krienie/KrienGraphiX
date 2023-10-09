@@ -21,14 +21,7 @@ DX12Shader::DX12Shader()
 
 bool DX12Shader::create(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
-
-    mDxDevice = dxDevice;
+    mDxDevice = static_cast<DX12GraphicsDevice*>(device);
 
     mShaderType = type;
 

@@ -46,19 +46,12 @@ DX12GraphicsPipelineState::DX12GraphicsPipelineState(const RHIGraphicsPipelineSt
 
 bool DX12GraphicsPipelineState::create(RHIGraphicsDevice* device)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    if (dxDevice == nullptr)
-    {
-        // This should never happen
-        return false;
-    }
-
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
     ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 
     if (mGraphicsDescriptor.VS)
     {
-        const auto dxVertexShader = dynamic_cast<DX12Shader*>(mGraphicsDescriptor.VS);
+        const auto dxVertexShader = static_cast<DX12Shader*>(mGraphicsDescriptor.VS);
         const auto& InputLayout = dxVertexShader->getVertexInputLayout();
 
         psoDesc.InputLayout = { InputLayout.data(), static_cast<UINT>(InputLayout.size()) };
@@ -68,7 +61,7 @@ bool DX12GraphicsPipelineState::create(RHIGraphicsDevice* device)
 
     if (mGraphicsDescriptor.PS)
     {
-        const auto dxPixelShader = dynamic_cast<DX12Shader*>(mGraphicsDescriptor.PS);
+        const auto dxPixelShader = static_cast<DX12Shader*>(mGraphicsDescriptor.PS);
         psoDesc.PS = toD3D12ShaderBytecode(dxPixelShader);
         psoDesc.pRootSignature = dxPixelShader->getRootSignature();
     }
@@ -93,6 +86,7 @@ bool DX12GraphicsPipelineState::create(RHIGraphicsDevice* device)
 
     psoDesc.DSVFormat = toDxgiPixelFormat(mGraphicsDescriptor.DepthStencilFormat);
 
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(device);
     HRESULT res = dxDevice->getNativeDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
 
     return SUCCEEDED(res);

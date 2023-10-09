@@ -22,9 +22,7 @@ DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 
 bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
-    assert(dxDevice);
-
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(device);
     auto* nativeFactory = dxDevice->getNativeFactory();
 
     // Describe and create the swap chain.
@@ -37,9 +35,7 @@ bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQu
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     swapChainDesc.SampleDesc.Count = 1;
 
-    auto* dxCommandQueue = dynamic_cast<DX12CommandQueue*>(commandQueue);
-    assert(dxCommandQueue);
-
+    auto* dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
     auto* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
 
     ComPtr<IDXGISwapChain1> swapChain;
