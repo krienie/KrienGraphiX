@@ -30,7 +30,7 @@ class RHIShader
         RHIShader& operator=(const RHIShader& rhs) = default;
         RHIShader& operator=(RHIShader&& rhs) = default;
 
-        virtual bool init(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) = 0;
+        virtual bool create(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type) = 0;
     
         virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
 

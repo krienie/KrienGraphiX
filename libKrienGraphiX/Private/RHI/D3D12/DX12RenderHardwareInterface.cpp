@@ -44,7 +44,7 @@ void DX12RenderHardwareInterface::endFrame(RHIGraphicsCommandList* commandList, 
 std::unique_ptr<RHIGraphicsDevice> DX12RenderHardwareInterface::createGraphicsDevice()
 {
     auto graphicsDevice = std::make_unique<DX12GraphicsDevice>();
-    if (!graphicsDevice->init())
+    if (!graphicsDevice->create())
     {
         return nullptr;
     }
@@ -55,7 +55,7 @@ std::unique_ptr<RHIGraphicsDevice> DX12RenderHardwareInterface::createGraphicsDe
 std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue(RHIGraphicsDevice * graphicsDevice)
 {
     auto commandQueue = std::make_unique<DX12CommandQueue>();
-    if (!commandQueue->init(graphicsDevice))
+    if (!commandQueue->create(graphicsDevice))
     {
         return nullptr;
     }
@@ -72,7 +72,7 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
     unsigned int frameCount)
 {
     auto swapChain = std::make_unique<DX12SwapChain>(width, height);
-    if (!swapChain->init(device, commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
+    if (!swapChain->create(device, commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
     {
         return nullptr;
     }
@@ -83,7 +83,7 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type)
 {
     auto newShader = std::make_unique<DX12Shader>();
-    if (!newShader->init(graphicsDevice, compiledShader, type))
+    if (!newShader->create(graphicsDevice, compiledShader, type))
     {
         return nullptr;
     }
@@ -94,7 +94,7 @@ std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphics
 std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
 {
     auto graphicsCommandList = std::make_unique<DX12GraphicsCommandList>();
-    if (!graphicsCommandList->init(graphicsDevice, commandQueue, pipelineState))
+    if (!graphicsCommandList->create(graphicsDevice, commandQueue, pipelineState))
     {
         return nullptr;
     }

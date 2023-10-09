@@ -17,7 +17,7 @@ class DX12GraphicsCommandList final : public RHIGraphicsCommandList
         [[nodiscard]]
         ID3D12GraphicsCommandList* getCommandList() const { return mCommandList.Get(); }
 
-        bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
+        bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
         void close() override;
         void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;

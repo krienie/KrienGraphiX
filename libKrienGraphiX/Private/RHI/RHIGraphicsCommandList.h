@@ -19,7 +19,7 @@ class RHIGraphicsCommandList
     public:
         virtual ~RHIGraphicsCommandList() = default;
         
-        virtual bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
+        virtual bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
         virtual void close() = 0;
 
         virtual void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) = 0;

@@ -30,7 +30,7 @@ DX12GraphicsCommandList::DX12GraphicsCommandList()
 {
 }
 
-bool DX12GraphicsCommandList::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
+bool DX12GraphicsCommandList::create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
     auto* nativeDevice = static_cast<DX12GraphicsDevice*>(device)->getNativeDevice();
 

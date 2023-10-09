@@ -16,7 +16,7 @@ class DX12GraphicsDevice : public RHIGraphicsDevice
         DX12GraphicsDevice();
         ~DX12GraphicsDevice() override;
 
-        bool init() override;
+        bool create() override;
 
         [[nodiscard]]
         ID3D12Device* getNativeDevice() const;

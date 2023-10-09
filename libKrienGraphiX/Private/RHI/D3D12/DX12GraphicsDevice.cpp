@@ -83,7 +83,7 @@ DX12GraphicsDevice::~DX12GraphicsDevice()
     //mResidencyManager.Destroy();
 }
 
-bool DX12GraphicsDevice::init()
+bool DX12GraphicsDevice::create()
 {
     UINT dxgiFactoryFlags = 0;
 

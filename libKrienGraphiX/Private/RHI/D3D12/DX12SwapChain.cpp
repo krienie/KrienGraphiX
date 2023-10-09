@@ -20,7 +20,7 @@ DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 {
 }
 
-bool DX12SwapChain::init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
+bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
     auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(device);
     assert(dxDevice);

@@ -16,7 +16,7 @@ class RHISwapChain
     public:
         virtual ~RHISwapChain() = default;
 
-        virtual bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int frameCount, RHIPixelFormat pixelFormat) = 0;
+        virtual bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int frameCount, RHIPixelFormat pixelFormat) = 0;
 
         [[nodiscard]] virtual RHITexture2D* getCurrentBuffer() const = 0;
         [[nodiscard]] virtual RHIResourceView* getCurrentBufferRTV() const

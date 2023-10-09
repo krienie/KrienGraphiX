@@ -19,7 +19,7 @@ class DX12SwapChain : public RHISwapChain
         DX12SwapChain(UINT width, UINT height);
         ~DX12SwapChain() override = default;
 
-        bool init(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
+        bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
 
         [[nodiscard]] RHITexture2D* getCurrentBuffer() const override;
         

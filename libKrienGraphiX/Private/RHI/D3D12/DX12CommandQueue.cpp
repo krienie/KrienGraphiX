@@ -14,9 +14,8 @@ DX12CommandQueue::DX12CommandQueue()
 {
 }
 
-bool DX12CommandQueue::init(RHIGraphicsDevice* device)
+bool DX12CommandQueue::create(RHIGraphicsDevice* device)
 {
-
     D3D12_COMMAND_QUEUE_DESC queueDesc = {};
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

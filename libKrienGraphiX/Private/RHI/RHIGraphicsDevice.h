@@ -10,6 +10,6 @@ class RHIGraphicsDevice
     public:
         virtual ~RHIGraphicsDevice() = default;
 
-        virtual bool init() = 0;
+        virtual bool create() = 0;
 };
 }

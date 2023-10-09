@@ -11,7 +11,7 @@ class RHICommandQueue
     public:
         virtual ~RHICommandQueue() = default;
 
-        virtual bool init(RHIGraphicsDevice *device) = 0;
+        virtual bool create(RHIGraphicsDevice *device) = 0;
 
         virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
         virtual void flushQueue() = 0;

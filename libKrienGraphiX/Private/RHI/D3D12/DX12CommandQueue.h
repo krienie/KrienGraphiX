@@ -14,7 +14,7 @@ public:
     DX12CommandQueue();
     ~DX12CommandQueue() override = default;
 
-    bool init(RHIGraphicsDevice *device) override;
+    bool create(RHIGraphicsDevice *device) override;
     void executeCommandList(RHIGraphicsCommandList * commandList) override;
     void flushQueue() override;
 
