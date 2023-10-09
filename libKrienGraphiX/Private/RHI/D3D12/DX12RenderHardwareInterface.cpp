@@ -109,4 +109,17 @@ std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthS
 
     return std::move(depthStencilBuffer);
 }
+
+std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc)
+{
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
+    
+    auto graphicsPipelineState = std::make_unique<DX12GraphicsPipelineState>(desc);
+    if (!graphicsPipelineState->create(dxDevice))
+    {
+        return nullptr;
+    }
+
+    return std::move(graphicsPipelineState);
+}
 }

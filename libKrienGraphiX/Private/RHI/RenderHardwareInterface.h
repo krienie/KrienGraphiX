@@ -50,6 +50,9 @@ public:
 
     [[nodiscard]]
     virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) = 0;
+
+    [[nodiscard]]
+    virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc) = 0;
 };
 
 inline std::unique_ptr<RenderHardwareInterface> PlatformRHI = nullptr;

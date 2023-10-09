@@ -44,5 +44,8 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
 
         [[nodiscard]]
         std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) override;
+
+        [[nodiscard]]
+        std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc) override;
 };
 }
