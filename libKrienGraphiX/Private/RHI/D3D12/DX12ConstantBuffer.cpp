@@ -44,8 +44,8 @@ DX12ConstantBuffer::DX12ConstantBuffer(DX12GraphicsDevice* dxDevice, const RHICo
 
     map(MapType::READ_WRITE);
 
-    constexpr bool IsShaderVisible = true;
-    addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::CBV, std::shared_ptr<DX12ConstantBuffer>(this), IsShaderVisible));
+    //constexpr bool IsShaderVisible = true;
+    //addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::CBV, std::shared_ptr<DX12ConstantBuffer>(this), IsShaderVisible));
 }
 
 void* DX12ConstantBuffer::mapImpl(MapType type)

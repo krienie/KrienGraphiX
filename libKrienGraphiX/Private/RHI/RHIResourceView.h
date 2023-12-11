@@ -5,8 +5,12 @@
 
 namespace kgx::RHI
 {
-class RHIResource;
+class RHIViewableResource;
 
+/**
+ * \brief Describes a view to a shader bindable resource that can be visible inside a shader.
+ * Does not include Vertex and Index buffers.
+ */
 class RHIResourceView
 {
 public:
@@ -17,34 +21,23 @@ public:
         CBV,
         SRV,
         UAV,
+        //VertexBuffer,
+        //IndexBuffer,
         NumTypes
     };
 
-    enum DepthStencilFlags
-    {
-        DepthClear = 1,
-        StencilClear = 2,
-
-        DepthStencilClear = DepthClear | StencilClear
-    };
-
-    RHIResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource) : mViewType(type), mViewedResource(viewedResource) {}
+    RHIResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource);
     virtual ~RHIResourceView() = default;
 
-    [[nodiscard]] ViewType getViewType() const { return mViewType; }
-    [[nodiscard]] RHIResource* getViewedResource() const
-    {
-        if (const auto resource = mViewedResource.lock())
-        {
-            return resource.get();
-        }
+    [[nodiscard]] bool IsBufferView() const;
+    [[nodiscard]] bool IsTextureView() const;
 
-        return nullptr;
-    }
+    [[nodiscard]] ViewType getViewType() const;
+    [[nodiscard]] RHIViewableResource* getViewedResource() const;
 
 private:
     ViewType mViewType;
-    std::weak_ptr<RHIResource> mViewedResource;
+    std::weak_ptr<RHIViewableResource> mViewedResource;
 };
 
 }

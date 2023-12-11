@@ -6,7 +6,6 @@
 #include "KrienGraphiX/Core/KGXDefinitions.h"
 
 #include "Private/Core/PrivateDefinitions.h"
-#include "Private/RHI/RHIDepthStencilBuffer.h"
 #include "Private/RHI/RHISwapChain.h"
 
 namespace kgx::rendering
@@ -26,10 +25,12 @@ public:
 private:
     WinHandle mWindowHandle;
 
-    std::unique_ptr<RHI::RHISwapChain> mRHISwapChain;
+    std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
+    std::shared_ptr<RHI::RHIResourceView> mSwapChainRTV;
 
     //TODO(KL): Temporarily here. Move to KGXRenderer
-    std::unique_ptr<RHI::RHIDepthStencilBuffer> mDepthStencil;
+    std::shared_ptr<RHI::RHITexture2D> mDepthStencil;
+    std::shared_ptr<RHI::RHIResourceView> mDSV;
 
     core::KGXViewport mViewport;
 };

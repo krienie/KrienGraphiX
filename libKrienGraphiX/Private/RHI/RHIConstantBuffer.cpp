@@ -7,7 +7,7 @@
 namespace kgx::RHI
 {
 RHIConstantBuffer::RHIConstantBuffer(const RHIConstantBufferDescriptor& cbDesc)
-    : RHIResource(cbDesc.flags), mBufferName(cbDesc.name), mBufferSize(cbDesc.bufferSize), mRegister(cbDesc.bufferRegister)
+    : RHIBuffer(cbDesc), mRegister(cbDesc.bufferRegister)
 {
 }
 

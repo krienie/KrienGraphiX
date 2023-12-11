@@ -37,13 +37,16 @@ KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, uns
         };
 
     mDepthStencil = PlatformRHI->createDepthStencilBuffer(rhiDevice, texDesc);
+
+    constexpr bool isShaderVisible = false;
+    mDSV = RHI::PlatformRHI->createResourceView(RHI::RHIResourceView::ViewType::DSV, mDepthStencil, isShaderVisible);
 }
 
 void KGXRenderWindow::draw()
 {
     const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
 
-    KGXRenderer renderer(mViewport, mRHISwapChain->getCurrentBuffer(), mDepthStencil.get());
+    KGXRenderer renderer(mViewport, *mRHISwapChain->getCurrentBufferView(), *mDSV);
     renderer.RenderFrame();
 
     mRHISwapChain->present();

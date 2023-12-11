@@ -4,15 +4,15 @@
 #include <cassert>
 
 #include "DX12CommandQueue.h"
-#include "DX12DepthStencilBuffer.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
+#include "DX12ResourceView.h"
 
 namespace
 {
-D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::RHIResourceView::DepthStencilFlags flags)
+D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::DepthStencilFlags flags)
 {
-    using DepthStencilFlags = kgx::RHI::RHIResourceView::DepthStencilFlags;
+    using DepthStencilFlags = kgx::RHI::DepthStencilFlags;
 
     assert(flags & DepthStencilFlags::DepthClear | flags & DepthStencilFlags::StencilClear);
 
@@ -117,7 +117,7 @@ void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView
     mCommandList->OMSetRenderTargets(static_cast<UINT>(rtvCpuHandles.size()), rtvCpuHandles.data(), false, &dsvCpuHandle);
 }
 
-void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, RHIResourceView::DepthStencilFlags clearFlags, float depth, uint8_t stencil)
+void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
     auto* dxDsv = static_cast<DX12ResourceView*>(dsv);
     assert(dxDsv->getViewType() == RHIResourceView::DSV);

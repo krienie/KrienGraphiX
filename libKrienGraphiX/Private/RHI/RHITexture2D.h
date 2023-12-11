@@ -11,7 +11,7 @@ class RHIGraphicsDevice;
 class RHITexture2D : public RHITexture
 {
     public:
-        RHITexture2D(RHITexture2DDescriptor descriptor)
+        RHITexture2D(const RHITexture2DDescriptor& descriptor)
             : RHITexture(descriptor.flags, descriptor.numMips, descriptor.numSamples, descriptor.pixelFormat), mWidth(descriptor.width), mHeight(descriptor.height)
         {}
 

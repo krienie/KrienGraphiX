@@ -6,6 +6,7 @@
 #include "DX12ConstantBuffer.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12Resource.h"
+#include "DX12Texture2D.h"
 #include "Private/Core/RenderCore.h"
 
 namespace
@@ -34,7 +35,7 @@ D3D12_DESCRIPTOR_HEAP_TYPE toDescriptorHeapType(kgx::RHI::DX12ResourceView::View
 
 namespace kgx::RHI
 {
-DX12ResourceView::DX12ResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource, bool isShaderVisible)
+DX12ResourceView::DX12ResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible)
     : RHIResourceView(type, viewedResource)
 {
     createView(isShaderVisible);
@@ -47,34 +48,53 @@ D3D12_CPU_DESCRIPTOR_HANDLE DX12ResourceView::getViewHandle() const
 
 void DX12ResourceView::createView(bool isShaderVisible)
 {
-    auto* dxDevice = dynamic_cast<DX12GraphicsDevice*>(core::RenderCore::get()->getRenderThreadPtr()->getGraphicsDevicePtr());
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(core::RenderCore::get()->getRenderThreadPtr()->getGraphicsDevicePtr());
     auto* nativeDevice = dxDevice->getNativeDevice();
 
-    D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
-    heapDesc.NumDescriptors = 1u;
-    heapDesc.Type = toDescriptorHeapType(getViewType());
-    heapDesc.Flags = isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-	heapDesc.NodeMask = 0;
-    nativeDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(mDescriptorHeap.GetAddressOf()));
+    auto createDescriptorHeap = [this, nativeDevice, &isShaderVisible]()
+    {
+        const D3D12_DESCRIPTOR_HEAP_TYPE heapType = toDescriptorHeapType(getViewType());
+        const bool canBeShaderVisible = heapType != D3D12_DESCRIPTOR_HEAP_TYPE_RTV && heapType != D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 
-    auto* dxResource = dynamic_cast<DX12Resource*>(getViewedResource());
-    if (!dxResource)
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
+        heapDesc.NumDescriptors = 1u;
+        heapDesc.Type = heapType;
+        heapDesc.Flags = canBeShaderVisible && isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+	    heapDesc.NodeMask = 0;
+        nativeDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&mDescriptorHeap));
+    };
+
+    auto* rhiResource = getViewedResource();
+    if (!rhiResource)
     {
         return;
     }
 
-    auto* nativeResource = dxResource->getResource().Get();
-
     switch (getViewType())
     {
         case ViewType::RTV:
+        {
+            auto* dxResource = static_cast<DX12Texture2D*>(rhiResource);
+            auto* nativeResource = dxResource->getResource().Get();
+            createDescriptorHeap();
             nativeDevice->CreateRenderTargetView(nativeResource, nullptr, mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        }
             break;
         case ViewType::DSV:
+        {
+            auto* dxResource = static_cast<DX12Texture2D*>(rhiResource);
+            auto* nativeResource = dxResource->getResource().Get();
+            createDescriptorHeap();
             nativeDevice->CreateDepthStencilView(nativeResource, nullptr, mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        }
             break;
         case ViewType::CBV:
             {
+                auto* dxResource = static_cast<DX12ConstantBuffer*>(rhiResource);
+                auto* nativeResource = dxResource->getResource().Get();
+
+                createDescriptorHeap();
+
                 const D3D12_RESOURCE_DESC nativeResourceDesc = nativeResource->GetDesc();
                 
                 D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
@@ -84,10 +104,24 @@ void DX12ResourceView::createView(bool isShaderVisible)
             }
             break;
         case ViewType::SRV:
+        {
+            //TODO(KL): get the correct resource in case of a buffer
+            auto* dxResource = static_cast<DX12Texture2D*>(rhiResource);
+            auto* nativeResource = dxResource->getResource().Get();
+
+            createDescriptorHeap();
             nativeDevice->CreateShaderResourceView(nativeResource, nullptr, mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        }
             break;
         case ViewType::UAV:
-            nativeDevice->CreateUnorderedAccessView(nativeResource, nullptr, nullptr, mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        //TODO(KL): Implement
+        //{
+        //    auto* dxResource = static_cast<DX12Texture2D*>(rhiResource);
+        //    auto* nativeResource = dxResource->getResource().Get();
+        //
+        //    createDescriptorHeap();
+        //    nativeDevice->CreateUnorderedAccessView(nativeResource, nullptr, nullptr, mDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+        //}
             break;
         default:
             break;

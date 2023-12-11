@@ -4,13 +4,14 @@
 #include <unordered_map>
 #include <string>
 
+#include "RHIBuffer.h"
 #include "RHIDescriptors.h"
 
 namespace kgx::RHI
 {
 class RHIGraphicsDevice;
 
-class RHIConstantBuffer : public RHIResource
+class RHIConstantBuffer : public RHIBuffer
 {
 public:
     enum MapType : uint8_t
@@ -21,17 +22,11 @@ public:
     };
 
     RHIConstantBuffer(const RHIConstantBufferDescriptor& cbDesc);
-    virtual ~RHIConstantBuffer();
+    ~RHIConstantBuffer() override;
     RHIConstantBuffer(RHIConstantBuffer&) = delete;
     RHIConstantBuffer(RHIConstantBuffer&&) noexcept = default;
     RHIConstantBuffer& operator=(RHIConstantBuffer&) = delete;
     RHIConstantBuffer& operator=(RHIConstantBuffer&&) noexcept = default;
-
-    [[nodiscard]]
-    std::string name() const { return mBufferName; }
-
-    [[nodiscard]]
-    size_t bufferSize() const { return mBufferSize; }
 
     [[nodiscard]]
     size_t bufferRegister() const { return mRegister; }
@@ -53,8 +48,6 @@ private:
     virtual void* mapImpl(MapType type) = 0;
     virtual void unmapImpl() = 0;
     
-    std::string mBufferName;
-    size_t mBufferSize = 0u;
     size_t mRegister = 0u;
 
     void* mMappedDataPtr = nullptr;

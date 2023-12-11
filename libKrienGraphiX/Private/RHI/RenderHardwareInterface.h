@@ -3,7 +3,6 @@
 
 #include "RHICommandQueue.h"
 #include "RHIConstantBuffer.h"
-#include "RHIDepthStencilBuffer.h"
 #include "RHIGraphicsCommandList.h"
 #include "RHIGraphicsDevice.h"
 #include "RHIShader.h"
@@ -49,7 +48,10 @@ public:
     virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
 
     [[nodiscard]]
-    virtual std::unique_ptr<RHIDepthStencilBuffer> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) = 0;
+    virtual std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) = 0;
+
+    [[nodiscard]]
+    virtual std::shared_ptr<RHIResourceView> createResourceView(RHIResourceView::ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) = 0;
 
     [[nodiscard]]
     virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc) = 0;

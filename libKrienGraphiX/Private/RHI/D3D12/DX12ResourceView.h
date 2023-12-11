@@ -9,6 +9,7 @@
 
 namespace kgx::RHI
 {
+class DX12GraphicsDevice;
 class DX12Resource;
 class DX12GraphicsCommandList;
 
@@ -31,7 +32,7 @@ public:
     //};
 
     //TODO(KL): Add customization options for typeless resources
-    DX12ResourceView(ViewType type, const std::shared_ptr<RHIResource>& viewedResource, bool isShaderVisible);
+    DX12ResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible);
 
     DX12ResourceView(const DX12ResourceView& rhs) = default;
     DX12ResourceView(DX12ResourceView&& rhs) = default;

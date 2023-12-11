@@ -9,12 +9,24 @@
 
 namespace kgx::RHI
 {
-struct RHIConstantBufferDescriptor
+struct RHIBufferDescriptor
 {
     std::string name;
-    unsigned int bufferRegister;
     unsigned int bufferSize;
     RHIResource::CreationFlags flags = RHIResource::None;
+};
+
+struct RHIConstantBufferDescriptor : public RHIBufferDescriptor
+{
+    unsigned int bufferRegister;
+};
+
+enum DepthStencilFlags
+{
+    DepthClear = 1,
+    StencilClear = 2,
+
+    DepthStencilClear = DepthClear | StencilClear
 };
 
 struct RHIClearValue final

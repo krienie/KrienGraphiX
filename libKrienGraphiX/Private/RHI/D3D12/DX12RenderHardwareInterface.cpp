@@ -3,7 +3,6 @@
 
 #include "DX12GraphicsDevice.h"
 #include "DX12CommandQueue.h"
-#include "DX12DepthStencilBuffer.h"
 #include "DX12GraphicsCommandList.h"
 #include "DX12GraphicsPipelineState.h"
 #include "DX12Shader.h"
@@ -102,12 +101,28 @@ std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraph
     return std::move(graphicsCommandList);
 }
 
-std::unique_ptr<RHIDepthStencilBuffer> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
+std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
 {
+    //TODO(KL): Validate pixelformat
+
+    DX12Texture2DDescriptor dx12Desc =
+    {
+        descriptor,
+        nullptr,
+        nullptr,
+        0,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE
+    };
+
     auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
-    auto depthStencilBuffer = std::make_unique<DX12DepthStencilBuffer>(dxDevice, descriptor);
+    auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dxDevice, dx12Desc);
 
     return std::move(depthStencilBuffer);
+}
+
+std::shared_ptr<RHIResourceView> DX12RenderHardwareInterface::createResourceView(RHIResourceView::ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible)
+{
+    return std::make_shared<DX12ResourceView>(type, viewedResource, isShaderVisible);
 }
 
 std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc)
