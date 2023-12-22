@@ -19,7 +19,7 @@ public:
 
 private:
     HWND initWindow() const;
-    void updateWindowTitle(float deltaTime);
+    void updateWindowTitle(float deltaTime) const;
 
     HINSTANCE mHInstance = nullptr;
     HWND mWindowHandle = nullptr;

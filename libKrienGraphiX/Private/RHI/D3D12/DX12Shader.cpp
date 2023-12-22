@@ -52,20 +52,18 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() 
     return mInputLayoutDesc;
 }
 
-//TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers te zetten. Verplaatsen naar RenderPass?
+//TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers aan te maken. Verplaatsen naar RenderPass?
 bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
 {
     for (const auto& buffDesc : bufferDescs)
     {
-        // create DX12ConstantBuffer
-        RHIConstantBufferDescriptor cbDesc
+        RHIBufferDescriptor cbDesc
         {
-            {
-                buffDesc.name,
-                buffDesc.size,
-                RHIResource::ShaderResource
-            },
-            buffDesc.bufferRegister,
+            .name = buffDesc.name,
+            .bufferSize = buffDesc.size,
+            .bufferRegister = buffDesc.bufferRegister,
+            .isBufferAligned = true,
+            .flags = RHIResource::ShaderResource
         };
         
         mConstantBuffers.emplace_back(mDxDevice, cbDesc);

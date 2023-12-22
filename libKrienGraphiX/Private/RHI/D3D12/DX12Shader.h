@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "DX12ConstantBuffer.h"
+#include "DX12UploadBuffer.h"
 #include "Private/RHI/RHIShader.h"
 
 #include <d3d12.h>
@@ -37,7 +37,7 @@ class DX12Shader : public RHIShader
 
         DX12GraphicsDevice* mDxDevice;
         
-        std::vector<DX12ConstantBuffer> mConstantBuffers;
+        std::vector<DX12UploadBuffer> mConstantBuffers;
         std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 
         Microsoft::WRL::ComPtr<ID3DBlob> mLoadedShaderBlob;

@@ -13,12 +13,9 @@ struct RHIBufferDescriptor
 {
     std::string name;
     unsigned int bufferSize;
-    RHIResource::CreationFlags flags = RHIResource::None;
-};
-
-struct RHIConstantBufferDescriptor : public RHIBufferDescriptor
-{
     unsigned int bufferRegister;
+    bool isBufferAligned;
+    RHIResource::CreationFlags flags = RHIResource::None;
 };
 
 enum DepthStencilFlags

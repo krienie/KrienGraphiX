@@ -1,22 +1,24 @@
 
-
-#include "RHIConstantBuffer.h"
+#include "RHIBuffer.h"
 
 #include <cassert>
 
 namespace kgx::RHI
 {
-RHIConstantBuffer::RHIConstantBuffer(const RHIConstantBufferDescriptor& cbDesc)
-    : RHIBuffer(cbDesc), mRegister(cbDesc.bufferRegister)
+RHIBuffer::RHIBuffer(const RHIBufferDescriptor& descriptor)
+    : RHIViewableResource(descriptor.flags),
+    mBufferName(descriptor.name),
+    mBufferSize(descriptor.bufferSize),
+    mRegister(descriptor.bufferRegister)
 {
 }
 
-RHIConstantBuffer::~RHIConstantBuffer()
+RHIBuffer::~RHIBuffer()
 {
     unmap();
 }
 
-void* RHIConstantBuffer::map(MapType type)
+void* RHIBuffer::map(MapType type)
 {
     unmap();
 
@@ -26,7 +28,7 @@ void* RHIConstantBuffer::map(MapType type)
     return mMappedDataPtr;
 }
 
-void RHIConstantBuffer::unmap()
+void RHIBuffer::unmap()
 {
     if (mMappedDataPtr)
     {
@@ -36,7 +38,7 @@ void RHIConstantBuffer::unmap()
     }
 }
 
-void RHIConstantBuffer::copyBufferData(const void* data, unsigned int sizeInBytes, bool keepMapped)
+void RHIBuffer::copyBufferData(const void* data, unsigned sizeInBytes, bool keepMapped)
 {
     assert(sizeInBytes <= bufferSize());
 

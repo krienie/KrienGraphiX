@@ -2,7 +2,6 @@
 #pragma once
 
 #include "RHICommandQueue.h"
-#include "RHIConstantBuffer.h"
 #include "RHIGraphicsCommandList.h"
 #include "RHIGraphicsDevice.h"
 #include "RHIShader.h"

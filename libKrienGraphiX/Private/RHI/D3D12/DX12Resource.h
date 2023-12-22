@@ -2,7 +2,6 @@
 #pragma once
 
 #include <d3d12.h>
-#include <vector>
 #include <wrl\client.h>
 
 #include "DX12ResourceView.h"

@@ -1,12 +1,14 @@
 
 #pragma once
 
-#include "Private/Core/CommandThread.h"
-#include "Private/Core/SceneThread.h"
-#include "Private/Core/RenderThread.h"
+#include "CommandThread.h"
+#include "RenderThread.h"
+#include "Timer.h"
+#include "Private/Scene/KGXScene.h"
 
 #include <memory>
 #include <unordered_map>
+
 
 namespace kgx::core
 {
@@ -25,7 +27,7 @@ public:
     RenderCore(RenderCore&&) noexcept                 = delete;
     RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
-    [[nodiscard]] SceneThread* getSceneThreadPtr() const;
+    [[nodiscard]] KGXScene* getSceneThreadPtr() const;
     [[nodiscard]] RenderThread* getRenderThreadPtr() const;
 
     bool createRenderWindow(WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
@@ -37,9 +39,10 @@ private:
     static RenderCore* mInst;
     static int mRefCount;
 
-    std::unique_ptr<SceneThread> mSceneThread;
+    std::unique_ptr<Timer> mFrameTimer;
+
+    std::unique_ptr<KGXScene> mScene;
     std::unique_ptr<RenderThread> mRenderThread;
-    //CommandThread mThreadPool; Not really needed for now
 
     std::mutex mRenderWindowMutex;
     std::unordered_map<WinHandle, std::shared_ptr<RenderWindow>> mRenderWindows;

@@ -1,15 +1,18 @@
 
-#include "DX12ConstantBuffer.h"
+#include "DX12UploadBuffer.h"
 #include "DX12Descriptors.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12MemoryUtils.h"
 
 namespace
 {
-kgx::RHI::RHIConstantBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIConstantBufferDescriptor& descriptor)
+kgx::RHI::RHIBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIBufferDescriptor& descriptor)
 {
-    kgx::RHI::RHIConstantBufferDescriptor alignedDesc = descriptor;
-    alignedDesc.bufferSize = static_cast<unsigned>(kgx::RHI::DX12MemoryUtils::alignTo256Bytes(alignedDesc.bufferSize));
+    kgx::RHI::RHIBufferDescriptor alignedDesc = descriptor;
+    if (descriptor.isBufferAligned)
+    {
+        alignedDesc.bufferSize = static_cast<unsigned>(kgx::RHI::DX12MemoryUtils::alignTo256Bytes(alignedDesc.bufferSize));
+    }
 
     return alignedDesc;
 }
@@ -17,8 +20,8 @@ kgx::RHI::RHIConstantBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI:
 
 namespace kgx::RHI
 {
-DX12ConstantBuffer::DX12ConstantBuffer(DX12GraphicsDevice* dxDevice, const RHIConstantBufferDescriptor& descriptor)
-    : RHIConstantBuffer(getAlignedBufferDescriptor(descriptor)),
+DX12UploadBuffer::DX12UploadBuffer(DX12GraphicsDevice* dxDevice, const RHIBufferDescriptor& descriptor)
+    : RHIBuffer(getAlignedBufferDescriptor(descriptor)),
         DX12Resource(nullptr, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ)
     , mDescriptor(descriptor)
 {
@@ -48,7 +51,7 @@ DX12ConstantBuffer::DX12ConstantBuffer(DX12GraphicsDevice* dxDevice, const RHICo
     //addResourceView(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::CBV, std::shared_ptr<DX12ConstantBuffer>(this), IsShaderVisible));
 }
 
-void* DX12ConstantBuffer::mapImpl(MapType type)
+void* DX12UploadBuffer::mapImpl(MapType type)
 {
     void* dataPtr;
 
@@ -66,7 +69,7 @@ void* DX12ConstantBuffer::mapImpl(MapType type)
     return dataPtr;
 }
 
-void DX12ConstantBuffer::unmapImpl()
+void DX12UploadBuffer::unmapImpl()
 {
     if ((currentMappedType() | MapType::READ) == MapType::READ)
     {

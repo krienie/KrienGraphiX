@@ -39,9 +39,9 @@ void RenderCore::shutdown()
     }
 }
 
-SceneThread* RenderCore::getSceneThreadPtr() const
+KGXScene* RenderCore::getSceneThreadPtr() const
 {
-    return mSceneThread.get();
+    return mScene.get();
 }
 
 RenderThread* RenderCore::getRenderThreadPtr() const
@@ -66,7 +66,7 @@ bool RenderCore::createRenderWindow(WinHandle windowHandle, unsigned initialWind
 }
 
 RenderCore::RenderCore()
-    : mSceneThread(std::make_unique<SceneThread>()), mRenderThread(std::make_unique<RenderThread>())
+    : mScene(std::make_unique<KGXScene>()), mRenderThread(std::make_unique<RenderThread>())
 {
 #ifdef WIN32
 #ifdef _DEBUG
@@ -82,22 +82,25 @@ RenderCore::RenderCore()
 #endif
 #endif
 
-    mSceneThread->addPostSceneUpdateDelegate([this]()
+    constexpr int timeIntervalMilli = 16; // +- 60 FPS
+    mFrameTimer = std::make_unique<Timer>(timeIntervalMilli, [this](float deltaTime)
     {
-        std::lock_guard lock(mRenderWindowMutex);
-        for (auto [_, renderWindow]: mRenderWindows)
+        mScene->updateScene(deltaTime);
+
         {
-            renderWindow->draw();
+            std::lock_guard lock(mRenderWindowMutex);
+            for (auto [_, renderWindow]: mRenderWindows)
+            {
+                renderWindow->draw();
+            }
         }
     });
-
-    mSceneThread->start();
 }
 
 RenderCore::~RenderCore()
 {
-    // Make sure the SceneThread is stopped before we destruct everything else
-    mSceneThread.reset();
+    // Make sure the frame time is stopped before we destruct everything else
+    mFrameTimer.reset();
     mRenderThread.reset();
 }
 }

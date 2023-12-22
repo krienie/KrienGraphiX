@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "d3dx12.h"
-#include "DX12ConstantBuffer.h"
+#include "DX12UploadBuffer.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12Resource.h"
 #include "DX12Texture2D.h"
@@ -90,7 +90,7 @@ void DX12ResourceView::createView(bool isShaderVisible)
             break;
         case ViewType::CBV:
             {
-                auto* dxResource = static_cast<DX12ConstantBuffer*>(rhiResource);
+                auto* dxResource = static_cast<DX12UploadBuffer*>(rhiResource);
                 auto* nativeResource = dxResource->getResource().Get();
 
                 createDescriptorHeap();

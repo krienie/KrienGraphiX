@@ -66,7 +66,7 @@ int KGToolboxApp::run()
 {
     MSG msg = {nullptr};
  
-	while(msg.message != WM_QUIT)
+	while (msg.message != WM_QUIT)
 	{
 		if(PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
 		{
@@ -123,7 +123,7 @@ HWND KGToolboxApp::initWindow() const
 	return windowHandle;
 }
 
-void KGToolboxApp::updateWindowTitle(float deltaTime)
+void KGToolboxApp::updateWindowTitle(float deltaTime) const
 {
     static int frameCount = 0;
     static float timeElapsed = 0.0;
