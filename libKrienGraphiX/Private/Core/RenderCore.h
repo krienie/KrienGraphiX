@@ -5,9 +5,12 @@
 #include "RenderThread.h"
 #include "Timer.h"
 #include "Private/Scene/KGXScene.h"
+#include "Private/Rendering/KGXRenderScene.h"
 
 #include <memory>
 #include <unordered_map>
+
+
 
 
 namespace kgx::core
@@ -27,7 +30,7 @@ public:
     RenderCore(RenderCore&&) noexcept                 = delete;
     RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
-    [[nodiscard]] KGXScene* getSceneThreadPtr() const;
+    [[nodiscard]] KGXScene* getScenePtr() const;
     [[nodiscard]] RenderThread* getRenderThreadPtr() const;
 
     bool createRenderWindow(WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight);

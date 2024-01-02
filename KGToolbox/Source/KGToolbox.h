@@ -27,5 +27,7 @@ private:
 	unsigned int mClientHeight;
 
     KrienGraphiXEngine mKgxEngine;
+
+    std::unique_ptr<kgx::KGXSceneObject> BoxObject;
 };
 }

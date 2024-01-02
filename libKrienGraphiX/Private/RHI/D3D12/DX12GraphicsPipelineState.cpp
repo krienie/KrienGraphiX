@@ -2,6 +2,7 @@
 #include "DX12GraphicsPipelineState.h"
 
 #include "DX12GraphicsDevice.h"
+#include "DX12PixelFormat.h"
 #include "DX12Shader.h"
 
 namespace

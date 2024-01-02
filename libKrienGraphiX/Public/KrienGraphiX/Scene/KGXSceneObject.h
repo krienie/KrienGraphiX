@@ -10,6 +10,10 @@
 #include <DirectXMath.h>
 #include <mutex>
 
+namespace kgx::core
+{
+class KGXScene;
+}
 
 namespace kgx
 {
@@ -21,6 +25,7 @@ public:
     explicit KGXSceneObject(std::string name);
     virtual ~KGXSceneObject() = default;
 
+    void setParentScene(core::KGXScene& parentScene);
     void setPosition(float xPos, float yPos, float zPos);
     void setRotation(float pitch, float yaw, float roll);
     void setScale(float xScale, float yScale, float zScale);
@@ -29,9 +34,9 @@ public:
     std::string getName() const;
 
     [[nodiscard]]
-    DirectX::XMFLOAT4X4 getModelMatrix();
+    DirectX::XMFLOAT4X4 getModelMatrix() const;
     [[nodiscard]]
-    DirectX::XMFLOAT4X4 getNormalMatrix();
+    DirectX::XMFLOAT4X4 getNormalMatrix() const;
 
     template<class Comp,
                 std::enable_if_t<std::is_base_of_v<KGXSceneObjectComponent, Comp>, int> = 0,
@@ -56,6 +61,8 @@ private:
     void addNewComponentInternal(KGXSceneObjectComponent* newComponent);
 
     bool mIsDirty;
+
+    core::KGXScene* mParentScene = nullptr;
 
     std::string mName;
 

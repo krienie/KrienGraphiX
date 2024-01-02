@@ -1,7 +1,8 @@
 
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 
-#include "KrienGraphiX/Scene/SceneObjectComponent.h"
+#include "KGXScene.h"
+#include "KrienGraphiX/Scene/KGXSceneObjectComponent.h"
 
 namespace kgx
 {
@@ -9,6 +10,11 @@ KGXSceneObject::KGXSceneObject(std::string name)
     : mIsDirty(true), mName(std::move(name)),
     mModelMatrix(), mNormalMatrix()
 {
+}
+
+void KGXSceneObject::setParentScene(core::KGXScene& parentScene)
+{
+    mParentScene = &parentScene;
 }
 
 void KGXSceneObject:: setPosition(float xPos, float yPos, float zPos)
@@ -49,13 +55,13 @@ std::string KGXSceneObject::getName() const
     return mName;
 }
 
-DirectX::XMFLOAT4X4 KGXSceneObject::getModelMatrix()
+DirectX::XMFLOAT4X4 KGXSceneObject::getModelMatrix() const
 {
     std::lock_guard lock(mUpdateMutex);
     return mModelMatrix;
 }
 
-DirectX::XMFLOAT4X4 KGXSceneObject::getNormalMatrix()
+DirectX::XMFLOAT4X4 KGXSceneObject::getNormalMatrix() const
 {
     std::lock_guard lock(mUpdateMutex);
     return mNormalMatrix;
@@ -97,6 +103,9 @@ std::vector<std::shared_ptr<KGXSceneObjectComponent>> KGXSceneObject::getCompone
 void KGXSceneObject::addNewComponentInternal(KGXSceneObjectComponent* newComponent)
 {
     std::lock_guard lock(mUpdateMutex);
+
+    newComponent->initialize();
+
     mSceneComponents.emplace_back(newComponent);
 }
 }

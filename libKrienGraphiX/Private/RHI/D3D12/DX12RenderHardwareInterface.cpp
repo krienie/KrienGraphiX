@@ -10,6 +10,7 @@
 
 #include <cassert>
 
+#include "DX12Descriptors.h"
 #include "DX12Texture2D.h"
 #include "Private/Core/RenderCore.h"
 

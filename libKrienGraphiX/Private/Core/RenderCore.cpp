@@ -39,7 +39,7 @@ void RenderCore::shutdown()
     }
 }
 
-KGXScene* RenderCore::getSceneThreadPtr() const
+KGXScene* RenderCore::getScenePtr() const
 {
     return mScene.get();
 }

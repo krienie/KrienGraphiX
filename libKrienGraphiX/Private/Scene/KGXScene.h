@@ -6,9 +6,11 @@
 #include <memory>
 #include <mutex>
 
+#include "Private/Rendering/KGXRenderScene.h"
+
 namespace kgx
 {
-    class KGXSceneObject;
+class KGXSceneObject;
 }
 
 namespace kgx::core
@@ -35,5 +37,7 @@ private:
 
     std::mutex mUpdateDelegateMutex;
     std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;
+
+    rendering::KGXRenderScene mRenderScene;
 };
 }

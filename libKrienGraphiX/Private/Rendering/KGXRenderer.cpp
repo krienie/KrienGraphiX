@@ -18,6 +18,8 @@ void KGXRenderer::RenderFrame()
 {
     const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
 
+    //TODO(KL): Update RendererScene objects
+
     auto* commandList = renderThread->getGraphicsCommandListPtr();
 
     auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV.getViewedResource());

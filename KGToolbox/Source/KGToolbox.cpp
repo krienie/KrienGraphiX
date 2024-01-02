@@ -6,6 +6,8 @@
 #include "KGToolbox.h"
 #include "Resource.h"
 
+#include "KrienGraphiX/Scene/KGXMeshComponent.h"
+
 namespace
 {
 kgt::KGToolboxApp* KGToolboxPtr = nullptr;
@@ -60,6 +62,10 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
     {
         updateWindowTitle(deltaTime);
     });
+
+    //BoxObject = mKgxEngine.spawnNewObject<kgx::KGXSceneObject>("BoxObject");
+    BoxObject = std::make_unique<kgx::KGXSceneObject>("BoxObject");
+    BoxObject->addNewComponent<kgx::KGXMeshComponent>();
 }
 
 int KGToolboxApp::run()

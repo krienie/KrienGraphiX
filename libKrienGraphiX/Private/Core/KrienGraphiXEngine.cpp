@@ -23,5 +23,13 @@ bool KrienGraphiXEngine::createRenderWindow(kgx::WinHandle windowHandle, unsigne
 
 void KrienGraphiXEngine::addSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const
 {
-    RenderCore::get()->getSceneThreadPtr()->addSceneUpdateDelegate(std::move(updateDelegate));
+    RenderCore::get()->getScenePtr()->addSceneUpdateDelegate(std::move(updateDelegate));
 }
+
+//std::weak_ptr<kgx::KGXSceneObject> KrienGraphiXEngine::spawnNewObjectInternal(kgx::KGXSceneObject* newObject)
+//{
+//    const std::shared_ptr<kgx::KGXSceneObject> NewObjectPtr(newObject);
+//    RenderCore::get()->getScenePtr()->addSceneObject(NewObjectPtr);
+//
+//    return NewObjectPtr;
+//}

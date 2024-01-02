@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx::core
 {
@@ -30,6 +31,11 @@ void KGXScene::addSceneObject(const std::shared_ptr<KGXSceneObject>& sceneObject
 {
     std::lock_guard lock(mUpdateSceneObjectsMutex);
     mSceneObjects.emplace_back(sceneObject);
+
+    //RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, sceneObject]()
+    //{
+    //    mRenderScene.addRenderObject(sceneObject);
+    //});
 }
 
 void KGXScene::addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)
