@@ -15,6 +15,8 @@ struct RHIBufferDescriptor
     unsigned int bufferSize;
     unsigned int bufferRegister;
     bool isBufferAligned;
+    bool isDynamic;
+    void* initialData;
     RHIResource::CreationFlags flags = RHIResource::None;
 };
 

@@ -2,6 +2,7 @@
 #include "DX12Shader.h"
 
 #include "DX12GraphicsDevice.h"
+#include "DX12GraphicsCommandList.h"
 #include "DX12MemoryUtils.h"
 
 #include <d3dcompiler.h>
@@ -15,13 +16,14 @@
 namespace kgx::RHI
 {
 DX12Shader::DX12Shader()
-    : RHIShader(), mDxDevice(nullptr), mConstantBuffers(), mInputLayoutDesc()
+    : RHIShader(), mDxDevice(nullptr), mDxCommandList(nullptr)
 {
 }
 
-bool DX12Shader::create(RHIGraphicsDevice* device, const CompiledShader& compiledShader, ShaderType type)
+bool DX12Shader::create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type)
 {
     mDxDevice = static_cast<DX12GraphicsDevice*>(device);
+    mDxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
 
     mShaderType = type;
 
@@ -63,10 +65,13 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
             .bufferSize = buffDesc.size,
             .bufferRegister = buffDesc.bufferRegister,
             .isBufferAligned = true,
+            .isDynamic = true,
+            .initialData = nullptr,
             .flags = RHIResource::ShaderResource
         };
-        
-        mConstantBuffers.emplace_back(mDxDevice, cbDesc);
+
+        //TODO(KL): Force to create these buffers via DX12 RHI? Or refactor the RHI so this doesn't matter anymore.
+        mConstantBuffers.emplace_back(mDxDevice, mDxCommandList, cbDesc);
     }
 
     return true;

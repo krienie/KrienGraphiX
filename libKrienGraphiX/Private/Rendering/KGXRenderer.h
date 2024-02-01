@@ -23,9 +23,9 @@ private:
     core::KGXViewport mViewport;
 
     //TODO(KL): Should probably implement some sort of resource handle/reference system instead of passing these pointers
-    RHI::RHIResourceView& mOutputRTV;
+    RHI::RHIResourceView* mOutputRTV;
 
     //TODO(KL): Implement a texture pool where textures can be re-used
-    RHI::RHIResourceView& mDSV;
+    RHI::RHIResourceView* mDSV;
 };
 }

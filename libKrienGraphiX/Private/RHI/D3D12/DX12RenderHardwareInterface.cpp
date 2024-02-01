@@ -10,6 +10,7 @@
 
 #include <cassert>
 
+#include "DX12Buffer.h"
 #include "DX12Descriptors.h"
 #include "DX12Texture2D.h"
 #include "Private/Core/RenderCore.h"
@@ -80,10 +81,10 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
     return std::move(swapChain);
 }
 
-std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type)
+std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type)
 {
     auto newShader = std::make_unique<DX12Shader>();
-    if (!newShader->create(graphicsDevice, compiledShader, type))
+    if (!newShader->create(graphicsDevice, commandList, compiledShader, type))
     {
         return nullptr;
     }
@@ -104,7 +105,7 @@ std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraph
 
 std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
 {
-    //TODO(KL): Validate pixelformat
+    //TODO(KL): Validate pixel format
 
     DX12Texture2DDescriptor dx12Desc =
     {
@@ -137,5 +138,14 @@ std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGra
     }
 
     return std::move(graphicsPipelineState);
+}
+
+std::unique_ptr<RHIBuffer> DX12RenderHardwareInterface::createBuffer(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
+{
+    auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
+    auto* dxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
+
+    auto newBuffer = std::make_unique<DX12Buffer>(dxDevice, dxCommandList, descriptor);
+    return std::move(newBuffer);
 }
 }

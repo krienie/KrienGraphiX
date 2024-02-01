@@ -10,7 +10,7 @@
 
 namespace kgx
 {
-class KGXSceneObject;
+class KGXMeshComponent;
 }
 
 namespace kgx::core
@@ -26,14 +26,16 @@ public:
     KGXScene& operator=(const KGXScene&) noexcept = delete;
     KGXScene& operator=(KGXScene&&) noexcept      = delete;
 
-    void updateScene(float deltaTime);
+    const rendering::KGXRenderScene* getRenderScenePtr() const;
 
-    void addSceneObject(const std::shared_ptr<KGXSceneObject>& sceneObject);
     void addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
 
+    void updateScene(float deltaTime);
+
+    void addMeshComponent(KGXMeshComponent* meshComponent);
+
 private:
-    std::mutex mUpdateSceneObjectsMutex;
-    std::vector<std::shared_ptr<KGXSceneObject>> mSceneObjects;
+    std::vector<KGXMeshComponent*> mMeshComponents;
 
     std::mutex mUpdateDelegateMutex;
     std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;

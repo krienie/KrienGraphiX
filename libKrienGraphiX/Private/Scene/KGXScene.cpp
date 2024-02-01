@@ -3,6 +3,7 @@
 
 #include <utility>
 
+#include "KrienGraphiX/Scene/KGXMeshComponent.h"
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 #include "Private/Core/RenderCore.h"
 
@@ -18,24 +19,31 @@ void KGXScene::updateScene(float deltaTime)
         }
     }
 
-    {
-        std::lock_guard lock(mUpdateSceneObjectsMutex);
-        for (const auto& sceneObject : mSceneObjects)
-        {
-            sceneObject->update(deltaTime);
-        }
-    }
+    //TODO(KL): Implement update tick for SceneObjects
+    //{
+    //    std::lock_guard lock(mUpdateMeshComponentsMutex);
+    //    for (const auto& sceneObject : mMeshComponents)
+    //    {
+    //        sceneObject->update(deltaTime);
+    //    }
+    //}
 }
 
-void KGXScene::addSceneObject(const std::shared_ptr<KGXSceneObject>& sceneObject)
+void KGXScene::addMeshComponent(KGXMeshComponent* meshComponent)
 {
-    std::lock_guard lock(mUpdateSceneObjectsMutex);
-    mSceneObjects.emplace_back(sceneObject);
+    mMeshComponents.push_back(meshComponent);
 
-    //RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, sceneObject]()
-    //{
-    //    mRenderScene.addRenderObject(sceneObject);
-    //});
+    std::shared_ptr<rendering::KGXMeshRenderObject> newMeshRenderObject = meshComponent->createMeshRenderObject();
+
+    RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, newMeshRenderObject]()
+    {
+        mRenderScene.addRenderObject(newMeshRenderObject);
+    });
+}
+
+const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
+{
+    return &mRenderScene;
 }
 
 void KGXScene::addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)

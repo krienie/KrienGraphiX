@@ -3,6 +3,7 @@
 
 #include "KGXScene.h"
 #include "KrienGraphiX/Scene/KGXSceneObjectComponent.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx
 {
@@ -10,6 +11,11 @@ KGXSceneObject::KGXSceneObject(std::string name)
     : mIsDirty(true), mName(std::move(name)),
     mModelMatrix(), mNormalMatrix()
 {
+    //TODO(KL): Think of something better for this..
+    core::RenderCore::get()->getScenePtr()->addSceneUpdateDelegate([this](float deltaTime)
+    {
+        update(deltaTime);
+    });
 }
 
 void KGXSceneObject::setParentScene(core::KGXScene& parentScene)
@@ -87,6 +93,11 @@ void KGXSceneObject::update(float deltaTime)
             DirectX::XMStoreFloat4x4( &mNormalMatrix, normalMat );
 
             mIsDirty = false;
+        }
+
+        for (const auto& sceneComponent : mSceneComponents)
+        {
+            sceneComponent->update(deltaTime);
         }
     }
 

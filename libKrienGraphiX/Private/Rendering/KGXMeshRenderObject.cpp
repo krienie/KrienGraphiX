@@ -3,6 +3,10 @@
 
 #include <array>
 #include <DirectXMath.h>
+#include <DirectXColors.h>
+
+#include "Private/Core/RenderCore.h"
+#include "Private/RHI/RenderHardwareInterface.h"
 
 namespace kgx::rendering
 {
@@ -61,7 +65,41 @@ void KGXMeshRenderObject::createRenderResources()
 		4, 3, 7
 	};
 
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-	const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+    const unsigned int vbByteSize = static_cast<unsigned int>(vertices.size()) * sizeof(Vertex);
+	const unsigned int ibByteSize = static_cast<unsigned int>(indices.size()) * sizeof(std::uint16_t);
+
+	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
+
+	//TODO(KL): Remove the need to get the graphics device ptr
+    RHI::RHIGraphicsDevice* graphicsDevice = renderThreadPtr->getGraphicsDevicePtr();
+	RHI::RHIGraphicsCommandList* commandList = renderThreadPtr->getGraphicsCommandListPtr();
+
+	const RHI::RHIBufferDescriptor vertexBufferDesc
+	{
+		.name = "VertexBuffer",
+		.bufferSize = vbByteSize,
+		.bufferRegister = 0,
+		.isBufferAligned = false,
+		.isDynamic = false,
+		.initialData = vertices.data(),
+		.flags = RHI::RHIResource::CreationFlags::None
+	};
+
+	mVertexBuffer = RHI::PlatformRHI->createBuffer(graphicsDevice, commandList, vertexBufferDesc);
+
+
+	const RHI::RHIBufferDescriptor indexBufferDesc
+	{
+		.name = "IndexBuffer",
+		.bufferSize = ibByteSize,
+		.bufferRegister = 0,
+		.isBufferAligned = false,
+		.isDynamic = false,
+		
+		.initialData = indices.data(),
+		.flags = RHI::RHIResource::CreationFlags::None
+	};
+
+	mIndexBuffer = RHI::PlatformRHI->createBuffer(graphicsDevice, commandList, indexBufferDesc);
 }
 }

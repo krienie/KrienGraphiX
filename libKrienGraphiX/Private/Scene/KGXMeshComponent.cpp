@@ -2,6 +2,7 @@
 #include "KrienGraphiX/Scene/KGXMeshComponent.h"
 
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx
 {
@@ -17,11 +18,16 @@ void KGXMeshComponent::initialize()
         return;
     }
 
-    //TODO(KL): Create KGXRenderGeometry
-
-
+    core::RenderCore::get()->getScenePtr()->addMeshComponent(this);
 
     KGXSceneObjectComponent::initialize();
+}
+
+std::shared_ptr<rendering::KGXMeshRenderObject> KGXMeshComponent::createMeshRenderObject()
+{
+    mMeshRenderObject = std::shared_ptr<rendering::KGXMeshRenderObject>(createMeshRenderObjectInternal());
+
+    return mMeshRenderObject;
 }
 
 KGXBoxMeshComponent::KGXBoxMeshComponent(KGXSceneObject* owner)
@@ -29,8 +35,8 @@ KGXBoxMeshComponent::KGXBoxMeshComponent(KGXSceneObject* owner)
 {
 }
 
-KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObject()
+rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInternal()
 {
-
+    return new rendering::KGXMeshRenderObject();
 }
 }

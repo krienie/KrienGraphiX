@@ -63,9 +63,8 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
         updateWindowTitle(deltaTime);
     });
 
-    //BoxObject = mKgxEngine.spawnNewObject<kgx::KGXSceneObject>("BoxObject");
     BoxObject = std::make_unique<kgx::KGXSceneObject>("BoxObject");
-    BoxObject->addNewComponent<kgx::KGXMeshComponent>();
+    BoxObject->addNewComponent<kgx::KGXBoxMeshComponent>();
 }
 
 int KGToolboxApp::run()
@@ -115,11 +114,10 @@ HWND KGToolboxApp::initWindow() const
 	const int width  = clientRect.right - clientRect.left;
 	const int height = clientRect.bottom - clientRect.top;
     
-	const auto windowHandle = CreateWindow(wndClassEx.lpszClassName, windowTitle.c_str(), 
-		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, mHInstance, nullptr); 
-	if( !windowHandle )
+	const auto windowHandle = CreateWindow(wndClassEx.lpszClassName, windowTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, mHInstance, nullptr);
+	if (!windowHandle)
 	{
-		MessageBox(0, L"CreateWindow Failed.", nullptr, 0);
+		MessageBox(nullptr, L"CreateWindow Failed.", nullptr, 0);
 		return nullptr;
 	}
 

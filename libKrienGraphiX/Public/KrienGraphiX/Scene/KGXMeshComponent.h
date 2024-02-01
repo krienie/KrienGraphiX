@@ -1,14 +1,18 @@
 
 #pragma once
 
+#include <memory>
+
 #include "KGXSceneObjectComponent.h"
 
 namespace kgx
 {
 class KGXSceneObject;
-class KGXMeshRenderObject;
 
-class MeshBuffer;
+namespace rendering
+{
+class KGXMeshRenderObject;
+}
 
 class KGXMeshComponent : public KGXSceneObjectComponent
 {
@@ -17,13 +21,16 @@ public:
     ~KGXMeshComponent() override = default;
 
     void initialize() override;
-    virtual KGXMeshRenderObject* createMeshRenderObject() = 0;
+    std::shared_ptr<rendering::KGXMeshRenderObject> createMeshRenderObject();
     
     //void setMaterial(const Material& material);
     //Material getMaterial() const;
 
 private:
+    virtual rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() = 0;
     //Material m_material;
+
+    std::shared_ptr<rendering::KGXMeshRenderObject> mMeshRenderObject;
 };
 
 class KGXBoxMeshComponent : public KGXMeshComponent
@@ -33,6 +40,8 @@ public:
     ~KGXBoxMeshComponent() override = default;
 
     //void initialize() override;
-    virtual KGXMeshRenderObject* createMeshRenderObject();
+
+private:
+    rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
 };
 }

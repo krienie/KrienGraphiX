@@ -29,7 +29,7 @@ void KrienGraphiXEngine::addSceneUpdateDelegate(kgx::SceneUpdateDelegate updateD
 //std::weak_ptr<kgx::KGXSceneObject> KrienGraphiXEngine::spawnNewObjectInternal(kgx::KGXSceneObject* newObject)
 //{
 //    const std::shared_ptr<kgx::KGXSceneObject> NewObjectPtr(newObject);
-//    RenderCore::get()->getScenePtr()->addSceneObject(NewObjectPtr);
+//    RenderCore::get()->getScenePtr()->addMeshComponent(NewObjectPtr);
 //
 //    return NewObjectPtr;
 //}

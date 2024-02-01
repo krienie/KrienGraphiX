@@ -22,7 +22,7 @@ RenderThread::RenderThread()
 #ifdef WIN32
     RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
 #else
-    static_assert(false, "Only DirectX 12 (Windows 10 and up) is currently supported");
+    static_assert(false, "Only DirectX 12 is currently supported");
 #endif
 
     assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
@@ -31,12 +31,13 @@ RenderThread::RenderThread()
     mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
     mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
 
-    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get());
+    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList.get());
 }
 
 RenderThread::~RenderThread()
 {
     mCommandThread.reset();
+    RHI::PlatformRHI.reset();
 }
 
 RHI::RHIGraphicsDevice* RenderThread::getGraphicsDevicePtr() const

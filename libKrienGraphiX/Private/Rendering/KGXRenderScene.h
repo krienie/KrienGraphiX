@@ -15,9 +15,9 @@ public:
     KGXRenderScene() = default;
     ~KGXRenderScene() = default;
 
-    void addRenderObject(const std::weak_ptr<KGXMeshRenderObject>& renderObject);
+    void addRenderObject(const std::shared_ptr<KGXMeshRenderObject>& renderObject);
 
 private:
-    std::vector<std::weak_ptr<KGXMeshRenderObject>> mRenderObjects;
+    std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;
 };
 }

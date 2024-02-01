@@ -37,7 +37,7 @@ public:
         unsigned int frameCount) override;
 
     [[nodiscard]]
-    std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
+    std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
 
     [[nodiscard]]
     std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
@@ -50,5 +50,8 @@ public:
 
     [[nodiscard]]
     std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc) override;
+
+    [[nodiscard]]
+    std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) override;
 };
 }
