@@ -23,7 +23,6 @@ namespace kgx::RHI
 {
 DX12Buffer::DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
     : RHIBuffer(getAlignedBufferDescriptor(descriptor)),
-        DX12Resource(nullptr, nullptr, D3D12_RESOURCE_STATE_GENERIC_READ),
         mDescriptor(descriptor)
 {
     ID3D12Device* nativeDevice = dxDevice->getNativeDevice();
@@ -52,13 +51,15 @@ DX12Buffer::DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* co
                 &resourceDesc,
                 D3D12_RESOURCE_STATE_GENERIC_READ,
                 nullptr,
-                IID_PPV_ARGS(&bufferUploader));
+                IID_PPV_ARGS(&mBufferUploader));
 
         if (FAILED(res))
         {
             return;
         }
     }
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> defaultBufferResource;
 
     // Create the default buffer resource
     const CD3DX12_HEAP_PROPERTIES heapProperties(heapType);
@@ -67,14 +68,18 @@ DX12Buffer::DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* co
             &heapProperties,
             D3D12_HEAP_FLAG_NONE,
             &resourceDesc,
-            initialResourceState,
+            D3D12_RESOURCE_STATE_COMMON,
             nullptr,
-            IID_PPV_ARGS(&mResource));
+            IID_PPV_ARGS(&defaultBufferResource));
     
     if (FAILED(res))
     {
         return;
     }
+
+    // Create managed DirectX 12 resource
+    mBufferDXResource = std::make_unique<DX12Resource>(defaultBufferResource, nullptr, D3D12_RESOURCE_STATE_COMMON);
+    mBufferDXResource->transitionToState(commandList, initialResourceState);
 
     if (mDescriptor.isDynamic)
     {
@@ -95,10 +100,16 @@ DX12Buffer::DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* co
             subResourceData.RowPitch = static_cast<LONG_PTR>(calculatedBufferSize);
             subResourceData.SlicePitch = subResourceData.RowPitch;
 
-            UpdateSubresources<1>(commandList->getCommandList(), mResource.Get(), bufferUploader.Get(), 0, 0, 1, &subResourceData);
-            transitionToState(commandList, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+            UpdateSubresources<1>(commandList->getCommandList(), mBufferDXResource->getResource().Get(), mBufferUploader.Get(), 0, 0, 1, &subResourceData);
+            mBufferDXResource->transitionToState(commandList, D3D12_RESOURCE_STATE_GENERIC_READ);
         }
     }
+}
+
+Microsoft::WRL::ComPtr<ID3D12Resource> DX12Buffer::getResource() const
+{
+    return mBufferDXResource->getResource();
 }
 
 void* DX12Buffer::mapImpl(MapType type)
@@ -109,11 +120,11 @@ void* DX12Buffer::mapImpl(MapType type)
     if ((type | MapType::WRITE) == MapType::WRITE)
     {
         const CD3DX12_RANGE readRange(0, 0);
-        mResource->Map(0, &readRange, &dataPtr);
+        mBufferDXResource->getResource()->Map(0, &readRange, &dataPtr);
     } else
     {
         // TODO(KL): Maybe allow a subset of the buffer to be set for reading. Like, mapSubResource or something
-        mResource->Map(0, nullptr, &dataPtr);
+        mBufferDXResource->getResource()->Map(0, nullptr, &dataPtr);
     }
 
     return dataPtr;
@@ -124,10 +135,10 @@ void DX12Buffer::unmapImpl()
     if ((currentMappedType() | MapType::READ) == MapType::READ)
     {
         const CD3DX12_RANGE writeRange(0, 0);
-        mResource->Unmap(0, &writeRange);
+        mBufferDXResource->getResource()->Unmap(0, &writeRange);
     } else
     {
-        mResource->Unmap(0, nullptr);
+        mBufferDXResource->getResource()->Unmap(0, nullptr);
     }
 }
 }

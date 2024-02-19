@@ -8,7 +8,7 @@ namespace kgx::RHI
 {
 class DX12GraphicsDevice;
 
-class DX12Buffer final : public RHIBuffer, public DX12Resource
+class DX12Buffer final : public RHIBuffer
 {
 public:
     DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor);
@@ -18,12 +18,16 @@ public:
     DX12Buffer(DX12Buffer&&) noexcept = default;
     DX12Buffer& operator=(DX12Buffer&) = delete;
     DX12Buffer& operator=(DX12Buffer&&) noexcept = default;
+
+    [[nodiscard]]
+    Microsoft::WRL::ComPtr<ID3D12Resource> getResource() const;
     
 private:
     void* mapImpl(MapType type) override;
     void unmapImpl() override;
     
     RHIBufferDescriptor mDescriptor;
-    Microsoft::WRL::ComPtr<ID3D12Resource> bufferUploader = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> mBufferUploader = nullptr;
+    std::unique_ptr<DX12Resource> mBufferDXResource = nullptr;
 };
 }
