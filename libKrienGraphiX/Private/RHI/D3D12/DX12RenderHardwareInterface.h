@@ -40,7 +40,7 @@ public:
     std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
 
     [[nodiscard]]
-    std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
+    std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
 
     [[nodiscard]]
     std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) override;

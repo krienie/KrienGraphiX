@@ -87,6 +87,7 @@ RenderCore::RenderCore()
     {
         mScene->updateScene(deltaTime);
 
+        //TODO(KL): Add safety to not enqueue a new draw call when the previous draw call has not started yet.
         {
             std::lock_guard lock(mRenderWindowMutex);
             for (auto [_, renderWindow]: mRenderWindows)

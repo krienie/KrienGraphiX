@@ -92,15 +92,15 @@ std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphics
     return std::move(newShader);
 }
 
-std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
+std::shared_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
 {
-    auto graphicsCommandList = std::make_unique<DX12GraphicsCommandList>();
+    auto graphicsCommandList = std::make_shared<DX12GraphicsCommandList>(allocator);
     if (!graphicsCommandList->create(graphicsDevice, commandQueue, pipelineState))
     {
         return nullptr;
     }
 
-    return std::move(graphicsCommandList);
+    return graphicsCommandList;
 }
 
 std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
