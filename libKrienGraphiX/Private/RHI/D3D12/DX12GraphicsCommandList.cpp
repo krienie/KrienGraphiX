@@ -25,8 +25,8 @@ D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::DepthStencilFlags flags)
 
 namespace kgx::RHI
 {
-DX12GraphicsCommandList::DX12GraphicsCommandList()
-    : RHIGraphicsCommandList(), mCommandList(nullptr)
+DX12GraphicsCommandList::DX12GraphicsCommandList(core::CommandListAllocator* allocator)
+    : RHIGraphicsCommandList(allocator), mCommandList(nullptr)
 {
 }
 
@@ -44,16 +44,17 @@ bool DX12GraphicsCommandList::create(RHIGraphicsDevice* device, RHICommandQueue*
     const auto dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
 
     const HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
-    if (SUCCEEDED(res))
-    {
-        // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
-        mCommandList->Close();
-    }
+    //if (SUCCEEDED(res))
+    //{
+    //    // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
+    //    //TODO(KL): change this, as this doesn't make sense. Create it with initial state and then immediately close it again?
+    //    mCommandList->Close();
+    //}
 
     return SUCCEEDED(res);
 }
 
-void DX12GraphicsCommandList::close()
+void DX12GraphicsCommandList::closeInternal()
 {
     mCommandList->Close();
 }

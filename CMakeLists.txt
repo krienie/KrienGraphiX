@@ -28,7 +28,8 @@ else()
 endif()
 
 conan_cmake_run(REQUIRES boost/1.78.0 gtest/1.11.0
-                BASIC_SETUP CMAKE_TARGETS
+                BASIC_SETUP
+                CMAKE_TARGETS
                 BUILD missing
                 REMOTE conan-center)
 

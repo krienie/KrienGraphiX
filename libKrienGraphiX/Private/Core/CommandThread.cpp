@@ -16,7 +16,7 @@ CommandThread::CommandThread(unsigned int numWorkerThreads)
 CommandThread::~CommandThread()
 {
     {
-        std::unique_lock lock(mEnqueueMutex);
+        std::lock_guard lock(mEnqueueMutex);
         mRunning = false;
         mCvCommand.notify_all();
     }

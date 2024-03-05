@@ -7,12 +7,17 @@
 
 #include "Private/RHI/RHIShader.h"
 
+namespace kgx::core
+{
+class CommandListAllocator;
+}
+
 namespace kgx::rendering
 {
 class KGXShaderCache final
 {
 public:
-    explicit KGXShaderCache(RHI::RHIGraphicsDevice* graphicsDevice, RHI::RHIGraphicsCommandList* commandList);
+    explicit KGXShaderCache(RHI::RHIGraphicsDevice* graphicsDevice, core::CommandListAllocator* commandListAllocator);
     ~KGXShaderCache() = default;
 
     bool loadShaderFromFile(const std::string& shaderFilePath, const std::string& mainEntry, RHI::RHIShader::ShaderType type);
@@ -23,6 +28,6 @@ private:
     std::unordered_map<std::string, std::shared_ptr<RHI::RHIShader>> mLoadedShaders;
 
     RHI::RHIGraphicsDevice* mGraphicsDevice;
-    RHI::RHIGraphicsCommandList* mCommandList;
+    core::CommandListAllocator* mCommandListAllocator;
 };
 }
