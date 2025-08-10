@@ -1,0 +1,2 @@
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/cmake/Boost-1.88.0")

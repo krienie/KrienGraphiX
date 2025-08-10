@@ -1,6 +1,8 @@
 
 enable_testing()
 
+find_package(GTest)
+
 set(EXE_NAME libshadercompiler.test)
 
 file(GLOB_RECURSE Src
@@ -14,13 +16,12 @@ target_link_libraries(${EXE_NAME}
                         PUBLIC
                             libshadercompiler
                         PRIVATE
-                            CONAN_PKG::gtest)
+                            GTest::gtest)
 
 if(MSVC)
     set_target_properties("${EXE_NAME}" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/x64/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
     set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/x64/Debug)
     set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/x64/Release)
-    set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/x64/Release)
 elseif(MACOSX)
     set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/x64/debug)
     set_target_properties("${EXE_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/x64/release)

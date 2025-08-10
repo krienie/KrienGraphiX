@@ -1,4 +1,7 @@
 
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost CONFIG REQUIRED COMPONENTS serialization program_options)
+
 set(LIB_NAME libshadercompiler)
 
 file(GLOB_RECURSE Src
@@ -13,7 +16,8 @@ target_include_directories(${LIB_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT
 target_link_libraries(${LIB_NAME}
                         PUBLIC
                             dxc
-                            CONAN_PKG::boost)
+                            Boost::serialization
+                            Boost::program_options)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})
 

@@ -43,11 +43,11 @@ TEST(Serialization, ShaderCompilation)
     EXPECT_EQ(constBuff.size, 48u);
 
     const std::vector<kgx::BufferVariableDescriptor> expectedVars = {
-        {"float3Param", 0u, 12u},
-        {"floatParam", 12u, 4u},
-        {"intParam", 16u, 4u},
-        {"int3Param", 20u, 12u},
-        {"float4Param", 32u, 16u}
+        {.name = "float3Param", .offset = 0u, .size = 12u},
+        {.name = "floatParam", .offset = 12u, .size = 4u},
+        {.name = "intParam", .offset = 16u, .size = 4u},
+        {.name = "int3Param", .offset = 20u, .size = 12u},
+        {.name = "float4Param", .offset = 32u, .size = 16u}
     };
 
     ASSERT_EQ(constBuff.variables.size(), expectedVars.size());
