@@ -1,14 +1,14 @@
 
 #include "Private/Rendering/KGXShaderCache.h"
 
-#include "Private/Core/CommandListAllocator.h"
+#include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "ShaderCompiler/ShaderCompiler.h"
 
 namespace kgx::rendering
 {
-KGXShaderCache::KGXShaderCache(RHI::RHIGraphicsDevice* graphicsDevice, core::CommandListAllocator* commandListAllocator)
-    : mGraphicsDevice(graphicsDevice), mCommandListAllocator(commandListAllocator)
+KGXShaderCache::KGXShaderCache(RHI::RHIGraphicsDevice* graphicsDevice, RHI::RHIGraphicsCommandList* commandList)
+    : mGraphicsDevice(graphicsDevice), mCommandList(commandList)
 {
 }
 

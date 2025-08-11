@@ -30,13 +30,18 @@ RenderThread::RenderThread()
     mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
     mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
     mCommandListAllocator = std::make_unique<CommandListAllocator>(mGraphicsDevice.get(), mCommandQueue.get());
-    //mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
+    mCommandList    = mCommandListAllocator->createGraphicsCommandList(nullptr);
 
-    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList.get());
+    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList);
 }
 
 RenderThread::~RenderThread()
 {
+    if (mCommandList)
+    {
+        mCommandListAllocator->releaseGraphicsCommandList(mCommandList);
+    }
+
     mCommandThread.reset();
     RHI::PlatformRHI.reset();
 }
@@ -53,7 +58,7 @@ RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
 
 RHI::RHIGraphicsCommandList* RenderThread::getGraphicsCommandListPtr() const
 {
-    return mCommandList.get();
+    return mCommandList;
 }
 
 void RenderThread::enqueueCommand(RenderCommand cmd) const

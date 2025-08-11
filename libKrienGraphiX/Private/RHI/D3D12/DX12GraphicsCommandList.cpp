@@ -26,7 +26,7 @@ D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::DepthStencilFlags flags)
 namespace kgx::RHI
 {
 DX12GraphicsCommandList::DX12GraphicsCommandList(core::CommandListAllocator* allocator)
-    : RHIGraphicsCommandList(allocator), mCommandList(nullptr)
+    : RHIGraphicsCommandList(*allocator), mCommandList(nullptr)
 {
 }
 

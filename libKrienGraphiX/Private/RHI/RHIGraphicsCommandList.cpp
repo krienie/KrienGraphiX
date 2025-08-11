@@ -12,7 +12,6 @@ RHIGraphicsCommandList::RHIGraphicsCommandList(core::CommandListAllocator& alloc
 RHIGraphicsCommandList::~RHIGraphicsCommandList()
 {
     close();
-    release();
 }
 
 void RHIGraphicsCommandList::release()

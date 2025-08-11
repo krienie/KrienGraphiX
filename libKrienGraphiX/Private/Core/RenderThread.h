@@ -42,7 +42,7 @@ private:
     std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
 
     std::unique_ptr<CommandListAllocator> mCommandListAllocator;
-    //std::unique_ptr<RHI::RHIGraphicsCommandList> mCommandList;
+    RHI::RHIGraphicsCommandList* mCommandList;
 
     std::unique_ptr<rendering::KGXShaderCache> mShaderCache;
 };

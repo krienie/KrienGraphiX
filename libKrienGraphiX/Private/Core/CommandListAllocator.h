@@ -23,7 +23,6 @@ public:
 
     [[nodiscard]] RHI::RHIGraphicsCommandList* createGraphicsCommandList(RHI::RHIGraphicsPipelineState* initialState);
     void releaseGraphicsCommandList(RHI::RHIGraphicsCommandList* commandList);
-    //[[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
 
 private:
     struct CommandListAllocation
@@ -35,7 +34,6 @@ private:
     RHI::RHIGraphicsDevice* mDevice = nullptr;
     RHI::RHICommandQueue* mCommandQueue = nullptr;
 
-    //std::vector<CommandListAllocation> mCommandLists;
     std::unordered_map<RHI::RHIGraphicsCommandList*, CommandListAllocation> mCommandLists;
 };
 }
