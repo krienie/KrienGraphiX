@@ -9,23 +9,23 @@ namespace kgx::rendering
 {
 KGXRenderPass::KGXRenderPass()
 {
-    const auto* renderEngine = core::RenderCore::get();
-    //mCommandList = renderEngine->getRHI()->createGraphicsCommandList(renderEngine->getGraphicsDevicePtr(), nullptr);
+	const auto* renderEngine = core::RenderCore::get();
+	//mCommandList = renderEngine->getRHI()->createGraphicsCommandList(renderEngine->getGraphicsDevicePtr(), nullptr);
 
-    std::memset(mRenderTargets.data(), 0, sizeof(mRenderTargets));
+	std::memset(mRenderTargets.data(), 0, sizeof(mRenderTargets));
 }
 
 KGXRenderPass& KGXRenderPass::setRenderTarget(const RHI::RHITexture2D& renderTarget, uint8_t slot)
 {
-    assert(slot < 6);
+	assert(slot < 6);
 
-    mRenderTargets[slot] = &renderTarget;
-    return *this;
+	mRenderTargets[slot] = &renderTarget;
+	return *this;
 }
 
 KGXRenderPass& KGXRenderPass::setShader(const RHI::RHIShader& shader, RHI::RHIShader::ShaderType type)
 {
-    mBoundShaders[type] = &shader;
-    return *this;
+	mBoundShaders[type] = &shader;
+	return *this;
 }
 }

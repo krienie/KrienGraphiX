@@ -13,22 +13,22 @@ namespace kgx::rendering
 
 struct Vertex
 {
-    DirectX::XMFLOAT3 Pos;
-    DirectX::XMFLOAT4 Color;
+	DirectX::XMFLOAT3 Pos;
+	DirectX::XMFLOAT4 Color;
 };
 
 using namespace DirectX;
 
 KGXMeshRenderObject::KGXMeshRenderObject()
 {
-    
+	
 }
 
 void KGXMeshRenderObject::createRenderResources()
 {
-    std::array<Vertex, 8> vertices =
-    {
-        Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
+	std::array<Vertex, 8> vertices =
+	{
+		Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
 		Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
 		Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
@@ -36,7 +36,7 @@ void KGXMeshRenderObject::createRenderResources()
 		Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
 		Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
 		Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
-    };
+	};
 
 	std::array<std::uint16_t, 36> indices =
 	{
@@ -65,13 +65,13 @@ void KGXMeshRenderObject::createRenderResources()
 		4, 3, 7
 	};
 
-    const unsigned int vbByteSize = static_cast<unsigned int>(vertices.size()) * sizeof(Vertex);
+	const unsigned int vbByteSize = static_cast<unsigned int>(vertices.size()) * sizeof(Vertex);
 	const unsigned int ibByteSize = static_cast<unsigned int>(indices.size()) * sizeof(std::uint16_t);
 
 	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
 
 	//TODO(KL): Remove the need to get the graphics device ptr
-    RHI::RHIGraphicsDevice* graphicsDevice = renderThreadPtr->getGraphicsDevicePtr();
+	RHI::RHIGraphicsDevice* graphicsDevice = renderThreadPtr->getGraphicsDevicePtr();
 	RHI::RHIGraphicsCommandList* commandList = renderThreadPtr->getGraphicsCommandListPtr();
 
 	const RHI::RHIBufferDescriptor vertexBufferDesc

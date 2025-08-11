@@ -18,28 +18,28 @@ namespace kgx::core
 class KGXScene final
 {
 public:
-    KGXScene() = default;
-    ~KGXScene() = default;
+	KGXScene() = default;
+	~KGXScene() = default;
 
-    KGXScene(const KGXScene&) noexcept            = delete;
-    KGXScene(KGXScene&&) noexcept                 = delete;
-    KGXScene& operator=(const KGXScene&) noexcept = delete;
-    KGXScene& operator=(KGXScene&&) noexcept      = delete;
+	KGXScene(const KGXScene&) noexcept            = delete;
+	KGXScene(KGXScene&&) noexcept                 = delete;
+	KGXScene& operator=(const KGXScene&) noexcept = delete;
+	KGXScene& operator=(KGXScene&&) noexcept      = delete;
 
-    const rendering::KGXRenderScene* getRenderScenePtr() const;
+	const rendering::KGXRenderScene* getRenderScenePtr() const;
 
-    void addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
+	void addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
 
-    void updateScene(float deltaTime);
+	void updateScene(float deltaTime);
 
-    void addMeshComponent(KGXMeshComponent* meshComponent);
+	void addMeshComponent(KGXMeshComponent* meshComponent);
 
 private:
-    std::vector<KGXMeshComponent*> mMeshComponents;
+	std::vector<KGXMeshComponent*> mMeshComponents;
 
-    std::mutex mUpdateDelegateMutex;
-    std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;
+	std::mutex mUpdateDelegateMutex;
+	std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;
 
-    rendering::KGXRenderScene mRenderScene;
+	rendering::KGXRenderScene mRenderScene;
 };
 }

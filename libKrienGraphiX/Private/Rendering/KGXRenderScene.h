@@ -12,12 +12,12 @@ namespace kgx::rendering
 class KGXRenderScene
 {
 public:
-    KGXRenderScene() = default;
-    ~KGXRenderScene() = default;
+	KGXRenderScene() = default;
+	~KGXRenderScene() = default;
 
-    void addRenderObject(const std::shared_ptr<KGXMeshRenderObject>& renderObject);
+	void addRenderObject(const std::shared_ptr<KGXMeshRenderObject>& renderObject);
 
 private:
-    std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;
+	std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;
 };
 }

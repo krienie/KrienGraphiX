@@ -11,31 +11,31 @@ class RHIGraphicsDevice;
 class RHIShader
 {
 public:
-    enum class ShaderType
-    {
-        Vertex,
-        Hull,
-        Domain,
-        Geometry,
-        Pixel,
-        //TODO(KL): add compute shader support
-        //Compute
+	enum class ShaderType
+	{
+		Vertex,
+		Hull,
+		Domain,
+		Geometry,
+		Pixel,
+		//TODO(KL): add compute shader support
+		//Compute
 
-        Unassigned
-    };
+		Unassigned
+	};
 
-    RHIShader() = default;
-    virtual ~RHIShader() = default;
-    RHIShader(RHIShader& rhs) = default;
-    RHIShader(RHIShader&& rhs) = default;
-    RHIShader& operator=(const RHIShader& rhs) = default;
-    RHIShader& operator=(RHIShader&& rhs) = default;
+	RHIShader() = default;
+	virtual ~RHIShader() = default;
+	RHIShader(RHIShader& rhs) = default;
+	RHIShader(RHIShader&& rhs) = default;
+	RHIShader& operator=(const RHIShader& rhs) = default;
+	RHIShader& operator=(RHIShader&& rhs) = default;
 
-    virtual bool create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) = 0;
+	virtual bool create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) = 0;
 
-    virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
+	virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
 
 protected:
-    virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;
+	virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;
 };
 }

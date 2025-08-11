@@ -6,25 +6,25 @@
 namespace kgx::RHI
 {
 RHIGraphicsCommandList::RHIGraphicsCommandList(core::CommandListAllocator& allocator)
-    : mAllocator(&allocator)
+	: mAllocator(&allocator)
 {}
 
 RHIGraphicsCommandList::~RHIGraphicsCommandList()
 {
-    close();
+	close();
 }
 
 void RHIGraphicsCommandList::release()
 {
-    mAllocator->releaseGraphicsCommandList(this);
+	mAllocator->releaseGraphicsCommandList(this);
 }
 
 void RHIGraphicsCommandList::close()
 {
-    if (!mIsClosed)
-    {
-        closeInternal();
-        mIsClosed = true;
-    }
+	if (!mIsClosed)
+	{
+		closeInternal();
+		mIsClosed = true;
+	}
 }
 }

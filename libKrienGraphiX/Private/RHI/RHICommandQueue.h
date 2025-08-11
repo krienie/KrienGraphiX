@@ -8,14 +8,14 @@ class RHIGraphicsCommandList;
 
 class RHICommandQueue
 {
-    public:
-        virtual ~RHICommandQueue() = default;
+	public:
+		virtual ~RHICommandQueue() = default;
 
-        virtual bool create(RHIGraphicsDevice *device) = 0;
+		virtual bool create(RHIGraphicsDevice *device) = 0;
 
-        virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
-        virtual void flushQueue() = 0;
+		virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
+		virtual void flushQueue() = 0;
 
-    //TODO(KL): add interface to add commands to the queue
+	//TODO(KL): add interface to add commands to the queue
 };
 }

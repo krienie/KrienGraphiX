@@ -6,7 +6,7 @@ namespace kgx::rendering
 {
 struct KGXSubMesh
 {
-    unsigned int IndexCount = 0;
+	unsigned int IndexCount = 0;
 	unsigned int StartIndexLocation = 0;
 	int BaseVertexLocation = 0;
 };
@@ -17,7 +17,7 @@ private:
 	KGXRenderGeometry();
 	~KGXRenderGeometry();
 
-    //// System memory copies.  Use Blobs because the vertex/index format can be generic.
+	//// System memory copies.  Use Blobs because the vertex/index format can be generic.
 	//// It is up to the client to cast appropriately.  
 	//Microsoft::WRL::ComPtr<ID3DBlob> VertexBufferCPU = nullptr;
 	//Microsoft::WRL::ComPtr<ID3DBlob> IndexBufferCPU  = nullptr;
@@ -28,7 +28,7 @@ private:
 	//Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
 	//Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
 	//
-    //// Data about the buffers.
+	//// Data about the buffers.
 	//UINT VertexByteStride = 0;
 	//UINT VertexBufferByteSize = 0;
 	//DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;

@@ -9,21 +9,21 @@ using namespace kgx::rendering;
 namespace kgx::core
 {
 RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
-    : mKGXRenderWindow(std::make_shared<KGXRenderWindow>(windowHandle, width, height))
+	: mKGXRenderWindow(std::make_shared<KGXRenderWindow>(windowHandle, width, height))
 {
-    //TODO(KL): create mKGXRenderWindow on the renderthread somehow
+	//TODO(KL): create mKGXRenderWindow on the renderthread somehow
 }
 
 WinHandle RenderWindow::getWinHandle() const
 {
-    return mKGXRenderWindow->getWinHandle();
+	return mKGXRenderWindow->getWinHandle();
 }
 
 void RenderWindow::draw() const
 {
-    RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
-    {
-        mKGXRenderWindow->draw();
-    });
+	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
+	{
+		mKGXRenderWindow->draw();
+	});
 }
 }

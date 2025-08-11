@@ -10,16 +10,16 @@ namespace kgx::RHI
 class DX12VertexLayout : public RHIVertexLayout
 {
 public:
-    DX12VertexLayout() = default;
-    ~DX12VertexLayout() override = default;
+	DX12VertexLayout() = default;
+	~DX12VertexLayout() override = default;
 
-    void addInputElement(const VertexInputElement& vertexInputElement) override;
-    void setFromInputElementVector(const std::vector<VertexInputElement>& vertexInputLayout) override;
+	void addInputElement(const VertexInputElement& vertexInputElement) override;
+	void setFromInputElementVector(const std::vector<VertexInputElement>& vertexInputLayout) override;
 
-    [[nodiscard]]
-    std::vector<D3D12_INPUT_ELEMENT_DESC> getDX12VertexLayout() const { return mInputLayoutDesc; }
+	[[nodiscard]]
+	std::vector<D3D12_INPUT_ELEMENT_DESC> getDX12VertexLayout() const { return mInputLayoutDesc; }
 
 private:
-    std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
+	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 };
 }

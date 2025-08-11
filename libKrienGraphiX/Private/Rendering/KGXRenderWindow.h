@@ -13,25 +13,25 @@ namespace kgx::rendering
 class KGXRenderWindow final
 {
 public:
-    KGXRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
-    ~KGXRenderWindow() = default;
+	KGXRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
+	~KGXRenderWindow() = default;
 
-    [[nodiscard]] WinHandle getWinHandle() const { return mWindowHandle; }
+	[[nodiscard]] WinHandle getWinHandle() const { return mWindowHandle; }
 
-    void draw();
+	void draw();
 
-    //TODO(KL): implement resize
+	//TODO(KL): implement resize
 
 private:
-    WinHandle mWindowHandle;
+	WinHandle mWindowHandle;
 
-    std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
-    std::shared_ptr<RHI::RHIResourceView> mSwapChainRTV;
+	std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
+	std::shared_ptr<RHI::RHIResourceView> mSwapChainRTV;
 
-    //TODO(KL): Temporarily here. Move to KGXRenderer
-    std::shared_ptr<RHI::RHITexture2D> mDepthStencil;
-    std::shared_ptr<RHI::RHIResourceView> mDSV;
+	//TODO(KL): Temporarily here. Move to KGXRenderer
+	std::shared_ptr<RHI::RHITexture2D> mDepthStencil;
+	std::shared_ptr<RHI::RHIResourceView> mDSV;
 
-    core::KGXViewport mViewport;
+	core::KGXViewport mViewport;
 };
 }

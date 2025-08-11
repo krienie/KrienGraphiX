@@ -11,21 +11,21 @@ namespace kgx::RHI
 class DX12CommandQueue final : public RHICommandQueue
 {
 public:
-    DX12CommandQueue();
-    ~DX12CommandQueue() override = default;
+	DX12CommandQueue();
+	~DX12CommandQueue() override = default;
 
-    bool create(RHIGraphicsDevice *device) override;
-    void executeCommandList(RHIGraphicsCommandList * commandList) override;
-    void flushQueue() override;
+	bool create(RHIGraphicsDevice *device) override;
+	void executeCommandList(RHIGraphicsCommandList * commandList) override;
+	void flushQueue() override;
 
-    [[nodiscard]] ID3D12CommandQueue* getNativeCommandQueue() const;
-    [[nodiscard]] ID3D12CommandAllocator* getNativeCommandAllocator() const;
+	[[nodiscard]] ID3D12CommandQueue* getNativeCommandQueue() const;
+	[[nodiscard]] ID3D12CommandAllocator* getNativeCommandAllocator() const;
 
 private:
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-    Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 
-    Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
-    UINT64 mCurrentFence = 0;
+	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
+	UINT64 mCurrentFence = 0;
 };
 }

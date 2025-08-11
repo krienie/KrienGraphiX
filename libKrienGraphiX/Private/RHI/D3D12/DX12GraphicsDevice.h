@@ -12,30 +12,30 @@ namespace kgx::RHI
 {
 class DX12GraphicsDevice : public RHIGraphicsDevice
 {
-    public:
-        DX12GraphicsDevice();
-        ~DX12GraphicsDevice() override;
+	public:
+		DX12GraphicsDevice();
+		~DX12GraphicsDevice() override;
 
-        bool create() override;
+		bool create() override;
 
-        [[nodiscard]]
-        ID3D12Device* getNativeDevice() const;
+		[[nodiscard]]
+		ID3D12Device* getNativeDevice() const;
 
-        [[nodiscard]]
-        IDXGIFactory4* getNativeFactory() const;
+		[[nodiscard]]
+		IDXGIFactory4* getNativeFactory() const;
 
-        [[nodiscard]]
-        IDXGIAdapter1* getNativeHardwareAdapter() const;
+		[[nodiscard]]
+		IDXGIAdapter1* getNativeHardwareAdapter() const;
 
-        [[nodiscard]]
-        D3DX12Residency::ResidencyManager* getResidencyManager();
+		[[nodiscard]]
+		D3DX12Residency::ResidencyManager* getResidencyManager();
 
-    private:
-        Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
-        Microsoft::WRL::ComPtr<IDXGIFactory4> mFactory;
-        Microsoft::WRL::ComPtr<IDXGIAdapter1> mHardwareAdapter;
-        Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-        Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
-        D3DX12Residency::ResidencyManager mResidencyManager;
+	private:
+		Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
+		Microsoft::WRL::ComPtr<IDXGIFactory4> mFactory;
+		Microsoft::WRL::ComPtr<IDXGIAdapter1> mHardwareAdapter;
+		Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
+		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
+		D3DX12Residency::ResidencyManager mResidencyManager;
 };
 }

@@ -14,62 +14,62 @@
 namespace kgx::core
 {
 RenderThread::RenderThread()
-    : mCommandThread(std::make_unique<CommandThread>(1)),
-        mGraphicsDevice(nullptr),
-        mCommandListAllocator(nullptr),
-        mShaderCache(nullptr)
+	: mCommandThread(std::make_unique<CommandThread>(1)),
+		mGraphicsDevice(nullptr),
+		mCommandListAllocator(nullptr),
+		mShaderCache(nullptr)
 {
 #ifdef WIN32
-    RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
+	RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
 #else
-    static_assert(false, "Only DirectX 12 is currently supported");
+	static_assert(false, "Only DirectX 12 is currently supported");
 #endif
 
-    assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
+	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
 
-    mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
-    mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
-    mCommandListAllocator = std::make_unique<CommandListAllocator>(mGraphicsDevice.get(), mCommandQueue.get());
-    mCommandList    = mCommandListAllocator->createGraphicsCommandList(nullptr);
+	mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
+	mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
+	mCommandListAllocator = std::make_unique<CommandListAllocator>(mGraphicsDevice.get(), mCommandQueue.get());
+	mCommandList    = mCommandListAllocator->createGraphicsCommandList(nullptr);
 
-    mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList);
+	mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList);
 }
 
 RenderThread::~RenderThread()
 {
-    if (mCommandList)
-    {
-        mCommandListAllocator->releaseGraphicsCommandList(mCommandList);
-    }
+	if (mCommandList)
+	{
+		mCommandListAllocator->releaseGraphicsCommandList(mCommandList);
+	}
 
-    mCommandThread.reset();
-    RHI::PlatformRHI.reset();
+	mCommandThread.reset();
+	RHI::PlatformRHI.reset();
 }
 
 RHI::RHIGraphicsDevice* RenderThread::getGraphicsDevicePtr() const
 {
-    return mGraphicsDevice.get();
+	return mGraphicsDevice.get();
 }
 
 RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
 {
-    return mCommandQueue.get();
+	return mCommandQueue.get();
 }
 
 RHI::RHIGraphicsCommandList* RenderThread::getGraphicsCommandListPtr() const
 {
-    return mCommandList;
+	return mCommandList;
 }
 
 void RenderThread::enqueueCommand(RenderCommand cmd) const
 {
-    //TODO(KL): encapsulate a lambda here to be able to include things like the commandlist
-    
-    mCommandThread->enqueueCommand(std::move(cmd));
+	//TODO(KL): encapsulate a lambda here to be able to include things like the commandlist
+	
+	mCommandThread->enqueueCommand(std::move(cmd));
 }
 
 void RenderThread::flush() const
 {
-    mCommandThread->flush();
+	mCommandThread->flush();
 }
 }

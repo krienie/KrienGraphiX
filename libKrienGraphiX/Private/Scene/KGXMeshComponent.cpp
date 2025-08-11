@@ -7,36 +7,36 @@
 namespace kgx
 {
 KGXMeshComponent::KGXMeshComponent(KGXSceneObject *owner)
-    : KGXSceneObjectComponent(owner)
+	: KGXSceneObjectComponent(owner)
 {
 }
 
 void KGXMeshComponent::initialize()
 {
-    if (mIsInitialized)
-    {
-        return;
-    }
+	if (mIsInitialized)
+	{
+		return;
+	}
 
-    core::RenderCore::get()->getScenePtr()->addMeshComponent(this);
+	core::RenderCore::get()->getScenePtr()->addMeshComponent(this);
 
-    KGXSceneObjectComponent::initialize();
+	KGXSceneObjectComponent::initialize();
 }
 
 std::shared_ptr<rendering::KGXMeshRenderObject> KGXMeshComponent::createMeshRenderObject()
 {
-    mMeshRenderObject = std::shared_ptr<rendering::KGXMeshRenderObject>(createMeshRenderObjectInternal());
+	mMeshRenderObject = std::shared_ptr<rendering::KGXMeshRenderObject>(createMeshRenderObjectInternal());
 
-    return mMeshRenderObject;
+	return mMeshRenderObject;
 }
 
 KGXBoxMeshComponent::KGXBoxMeshComponent(KGXSceneObject* owner)
-    : KGXMeshComponent(owner)
+	: KGXMeshComponent(owner)
 {
 }
 
 rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInternal()
 {
-    return new rendering::KGXMeshRenderObject();
+	return new rendering::KGXMeshRenderObject();
 }
 }

@@ -8,22 +8,22 @@ using namespace kgx::core;
 
 KrienGraphiXEngine::KrienGraphiXEngine()
 {
-    RenderCore::startup();
+	RenderCore::startup();
 }
 
 KrienGraphiXEngine::~KrienGraphiXEngine()
 {
-    RenderCore::shutdown();
+	RenderCore::shutdown();
 }
 
 bool KrienGraphiXEngine::createRenderWindow(kgx::WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const
 {
-    return RenderCore::get()->createRenderWindow(windowHandle, initialWindowWidth, initialWindowHeight);
+	return RenderCore::get()->createRenderWindow(windowHandle, initialWindowWidth, initialWindowHeight);
 }
 
 void KrienGraphiXEngine::addSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const
 {
-    RenderCore::get()->getScenePtr()->addSceneUpdateDelegate(std::move(updateDelegate));
+	RenderCore::get()->getScenePtr()->addSceneUpdateDelegate(std::move(updateDelegate));
 }
 
 //std::weak_ptr<kgx::KGXSceneObject> KrienGraphiXEngine::spawnNewObjectInternal(kgx::KGXSceneObject* newObject)

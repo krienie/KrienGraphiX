@@ -14,30 +14,30 @@ class RHIViewableResource;
 class RHIResourceView
 {
 public:
-    enum ViewType
-    {
-        RTV = 0,
-        DSV,
-        CBV,
-        SRV,
-        UAV,
-        //VertexBuffer,
-        //IndexBuffer,
-        NumTypes
-    };
+	enum ViewType
+	{
+		RTV = 0,
+		DSV,
+		CBV,
+		SRV,
+		UAV,
+		//VertexBuffer,
+		//IndexBuffer,
+		NumTypes
+	};
 
-    RHIResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource);
-    virtual ~RHIResourceView() = default;
+	RHIResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource);
+	virtual ~RHIResourceView() = default;
 
-    [[nodiscard]] bool IsBufferView() const;
-    [[nodiscard]] bool IsTextureView() const;
+	[[nodiscard]] bool IsBufferView() const;
+	[[nodiscard]] bool IsTextureView() const;
 
-    [[nodiscard]] ViewType getViewType() const;
-    [[nodiscard]] RHIViewableResource* getViewedResource() const;
+	[[nodiscard]] ViewType getViewType() const;
+	[[nodiscard]] RHIViewableResource* getViewedResource() const;
 
 private:
-    ViewType mViewType;
-    std::weak_ptr<RHIViewableResource> mViewedResource;
+	ViewType mViewType;
+	std::weak_ptr<RHIViewableResource> mViewedResource;
 };
 
 }

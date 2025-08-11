@@ -11,13 +11,13 @@ namespace kgx::RHI
 {
 class RHISwapChain
 {
-    public:
-        virtual ~RHISwapChain() = default;
+	public:
+		virtual ~RHISwapChain() = default;
 
-        virtual bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int frameCount, RHIPixelFormat pixelFormat) = 0;
+		virtual bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int frameCount, RHIPixelFormat pixelFormat) = 0;
 
-        [[nodiscard]] virtual RHIResourceView* getCurrentBufferView() const = 0;
-        
-        virtual void present() = 0;
+		[[nodiscard]] virtual RHIResourceView* getCurrentBufferView() const = 0;
+		
+		virtual void present() = 0;
 };
 }

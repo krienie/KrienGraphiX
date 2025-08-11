@@ -8,16 +8,16 @@ namespace kgx::RHI
 class RHIGraphicsPipelineState
 {
 public:
-    RHIGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc)
-        : mGraphicsDescriptor(desc)
-    {
-    }
+	RHIGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc)
+		: mGraphicsDescriptor(desc)
+	{
+	}
 
-    virtual ~RHIGraphicsPipelineState() = default;
+	virtual ~RHIGraphicsPipelineState() = default;
 
-    virtual bool create(RHIGraphicsDevice* device) = 0;
+	virtual bool create(RHIGraphicsDevice* device) = 0;
 
 protected:
-    RHIGraphicsPipelineStateDescriptor mGraphicsDescriptor;
+	RHIGraphicsPipelineStateDescriptor mGraphicsDescriptor;
 };
 }

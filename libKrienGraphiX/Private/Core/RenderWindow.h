@@ -15,16 +15,16 @@ namespace kgx::core
 class RenderWindow final
 {
 public:
-    RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
-    ~RenderWindow() = default;
+	RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
+	~RenderWindow() = default;
 
-    [[nodiscard]] WinHandle getWinHandle() const;
+	[[nodiscard]] WinHandle getWinHandle() const;
 
-    void draw() const;
-    
-    //TODO(KL): implement resize
+	void draw() const;
+	
+	//TODO(KL): implement resize
 
 private:
-    std::shared_ptr<rendering::KGXRenderWindow> mKGXRenderWindow;
+	std::shared_ptr<rendering::KGXRenderWindow> mKGXRenderWindow;
 };
 }

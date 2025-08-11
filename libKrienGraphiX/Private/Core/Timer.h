@@ -11,27 +11,27 @@ namespace kgx::core
 class Timer final
 {
 public:
-    using OnCompletedEvent = std::function<void(float deltaTime)>;
+	using OnCompletedEvent = std::function<void(float deltaTime)>;
 
-    Timer(int intervalMilliseconds, OnCompletedEvent onCompleted);
-    ~Timer();
+	Timer(int intervalMilliseconds, OnCompletedEvent onCompleted);
+	~Timer();
 
-    void stop();
+	void stop();
 
-    Timer(const Timer&) noexcept            = delete;
-    Timer& operator=(const Timer&) noexcept = delete;
-    Timer(Timer&&) noexcept                 = delete;
-    Timer& operator=(Timer&&) noexcept      = delete;
+	Timer(const Timer&) noexcept            = delete;
+	Timer& operator=(const Timer&) noexcept = delete;
+	Timer(Timer&&) noexcept                 = delete;
+	Timer& operator=(Timer&&) noexcept      = delete;
 
 private:
-    void timerTick();
+	void timerTick();
 
-    std::unique_ptr<std::thread> mWorkerThread;
+	std::unique_ptr<std::thread> mWorkerThread;
 
-    std::atomic<bool> mIsRunning = false;
-    int mIntervalMilliSeconds;
-    int64_t mPrevEvent = 0;
+	std::atomic<bool> mIsRunning = false;
+	int mIntervalMilliSeconds;
+	int64_t mPrevEvent = 0;
 
-    OnCompletedEvent mOnCompletedEvent;
+	OnCompletedEvent mOnCompletedEvent;
 };
 }

@@ -6,12 +6,12 @@
 namespace kgx
 {
 KGXSceneObjectComponent::KGXSceneObjectComponent(KGXSceneObject* owner)
-    : mOwner(owner)
+	: mOwner(owner)
 {
 }
 
 KGXSceneObject* KGXSceneObjectComponent::getOwner() const
 {
-    return mOwner;
+	return mOwner;
 }
 }

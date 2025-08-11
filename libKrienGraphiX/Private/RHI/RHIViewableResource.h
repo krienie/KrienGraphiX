@@ -12,8 +12,8 @@ class RHIResourceView;
 class RHIViewableResource : public RHIResource
 {
 public:
-    RHIViewableResource(CreationFlags flags)
-        : RHIResource(flags) {}
-    ~RHIViewableResource() override = default;
+	RHIViewableResource(CreationFlags flags)
+		: RHIResource(flags) {}
+	~RHIViewableResource() override = default;
 };
 }

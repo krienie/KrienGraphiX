@@ -17,31 +17,31 @@ class KGXMeshRenderObject;
 class KGXMeshComponent : public KGXSceneObjectComponent
 {
 public:
-    KGXMeshComponent(KGXSceneObject *owner);
-    ~KGXMeshComponent() override = default;
+	KGXMeshComponent(KGXSceneObject *owner);
+	~KGXMeshComponent() override = default;
 
-    void initialize() override;
-    std::shared_ptr<rendering::KGXMeshRenderObject> createMeshRenderObject();
-    
-    //void setMaterial(const Material& material);
-    //Material getMaterial() const;
+	void initialize() override;
+	std::shared_ptr<rendering::KGXMeshRenderObject> createMeshRenderObject();
+	
+	//void setMaterial(const Material& material);
+	//Material getMaterial() const;
 
 private:
-    virtual rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() = 0;
-    //Material m_material;
+	virtual rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() = 0;
+	//Material m_material;
 
-    std::shared_ptr<rendering::KGXMeshRenderObject> mMeshRenderObject;
+	std::shared_ptr<rendering::KGXMeshRenderObject> mMeshRenderObject;
 };
 
 class KGXBoxMeshComponent : public KGXMeshComponent
 {
 public:
-    KGXBoxMeshComponent(KGXSceneObject *owner);
-    ~KGXBoxMeshComponent() override = default;
+	KGXBoxMeshComponent(KGXSceneObject *owner);
+	~KGXBoxMeshComponent() override = default;
 
-    //void initialize() override;
+	//void initialize() override;
 
 private:
-    rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
+	rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
 };
 }
