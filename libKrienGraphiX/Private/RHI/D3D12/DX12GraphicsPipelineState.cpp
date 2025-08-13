@@ -3,6 +3,7 @@
 
 #include "DX12GraphicsDevice.h"
 #include "DX12PixelFormat.h"
+#include "DX12RenderHardwareInterface.h"
 #include "DX12Shader.h"
 
 namespace
@@ -45,7 +46,7 @@ DX12GraphicsPipelineState::DX12GraphicsPipelineState(const RHIGraphicsPipelineSt
 {
 }
 
-bool DX12GraphicsPipelineState::create(RHIGraphicsDevice* device)
+bool DX12GraphicsPipelineState::create()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
 	ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -87,8 +88,8 @@ bool DX12GraphicsPipelineState::create(RHIGraphicsDevice* device)
 
 	psoDesc.DSVFormat = toDxgiPixelFormat(mGraphicsDescriptor.DepthStencilFormat);
 
-	auto* dxDevice = static_cast<DX12GraphicsDevice*>(device);
-	HRESULT res = dxDevice->getNativeDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
+	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
+	HRESULT res = nativeDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&mPipelineState));
 
 	return SUCCEEDED(res);
 }

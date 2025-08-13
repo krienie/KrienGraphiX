@@ -5,7 +5,7 @@
 
 namespace kgx::RHI
 {
-RHIResourceView::RHIResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource)
+RHIResourceView::RHIResourceView(Type type, const std::shared_ptr<RHIViewableResource>& viewedResource)
 	: mViewType(type), mViewedResource(viewedResource)
 {
 }
@@ -22,7 +22,7 @@ bool RHIResourceView::IsTextureView() const
 	return viewedResource != nullptr ? viewedResource->IsTexture() : false;
 }
 
-RHIResourceView::ViewType RHIResourceView::getViewType() const
+RHIResourceView::Type RHIResourceView::getViewType() const
 {
 	return mViewType;
 }

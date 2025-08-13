@@ -6,8 +6,6 @@
 
 namespace kgx::RHI
 {
-class RHIGraphicsDevice;
-
 class RHITexture2D : public RHITexture
 {
 	public:

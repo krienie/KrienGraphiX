@@ -7,8 +7,8 @@
 
 namespace kgx::core
 {
-CommandListAllocator::CommandListAllocator(RHI::RHIGraphicsDevice* device, RHI::RHICommandQueue* commandQueue)
-	: mDevice(device), mCommandQueue(commandQueue)
+CommandListAllocator::CommandListAllocator(RHI::RHICommandQueue* commandQueue)
+	: mCommandQueue(commandQueue)
 {
 	//mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
 	//mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
@@ -32,7 +32,7 @@ RHI::RHIGraphicsCommandList* CommandListAllocator::createGraphicsCommandList(RHI
 		}
 	}
 
-	const std::shared_ptr<RHI::RHIGraphicsCommandList> newCommandList = RHI::PlatformRHI->createGraphicsCommandList(this, mDevice, mCommandQueue, initialState);
+	const std::shared_ptr<RHI::RHIGraphicsCommandList> newCommandList = RHI::PlatformRHI->createGraphicsCommandList(this, mCommandQueue, initialState);
 	CommandListAllocation newAllocation
 	{
 		.isFree = false,

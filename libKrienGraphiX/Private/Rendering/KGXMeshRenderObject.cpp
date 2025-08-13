@@ -70,8 +70,6 @@ void KGXMeshRenderObject::createRenderResources()
 
 	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
 
-	//TODO(KL): Remove the need to get the graphics device ptr
-	RHI::RHIGraphicsDevice* graphicsDevice = renderThreadPtr->getGraphicsDevicePtr();
 	RHI::RHIGraphicsCommandList* commandList = renderThreadPtr->getGraphicsCommandListPtr();
 
 	const RHI::RHIBufferDescriptor vertexBufferDesc
@@ -85,7 +83,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::None
 	};
 
-	mVertexBuffer = RHI::PlatformRHI->createBuffer(graphicsDevice, commandList, vertexBufferDesc);
+	mVertexBuffer = RHI::PlatformRHI->createBuffer(commandList, vertexBufferDesc);
 
 
 	const RHI::RHIBufferDescriptor indexBufferDesc
@@ -100,6 +98,6 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::None
 	};
 
-	mIndexBuffer = RHI::PlatformRHI->createBuffer(graphicsDevice, commandList, indexBufferDesc);
+	mIndexBuffer = RHI::PlatformRHI->createBuffer(commandList, indexBufferDesc);
 }
 }

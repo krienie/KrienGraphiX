@@ -6,12 +6,10 @@
 
 namespace kgx::RHI
 {
-class DX12GraphicsDevice;
-
 class DX12Buffer final : public RHIBuffer
 {
 public:
-	DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor);
+	DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor);
 	~DX12Buffer() override = default;
 
 	DX12Buffer(DX12Buffer&) = delete;

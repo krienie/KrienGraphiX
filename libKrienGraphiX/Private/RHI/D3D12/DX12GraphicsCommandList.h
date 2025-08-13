@@ -6,6 +6,8 @@
 #include <d3d12.h>
 #include <wrl\client.h>
 
+#include "DX12Utils.h"
+
 namespace kgx::RHI
 {
 class DX12GraphicsCommandList final : public RHIGraphicsCommandList
@@ -17,7 +19,7 @@ public:
 	[[nodiscard]]
 	ID3D12GraphicsCommandList* getCommandList() const { return mCommandList.Get(); }
 
-	bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
+	bool create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
 	void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
 
@@ -35,4 +37,6 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
 };
+
+DEFINE_RESOURCE_CAST(DX12GraphicsCommandList, RHIGraphicsCommandList)
 }

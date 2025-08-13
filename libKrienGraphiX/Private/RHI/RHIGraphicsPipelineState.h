@@ -15,7 +15,7 @@ public:
 
 	virtual ~RHIGraphicsPipelineState() = default;
 
-	virtual bool create(RHIGraphicsDevice* device) = 0;
+	virtual bool create() = 0;
 
 protected:
 	RHIGraphicsPipelineStateDescriptor mGraphicsDescriptor;

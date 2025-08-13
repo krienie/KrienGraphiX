@@ -15,7 +15,6 @@ namespace kgx::core
 {
 RenderThread::RenderThread()
 	: mCommandThread(std::make_unique<CommandThread>(1)),
-		mGraphicsDevice(nullptr),
 		mCommandListAllocator(nullptr),
 		mShaderCache(nullptr)
 {
@@ -27,12 +26,11 @@ RenderThread::RenderThread()
 
 	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
 
-	mGraphicsDevice = RHI::PlatformRHI->createGraphicsDevice();
-	mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
-	mCommandListAllocator = std::make_unique<CommandListAllocator>(mGraphicsDevice.get(), mCommandQueue.get());
+	mCommandQueue   = RHI::PlatformRHI->createCommandQueue();
+	mCommandListAllocator = std::make_unique<CommandListAllocator>(mCommandQueue.get());
 	mCommandList    = mCommandListAllocator->createGraphicsCommandList(nullptr);
 
-	mShaderCache = std::make_unique<rendering::KGXShaderCache>(mGraphicsDevice.get(), mCommandList);
+	mShaderCache = std::make_unique<rendering::KGXShaderCache>(mCommandList);
 }
 
 RenderThread::~RenderThread()
@@ -46,10 +44,6 @@ RenderThread::~RenderThread()
 	RHI::PlatformRHI.reset();
 }
 
-RHI::RHIGraphicsDevice* RenderThread::getGraphicsDevicePtr() const
-{
-	return mGraphicsDevice.get();
-}
 
 RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
 {

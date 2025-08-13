@@ -44,6 +44,7 @@ void KGXRenderer::RenderFrame()
 
 	RHI::PlatformRHI->endFrame(commandList, OutputRenderTarget);
 
+	//TODO(KL): Remove the need for this train. Just get a commandList instance and have that one figure out how to execute itself
 	renderThread->getCommandQueuePtr()->executeCommandList(commandList);
 }
 }

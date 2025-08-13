@@ -3,7 +3,6 @@
 
 namespace kgx::RHI
 {
-class RHIGraphicsDevice;
 class RHIGraphicsCommandList;
 
 class RHICommandQueue
@@ -11,7 +10,7 @@ class RHICommandQueue
 	public:
 		virtual ~RHICommandQueue() = default;
 
-		virtual bool create(RHIGraphicsDevice *device) = 0;
+		virtual bool create() = 0;
 
 		virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
 		virtual void flushQueue() = 0;

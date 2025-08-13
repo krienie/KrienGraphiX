@@ -8,7 +8,6 @@
 #include "Private/Rendering/KGXShaderCache.h"
 
 #include "Private/RHI/RHIGraphicsCommandList.h"
-#include "Private/RHI/RHIGraphicsDevice.h"
 #include "Private/RHI/RHISwapChain.h"
 
 namespace kgx::core
@@ -28,7 +27,6 @@ public:
 	RenderThread& operator=(const RenderThread&) noexcept = delete;
 	RenderThread& operator=(RenderThread&&) noexcept      = delete;
 
-	[[nodiscard]] RHI::RHIGraphicsDevice* getGraphicsDevicePtr() const;
 	[[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
 	[[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
 
@@ -38,7 +36,6 @@ public:
 private:
 	std::unique_ptr<CommandThread> mCommandThread;
 
-	std::unique_ptr<RHI::RHIGraphicsDevice> mGraphicsDevice;
 	std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
 
 	std::unique_ptr<CommandListAllocator> mCommandListAllocator;

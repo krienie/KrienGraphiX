@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "DX12GraphicsDevice.h"
+#include "DX12RenderHardwareInterface.h"
 #include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/D3D12/DX12GraphicsCommandList.h"
 
@@ -14,13 +15,13 @@ DX12CommandQueue::DX12CommandQueue()
 {
 }
 
-bool DX12CommandQueue::create(RHIGraphicsDevice* device)
+bool DX12CommandQueue::create()
 {
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-	auto* nativeDevice = static_cast<DX12GraphicsDevice*>(device)->getNativeDevice();
+	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	HRESULT res = nativeDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
 	if (FAILED(res))
@@ -41,7 +42,7 @@ bool DX12CommandQueue::create(RHIGraphicsDevice* device)
 
 void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
-	auto* dxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
+	DX12GraphicsCommandList* dxCommandList = dxCast(commandList);
 
 	ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
 	mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);

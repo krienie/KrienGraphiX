@@ -7,8 +7,8 @@
 
 namespace kgx::rendering
 {
-KGXShaderCache::KGXShaderCache(RHI::RHIGraphicsDevice* graphicsDevice, RHI::RHIGraphicsCommandList* commandList)
-	: mGraphicsDevice(graphicsDevice), mCommandList(commandList)
+KGXShaderCache::KGXShaderCache(RHI::RHIGraphicsCommandList* commandList)
+	: mCommandList(commandList)
 {
 }
 
@@ -30,7 +30,7 @@ bool KGXShaderCache::loadShaderFromFile(const std::string& shaderFilePath, const
 		return false;
 	}
 
-	std::unique_ptr<RHI::RHIShader> newShader = RHI::PlatformRHI->createShader(mGraphicsDevice, mCommandList, compiledShader, type);
+	std::unique_ptr<RHI::RHIShader> newShader = RHI::PlatformRHI->createShader(mCommandList, compiledShader, type);
 	if (!newShader)
 	{
 		return false;

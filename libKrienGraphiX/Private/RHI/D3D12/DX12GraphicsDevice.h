@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "Private/RHI/RHIGraphicsDevice.h"
 #include "Private/RHI/D3D12/d3dx12Residency.h"
 
 #include <d3d12.h>
@@ -10,13 +9,13 @@
 
 namespace kgx::RHI
 {
-class DX12GraphicsDevice : public RHIGraphicsDevice
+class DX12GraphicsDevice
 {
 	public:
 		DX12GraphicsDevice();
-		~DX12GraphicsDevice() override;
+		~DX12GraphicsDevice();
 
-		bool create() override;
+		bool create();
 
 		[[nodiscard]]
 		ID3D12Device* getNativeDevice() const;

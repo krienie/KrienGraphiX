@@ -9,6 +9,7 @@
 #include "DX12Texture2D.h"
 #include "d3dx12.h"
 #include "DX12Descriptors.h"
+#include "DX12RenderHardwareInterface.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -20,10 +21,10 @@ DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 {
 }
 
-bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
+bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
-	auto* dxDevice = static_cast<DX12GraphicsDevice*>(device);
-	auto* nativeFactory = dxDevice->getNativeFactory();
+	DX12GraphicsDevice* dxDevice = getDX12RHI()->getDX12Device();
+	IDXGIFactory4* nativeFactory = dxDevice->getNativeFactory();
 
 	// Describe and create the swap chain.
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -35,8 +36,8 @@ bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQu
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.SampleDesc.Count = 1;
 
-	auto* dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
-	auto* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
+	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
+	ID3D12CommandQueue* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
 
 	ComPtr<IDXGISwapChain1> swapChain;
 
@@ -63,7 +64,7 @@ bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQu
 		return false;
 	}
 
-	auto* nativeDevice = dxDevice->getNativeDevice();
+	ID3D12Device* nativeDevice = dxDevice->getNativeDevice();
 
 	// Create descriptor heap for the backbuffer RTV's
 	D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
@@ -110,8 +111,8 @@ bool DX12SwapChain::create(RHIGraphicsDevice* device, RHICommandQueue* commandQu
 
 		// Register the created D3D12 resources
 		constexpr bool isShaderVisible = false;
-		auto newBuffer = std::make_shared<DX12Texture2D>(dxDevice, desc);
-		mBufferViews.push_back(std::make_shared<DX12ResourceView>(DX12ResourceView::ViewType::RTV, newBuffer, isShaderVisible));
+		auto newBuffer = std::make_shared<DX12Texture2D>(desc);
+		mBufferViews.push_back(std::make_shared<DX12ResourceView>(DX12ResourceView::Type::RTV, newBuffer, isShaderVisible));
 		mBuffers.push_back(std::move(newBuffer));
 	}
 

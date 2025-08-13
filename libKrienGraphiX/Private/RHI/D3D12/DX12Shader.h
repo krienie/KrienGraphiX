@@ -2,6 +2,7 @@
 #pragma once
 
 #include "DX12Buffer.h"
+#include "DX12Utils.h"
 #include "Private/RHI/RHIShader.h"
 
 #include <d3d12.h>
@@ -22,7 +23,7 @@ public:
 	DX12Shader& operator=(const DX12Shader& rhs) = default;
 	DX12Shader& operator=(DX12Shader&& rhs) = default;
 
-	bool create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) override;
+	bool create(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) override;
 	
 	void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& getVertexInputLayout() const;
@@ -36,7 +37,6 @@ protected:
 private:
 	bool createRootSignature(const CompiledShader& compiledShader);
 
-	DX12GraphicsDevice* mDxDevice;
 	DX12GraphicsCommandList* mDxCommandList;
 	
 	std::vector<DX12Buffer> mConstantBuffers;
@@ -46,4 +46,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
 	ShaderType mShaderType = ShaderType::Unassigned;
 };
+
+DEFINE_RESOURCE_CAST(DX12Shader, RHIShader)
 }

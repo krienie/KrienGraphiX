@@ -3,6 +3,8 @@
 
 #include "Private/RHI/RHIVertexLayout.h"
 
+#include "DX12Utils.h"
+
 #include <d3d12.h>
 
 namespace kgx::RHI
@@ -22,4 +24,6 @@ public:
 private:
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 };
+
+DEFINE_RESOURCE_CAST(DX12VertexLayout, RHIVertexLayout)
 }

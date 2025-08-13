@@ -13,7 +13,7 @@ class CommandThread;
 class CommandListAllocator final
 {
 public:
-	CommandListAllocator(RHI::RHIGraphicsDevice* device, RHI::RHICommandQueue* commandQueue);
+	CommandListAllocator(RHI::RHICommandQueue* commandQueue);
 	~CommandListAllocator();
 
 	CommandListAllocator(const CommandListAllocator&) noexcept            = delete;
@@ -31,7 +31,6 @@ private:
 		std::shared_ptr<RHI::RHIGraphicsCommandList> commandList;
 	};
 
-	RHI::RHIGraphicsDevice* mDevice = nullptr;
 	RHI::RHICommandQueue* mCommandQueue = nullptr;
 
 	std::unordered_map<RHI::RHIGraphicsCommandList*, CommandListAllocation> mCommandLists;

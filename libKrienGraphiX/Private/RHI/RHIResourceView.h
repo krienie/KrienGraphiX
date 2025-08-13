@@ -14,7 +14,7 @@ class RHIViewableResource;
 class RHIResourceView
 {
 public:
-	enum ViewType
+	enum class Type : uint8_t
 	{
 		RTV = 0,
 		DSV,
@@ -26,18 +26,17 @@ public:
 		NumTypes
 	};
 
-	RHIResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource);
+	RHIResourceView(Type type, const std::shared_ptr<RHIViewableResource>& viewedResource);
 	virtual ~RHIResourceView() = default;
 
 	[[nodiscard]] bool IsBufferView() const;
 	[[nodiscard]] bool IsTextureView() const;
 
-	[[nodiscard]] ViewType getViewType() const;
+	[[nodiscard]] Type getViewType() const;
 	[[nodiscard]] RHIViewableResource* getViewedResource() const;
 
 private:
-	ViewType mViewType;
+	Type mViewType;
 	std::weak_ptr<RHIViewableResource> mViewedResource;
 };
-
 }

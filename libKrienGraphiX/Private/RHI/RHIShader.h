@@ -6,7 +6,6 @@
 namespace kgx::RHI
 {
 class RHIGraphicsCommandList;
-class RHIGraphicsDevice;
 
 class RHIShader
 {
@@ -31,7 +30,7 @@ public:
 	RHIShader& operator=(const RHIShader& rhs) = default;
 	RHIShader& operator=(RHIShader&& rhs) = default;
 
-	virtual bool create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) = 0;
+	virtual bool create(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) = 0;
 
 	virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
 

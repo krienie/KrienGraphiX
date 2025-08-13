@@ -3,6 +3,8 @@
 
 #include "Private/RHI/RHISwapChain.h"
 
+#include "DX12Utils.h"
+
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl\client.h>
@@ -20,7 +22,7 @@ class DX12SwapChain : public RHISwapChain
 		DX12SwapChain(UINT width, UINT height);
 		~DX12SwapChain() override = default;
 
-		bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
+		bool create(RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
 
 		[[nodiscard]] RHIResourceView* getCurrentBufferView() const override;
 		
@@ -35,4 +37,6 @@ class DX12SwapChain : public RHISwapChain
 		UINT mWidth;
 		UINT mHeight;
 };
+
+DEFINE_RESOURCE_CAST(DX12SwapChain, RHISwapChain)
 }

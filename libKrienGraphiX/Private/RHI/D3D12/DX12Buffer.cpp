@@ -4,6 +4,7 @@
 #include "DX12GraphicsCommandList.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12MemoryUtils.h"
+#include "DX12RenderHardwareInterface.h"
 
 namespace
 {
@@ -21,11 +22,11 @@ kgx::RHI::RHIBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIBuff
 
 namespace kgx::RHI
 {
-DX12Buffer::DX12Buffer(DX12GraphicsDevice* dxDevice, DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
+DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
 	: RHIBuffer(getAlignedBufferDescriptor(descriptor)),
 		mDescriptor(descriptor)
 {
-	ID3D12Device* nativeDevice = dxDevice->getNativeDevice();
+	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	D3D12_HEAP_TYPE heapType = mDescriptor.isDynamic ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 	D3D12_RESOURCE_STATES initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;

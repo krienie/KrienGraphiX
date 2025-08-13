@@ -26,7 +26,6 @@ private:
 	WinHandle mWindowHandle;
 
 	std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
-	std::shared_ptr<RHI::RHIResourceView> mSwapChainRTV;
 
 	//TODO(KL): Temporarily here. Move to KGXRenderer
 	std::shared_ptr<RHI::RHITexture2D> mDepthStencil;

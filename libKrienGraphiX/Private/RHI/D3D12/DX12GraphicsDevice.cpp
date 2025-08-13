@@ -75,7 +75,7 @@ void GetHardwareAdapter(IDXGIFactory4 * pFactory, IDXGIAdapter1 ** ppAdapter, bo
 namespace kgx::RHI
 {
 DX12GraphicsDevice::DX12GraphicsDevice()
-	: RHIGraphicsDevice(), mDevice(nullptr), mFactory(nullptr), mHardwareAdapter(nullptr), mResidencyManager()
+	: mDevice(nullptr), mFactory(nullptr), mHardwareAdapter(nullptr), mResidencyManager()
 {}
 
 DX12GraphicsDevice::~DX12GraphicsDevice()

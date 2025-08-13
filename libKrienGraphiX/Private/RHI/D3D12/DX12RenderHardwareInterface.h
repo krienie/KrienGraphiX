@@ -3,14 +3,12 @@
 
 #include "Private/RHI/RenderHardwareInterface.h"
 
-#include <string>
-
 namespace kgx::RHI
 {
 class DX12RenderHardwareInterface : public RenderHardwareInterface
 {
 public:
-	DX12RenderHardwareInterface() = default;
+	DX12RenderHardwareInterface();
 	~DX12RenderHardwareInterface() override = default;
 
 	DX12RenderHardwareInterface(const DX12RenderHardwareInterface&) noexcept            = delete;
@@ -22,14 +20,10 @@ public:
 	void endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) override;
 
 	[[nodiscard]]
-	std::unique_ptr<RHIGraphicsDevice> createGraphicsDevice() override;
-
-	[[nodiscard]]
-	std::unique_ptr<RHICommandQueue> createCommandQueue(RHIGraphicsDevice *graphicsDevice) override;
+	std::unique_ptr<RHICommandQueue> createCommandQueue() override;
 
 	[[nodiscard]]
 	std::unique_ptr<RHISwapChain> createSwapChain(
-		RHIGraphicsDevice * device,
 		RHICommandQueue * commandQueue,
 		WinHandle windowHandle,
 		unsigned int width,
@@ -37,21 +31,32 @@ public:
 		unsigned int frameCount) override;
 
 	[[nodiscard]]
-	std::unique_ptr<RHIShader> createShader(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
+	std::unique_ptr<RHIShader> createShader(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type) override;
+
+	//TODO(KL): Remove the need for passing CommandListAllocator? integrate it into DX12RenderHardwareInterface
+	[[nodiscard]]
+	std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
 
 	[[nodiscard]]
-	std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsDevice *graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) override;
+	std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHITexture2DDescriptor descriptor) override;
 
 	[[nodiscard]]
-	std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor) override;
+	std::shared_ptr<RHIResourceView> createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) override;
 
 	[[nodiscard]]
-	std::shared_ptr<RHIResourceView> createResourceView(RHIResourceView::ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) override;
+	std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc) override;
 
 	[[nodiscard]]
-	std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc) override;
+	std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) override;
 
-	[[nodiscard]]
-	std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) override;
+	class DX12GraphicsDevice* getDX12Device() const { return mGraphicsDevice.get(); }
+
+private:
+	std::unique_ptr<class DX12GraphicsDevice> mGraphicsDevice;
 };
+
+inline DX12RenderHardwareInterface* getDX12RHI()
+{
+	return static_cast<DX12RenderHardwareInterface*>(PlatformRHI.get());
+}
 }

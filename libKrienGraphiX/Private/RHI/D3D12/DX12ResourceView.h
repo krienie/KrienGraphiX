@@ -5,6 +5,7 @@
 #include <memory>
 #include <wrl\client.h>
 
+#include "DX12Utils.h"
 #include "Private/RHI/RHIResourceView.h"
 
 namespace kgx::RHI
@@ -32,7 +33,7 @@ public:
 	//};
 
 	//TODO(KL): Add customization options for typeless resources
-	DX12ResourceView(ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible);
+	DX12ResourceView(Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible);
 
 	DX12ResourceView(const DX12ResourceView& rhs) = default;
 	DX12ResourceView(DX12ResourceView&& rhs) = default;
@@ -48,4 +49,6 @@ private:
 
 	int mDescriptorOffset = 0;
 };
+
+DEFINE_RESOURCE_CAST(DX12ResourceView, RHIResourceView)
 }

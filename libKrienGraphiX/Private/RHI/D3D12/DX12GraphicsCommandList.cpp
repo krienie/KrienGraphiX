@@ -6,6 +6,7 @@
 #include "DX12CommandQueue.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
+#include "DX12RenderHardwareInterface.h"
 #include "DX12ResourceView.h"
 
 namespace
@@ -30,18 +31,18 @@ DX12GraphicsCommandList::DX12GraphicsCommandList(core::CommandListAllocator* all
 {
 }
 
-bool DX12GraphicsCommandList::create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
+bool DX12GraphicsCommandList::create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
-	auto* nativeDevice = static_cast<DX12GraphicsDevice*>(device)->getNativeDevice();
+	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	ID3D12PipelineState* nativeInitialState = nullptr;
 
 	if (initialState != nullptr)
 	{
-		nativeInitialState = static_cast<DX12GraphicsPipelineState*>(initialState)->getPSO();
+		nativeInitialState = dxCast(initialState)->getPSO();
 	}
 	
-	const auto dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
+	const DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
 
 	const HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
 	//if (SUCCEEDED(res))
@@ -61,23 +62,22 @@ void DX12GraphicsCommandList::closeInternal()
 
 void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
 {
-	auto dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
+	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
 
 	ID3D12PipelineState* nativeInitialState = nullptr;
 
 	if (initialState != nullptr)
 	{
-		auto* dxPipelineState = static_cast<DX12GraphicsPipelineState*>(initialState);
+		DX12GraphicsPipelineState* dxPipelineState = dxCast(initialState);
 		nativeInitialState = dxPipelineState->getPSO();
 	}
-	
 
 	mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nativeInitialState);
 }
 
 void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
 {
-	auto* dxPipelineState = static_cast<DX12GraphicsPipelineState*>(pipelineState);
+	DX12GraphicsPipelineState* dxPipelineState = dxCast(pipelineState);
 	ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
 	mCommandList->SetPipelineState(nativePipelineState);
 }
@@ -101,14 +101,14 @@ void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
 
 void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView)
 {
-	auto* dxDsv = static_cast<const DX12ResourceView*>(depthStencilView);
-	assert(dxDsv->getViewType() == RHIResourceView::DSV);
+	const DX12ResourceView* dxDsv = dxCast(depthStencilView);
+	assert(dxDsv->getViewType() == RHIResourceView::Type::DSV);
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvCpuHandles(renderTargetViews.size());
 	for (uint8_t i = 0u; i < static_cast<uint8_t>(renderTargetViews.size()); ++i)
 	{
-		auto dxRtv = static_cast<DX12ResourceView*>(renderTargetViews[i]);
-		assert(dxRtv->getViewType() == RHIResourceView::RTV);
+		DX12ResourceView* dxRtv = dxCast(renderTargetViews[i]);
+		assert(dxRtv->getViewType() == RHIResourceView::Type::RTV);
 
 		rtvCpuHandles[i] = dxRtv->getViewHandle();
 	}
@@ -120,16 +120,16 @@ void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView
 
 void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
-	auto* dxDsv = static_cast<DX12ResourceView*>(dsv);
-	assert(dxDsv->getViewType() == RHIResourceView::DSV);
+	DX12ResourceView* dxDsv = dxCast(dsv);
+	assert(dxDsv->getViewType() == RHIResourceView::Type::DSV);
 	
 	mCommandList->ClearDepthStencilView(dxDsv->getViewHandle(), toDxClearFlags(clearFlags), depth, stencil, 0, nullptr);
 }
 
 void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4])
 {
-	auto* dxRtv = static_cast<DX12ResourceView*>(rtv);
-	assert(dxRtv->getViewType() == RHIResourceView::RTV);
+	DX12ResourceView* dxRtv = dxCast(rtv);
+	assert(dxRtv->getViewType() == RHIResourceView::Type::RTV);
 
 	mCommandList->ClearRenderTargetView(dxRtv->getViewHandle(), colorRGBA, 0, nullptr);
 }

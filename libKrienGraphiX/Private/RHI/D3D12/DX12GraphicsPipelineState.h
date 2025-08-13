@@ -6,6 +6,8 @@
 #include <d3d12.h>
 #include <wrl\client.h>
 
+#include "DX12Utils.h"
+
 namespace kgx::RHI
 {
 class DX12GraphicsPipelineState final : public RHIGraphicsPipelineState
@@ -14,7 +16,7 @@ public:
 	DX12GraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc);
 	~DX12GraphicsPipelineState() override = default;
 
-	bool create(RHIGraphicsDevice* device) override;
+	bool create() override;
 
 	[[nodiscard]]
 	ID3D12PipelineState* getPSO() const;
@@ -22,4 +24,6 @@ public:
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPipelineState;
 };
+
+DEFINE_RESOURCE_CAST(DX12GraphicsPipelineState, RHIGraphicsPipelineState)
 }

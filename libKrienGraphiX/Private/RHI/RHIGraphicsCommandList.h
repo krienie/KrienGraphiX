@@ -16,7 +16,6 @@ class CommandListAllocator;
 namespace kgx::RHI
 {
 class RHIResourceView;
-class RHIGraphicsDevice;
 class RHICommandQueue;
 class RHIGraphicsPipelineState;
 
@@ -27,7 +26,7 @@ public:
 
 	virtual ~RHIGraphicsCommandList();
 	
-	virtual bool create(RHIGraphicsDevice* device, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
+	virtual bool create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
 
 	void release();
 	void close();

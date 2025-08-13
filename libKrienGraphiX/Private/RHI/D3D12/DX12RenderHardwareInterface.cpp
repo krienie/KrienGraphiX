@@ -19,44 +19,39 @@ namespace kgx::RHI
 {
 //TODO(KL): log errors when any of these inits fail
 
+DX12RenderHardwareInterface::DX12RenderHardwareInterface()
+{
+	mGraphicsDevice = std::make_unique<DX12GraphicsDevice>();
+	mGraphicsDevice->create();
+}
+
 void DX12RenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
 	const auto* renderCore = core::RenderCore::get();
 
-	auto* commandQueue = renderCore->getRenderThreadPtr()->getCommandQueuePtr();
+	RHICommandQueue* commandQueue = renderCore->getRenderThreadPtr()->getCommandQueuePtr();
 
-	auto* dxCommandQueue = static_cast<DX12CommandQueue*>(commandQueue);
+	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
 	dxCommandQueue->getNativeCommandAllocator()->Reset();
 
 	commandList->reset(commandQueue);
 
-	auto* dxTexture2D = static_cast<DX12Texture2D*>(renderTarget);
-	dxTexture2D->transitionToState(static_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
+	DX12Texture2D* dxTexture2D = dxCast(renderTarget);
+	dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
 }
 
 void DX12RenderHardwareInterface::endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	auto* dxTexture2D = static_cast<DX12Texture2D*>(renderTarget);
-	dxTexture2D->transitionToState(static_cast<DX12GraphicsCommandList*>(commandList), D3D12_RESOURCE_STATE_PRESENT);
+	DX12Texture2D* dxTexture2D = dxCast(renderTarget);
+	dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_PRESENT);
 
 	commandList->close();
 }
 
-std::unique_ptr<RHIGraphicsDevice> DX12RenderHardwareInterface::createGraphicsDevice()
-{
-	auto graphicsDevice = std::make_unique<DX12GraphicsDevice>();
-	if (!graphicsDevice->create())
-	{
-		return nullptr;
-	}
-
-	return std::move(graphicsDevice);
-}
-
-std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue(RHIGraphicsDevice * graphicsDevice)
+std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue()
 {
 	auto commandQueue = std::make_unique<DX12CommandQueue>();
-	if (!commandQueue->create(graphicsDevice))
+	if (!commandQueue->create())
 	{
 		return nullptr;
 	}
@@ -65,7 +60,6 @@ std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue
 }
 
 std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
-	RHIGraphicsDevice* device,
 	RHICommandQueue* commandQueue,
 	WinHandle windowHandle,
 	unsigned int width,
@@ -73,7 +67,7 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 	unsigned int frameCount)
 {
 	auto swapChain = std::make_unique<DX12SwapChain>(width, height);
-	if (!swapChain->create(device, commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
+	if (!swapChain->create(commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
 	{
 		return nullptr;
 	}
@@ -81,10 +75,10 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 	return std::move(swapChain);
 }
 
-std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type)
+std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type)
 {
 	auto newShader = std::make_unique<DX12Shader>();
-	if (!newShader->create(graphicsDevice, commandList, compiledShader, type))
+	if (!newShader->create(commandList, compiledShader, type))
 	{
 		return nullptr;
 	}
@@ -92,10 +86,10 @@ std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(RHIGraphics
 	return std::move(newShader);
 }
 
-std::shared_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsDevice* graphicsDevice, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
+std::shared_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(core::CommandListAllocator* allocator, RHICommandQueue* commandQueue, RHIGraphicsPipelineState* pipelineState)
 {
 	auto graphicsCommandList = std::make_shared<DX12GraphicsCommandList>(allocator);
-	if (!graphicsCommandList->create(graphicsDevice, commandQueue, pipelineState))
+	if (!graphicsCommandList->create(commandQueue, pipelineState))
 	{
 		return nullptr;
 	}
@@ -103,7 +97,7 @@ std::shared_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraph
 	return graphicsCommandList;
 }
 
-std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuffer(RHIGraphicsDevice* graphicsDevice, RHITexture2DDescriptor descriptor)
+std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuffer(RHITexture2DDescriptor descriptor)
 {
 	//TODO(KL): Validate pixel format
 
@@ -116,23 +110,20 @@ std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuf
 		D3D12_RESOURCE_STATE_DEPTH_WRITE
 	};
 
-	auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
-	auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dxDevice, dx12Desc);
+	auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dx12Desc);
 
 	return std::move(depthStencilBuffer);
 }
 
-std::shared_ptr<RHIResourceView> DX12RenderHardwareInterface::createResourceView(RHIResourceView::ViewType type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible)
+std::shared_ptr<RHIResourceView> DX12RenderHardwareInterface::createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible)
 {
 	return std::make_shared<DX12ResourceView>(type, viewedResource, isShaderVisible);
 }
 
-std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState(RHIGraphicsDevice* graphicsDevice, const RHIGraphicsPipelineStateDescriptor& desc)
+std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc)
 {
-	auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
-	
 	auto graphicsPipelineState = std::make_unique<DX12GraphicsPipelineState>(desc);
-	if (!graphicsPipelineState->create(dxDevice))
+	if (!graphicsPipelineState->create())
 	{
 		return nullptr;
 	}
@@ -140,12 +131,11 @@ std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGra
 	return std::move(graphicsPipelineState);
 }
 
-std::unique_ptr<RHIBuffer> DX12RenderHardwareInterface::createBuffer(RHIGraphicsDevice* graphicsDevice, RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
+std::unique_ptr<RHIBuffer> DX12RenderHardwareInterface::createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
 {
-	auto* dxDevice = static_cast<DX12GraphicsDevice*>(graphicsDevice);
-	auto* dxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
+	DX12GraphicsCommandList* dxCommandList = dxCast(commandList);
 
-	auto newBuffer = std::make_unique<DX12Buffer>(dxDevice, dxCommandList, descriptor);
+	auto newBuffer = std::make_unique<DX12Buffer>(dxCommandList, descriptor);
 	return std::move(newBuffer);
 }
 }

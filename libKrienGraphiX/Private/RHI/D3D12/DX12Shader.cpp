@@ -11,19 +11,19 @@
 #include <cassert>
 #include <iostream>
 
+#include "DX12RenderHardwareInterface.h"
 #include "DX12VertexLayout.h"
 
 namespace kgx::RHI
 {
 DX12Shader::DX12Shader()
-	: RHIShader(), mDxDevice(nullptr), mDxCommandList(nullptr)
+	: RHIShader(), mDxCommandList(nullptr)
 {
 }
 
-bool DX12Shader::create(RHIGraphicsDevice* device, RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type)
+bool DX12Shader::create(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type)
 {
-	mDxDevice = static_cast<DX12GraphicsDevice*>(device);
-	mDxCommandList = static_cast<DX12GraphicsCommandList*>(commandList);
+	mDxCommandList = dxCast(commandList);
 
 	mShaderType = type;
 
@@ -71,7 +71,7 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
 		};
 
 		//TODO(KL): Force to create these buffers via DX12 RHI? Or refactor the RHI so this doesn't matter anymore.
-		mConstantBuffers.emplace_back(mDxDevice, mDxCommandList, cbDesc);
+		mConstantBuffers.emplace_back(mDxCommandList, cbDesc);
 	}
 
 	return true;
@@ -79,13 +79,13 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
 
 bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 {
-	auto *dxNativeDevice = mDxDevice->getNativeDevice();
+	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
 	featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
-	if (FAILED(dxNativeDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+	if (FAILED(nativeDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
 	{
 		// Fallback to older version
 		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
@@ -117,7 +117,7 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 		return false;
 	}
 
-	const HRESULT result = dxNativeDevice->CreateRootSignature(
+	const HRESULT result = nativeDevice->CreateRootSignature(
 		0,
 		serializedRootSig->GetBufferPointer(),
 		serializedRootSig->GetBufferSize(),

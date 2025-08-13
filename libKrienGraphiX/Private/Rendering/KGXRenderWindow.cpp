@@ -14,11 +14,9 @@ KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, uns
 {
 	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
 
-	auto* rhiDevice = renderThread->getGraphicsDevicePtr();
-
+	//TODO(KL): Integrate the swapchain into KGXRenderWindow? or KGXViewport? as an interface
 	using namespace RHI;
 	mRHISwapChain = PlatformRHI->createSwapChain(
-		rhiDevice,
 		renderThread->getCommandQueuePtr(),
 		mWindowHandle,
 		width,
@@ -36,10 +34,11 @@ KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, uns
 		RHIResource::DepthStencil
 		};
 
-	mDepthStencil = PlatformRHI->createDepthStencilBuffer(rhiDevice, texDesc);
+	//TODO(KL): Create a global rendertarget pool where this one comes out of and move it into KGXRenderer.
+	mDepthStencil = PlatformRHI->createDepthStencilBuffer(texDesc);
 
 	constexpr bool isShaderVisible = false;
-	mDSV = RHI::PlatformRHI->createResourceView(RHI::RHIResourceView::ViewType::DSV, mDepthStencil, isShaderVisible);
+	mDSV = PlatformRHI->createResourceView(RHI::RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
 }
 
 void KGXRenderWindow::draw()
