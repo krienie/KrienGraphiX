@@ -80,6 +80,7 @@ void KGXSceneObject::update(float deltaTime)
 
 		if ( mIsDirty )
 		{
+			//TODO(KL): Abstract the directX math away
 			// Model matrix
 			const DirectX::XMMATRIX rotMat   = DirectX::XMMatrixRotationRollPitchYaw(mPitch, mYaw, mRoll);
 			const DirectX::XMMATRIX transMat = DirectX::XMMatrixTranslation(mXPos, mYPos, mZPos);
