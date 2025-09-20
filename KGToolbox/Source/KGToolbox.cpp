@@ -4,6 +4,10 @@
 #include <sstream>
 
 #include "KGToolbox.h"
+
+#include <chrono>
+#include <format>
+
 #include "Resource.h"
 
 #include "KrienGraphiX/Scene/KGXMeshComponent.h"
@@ -197,7 +201,12 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 	case WM_INITDIALOG:
+	{
+		const auto now = std::chrono::system_clock::now();
+		std::wstring formattedText = std::format(L"Copyright © {:%Y}", now);
+		SetDlgItemText(hDlg, IDC_COPYRIGHT, formattedText.c_str());
 		return (INT_PTR)TRUE;
+	}
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
