@@ -2,13 +2,15 @@
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 
 #include "KGXScene.h"
+#include "KrienGraphiX/Scene/KGXCameraComponent.h"
+#include "KrienGraphiX/Scene/KGXMeshComponent.h"
 #include "KrienGraphiX/Scene/KGXSceneObjectComponent.h"
 #include "Private/Core/RenderCore.h"
 
 namespace kgx
 {
-KGXSceneObject::KGXSceneObject(std::string name)
-	: mIsDirty(true), mName(std::move(name)),
+KGXSceneObject::KGXSceneObject(const std::string& name)
+	: mIsDirty(true), mName(name),
 	mModelMatrix(), mNormalMatrix()
 {
 	//TODO(KL): Think of something better for this..
@@ -119,5 +121,21 @@ void KGXSceneObject::addNewComponentInternal(KGXSceneObjectComponent* newCompone
 	newComponent->initialize();
 
 	mSceneComponents.emplace_back(newComponent);
+}
+
+KGXBoxObject::KGXBoxObject(const std::string& name)
+	: KGXSceneObject(name)
+{
+	addNewComponent<KGXBoxMeshComponent>();
+}
+
+KGXCameraObject::KGXCameraObject(const std::string& name)
+	: KGXSceneObject(name)
+{
+	//TODO(KL): Add interface for setting camera settings
+	constexpr DirectX::XMFLOAT3 eye(0, -20, -20);
+	constexpr DirectX::XMFLOAT3 target(0, 0, 0);
+	constexpr DirectX::XMFLOAT3 up(0, 0, 1);
+	addNewComponent<KGXCameraComponent>(eye, target, up);
 }
 }

@@ -67,8 +67,8 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
 		updateWindowTitle(deltaTime);
 	});
 
-	BoxObject = std::make_unique<kgx::KGXSceneObject>("BoxObject");
-	BoxObject->addNewComponent<kgx::KGXBoxMeshComponent>();
+	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
+	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 }
 
 int KGToolboxApp::run()

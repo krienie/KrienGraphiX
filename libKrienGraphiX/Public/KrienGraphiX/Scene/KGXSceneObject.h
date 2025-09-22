@@ -22,7 +22,7 @@ class KGXSceneObjectComponent;
 class KGXSceneObject
 {
 public:
-	explicit KGXSceneObject(std::string name);
+	explicit KGXSceneObject(const std::string& name);
 	virtual ~KGXSceneObject() = default;
 
 	void setParentScene(core::KGXScene& parentScene);
@@ -83,5 +83,17 @@ private:
 	std::vector<std::shared_ptr<KGXSceneObjectComponent>> mSceneComponents;
 
 	mutable std::mutex mUpdateMutex;
+};
+
+class KGXBoxObject : public KGXSceneObject
+{
+public:
+	KGXBoxObject(const std::string& name);
+};
+
+class KGXCameraObject : public KGXSceneObject
+{
+public:
+	KGXCameraObject(const std::string& name);
 };
 }

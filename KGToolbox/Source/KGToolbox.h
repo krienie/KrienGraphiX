@@ -28,6 +28,7 @@ private:
 
 	KrienGraphiXEngine mKgxEngine;
 
-	std::unique_ptr<kgx::KGXSceneObject> BoxObject;
+	std::unique_ptr<kgx::KGXBoxObject> mBoxObject;
+	std::unique_ptr<kgx::KGXCameraObject> mCameraObject;
 };
 }
