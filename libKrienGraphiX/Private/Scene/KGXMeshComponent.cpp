@@ -1,11 +1,11 @@
 
 #include "KrienGraphiX/Scene/KGXMeshComponent.h"
 
-#include <array>
-#include <DirectXColors.h>
-
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 #include "Private/Core/RenderCore.h"
+
+#include <array>
+#include <DirectXColors.h>
 
 namespace kgx
 {
@@ -14,16 +14,19 @@ KGXMeshComponent::KGXMeshComponent(KGXSceneObject *owner)
 {
 }
 
-void KGXMeshComponent::initialize()
+bool KGXMeshComponent::initializeImpl()
 {
-	if (mIsInitialized)
-	{
-		return;
-	}
-
 	core::RenderCore::get()->getScenePtr()->addMeshComponent(this);
 
-	KGXSceneObjectComponent::initialize();
+	return true;
+}
+
+void KGXMeshComponent::updateImpl([[maybe_unused]] float deltaTime)
+{
+	if (hasTransformChangedThisFrame())
+	{
+		getOwner()->getParentScene()->enqueueMeshTransformUpdate(this);
+	}
 }
 
 std::shared_ptr<rendering::KGXMeshRenderObject> KGXMeshComponent::createMeshRenderObject()

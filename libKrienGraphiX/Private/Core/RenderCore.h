@@ -5,13 +5,9 @@
 #include "RenderThread.h"
 #include "Timer.h"
 #include "Private/Scene/KGXScene.h"
-#include "Private/Rendering/KGXRenderScene.h"
 
 #include <memory>
 #include <unordered_map>
-
-
-
 
 namespace kgx::core
 {

@@ -16,10 +16,6 @@ public:
 			const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3( 0.0f, 0.0f, -1.0f ),
 			const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ));
 	~KGXCameraComponent() override = default;
-	//KGXCameraComponent(const KGXCameraComponent &other) noexcept = delete;
-	//KGXCameraComponent& operator=(const KGXCameraComponent &rhs) = delete;
-	//KGXCameraComponent(KGXCameraComponent &&other) noexcept = delete;
-	//KGXCameraComponent&& operator=(KGXCameraComponent &&rhs) = delete;
 
 	const DirectX::XMFLOAT4X4& getProjMatrix() const;
 	const DirectX::XMFLOAT4X4& getViewMatrix() const;

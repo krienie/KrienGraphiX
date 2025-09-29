@@ -20,13 +20,17 @@ public:
 	KGXMeshComponent(KGXSceneObject *owner);
 	~KGXMeshComponent() override = default;
 
-	void initialize() override;
 	std::shared_ptr<rendering::KGXMeshRenderObject> createMeshRenderObject();
-	
+
+	rendering::KGXMeshRenderObject* getMeshRenderObject() const { return mMeshRenderObject.get(); }
+
 	//void setMaterial(const Material& material);
 	//Material getMaterial() const;
 
 private:
+	bool initializeImpl() override;
+	void updateImpl([[maybe_unused]] float deltaTime) override;
+
 	virtual rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() = 0;
 	//Material m_material;
 

@@ -66,8 +66,12 @@ bool RenderCore::createRenderWindow(WinHandle windowHandle, unsigned initialWind
 }
 
 RenderCore::RenderCore()
-	: mScene(std::make_unique<KGXScene>()), mRenderThread(std::make_unique<RenderThread>())
 {
+	math::initMathDefines();
+
+	mScene = std::make_unique<KGXScene>();
+	mRenderThread = std::make_unique<RenderThread>();
+
 #ifdef WIN32
 #ifdef _DEBUG
 		// open console when compiling for debugging

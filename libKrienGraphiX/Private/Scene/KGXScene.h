@@ -2,11 +2,9 @@
 #pragma once
 
 #include "KrienGraphiX/Core/KGXDefinitions.h"
-
-#include <memory>
-#include <mutex>
-
 #include "Private/Rendering/KGXRenderScene.h"
+
+#include <mutex>
 
 namespace kgx
 {
@@ -34,6 +32,8 @@ public:
 
 	void addMeshComponent(KGXMeshComponent* meshComponent);
 
+	void enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent);
+
 private:
 	std::vector<KGXMeshComponent*> mMeshComponents;
 
@@ -41,5 +41,7 @@ private:
 	std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;
 
 	rendering::KGXRenderScene mRenderScene;
+
+	std::vector<rendering::MeshTransformUpdateParams> mPendingMeshTransformUpdates;
 };
 }

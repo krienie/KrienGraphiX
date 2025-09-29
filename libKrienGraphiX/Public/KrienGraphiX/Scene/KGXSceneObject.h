@@ -6,9 +6,10 @@
 #include <type_traits>
 #include <vector>
 
-// TODO(KL): We're temporarily using DirectXMath directly until there is a more generic replacement for it
-#include <DirectXMath.h>
 #include <mutex>
+
+#include "Private/Math/MathDefines.h"
+#include "Private/Math/Transform.h"
 
 namespace kgx::core
 {
@@ -25,18 +26,18 @@ public:
 	explicit KGXSceneObject(const std::string& name);
 	virtual ~KGXSceneObject() = default;
 
-	void setParentScene(core::KGXScene& parentScene);
+	core::KGXScene* getParentScene() const;
 	void setPosition(float xPos, float yPos, float zPos);
 	void setRotation(float pitch, float yaw, float roll);
 	void setScale(float xScale, float yScale, float zScale);
+
+	bool hasTransformChangedThisFrame() const { return mHasTransformChanged; }
 
 	[[nodiscard]]
 	std::string getName() const;
 
 	[[nodiscard]]
-	DirectX::XMFLOAT4X4 getModelMatrix() const;
-	[[nodiscard]]
-	DirectX::XMFLOAT4X4 getNormalMatrix() const;
+	math::Matrix4X4 getWorldTransform() const;
 
 	template<class Comp,
 				std::enable_if_t<std::is_base_of_v<KGXSceneObjectComponent, Comp>, int> = 0,
@@ -54,35 +55,20 @@ public:
 	[[nodiscard]]
 	std::vector<std::shared_ptr<KGXSceneObjectComponent>> getComponents() const;
 
-protected:
-	virtual void updateInternal([[maybe_unused]] float deltaTime) {}
-
 private:
+	virtual void updateImpl([[maybe_unused]] float deltaTime) {}
+
 	void addNewComponentInternal(KGXSceneObjectComponent* newComponent);
 
-	bool mIsDirty;
+	bool mHasTransformChanged = false;
 
 	core::KGXScene* mParentScene = nullptr;
 
 	std::string mName;
 
-	//TODO(KL): Place all this in a Transform class
-	float mXPos = 0;
-	float mYPos = 0;
-	float mZPos = 0;
-	float mPitch = 0;
-	float mYaw = 0;
-	float mRoll = 0;
-	float mXScale = 1;
-	float mYScale = 1;
-	float mZScale = 1;
-
-	DirectX::XMFLOAT4X4 mModelMatrix;
-	DirectX::XMFLOAT4X4 mNormalMatrix;
+	math::Transform mTransform;
 
 	std::vector<std::shared_ptr<KGXSceneObjectComponent>> mSceneComponents;
-
-	mutable std::mutex mUpdateMutex;
 };
 
 class KGXBoxObject : public KGXSceneObject

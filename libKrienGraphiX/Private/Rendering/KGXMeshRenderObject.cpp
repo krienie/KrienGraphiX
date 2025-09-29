@@ -1,9 +1,7 @@
 
 #include "KGXMeshRenderObject.h"
 
-#include <array>
 #include <DirectXMath.h>
-#include <DirectXColors.h>
 
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
@@ -13,7 +11,7 @@ namespace kgx::rendering
 using namespace DirectX;
 
 KGXMeshRenderObject::KGXMeshRenderObject(const RawMeshData& rawMeshData)
-	: mRawMeshData(rawMeshData)
+	: mTransform(math::IdentityMatrix4X4), mRawMeshData(rawMeshData)
 {
 }
 
@@ -53,5 +51,10 @@ void KGXMeshRenderObject::createRenderResources()
 	};
 
 	mIndexBuffer = RHI::PlatformRHI->createBuffer(commandList, indexBufferDesc);
+}
+
+void KGXMeshRenderObject::updateTransform(const math::Matrix4X4& newTransform)
+{
+	mTransform = newTransform;
 }
 }

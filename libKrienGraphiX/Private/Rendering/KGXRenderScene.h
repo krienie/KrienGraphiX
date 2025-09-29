@@ -4,11 +4,16 @@
 #include <memory>
 #include <vector>
 
-#include "KGXRenderGeometry.h"
 #include "KGXMeshRenderObject.h"
 
 namespace kgx::rendering
 {
+struct MeshTransformUpdateParams
+{
+	KGXMeshRenderObject* meshToUpdate;
+	math::Matrix4X4 transform;
+};
+
 class KGXRenderScene
 {
 public:
@@ -16,6 +21,7 @@ public:
 	~KGXRenderScene() = default;
 
 	void addRenderObject(const std::shared_ptr<KGXMeshRenderObject>& renderObject);
+	void updateRenderObjectTransforms(const std::vector<MeshTransformUpdateParams>& transformUpdates);
 
 private:
 	std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;

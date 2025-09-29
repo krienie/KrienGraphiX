@@ -10,52 +10,38 @@
 namespace kgx
 {
 KGXSceneObject::KGXSceneObject(const std::string& name)
-	: mIsDirty(true), mName(name),
-	mModelMatrix(), mNormalMatrix()
+	: mName(name)
 {
+	mParentScene = core::RenderCore::get()->getScenePtr();
+
 	//TODO(KL): Think of something better for this..
-	core::RenderCore::get()->getScenePtr()->addSceneUpdateDelegate([this](float deltaTime)
+	mParentScene->addSceneUpdateDelegate([this](float deltaTime)
 	{
 		update(deltaTime);
 	});
 }
 
-void KGXSceneObject::setParentScene(core::KGXScene& parentScene)
+core::KGXScene* KGXSceneObject::getParentScene() const
 {
-	mParentScene = &parentScene;
+	return mParentScene;
 }
 
-void KGXSceneObject:: setPosition(float xPos, float yPos, float zPos)
+void KGXSceneObject::setPosition(float xPos, float yPos, float zPos)
 {
-	std::lock_guard lock(mUpdateMutex);
-
-	mXPos = xPos;
-	mYPos = yPos;
-	mZPos = zPos;
-
-	mIsDirty = true;
+	mTransform.setTranslation(xPos, yPos, zPos);
+	mHasTransformChanged = true;
 }
 
 void KGXSceneObject::setRotation(float pitch, float yaw, float roll)
 {
-	std::lock_guard lock(mUpdateMutex);
-
-	mPitch = pitch;
-	mYaw = yaw;
-	mRoll = roll;
-
-	mIsDirty = false;
+	mTransform.setRotation(pitch, yaw, roll);
+	mHasTransformChanged = true;
 }
 
 void KGXSceneObject::setScale(float xScale, float yScale, float zScale)
 {
-	std::lock_guard lock(mUpdateMutex);
-
-	mXScale = xScale;
-	mYScale = yScale;
-	mZScale = zScale;
-
-	mIsDirty = true;
+	mTransform.setScale(xScale, yScale, zScale);
+	mHasTransformChanged = true;
 }
 
 std::string KGXSceneObject::getName() const
@@ -63,61 +49,30 @@ std::string KGXSceneObject::getName() const
 	return mName;
 }
 
-DirectX::XMFLOAT4X4 KGXSceneObject::getModelMatrix() const
+DirectX::XMFLOAT4X4 KGXSceneObject::getWorldTransform() const
 {
-	std::lock_guard lock(mUpdateMutex);
-	return mModelMatrix;
-}
-
-DirectX::XMFLOAT4X4 KGXSceneObject::getNormalMatrix() const
-{
-	std::lock_guard lock(mUpdateMutex);
-	return mNormalMatrix;
+	return mTransform.getMatrix();
 }
 
 void KGXSceneObject::update(float deltaTime)
 {
+	updateImpl(deltaTime);
+
+	for (const auto& sceneComponent : mSceneComponents)
 	{
-		std::lock_guard lock(mUpdateMutex);
-
-		if ( mIsDirty )
-		{
-			//TODO(KL): Abstract the directX math away
-			// Model matrix
-			const DirectX::XMMATRIX rotMat   = DirectX::XMMatrixRotationRollPitchYaw(mPitch, mYaw, mRoll);
-			const DirectX::XMMATRIX transMat = DirectX::XMMatrixTranslation(mXPos, mYPos, mZPos);
-			const DirectX::XMMATRIX scaleMat = DirectX::XMMatrixScaling(mXScale, mYScale, mZScale);
-			const DirectX::XMMATRIX modelMat = DirectX::XMMatrixMultiply(rotMat, DirectX::XMMatrixMultiply(scaleMat, transMat));
-			DirectX::XMStoreFloat4x4( &mModelMatrix, modelMat );
-
-			// Normal matrix
-			DirectX::XMMATRIX normalMat = DirectX::XMMatrixInverse( nullptr, modelMat );
-			normalMat = DirectX::XMMatrixTranspose( normalMat );
-			DirectX::XMStoreFloat4x4( &mNormalMatrix, normalMat );
-
-			mIsDirty = false;
-		}
-
-		for (const auto& sceneComponent : mSceneComponents)
-		{
-			sceneComponent->update(deltaTime);
-		}
+		sceneComponent->update(deltaTime);
 	}
 
-	updateInternal(deltaTime);
+	mHasTransformChanged = false;
 }
 
 std::vector<std::shared_ptr<KGXSceneObjectComponent>> KGXSceneObject::getComponents() const
 {
-	std::lock_guard lock(mUpdateMutex);
-
 	return mSceneComponents;
 }
 
 void KGXSceneObject::addNewComponentInternal(KGXSceneObjectComponent* newComponent)
 {
-	std::lock_guard lock(mUpdateMutex);
-
 	newComponent->initialize();
 
 	mSceneComponents.emplace_back(newComponent);

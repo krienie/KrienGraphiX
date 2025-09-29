@@ -147,7 +147,6 @@ namespace kgx
 		DirectX::XMVECTOR newTarget = DirectX::XMVectorAdd( DirectX::XMVector3Transform( dirVect, rotMat ), eyeVect );
 		DirectX::XMStoreFloat3( &m_target, newTarget );
 
-
 		lookAt( m_eye, m_target, m_camUp );
 	}
 

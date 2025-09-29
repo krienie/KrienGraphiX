@@ -12,12 +12,19 @@ namespace kgx::core
 void KGXScene::updateScene(float deltaTime)
 {
 	{
+		//TODO(KL): Are these locks really needed?
 		std::lock_guard lock(mUpdateDelegateMutex);
 		for (const auto& updateDelegate : mSceneUpdateDelegates)
 		{
 			updateDelegate(deltaTime);
 		}
 	}
+
+	std::vector<rendering::MeshTransformUpdateParams> LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates);
+	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates]()
+	{
+		mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
+	});
 
 	//TODO(KL): Implement update tick for SceneObjects
 	//{
@@ -41,6 +48,17 @@ void KGXScene::addMeshComponent(KGXMeshComponent* meshComponent)
 	});
 }
 
+void KGXScene::enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent)
+{
+	rendering::MeshTransformUpdateParams updateParams =
+	{
+		.meshToUpdate = meshComponent->getMeshRenderObject(),
+		.transform = meshComponent->getWorldTransform()
+	};
+
+	mPendingMeshTransformUpdates.push_back(updateParams);
+}
+
 const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
 {
 	return &mRenderScene;
@@ -48,6 +66,8 @@ const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
 
 void KGXScene::addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)
 {
+	//TODO(KL): Implement update priority
+
 	if (updateDelegate)
 	{
 		std::lock_guard lock(mUpdateDelegateMutex);
