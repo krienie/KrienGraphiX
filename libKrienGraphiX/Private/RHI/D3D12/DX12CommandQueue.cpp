@@ -11,7 +11,7 @@
 namespace kgx::RHI
 {
 DX12CommandQueue::DX12CommandQueue()
-	: RHICommandQueue(), mCommandQueue(nullptr), mCommandAllocator(nullptr)
+	: RHICommandQueue(), mCommandQueue(nullptr)
 {
 }
 
@@ -24,12 +24,6 @@ bool DX12CommandQueue::create()
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	HRESULT res = nativeDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue));
-	if (FAILED(res))
-	{
-		return false;
-	}
-
-	res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
 	if (FAILED(res))
 	{
 		return false;
@@ -69,10 +63,5 @@ void DX12CommandQueue::flushQueue()
 ID3D12CommandQueue* DX12CommandQueue::getNativeCommandQueue() const
 {
 	return mCommandQueue.Get();
-}
-
-ID3D12CommandAllocator* DX12CommandQueue::getNativeCommandAllocator() const
-{
-	return mCommandAllocator.Get();
 }
 } // namespace kgx::RHI

@@ -19,9 +19,11 @@ public:
 	[[nodiscard]]
 	ID3D12GraphicsCommandList* getCommandList() const { return mCommandList.Get(); }
 
-	bool create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
+	bool create(RHIGraphicsPipelineState* initialState = nullptr) override;
 
-	void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) override;
+	void close() override;
+
+	void reset(RHIGraphicsPipelineState* initialState = nullptr) override;
 
 	void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
 
@@ -33,8 +35,7 @@ public:
 	void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) override;
 
 private:
-	void closeInternal() override;
-
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
 };
 

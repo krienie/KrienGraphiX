@@ -85,7 +85,7 @@ void DX12VertexLayout::addInputElement(const VertexInputElement& vertexInputElem
 		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 		0
 	};
-	
+
 	mInputLayoutDesc.push_back(inputDesc);
 }
 

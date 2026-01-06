@@ -20,9 +20,14 @@ public:
 
 	[[nodiscard]]
 	ID3D12PipelineState* getPSO() const;
+
+	[[nodiscard]]
+	ID3D12RootSignature* getRootSignature() const;
 	
 private:
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> mPipelineState;
+	//TODO(KL): Temporary here.
+	ID3D12RootSignature* mRootSignature = nullptr;
 };
 
 DEFINE_RESOURCE_CAST(DX12GraphicsPipelineState, RHIGraphicsPipelineState)

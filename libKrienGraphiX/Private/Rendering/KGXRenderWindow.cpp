@@ -38,7 +38,7 @@ KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, uns
 	mDepthStencil = PlatformRHI->createDepthStencilBuffer(texDesc);
 
 	constexpr bool isShaderVisible = false;
-	mDSV = PlatformRHI->createResourceView(RHI::RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
+	mDSV = PlatformRHI->createResourceView(RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
 }
 
 void KGXRenderWindow::draw()

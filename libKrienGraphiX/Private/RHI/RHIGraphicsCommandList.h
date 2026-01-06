@@ -24,17 +24,15 @@ class RHIGraphicsCommandList
 public:
 	RHIGraphicsCommandList(core::CommandListAllocator& allocator);
 
-	virtual ~RHIGraphicsCommandList();
-	
-	virtual bool create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState) = 0;
+	virtual ~RHIGraphicsCommandList() = default;
+
+	virtual bool create(RHIGraphicsPipelineState* initialState) = 0;
 
 	void release();
-	void close();
 
-	[[nodiscard]]
-	bool isClosed() const { return mIsClosed; }
+	virtual void close() = 0;
 
-	virtual void reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState = nullptr) = 0;
+	virtual void reset(RHIGraphicsPipelineState* initialState = nullptr) = 0;
 
 	virtual void setPipelineState(RHIGraphicsPipelineState* pipelineState) = 0;
 
@@ -47,9 +45,20 @@ public:
 	//TODO(KL): add other commandList methods
 
 private:
-	virtual void closeInternal() = 0;
-
-	bool mIsClosed = false;
 	core::CommandListAllocator* mAllocator;
+};
+
+class RHIGraphicsCommandListHandle
+{
+public:
+	RHIGraphicsCommandListHandle(RHIGraphicsCommandList& commandList);
+	~RHIGraphicsCommandListHandle();
+
+	RHIGraphicsCommandList* get() const { return mCommandList; }
+
+	RHIGraphicsCommandList* operator->() const { return mCommandList; }
+
+private:
+	RHIGraphicsCommandList* mCommandList;
 };
 }

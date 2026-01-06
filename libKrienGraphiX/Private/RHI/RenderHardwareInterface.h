@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include "RHIVertexLayout.h"
+
 namespace kgx::RHI
 {
 class RenderHardwareInterface
@@ -26,7 +28,7 @@ public:
 	virtual void endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) = 0;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<RHICommandQueue> createCommandQueue() = 0;
+	virtual std::unique_ptr<RHICommandQueue> createCommandQueue() const = 0;
 
 	[[nodiscard]]
 	virtual std::unique_ptr<RHISwapChain> createSwapChain(
@@ -34,27 +36,27 @@ public:
 		WinHandle windowHandle,
 		unsigned int width,
 		unsigned int height,
-		unsigned int frameCount) = 0;
+		unsigned int frameCount) const = 0;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<RHIShader> createShader(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, RHIShader::ShaderType type) = 0;
+	virtual std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const = 0;
 
 	//TODO(KL): Remove the need to pass CommandListAllocator
 	[[nodiscard]]
-	virtual std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHICommandQueue* commandQueue, RHIGraphicsPipelineState *pipelineState) = 0;
+	virtual std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState *pipelineState) const = 0;
 
 	//TODO(KL): Replace with createTexture()
 	[[nodiscard]]
-	virtual std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHITexture2DDescriptor descriptor) = 0;
+	virtual std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHITexture2DDescriptor descriptor) const = 0;
 
 	[[nodiscard]]
-	virtual std::shared_ptr<RHIResourceView> createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) = 0;
+	virtual std::shared_ptr<RHIResourceView> createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) const = 0;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc) = 0;
+	virtual std::unique_ptr<RHIGraphicsPipelineState> createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc) const = 0;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) = 0;
+	virtual std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const = 0;
 };
 
 inline std::unique_ptr<RenderHardwareInterface> PlatformRHI = nullptr;

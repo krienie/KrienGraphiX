@@ -26,20 +26,14 @@ RenderThread::RenderThread()
 
 	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
 
-	mCommandQueue   = RHI::PlatformRHI->createCommandQueue();
-	mCommandListAllocator = std::make_unique<CommandListAllocator>(mCommandQueue.get());
-	mCommandList    = mCommandListAllocator->createGraphicsCommandList(nullptr);
+	mCommandQueue = RHI::PlatformRHI->createCommandQueue();
+	mCommandListAllocator = std::make_unique<CommandListAllocator>();
 
-	mShaderCache = std::make_unique<rendering::KGXShaderCache>(mCommandList);
+	mShaderCache = std::make_unique<rendering::KGXShaderCache>();
 }
 
 RenderThread::~RenderThread()
 {
-	if (mCommandList)
-	{
-		mCommandListAllocator->releaseGraphicsCommandList(mCommandList);
-	}
-
 	mCommandThread.reset();
 	RHI::PlatformRHI.reset();
 }
@@ -50,9 +44,14 @@ RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
 	return mCommandQueue.get();
 }
 
-RHI::RHIGraphicsCommandList* RenderThread::getGraphicsCommandListPtr() const
+rendering::KGXShaderCache* RenderThread::getShaderCache() const
 {
-	return mCommandList;
+	return mShaderCache.get();
+}
+
+RHI::RHIGraphicsCommandListHandle RenderThread::getCommandList() const
+{
+	return mCommandListAllocator->createGraphicsCommandList(nullptr);
 }
 
 void RenderThread::enqueueCommand(RenderCommand cmd) const

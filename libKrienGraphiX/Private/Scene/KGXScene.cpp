@@ -20,11 +20,14 @@ void KGXScene::updateScene(float deltaTime)
 		}
 	}
 
-	std::vector<rendering::MeshTransformUpdateParams> LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates);
-	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates]()
+	if (!mPendingMeshTransformUpdates.empty())
 	{
-		mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
-	});
+		std::vector<rendering::MeshTransformUpdateParams> LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates);
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates]()
+		{
+			mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
+		});
+	}
 
 	//TODO(KL): Implement update tick for SceneObjects
 	//{

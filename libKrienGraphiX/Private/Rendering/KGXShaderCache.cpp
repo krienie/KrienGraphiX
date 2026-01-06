@@ -1,44 +1,73 @@
 
 #include "Private/Rendering/KGXShaderCache.h"
 
-#include "Private/RHI/RHIGraphicsCommandList.h"
+#include <cassert>
+
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "ShaderCompiler/ShaderCompiler.h"
 
-namespace kgx::rendering
+namespace
 {
-KGXShaderCache::KGXShaderCache(RHI::RHIGraphicsCommandList* commandList)
-	: mCommandList(commandList)
+std::string shaderTypeToTargetString(kgx::RHI::RHIShader::ShaderType type)
 {
+	using namespace kgx::RHI;
+
+	std::string shaderTypeStr;
+
+	switch (type)
+	{
+	case RHIShader::ShaderType::Vertex:
+		shaderTypeStr = "vs";
+		break;
+	case RHIShader::ShaderType::Hull:
+		shaderTypeStr = "hs";
+		break;
+	case RHIShader::ShaderType::Domain:
+		shaderTypeStr = "ds";
+		break;
+	case RHIShader::ShaderType::Geometry:
+		shaderTypeStr = "gs";
+		break;
+	case RHIShader::ShaderType::Pixel:
+		shaderTypeStr = "ps";
+		break;
+	case RHIShader::ShaderType::Unassigned:
+		assert(false);
+	}
+
+	return shaderTypeStr + "_6_5";
+}
 }
 
-bool KGXShaderCache::loadShaderFromFile(const std::string& shaderFilePath, const std::string& mainEntry, RHI::RHIShader::ShaderType type)
+namespace kgx::rendering
+{
+RHI::RHIShader* KGXShaderCache::loadShaderFromFile(const std::string& shaderFilePath, const std::string& mainEntry, RHI::RHIShader::ShaderType type)
 {
 	if (mLoadedShaders.contains(shaderFilePath))
 	{
-		// Shader is already loaded. Do nothing.
-		return true;
+		return mLoadedShaders[shaderFilePath].get();
 	}
 
 	CompiledShader compiledShader;
 
 	constexpr bool includeDebugInfo = true;
-	const bool success = ShaderCompiler::compileShader(shaderFilePath, mainEntry, includeDebugInfo, compiledShader);
+	const bool success = ShaderCompiler::compileShader(shaderFilePath, mainEntry, shaderTypeToTargetString(type), includeDebugInfo, compiledShader);
 
 	if (!success)
 	{
-		return false;
+		return nullptr;
 	}
 
-	std::unique_ptr<RHI::RHIShader> newShader = RHI::PlatformRHI->createShader(mCommandList, compiledShader, type);
+	std::unique_ptr<RHI::RHIShader> newShader = RHI::PlatformRHI->createShader(compiledShader, type);
 	if (!newShader)
 	{
-		return false;
+		return nullptr;
 	}
 
+	RHI::RHIShader* shaderPtr = newShader.get();
 	mLoadedShaders[shaderFilePath] = std::move(newShader);
 
-	return true;
+	return shaderPtr;
 }
 
 	//TODO(KL): Find a better way to retrieve shaders than to lookup their original file path every time..

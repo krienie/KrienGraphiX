@@ -21,11 +21,9 @@ public:
 	void flushQueue() override;
 
 	[[nodiscard]] ID3D12CommandQueue* getNativeCommandQueue() const;
-	[[nodiscard]] ID3D12CommandAllocator* getNativeCommandAllocator() const;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 
 	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
 	UINT64 mCurrentFence = 0;

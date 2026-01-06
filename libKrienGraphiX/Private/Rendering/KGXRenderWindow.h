@@ -8,6 +8,11 @@
 #include "Private/Core/PrivateDefinitions.h"
 #include "Private/RHI/RHISwapChain.h"
 
+namespace kgx::RHI
+{
+	class RHIGraphicsPipelineState;
+}
+
 namespace kgx::rendering
 {
 class KGXRenderWindow final

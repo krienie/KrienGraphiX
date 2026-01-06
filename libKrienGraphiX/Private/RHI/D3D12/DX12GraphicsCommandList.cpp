@@ -27,13 +27,19 @@ D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::DepthStencilFlags flags)
 namespace kgx::RHI
 {
 DX12GraphicsCommandList::DX12GraphicsCommandList(core::CommandListAllocator* allocator)
-	: RHIGraphicsCommandList(*allocator), mCommandList(nullptr)
+	: RHIGraphicsCommandList(*allocator), mCommandAllocator(nullptr), mCommandList(nullptr)
 {
 }
 
-bool DX12GraphicsCommandList::create(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
+bool DX12GraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 {
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
+
+	HRESULT res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
+	if (FAILED(res))
+	{
+		return false;
+	}
 
 	ID3D12PipelineState* nativeInitialState = nullptr;
 
@@ -42,28 +48,23 @@ bool DX12GraphicsCommandList::create(RHICommandQueue* commandQueue, RHIGraphicsP
 		nativeInitialState = dxCast(initialState)->getPSO();
 	}
 	
-	const DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
-
-	const HRESULT res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, dxCommandQueue->getNativeCommandAllocator(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
-	//if (SUCCEEDED(res))
-	//{
-	//    // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
-	//    //TODO(KL): change this, as this doesn't make sense. Create it with initial state and then immediately close it again?
-	//    mCommandList->Close();
-	//}
+	res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
+	if (SUCCEEDED(res))
+	{
+	    // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
+	    mCommandList->Close();
+	}
 
 	return SUCCEEDED(res);
 }
 
-void DX12GraphicsCommandList::closeInternal()
+void DX12GraphicsCommandList::close()
 {
 	mCommandList->Close();
 }
 
-void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue, RHIGraphicsPipelineState* initialState)
+void DX12GraphicsCommandList::reset(RHIGraphicsPipelineState* initialState)
 {
-	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
-
 	ID3D12PipelineState* nativeInitialState = nullptr;
 
 	if (initialState != nullptr)
@@ -72,7 +73,8 @@ void DX12GraphicsCommandList::reset(RHICommandQueue* commandQueue, RHIGraphicsPi
 		nativeInitialState = dxPipelineState->getPSO();
 	}
 
-	mCommandList->Reset(dxCommandQueue->getNativeCommandAllocator(), nativeInitialState);
+	mCommandAllocator->Reset();
+	mCommandList->Reset(mCommandAllocator.Get(), nativeInitialState);
 }
 
 void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
@@ -80,6 +82,7 @@ void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelin
 	DX12GraphicsPipelineState* dxPipelineState = dxCast(pipelineState);
 	ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
 	mCommandList->SetPipelineState(nativePipelineState);
+	mCommandList->SetGraphicsRootSignature(dxPipelineState->getRootSignature());
 }
 
 void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)

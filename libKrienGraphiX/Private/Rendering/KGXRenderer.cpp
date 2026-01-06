@@ -2,10 +2,55 @@
 #include "KGXRenderer.h"
 
 #include <cassert>
+#include <filesystem>
 
 #include "Private/Core/RenderCore.h"
-#include "Private/RHI/RHIDescriptors.h"
 #include "Private/RHI/RenderHardwareInterface.h"
+#include "Private/RHI/RHIDescriptors.h"
+#include "Private/RHI/RHIGraphicsPipelineState.h"
+
+namespace
+{
+//TODO(KL): Temporary defined like this
+std::unique_ptr<kgx::RHI::RHIGraphicsPipelineState> staticPSO;
+
+kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
+{
+	using namespace kgx;
+
+	if (staticPSO)
+	{
+		return staticPSO.get();
+	}
+
+	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	rendering::KGXShaderCache* shaderCache = renderThread->getShaderCache();
+
+	const auto vertexShaderPath = std::filesystem::absolute("./Shaders/DefaultVS.hlsl");
+	const auto pixelShaderPath = std::filesystem::absolute("./Shaders/DefaultPS.hlsl");
+
+	auto* vertexShader = shaderCache->loadShaderFromFile(vertexShaderPath.string(), "main", RHI::RHIShader::ShaderType::Vertex);
+	auto* pixelShader = shaderCache->loadShaderFromFile(pixelShaderPath.string(), "main", RHI::RHIShader::ShaderType::Pixel);
+
+	std::vector<VertexInputElement> layoutDesc = {VertexPositionInput, VertexColorInput};
+	vertexShader->setVertexInputLayout(layoutDesc);
+
+	RHI::RHIGraphicsPipelineStateDescriptor psoDesc =
+	{
+		.vs = vertexShader,
+		.ps = pixelShader,
+		.primitiveTopology = RHI::Triangle,
+		.numRenderTargets = 1,
+		.depthStencilFormat = RHI::RHIPixelFormat::D32_float
+	};
+
+	psoDesc.renderTargetFormats[0] = RHI::RHIPixelFormat::R8G8B8A8_unorm;
+
+	staticPSO = RHI::PlatformRHI->createGraphicsPipelineState(psoDesc);
+
+	return staticPSO.get();
+}
+}
 
 namespace kgx::rendering
 {
@@ -24,11 +69,11 @@ void KGXRenderer::RenderFrame()
 	// Flush?
 	//core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
 
-	auto* commandList = renderThread->getGraphicsCommandListPtr();
+	RHI::RHIGraphicsCommandListHandle commandList = renderThread->getCommandList();
 
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
 
-	RHI::PlatformRHI->beginFrame(commandList, OutputRenderTarget);
+	RHI::PlatformRHI->beginFrame(commandList.get(), OutputRenderTarget);
 	
 	commandList->setViewport(mViewport);
 	
@@ -42,9 +87,8 @@ void KGXRenderer::RenderFrame()
 	// Specify the buffers we are going to render to.
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
-	RHI::PlatformRHI->endFrame(commandList, OutputRenderTarget);
+	commandList->setPipelineState(getStaticPSO());
 
-	//TODO(KL): Remove the need for this train. Just get a commandList instance and have that one figure out how to execute itself
-	renderThread->getCommandQueuePtr()->executeCommandList(commandList);
+	RHI::PlatformRHI->endFrame(commandList.get(), OutputRenderTarget);
 }
 }

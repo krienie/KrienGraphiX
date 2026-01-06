@@ -23,7 +23,7 @@ public:
 	DX12Shader& operator=(const DX12Shader& rhs) = default;
 	DX12Shader& operator=(DX12Shader&& rhs) = default;
 
-	bool create(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type) override;
+	bool create(const CompiledShader& compiledShader, ShaderType type) override;
 	
 	void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) override;
 	const std::vector<D3D12_INPUT_ELEMENT_DESC>& getVertexInputLayout() const;
@@ -37,8 +37,6 @@ protected:
 private:
 	bool createRootSignature(const CompiledShader& compiledShader);
 
-	DX12GraphicsCommandList* mDxCommandList;
-	
 	std::vector<DX12Buffer> mConstantBuffers;
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 

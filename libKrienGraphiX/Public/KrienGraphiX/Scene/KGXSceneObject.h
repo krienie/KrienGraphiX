@@ -60,7 +60,7 @@ private:
 
 	void addNewComponentInternal(KGXSceneObjectComponent* newComponent);
 
-	bool mHasTransformChanged = false;
+	bool mHasTransformChanged = true;
 
 	core::KGXScene* mParentScene = nullptr;
 

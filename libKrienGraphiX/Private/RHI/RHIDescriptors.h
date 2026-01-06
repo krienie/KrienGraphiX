@@ -65,23 +65,23 @@ enum RHIPrimitiveTopologyType
 
 struct RHIGraphicsPipelineStateDescriptor
 {
-	RHIShader* VS;
-	RHIShader* PS;
-	RHIShader* DS;
-	RHIShader* HS;
-	RHIShader* GS;
+	RHIShader* vs;
+	RHIShader* ps;
+	RHIShader* ds;
+	RHIShader* hs;
+	RHIShader* gs;
 	//RHIShader* AS; // To be implemented later
 	//RHIShader* MS; // To be implemented later
 	//TODO(KL): Implement blendstate
 	//RHIBlendState BlendState;
 	//TODO(KL): Implement rasterizerstate
 	//RHIRasterizerState RasterizerState;
-	RHIPrimitiveTopologyType PrimitiveTopology;
-	unsigned int NumRenderTargets;
-	RHIPixelFormat RenderTargetFormats[8];
+	RHIPrimitiveTopologyType primitiveTopology;
+	unsigned int numRenderTargets;
+	RHIPixelFormat renderTargetFormats[8];
 	//TODO(KL): Implement MSAA support
 	//SampleDesc.Count
 	//SampleDesc.Quality
-	RHIPixelFormat DepthStencilFormat;
+	RHIPixelFormat depthStencilFormat;
 };
 }

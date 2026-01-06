@@ -2,6 +2,7 @@
 #include "RHIGraphicsCommandList.h"
 
 #include "Private/Core/CommandListAllocator.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx::RHI
 {
@@ -9,22 +10,27 @@ RHIGraphicsCommandList::RHIGraphicsCommandList(core::CommandListAllocator& alloc
 	: mAllocator(&allocator)
 {}
 
-RHIGraphicsCommandList::~RHIGraphicsCommandList()
-{
-	close();
-}
-
 void RHIGraphicsCommandList::release()
 {
 	mAllocator->releaseGraphicsCommandList(this);
 }
 
-void RHIGraphicsCommandList::close()
+RHIGraphicsCommandListHandle::RHIGraphicsCommandListHandle(RHIGraphicsCommandList& commandList)
+	: mCommandList(&commandList)
 {
-	if (!mIsClosed)
-	{
-		closeInternal();
-		mIsClosed = true;
-	}
+	mCommandList->reset();
+}
+
+RHIGraphicsCommandListHandle::~RHIGraphicsCommandListHandle()
+{
+	mCommandList->close();
+
+	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	renderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
+
+	//TODO(KL): Misschien niet nodig?
+	renderThread->getCommandQueuePtr()->flushQueue();
+
+	mCommandList->release();
 }
 }

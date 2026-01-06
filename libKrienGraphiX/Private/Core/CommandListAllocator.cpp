@@ -7,32 +7,21 @@
 
 namespace kgx::core
 {
-CommandListAllocator::CommandListAllocator(RHI::RHICommandQueue* commandQueue)
-	: mCommandQueue(commandQueue)
+RHI::RHIGraphicsCommandListHandle CommandListAllocator::createGraphicsCommandList(RHI::RHIGraphicsPipelineState* initialState)
 {
-	//mCommandQueue   = RHI::PlatformRHI->createCommandQueue(mGraphicsDevice.get());
-	//mCommandList    = RHI::PlatformRHI->createGraphicsCommandList(mGraphicsDevice.get(), mCommandQueue.get(), nullptr);
-}
+	//TODO(KL): Enforce this is only called on the RenderThread
 
-CommandListAllocator::~CommandListAllocator()
-{
-	//mCommandThread.reset();
-	//RHI::PlatformRHI.reset();
-}
-
-RHI::RHIGraphicsCommandList* CommandListAllocator::createGraphicsCommandList(RHI::RHIGraphicsPipelineState* initialState)
-{
 	// For now I just loop through the entire list to get the next one that is open. If this causes too much of a performance hit I will think of a different way to handle this
-	//for (int i = 0; i < mCommandLists.size(); ++i)
-	for (const auto& [_, commandListAllocation] : mCommandLists)
+	for (auto& [_, commandListAllocation] : mCommandLists)
 	{
 		if (commandListAllocation.isFree)
 		{
-			return commandListAllocation.commandList.get();
+			commandListAllocation.isFree = false;
+			return RHI::RHIGraphicsCommandListHandle(*commandListAllocation.commandList);
 		}
 	}
 
-	const std::shared_ptr<RHI::RHIGraphicsCommandList> newCommandList = RHI::PlatformRHI->createGraphicsCommandList(this, mCommandQueue, initialState);
+	const std::shared_ptr<RHI::RHIGraphicsCommandList> newCommandList = RHI::PlatformRHI->createGraphicsCommandList(this, initialState);
 	CommandListAllocation newAllocation
 	{
 		.isFree = false,
@@ -41,12 +30,15 @@ RHI::RHIGraphicsCommandList* CommandListAllocator::createGraphicsCommandList(RHI
 
 	mCommandLists.insert(std::make_pair(newCommandList.get(), std::move(newAllocation)));
 
-	return newCommandList.get();
+	return RHI::RHIGraphicsCommandListHandle(*newCommandList);
 }
 
 void CommandListAllocator::releaseGraphicsCommandList(RHI::RHIGraphicsCommandList* commandList)
 {
-	if (auto it = mCommandLists.find(commandList); it != mCommandLists.end())
+	const auto it = mCommandLists.find(commandList);
+	assert(it != mCommandLists.cend());
+
+	if (it != mCommandLists.end())
 	{
 		it->second.isFree = true;
 	}

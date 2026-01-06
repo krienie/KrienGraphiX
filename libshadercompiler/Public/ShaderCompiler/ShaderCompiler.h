@@ -28,11 +28,11 @@ struct VertexInputElement
 	VertexInputElementFormat format;
 };
 
-const VertexInputElement VertexPositionInput = { "POSITION", VertexInputElementFormat::FLOAT4 };
-const VertexInputElement VertexTexCoordInput = { "TEXCOORD", VertexInputElementFormat::FLOAT2 };
-const VertexInputElement VertexNormalInput   = { "NORMAL",   VertexInputElementFormat::FLOAT3 };
-const VertexInputElement VertexTangentInput  = { "TANGENT",  VertexInputElementFormat::FLOAT3 };
-const VertexInputElement VertexColorInput    = { "COLOR", VertexInputElementFormat::FLOAT4 };
+const VertexInputElement VertexPositionInput = { .semanticName = "POSITION", .format = VertexInputElementFormat::FLOAT3 };
+const VertexInputElement VertexTexCoordInput = { .semanticName = "TEXCOORD", .format = VertexInputElementFormat::FLOAT2 };
+const VertexInputElement VertexNormalInput   = { .semanticName = "NORMAL",   .format = VertexInputElementFormat::FLOAT3 };
+const VertexInputElement VertexTangentInput  = { .semanticName = "TANGENT",  .format = VertexInputElementFormat::FLOAT3 };
+const VertexInputElement VertexColorInput    = { .semanticName = "COLOR",    .format = VertexInputElementFormat::FLOAT4 };
 
 struct BufferVariableDescriptor
 {
@@ -60,6 +60,6 @@ class ShaderCompiler final
 {
 public:
 	[[nodiscard]]
-	static bool compileShader(const std::string& sourceFile, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader);
+	static bool compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader);
 };
 }

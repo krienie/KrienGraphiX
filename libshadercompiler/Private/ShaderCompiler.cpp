@@ -20,7 +20,7 @@ ComPtr<IDxcCompiler3> mCompiler = nullptr;
 
 namespace kgx
 {
-bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader)
+bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader)
 {
 	if (!std::filesystem::exists(sourceFile))
 	{
@@ -43,12 +43,13 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 	// COMMAND LINE: dxc myshader.hlsl -E main -T ps_6_0 -Zi -D MYDEFINE=1 -Fo myshader.bin -Fd myshader.pdb -Qstrip_reflect
 	const std::wstring wSourceFile(sourceFile.cbegin(), sourceFile.cend());
+	const std::wstring wMainEntry(mainEntry.cbegin(), mainEntry.cend());
 	const std::wstring wTarget(target.cbegin(), target.cend());
 
 	std::vector<LPCWSTR> compileArgs =
 	{
 		wSourceFile.c_str(),
-		L"-E", L"main",
+		L"-E", wMainEntry.c_str(),
 		L"-T", wTarget.c_str(),
 		L"-Qstrip_reflect"
 	};
@@ -77,9 +78,9 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	HRESULT res = mUtils->LoadFile(wSourceFile.c_str(), nullptr, &pSource);
 	if (FAILED(res))
 	{
-		std::cout << "ShaderCompiler::compileShader: failed to load file " << sourceFile << std::endl;
+		std::cout << "ShaderCompiler::compileShader: failed to load file " << sourceFile << "\n";
 		OutCompiledShader = CompiledShader();
-		false;
+		return false;
 	}
 
 	DxcBuffer Source;
@@ -105,7 +106,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	// IDxcCompiler3::Compile will always return an error buffer, but its length will be zero if there are no warnings or errors.
 	if (pErrors != nullptr && pErrors->GetStringLength() != 0)
 	{
-		std::wcout << L"Warnings and Errors: " << pErrors->GetStringPointer() << std::endl;
+		std::wcout << L"Warnings and Errors: " << pErrors->GetStringPointer() << "\n";
 	}
 
 	// Quit if the compilation failed.
@@ -113,7 +114,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	pResults->GetStatus(&hrStatus);
 	if (FAILED(hrStatus))
 	{
-		std::wcout << L"Compilation Failed" << std::endl;
+		std::wcout << L"Compilation Failed\n";
 		OutCompiledShader = CompiledShader();
 		return false;
 	}
@@ -177,7 +178,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 		res = pReflection->GetDesc(&shaderDesc);
 		if (FAILED(res))
 		{
-			std::wcout << L"Shader reflection failed." << std::endl;
+			std::wcout << L"Shader reflection failed.\n";
 			OutCompiledShader = std::move(shader);
 			return false;
 		}

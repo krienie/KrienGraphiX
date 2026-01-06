@@ -13,18 +13,17 @@
 
 #include "DX12RenderHardwareInterface.h"
 #include "DX12VertexLayout.h"
+#include "Private/Core/RenderCore.h"
 
 namespace kgx::RHI
 {
 DX12Shader::DX12Shader()
-	: RHIShader(), mDxCommandList(nullptr)
+	: RHIShader()
 {
 }
 
-bool DX12Shader::create(RHIGraphicsCommandList* commandList, const CompiledShader& compiledShader, ShaderType type)
+bool DX12Shader::create(const CompiledShader& compiledShader, ShaderType type)
 {
-	mDxCommandList = dxCast(commandList);
-
 	mShaderType = type;
 
 	// Load the compiled shader
@@ -57,6 +56,11 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() 
 //TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers aan te maken. Verplaatsen naar RenderPass?
 bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
 {
+	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	RHIGraphicsCommandListHandle commandListHandle = renderThread->getCommandList();
+
+	DX12GraphicsCommandList* mDxCommandList = dxCast(commandListHandle.get());
+
 	for (const auto& buffDesc : bufferDescs)
 	{
 		RHIBufferDescriptor cbDesc
@@ -83,7 +87,7 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 
 	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
 
-	featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
+	featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 
 	if (FAILED(nativeDevice->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
 	{
@@ -93,15 +97,19 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 
 	//TODO(KL): Actually do something with the root signature feature data
 
-	// Only supporting CBV's for now, so we only need 1 root parameter slot
-	std::vector<CD3DX12_ROOT_PARAMETER> rootParameterSlots(1);
+	std::vector<CD3DX12_ROOT_PARAMETER> rootParameterSlots;
+
+	if (!compiledShader.constantBuffers.empty())
+	{
+		// Only supporting CBV's for now, so we only need 1 root parameter slot
+		rootParameterSlots.resize(1);
+
+		CD3DX12_DESCRIPTOR_RANGE cbvTable;
+		cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, static_cast<UINT>(compiledShader.constantBuffers.size()), 0);
+		rootParameterSlots[0].InitAsDescriptorTable(1, &cbvTable);
+	}
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
-
-	CD3DX12_DESCRIPTOR_RANGE cbvTable;
-	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, static_cast<UINT>(compiledShader.constantBuffers.size()), 0);
-	rootParameterSlots[0].InitAsDescriptorTable(1, &cbvTable);
-
 	rootSigDesc.Init(static_cast<UINT>(rootParameterSlots.size()), rootParameterSlots.data(), 0, nullptr,
 					 D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 

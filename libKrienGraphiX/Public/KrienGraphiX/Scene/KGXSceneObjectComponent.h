@@ -40,6 +40,6 @@ private:
 
 	KGXSceneObject* mOwner;
 
-	bool mHasTransformChanged = false;
+	bool mHasTransformChanged = true;
 };
 }

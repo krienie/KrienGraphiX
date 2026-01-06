@@ -28,7 +28,8 @@ public:
 	RenderThread& operator=(RenderThread&&) noexcept      = delete;
 
 	[[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
-	[[nodiscard]] RHI::RHIGraphicsCommandList* getGraphicsCommandListPtr() const;
+	[[nodiscard]] rendering::KGXShaderCache* getShaderCache() const;
+	[[nodiscard]] RHI::RHIGraphicsCommandListHandle getCommandList() const;
 
 	void enqueueCommand(RenderCommand cmd) const;
 	void flush() const;
@@ -37,9 +38,7 @@ private:
 	std::unique_ptr<CommandThread> mCommandThread;
 
 	std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
-
 	std::unique_ptr<CommandListAllocator> mCommandListAllocator;
-	RHI::RHIGraphicsCommandList* mCommandList;
 
 	std::unique_ptr<rendering::KGXShaderCache> mShaderCache;
 };

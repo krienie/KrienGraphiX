@@ -18,11 +18,11 @@ TEST(Serialization, ShaderCompilation)
 	ASSERT_TRUE(std::filesystem::exists(pixelShaderPath));
 	
 	kgx::CompiledShader vertexShader;
-	bool success = kgx::ShaderCompiler::compileShader(vertexShaderPath.string(), "vs_6_5", true, vertexShader);
+	bool success = kgx::ShaderCompiler::compileShader(vertexShaderPath.string(), "main", "vs_6_5", true, vertexShader);
 	ASSERT_TRUE(success);
 
 	kgx::CompiledShader pixelShader;
-	success = kgx::ShaderCompiler::compileShader(pixelShaderPath.string(), "ps_6_5", true, pixelShader);
+	success = kgx::ShaderCompiler::compileShader(pixelShaderPath.string(), "main", "ps_6_5", true, pixelShader);
 	ASSERT_TRUE(success);
 	
 	auto checkShader = [](const kgx::CompiledShader& shader)

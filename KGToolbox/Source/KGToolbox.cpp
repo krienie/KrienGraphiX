@@ -155,6 +155,17 @@ void KGToolboxApp::updateWindowTitle(float deltaTime) const
 		frameCount = 0;
 		timeElapsed -= 1.0f;
 	}
+
+
+	//TODO(KL): Temporary
+	//if (static_cast<int>(deltaTime) % 2 == 0)
+	//{
+	//	mBoxObject->setPosition(1 ,2, 3);
+	//}
+	//else
+	//{
+	//	mBoxObject->setPosition(3, 2, 1);
+	//}
 }
 
 LRESULT KGToolboxApp::msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
