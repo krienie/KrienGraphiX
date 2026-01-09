@@ -3,11 +3,13 @@
 
 #include <cassert>
 
+#include "DX12Buffer.h"
 #include "DX12CommandQueue.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
 #include "DX12RenderHardwareInterface.h"
 #include "DX12ResourceView.h"
+#include "Private/Rendering/KGXMeshRenderObject.h"
 
 namespace
 {
@@ -137,4 +139,16 @@ void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const 
 	mCommandList->ClearRenderTargetView(dxRtv->getViewHandle(), colorRGBA, 0, nullptr);
 }
 
+void DX12GraphicsCommandList::drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject)
+{
+	DX12Buffer* dxIndexBuffer = dxCast(renderObject->getIndexBuffer());
+	DX12Buffer* dxVertexBuffer = dxCast(renderObject->getVertexBuffer());
+
+	//TODO(KL): For now this is grouped together like this. Later will be packed into a drawpacket or something for easy handling
+	//TODO(KL): Hard-coded to triangle list for now
+	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mCommandList->IASetIndexBuffer(dxIndexBuffer->getIndexBufferView());
+	mCommandList->IASetVertexBuffers(0, 1, dxVertexBuffer->getVertexBufferView());
+	mCommandList->DrawInstanced(static_cast<UINT>(renderObject->getNumVertices()), 1, 0, 0);
+}
 } // namespace kgx::RHI

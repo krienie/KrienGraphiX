@@ -39,34 +39,6 @@ DXGI_FORMAT toDxgiFormat(const kgx::VertexInputElementFormat& vertexInputElement
 	assert(false);
 	return DXGI_FORMAT_UNKNOWN;
 }
-
-UINT getDxgiSize(DXGI_FORMAT format)
-{
-	switch (format)
-	{
-		case DXGI_FORMAT_R32_FLOAT:
-		case DXGI_FORMAT_R32_SINT:
-		case DXGI_FORMAT_R32_UINT:
-			return 4;
-		case DXGI_FORMAT_R32G32_FLOAT:
-		case DXGI_FORMAT_R32G32_SINT:
-		case DXGI_FORMAT_R32G32_UINT:
-			return 8;
-		case DXGI_FORMAT_R32G32B32_FLOAT:
-		case DXGI_FORMAT_R32G32B32_SINT:
-		case DXGI_FORMAT_R32G32B32_UINT:
-			return 12;
-		case DXGI_FORMAT_R32G32B32A32_FLOAT:
-		case DXGI_FORMAT_R32G32B32A32_SINT:
-		case DXGI_FORMAT_R32G32B32A32_UINT:
-			return 16;
-		default:
-			// Unknown format size. Extend this switch-case to support other DXGI_FORMAT's
-			assert(false);
-	}
-
-	return 0u;
-}
 }
 
 namespace kgx::RHI
@@ -81,7 +53,7 @@ void DX12VertexLayout::addInputElement(const VertexInputElement& vertexInputElem
 		0,
 		dxgiFormat,
 		0,
-		getDxgiSize(dxgiFormat),
+		D3D12_APPEND_ALIGNED_ELEMENT,
 		D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 		0
 	};

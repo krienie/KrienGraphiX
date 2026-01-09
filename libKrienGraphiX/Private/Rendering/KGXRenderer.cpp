@@ -41,10 +41,11 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 		.ps = pixelShader,
 		.primitiveTopology = RHI::Triangle,
 		.numRenderTargets = 1,
-		.depthStencilFormat = RHI::RHIPixelFormat::D32_float
+		.depthStencilFormat = RHI::RHIPixelFormat::D24_unorm_S8_uint
 	};
 
-	psoDesc.renderTargetFormats[0] = RHI::RHIPixelFormat::R8G8B8A8_unorm;
+	//TODO(KL): Get these pixelformats from the buffers themselves
+	psoDesc.renderTargetFormats[0] = RHI::RHIPixelFormat::R10G10B10A2_unorm;
 
 	staticPSO = RHI::PlatformRHI->createGraphicsPipelineState(psoDesc);
 
@@ -88,6 +89,13 @@ void KGXRenderer::RenderFrame()
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
 	commandList->setPipelineState(getStaticPSO());
+
+	//TODO(KL): record mesh draw commands. Simple for now
+	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
+	for (auto& renderObject : *renderScene)
+	{
+		commandList->drawMeshRenderObject(renderObject.get());
+	}
 
 	RHI::PlatformRHI->endFrame(commandList.get(), OutputRenderTarget);
 }

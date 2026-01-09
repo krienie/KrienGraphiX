@@ -3,13 +3,11 @@
 
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsCommandList.h"
-#include "DX12MemoryUtils.h"
 
 #include <d3dcompiler.h>
 #include "d3dx12.h"
 
 #include <cassert>
-#include <iostream>
 
 #include "DX12RenderHardwareInterface.h"
 #include "DX12VertexLayout.h"
@@ -63,6 +61,8 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
 
 	for (const auto& buffDesc : bufferDescs)
 	{
+		constexpr RHIResource::CreationFlags flags = static_cast<RHIResource::CreationFlags>(RHIResource::ShaderResource | RHIResource::ConstantBuffer);
+
 		RHIBufferDescriptor cbDesc
 		{
 			.name = buffDesc.name,
@@ -71,7 +71,7 @@ bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>
 			.isBufferAligned = true,
 			.isDynamic = true,
 			.initialData = nullptr,
-			.flags = RHIResource::ShaderResource
+			.flags = flags
 		};
 
 		//TODO(KL): Force to create these buffers via DX12 RHI? Or refactor the RHI so this doesn't matter anymore.

@@ -32,11 +32,10 @@ void KGXMeshRenderObject::createRenderResources()
 		.isBufferAligned = false,
 		.isDynamic = false,
 		.initialData = mRawMeshData.vertices.data(),
-		.flags = RHI::RHIResource::CreationFlags::None
+		.flags = RHI::RHIResource::CreationFlags::VertexBuffer
 	};
 
 	mVertexBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), vertexBufferDesc);
-
 
 	const RHI::RHIBufferDescriptor indexBufferDesc
 	{
@@ -47,7 +46,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.isDynamic = false,
 		
 		.initialData = mRawMeshData.indices.data(),
-		.flags = RHI::RHIResource::CreationFlags::None
+		.flags = RHI::RHIResource::CreationFlags::IndexBuffer
 	};
 
 	mIndexBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), indexBufferDesc);

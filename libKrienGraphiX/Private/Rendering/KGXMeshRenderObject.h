@@ -29,6 +29,11 @@ public:
 	void createRenderResources();
 	void updateTransform(const math::Matrix4X4& newTransform);
 
+	const math::Matrix4X4& getTransform() const { return mTransform; }
+	RHI::RHIBuffer* getVertexBuffer() const { return mVertexBuffer.get(); }
+	RHI::RHIBuffer* getIndexBuffer() const { return mIndexBuffer.get(); }
+	size_t getNumVertices() const { return mRawMeshData.vertices.size(); }
+
 private:
 	math::Matrix4X4 mTransform;
 

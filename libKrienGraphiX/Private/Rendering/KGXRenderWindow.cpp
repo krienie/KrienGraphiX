@@ -50,6 +50,7 @@ void KGXRenderWindow::draw()
 
 	mRHISwapChain->present();
 
+	//TODO(KL): Niet nodig?
 	renderThread->getCommandQueuePtr()->flushQueue();
 }
 }

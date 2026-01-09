@@ -13,6 +13,11 @@ namespace kgx::core
 class CommandListAllocator;
 }
 
+namespace kgx::rendering
+{
+	class KGXMeshRenderObject;
+}
+
 namespace kgx::RHI
 {
 class RHIResourceView;
@@ -42,6 +47,9 @@ public:
 
 	virtual void clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth, uint8_t stencil) = 0;
 	virtual void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) = 0;
+
+	virtual void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) = 0;
+
 	//TODO(KL): add other commandList methods
 
 private:

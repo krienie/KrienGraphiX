@@ -1,13 +1,22 @@
 
 #include "DX12Buffer.h"
+
+#include <cassert>
+
 #include "DX12Descriptors.h"
 #include "DX12GraphicsCommandList.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12MemoryUtils.h"
 #include "DX12RenderHardwareInterface.h"
+#include "Private/Rendering/KGXMeshRenderObject.h"
 
 namespace
 {
+bool hasFlag(kgx::RHI::RHIResource::CreationFlags flags, kgx::RHI::RHIResource::CreationFlags flagToTest)
+{
+	return (flags & flagToTest) == flagToTest;
+}
+
 kgx::RHI::RHIBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIBufferDescriptor& descriptor)
 {
 	kgx::RHI::RHIBufferDescriptor alignedDesc = descriptor;
@@ -18,6 +27,24 @@ kgx::RHI::RHIBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIBuff
 
 	return alignedDesc;
 }
+
+D3D12_RESOURCE_STATES getDXResourceStateFromCreationFlag(kgx::RHI::RHIResource::CreationFlags flags)
+{
+	using namespace kgx::RHI;
+
+	if (hasFlag(flags, RHIResource::IndexBuffer))
+	{
+		return D3D12_RESOURCE_STATE_INDEX_BUFFER;
+	}
+
+	if (hasFlag(flags, RHIResource::VertexBuffer) ||
+		hasFlag(flags, RHIResource::ConstantBuffer))
+	{
+		return D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+	}
+
+	return D3D12_RESOURCE_STATE_GENERIC_READ;
+}
 }
 
 namespace kgx::RHI
@@ -26,6 +53,8 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	: RHIBuffer(getAlignedBufferDescriptor(descriptor)),
 		mDescriptor(descriptor)
 {
+	//TODO(KL): Add descriptor sanitation check
+
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	D3D12_HEAP_TYPE heapType = mDescriptor.isDynamic ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
@@ -103,14 +132,42 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 
 
 			UpdateSubresources<1>(commandList->getCommandList(), mBufferDXResource->getResource().Get(), mBufferUploader.Get(), 0, 0, 1, &subResourceData);
-			mBufferDXResource->transitionToState(commandList, D3D12_RESOURCE_STATE_GENERIC_READ);
+			mBufferDXResource->transitionToState(commandList, getDXResourceStateFromCreationFlag(mDescriptor.flags));
 		}
+	}
+
+	// Init buffer views if needed
+
+	if (hasFlag(mDescriptor.flags, RHIResource::IndexBuffer))
+	{
+		mIndexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
+		mIndexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
+		mIndexBufferView.Format = DXGI_FORMAT_R16_UINT;
+	}
+	else if (hasFlag(mDescriptor.flags, RHIResource::VertexBuffer))
+	{
+		mVertexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
+		mVertexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
+		//TODO(KL): Perhaps move Vertex to a different location or get the vertex stride in a different way somehow
+		mVertexBufferView.StrideInBytes = sizeof(rendering::Vertex);
 	}
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DX12Buffer::getResource() const
 {
 	return mBufferDXResource->getResource();
+}
+
+const D3D12_INDEX_BUFFER_VIEW* DX12Buffer::getIndexBufferView() const
+{
+	assert(hasFlag(mDescriptor.flags, RHIResource::IndexBuffer));
+	return &mIndexBufferView;
+}
+
+const D3D12_VERTEX_BUFFER_VIEW* DX12Buffer::getVertexBufferView() const
+{
+	assert(hasFlag(mDescriptor.flags, RHIResource::VertexBuffer));
+	return &mVertexBufferView;
 }
 
 void* DX12Buffer::mapImpl(MapType type)

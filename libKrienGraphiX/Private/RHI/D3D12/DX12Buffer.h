@@ -19,7 +19,10 @@ public:
 
 	[[nodiscard]]
 	Microsoft::WRL::ComPtr<ID3D12Resource> getResource() const;
-	
+
+	const D3D12_INDEX_BUFFER_VIEW* getIndexBufferView() const;
+	const D3D12_VERTEX_BUFFER_VIEW* getVertexBufferView() const;
+
 private:
 	void* mapImpl(MapType type) override;
 	void unmapImpl() override;
@@ -27,5 +30,10 @@ private:
 	RHIBufferDescriptor mDescriptor;
 	Microsoft::WRL::ComPtr<ID3D12Resource> mBufferUploader = nullptr;
 	std::unique_ptr<DX12Resource> mBufferDXResource = nullptr;
+
+	D3D12_INDEX_BUFFER_VIEW mIndexBufferView;
+	D3D12_VERTEX_BUFFER_VIEW mVertexBufferView;
 };
+
+DEFINE_RESOURCE_CAST(DX12Buffer, RHIBuffer)
 }

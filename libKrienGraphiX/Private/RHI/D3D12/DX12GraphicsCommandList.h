@@ -34,6 +34,8 @@ public:
 	void clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth, uint8_t stencil) override;
 	void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) override;
 
+	void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) override;
+
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
