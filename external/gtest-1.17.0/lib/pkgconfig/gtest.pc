@@ -1,5 +1,5 @@
-libdir=D:/Projects/googletest/install/lib
-includedir=D:/Projects/googletest/install/include
+libdir=D:/Projects/googletest-1.17.0/install/lib
+includedir=D:/Projects/googletest-1.17.0/install/include
 
 Name: gtest
 Description: GoogleTest (without main() function)
