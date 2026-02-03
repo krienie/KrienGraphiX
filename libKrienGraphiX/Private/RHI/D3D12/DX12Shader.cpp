@@ -51,6 +51,19 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() 
 	return mInputLayoutDesc;
 }
 
+std::vector<const RHIBuffer*> DX12Shader::getConstantBufferPtrs() const
+{
+	std::vector<const RHIBuffer*> localBufferPointers;
+	localBufferPointers.reserve(mConstantBuffers.size());
+
+	for (const DX12Buffer& dxBuffer : mConstantBuffers)
+	{
+		localBufferPointers.push_back(&dxBuffer);
+	}
+
+	return localBufferPointers;
+}
+
 //TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers aan te maken. Verplaatsen naar RenderPass?
 bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
 {
@@ -103,10 +116,7 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 	{
 		// Only supporting CBV's for now, so we only need 1 root parameter slot
 		rootParameterSlots.resize(1);
-
-		CD3DX12_DESCRIPTOR_RANGE cbvTable;
-		cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, static_cast<UINT>(compiledShader.constantBuffers.size()), 0);
-		rootParameterSlots[0].InitAsDescriptorTable(1, &cbvTable);
+		rootParameterSlots[0].InitAsConstantBufferView(0);
 	}
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;

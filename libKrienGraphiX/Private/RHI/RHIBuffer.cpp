@@ -13,11 +13,6 @@ RHIBuffer::RHIBuffer(const RHIBufferDescriptor& descriptor)
 {
 }
 
-RHIBuffer::~RHIBuffer()
-{
-	unmap();
-}
-
 void* RHIBuffer::map(MapType type)
 {
 	unmap();

@@ -15,6 +15,8 @@ public:
 
 	virtual ~RHIGraphicsPipelineState() = default;
 
+	const RHIGraphicsPipelineStateDescriptor& getDescriptor() const { return mGraphicsDescriptor; }
+
 	virtual bool create() = 0;
 
 protected:

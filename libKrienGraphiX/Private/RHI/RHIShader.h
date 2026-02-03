@@ -5,6 +5,7 @@
 
 namespace kgx::RHI
 {
+class RHIBuffer;
 class RHIGraphicsCommandList;
 
 class RHIShader
@@ -25,14 +26,12 @@ public:
 
 	RHIShader() = default;
 	virtual ~RHIShader() = default;
-	RHIShader(RHIShader& rhs) = default;
-	RHIShader(RHIShader&& rhs) = default;
-	RHIShader& operator=(const RHIShader& rhs) = default;
-	RHIShader& operator=(RHIShader&& rhs) = default;
 
 	virtual bool create(const CompiledShader& compiledShader, ShaderType type) = 0;
 
 	virtual void setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout) = 0;
+
+	virtual std::vector<const RHIBuffer*> getConstantBufferPtrs() const = 0;
 
 protected:
 	virtual bool loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDesc) = 0;

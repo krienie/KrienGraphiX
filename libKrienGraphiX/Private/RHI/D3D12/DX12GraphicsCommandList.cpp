@@ -85,6 +85,17 @@ void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelin
 	ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
 	mCommandList->SetPipelineState(nativePipelineState);
 	mCommandList->SetGraphicsRootSignature(dxPipelineState->getRootSignature());
+
+	//TODO(KL): Temporary like this
+	const RHI::RHIGraphicsPipelineStateDescriptor& psoDesk = dxPipelineState->getDescriptor();
+	std::vector<const RHIBuffer*> constBuffs = psoDesk.ps->getConstantBufferPtrs();
+
+	if (constBuffs.size() > 0)
+	{
+		const DX12Buffer* firstCB = dxCast(constBuffs[0]);
+		
+		mCommandList->SetGraphicsRootConstantBufferView(0, firstCB->getResource()->GetGPUVirtualAddress());
+	}
 }
 
 void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)

@@ -1,16 +1,15 @@
 
+cbuffer MainConstants : register(b0)
+{
+	//float4x4 World;
+	//float4x4 View;
+	//float4x4 Proj;
+	float4 randomColor;
+}
+
 //Texture2D gbuffDiffuseTexture : register(t0);
 //Texture2D gbuffDepthTexture   : register(t1);
 //SamplerState defaultSampler   : register(s0);
-
-//cbuffer pixelConstants : register(b0)
-//{
-//	float3 float3Param;
-//	float floatParam;
-//	int intParam;
-//	int3 int3Param;
-//	float4 float4Param;
-//}
 
 struct PixelInput
 {
@@ -20,5 +19,5 @@ struct PixelInput
 
 float4 main(in PixelInput input) : SV_TARGET
 {
-	return float4(0.0f, 1.0f, 0.0f, 1.0f);
+	return randomColor; //float4(0.0f, 1.0f, 0.0f, 1.0f);
 }

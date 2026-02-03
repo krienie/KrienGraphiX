@@ -88,12 +88,34 @@ void KGXRenderer::RenderFrame()
 	// Specify the buffers we are going to render to.
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
-	commandList->setPipelineState(getStaticPSO());
+	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
+	commandList->setPipelineState(staticPSO);
 
 	//TODO(KL): record mesh draw commands. Simple for now
 	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
 	for (auto& renderObject : *renderScene)
 	{
+		//TODO(KL): Define and create constantbuffers independent of shaders. Don't automatically create them during shader creation.
+		const RHI::RHIGraphicsPipelineStateDescriptor& psoDesk = staticPSO->getDescriptor();
+		std::vector<const RHI::RHIBuffer*> constBuffs = psoDesk.ps->getConstantBufferPtrs();
+
+		assert(constBuffs.size() > 0);
+
+		// Only fill in the first CB for now. Just as a temporary solution
+		const RHI::RHIBuffer* firstCB = constBuffs[0];
+
+		//TODO(KL): Temporary
+		_declspec(align(256u)) struct ConstantBufferData
+		{
+			math::Vector4 randomColor;
+		} cbData;
+		cbData.randomColor.x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		cbData.randomColor.y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		cbData.randomColor.z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		cbData.randomColor.w = 1.0f;
+
+		memcpy(firstCB->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
+
 		commandList->drawMeshRenderObject(renderObject.get());
 	}
 

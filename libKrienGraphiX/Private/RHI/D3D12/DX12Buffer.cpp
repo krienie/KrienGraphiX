@@ -113,7 +113,7 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 
 	if (mDescriptor.isDynamic)
 	{
-		map(MapType::READ_WRITE);
+		map(MapType::WRITE);
 	}
 
 	if (mDescriptor.initialData)
@@ -137,7 +137,6 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	}
 
 	// Init buffer views if needed
-
 	if (hasFlag(mDescriptor.flags, RHIResource::IndexBuffer))
 	{
 		mIndexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
@@ -150,6 +149,11 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 		mVertexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
 		//TODO(KL): Perhaps move Vertex to a different location or get the vertex stride in a different way somehow
 		mVertexBufferView.StrideInBytes = sizeof(rendering::Vertex);
+	}
+	else if (hasFlag(mDescriptor.flags, RHIResource::ConstantBuffer))
+	{
+		mConstantBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
+		mConstantBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
 	}
 }
 

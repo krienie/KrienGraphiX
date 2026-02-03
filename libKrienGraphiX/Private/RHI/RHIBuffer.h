@@ -19,7 +19,7 @@ public:
 	};
 
 	RHIBuffer(const RHIBufferDescriptor& descriptor);
-	~RHIBuffer() override;
+	~RHIBuffer() override = default;
 
 	[[nodiscard]]
 	std::string name() const { return mBufferName; }
