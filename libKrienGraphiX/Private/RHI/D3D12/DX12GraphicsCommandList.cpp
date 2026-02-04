@@ -85,17 +85,12 @@ void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelin
 	ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
 	mCommandList->SetPipelineState(nativePipelineState);
 	mCommandList->SetGraphicsRootSignature(dxPipelineState->getRootSignature());
+}
 
-	//TODO(KL): Temporary like this
-	const RHI::RHIGraphicsPipelineStateDescriptor& psoDesk = dxPipelineState->getDescriptor();
-	std::vector<const RHIBuffer*> constBuffs = psoDesk.ps->getConstantBufferPtrs();
-
-	if (constBuffs.size() > 0)
-	{
-		const DX12Buffer* firstCB = dxCast(constBuffs[0]);
-		
-		mCommandList->SetGraphicsRootConstantBufferView(0, firstCB->getResource()->GetGPUVirtualAddress());
-	}
+void DX12GraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer)
+{
+	const DX12Buffer* dxConstantBuffer = dxCast(constantBuffer);
+	mCommandList->SetGraphicsRootConstantBufferView(0, dxConstantBuffer->getResource()->GetGPUVirtualAddress());
 }
 
 void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
@@ -162,4 +157,4 @@ void DX12GraphicsCommandList::drawMeshRenderObject(const rendering::KGXMeshRende
 	mCommandList->IASetVertexBuffers(0, 1, dxVertexBuffer->getVertexBufferView());
 	mCommandList->DrawInstanced(static_cast<UINT>(renderObject->getNumVertices()), 1, 0, 0);
 }
-} // namespace kgx::RHI
+}

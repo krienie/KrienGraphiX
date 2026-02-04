@@ -182,40 +182,6 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 			OutCompiledShader = std::move(shader);
 			return false;
 		}
-
-		for ( auto i = 0U; i < shaderDesc.ConstantBuffers; ++i )
-		{
-			auto * cbReflection = pReflection->GetConstantBufferByIndex(i);
-
-			D3D12_SHADER_BUFFER_DESC d3dShaderBufferDesc;
-			cbReflection->GetDesc(&d3dShaderBufferDesc);
-			
-			ConstantBufferDescriptor cbDesc;
-			cbDesc.name = d3dShaderBufferDesc.Name;
-			cbDesc.size = d3dShaderBufferDesc.Size;
-
-			for (auto j = 0U; j < d3dShaderBufferDesc.Variables; ++j)
-			{
-				auto * varReflection = cbReflection->GetVariableByIndex(j);
-
-				D3D12_SHADER_VARIABLE_DESC d3dVarDesc;
-				varReflection->GetDesc(&d3dVarDesc);
-
-				BufferVariableDescriptor varDesc;
-				varDesc.name = d3dVarDesc.Name;
-				varDesc.offset = d3dVarDesc.StartOffset;
-				varDesc.size = d3dVarDesc.Size;
-
-				cbDesc.variables.push_back(varDesc);
-			}
-
-			// Parse the buffer register number from the shader reflection
-			D3D12_SHADER_INPUT_BIND_DESC inputDesc;
-			pReflection->GetResourceBindingDescByName(cbDesc.name.c_str(), &inputDesc);
-			cbDesc.bufferRegister = inputDesc.BindPoint;
-			
-			shader.constantBuffers.push_back(std::move(cbDesc));
-		}
 	}
 
 	OutCompiledShader = std::move(shader);

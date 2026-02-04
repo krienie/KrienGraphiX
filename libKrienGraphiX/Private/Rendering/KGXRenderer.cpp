@@ -13,6 +13,7 @@ namespace
 {
 //TODO(KL): Temporary defined like this
 std::unique_ptr<kgx::RHI::RHIGraphicsPipelineState> staticPSO;
+std::unique_ptr<kgx::RHI::RHIBuffer> staticConstantBuffer;
 
 kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 {
@@ -50,6 +51,41 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 	staticPSO = RHI::PlatformRHI->createGraphicsPipelineState(psoDesc);
 
 	return staticPSO.get();
+}
+
+_declspec(align(256u)) struct ConstantBufferData
+{
+	kgx::math::Vector4 randomColor;
+};
+
+kgx::RHI::RHIBuffer* getStaticConstantBuffer()
+{
+	using namespace kgx;
+
+	if (staticConstantBuffer)
+	{
+		return staticConstantBuffer.get();
+	}
+
+	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
+	RHI::RHIGraphicsCommandListHandle commandList = renderThreadPtr->getCommandList();
+
+	constexpr RHI::RHIResource::CreationFlags flags = static_cast<RHI::RHIResource::CreationFlags>(RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
+
+	RHI::RHIBufferDescriptor cbDesc
+	{
+		.name = "StaticConstantBuffer",
+		.bufferSize = sizeof(ConstantBufferData),
+		.bufferRegister = 0,
+		.isBufferAligned = true,
+		.isDynamic = true,
+		.initialData = nullptr,
+		.flags = flags
+	};
+
+	staticConstantBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), cbDesc);
+
+	return staticConstantBuffer.get();
 }
 }
 
@@ -91,30 +127,21 @@ void KGXRenderer::RenderFrame()
 	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
 	commandList->setPipelineState(staticPSO);
 
+	const RHI::RHIBuffer* staticConstantBuff = getStaticConstantBuffer();
+	commandList->setConstantBuffer(staticConstantBuff);
+
 	//TODO(KL): record mesh draw commands. Simple for now
 	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
 	for (auto& renderObject : *renderScene)
 	{
-		//TODO(KL): Define and create constantbuffers independent of shaders. Don't automatically create them during shader creation.
-		const RHI::RHIGraphicsPipelineStateDescriptor& psoDesk = staticPSO->getDescriptor();
-		std::vector<const RHI::RHIBuffer*> constBuffs = psoDesk.ps->getConstantBufferPtrs();
-
-		assert(constBuffs.size() > 0);
-
-		// Only fill in the first CB for now. Just as a temporary solution
-		const RHI::RHIBuffer* firstCB = constBuffs[0];
-
 		//TODO(KL): Temporary
-		_declspec(align(256u)) struct ConstantBufferData
-		{
-			math::Vector4 randomColor;
-		} cbData;
+		ConstantBufferData cbData;
 		cbData.randomColor.x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		cbData.randomColor.y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		cbData.randomColor.z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		cbData.randomColor.w = 1.0f;
 
-		memcpy(firstCB->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
+		memcpy(staticConstantBuff->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
 
 		commandList->drawMeshRenderObject(renderObject.get());
 	}

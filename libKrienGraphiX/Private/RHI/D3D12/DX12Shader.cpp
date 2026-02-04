@@ -28,13 +28,7 @@ bool DX12Shader::create(const CompiledShader& compiledShader, ShaderType type)
 	D3DCreateBlob(compiledShader.byteCode.size(), &mLoadedShaderBlob);
 	memcpy(mLoadedShaderBlob->GetBufferPointer(), compiledShader.byteCode.data(), compiledShader.byteCode.size());
 
-	const bool success = loadConstantBuffers(compiledShader.constantBuffers);
-	if (!success)
-	{
-		return false;
-	}
-
-	return createRootSignature(compiledShader);
+	return createRootSignature();
 }
 
 void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout)
@@ -51,50 +45,7 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() 
 	return mInputLayoutDesc;
 }
 
-std::vector<const RHIBuffer*> DX12Shader::getConstantBufferPtrs() const
-{
-	std::vector<const RHIBuffer*> localBufferPointers;
-	localBufferPointers.reserve(mConstantBuffers.size());
-
-	for (const DX12Buffer& dxBuffer : mConstantBuffers)
-	{
-		localBufferPointers.push_back(&dxBuffer);
-	}
-
-	return localBufferPointers;
-}
-
-//TODO(KL): Misschien is dit niet te juiste plek om ConstantBuffers aan te maken. Verplaatsen naar RenderPass?
-bool DX12Shader::loadConstantBuffers(const std::vector<ConstantBufferDescriptor>& bufferDescs)
-{
-	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	RHIGraphicsCommandListHandle commandListHandle = renderThread->getCommandList();
-
-	DX12GraphicsCommandList* mDxCommandList = dxCast(commandListHandle.get());
-
-	for (const auto& buffDesc : bufferDescs)
-	{
-		constexpr RHIResource::CreationFlags flags = static_cast<RHIResource::CreationFlags>(RHIResource::ShaderResource | RHIResource::ConstantBuffer);
-
-		RHIBufferDescriptor cbDesc
-		{
-			.name = buffDesc.name,
-			.bufferSize = buffDesc.size,
-			.bufferRegister = buffDesc.bufferRegister,
-			.isBufferAligned = true,
-			.isDynamic = true,
-			.initialData = nullptr,
-			.flags = flags
-		};
-
-		//TODO(KL): Force to create these buffers via DX12 RHI? Or refactor the RHI so this doesn't matter anymore.
-		mConstantBuffers.emplace_back(mDxCommandList, cbDesc);
-	}
-
-	return true;
-}
-
-bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
+bool DX12Shader::createRootSignature()
 {
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
@@ -111,13 +62,9 @@ bool DX12Shader::createRootSignature(const CompiledShader& compiledShader)
 	//TODO(KL): Actually do something with the root signature feature data
 
 	std::vector<CD3DX12_ROOT_PARAMETER> rootParameterSlots;
-
-	if (!compiledShader.constantBuffers.empty())
-	{
-		// Only supporting CBV's for now, so we only need 1 root parameter slot
-		rootParameterSlots.resize(1);
-		rootParameterSlots[0].InitAsConstantBufferView(0);
-	}
+	// Only supporting CBV's for now, so we only need 1 root parameter slot
+	rootParameterSlots.resize(1);
+	rootParameterSlots[0].InitAsConstantBufferView(0);
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc;
 	rootSigDesc.Init(static_cast<UINT>(rootParameterSlots.size()), rootParameterSlots.data(), 0, nullptr,

@@ -41,19 +41,10 @@ struct BufferVariableDescriptor
 	unsigned int size = 0;
 };
 
-struct ConstantBufferDescriptor
-{
-	std::string name;
-	unsigned int bufferRegister = 0;
-	unsigned int size = 0;
-	std::vector<BufferVariableDescriptor> variables;
-};
-
 struct CompiledShader
 {
 	std::vector<char> byteCode;
 	std::vector<char> pdb;
-	std::vector<ConstantBufferDescriptor> constantBuffers;
 };
 
 class ShaderCompiler final

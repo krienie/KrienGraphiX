@@ -27,6 +27,8 @@ public:
 
 	void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
 
+	void setConstantBuffer(const RHIBuffer* constantBuffer) override;
+
 	void setViewport(const core::KGXViewport &viewport) override;
 
 	void setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView) override;
