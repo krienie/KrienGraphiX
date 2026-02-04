@@ -33,7 +33,6 @@ private:
 
 	D3D12_INDEX_BUFFER_VIEW mIndexBufferView;
 	D3D12_VERTEX_BUFFER_VIEW mVertexBufferView;
-	D3D12_CONSTANT_BUFFER_VIEW_DESC mConstantBufferView;
 };
 
 DEFINE_RESOURCE_CAST(DX12Buffer, RHIBuffer)

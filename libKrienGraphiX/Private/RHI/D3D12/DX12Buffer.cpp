@@ -150,11 +150,6 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 		//TODO(KL): Perhaps move Vertex to a different location or get the vertex stride in a different way somehow
 		mVertexBufferView.StrideInBytes = sizeof(rendering::Vertex);
 	}
-	else if (hasFlag(mDescriptor.flags, RHIResource::ConstantBuffer))
-	{
-		mConstantBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
-		mConstantBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
-	}
 }
 
 Microsoft::WRL::ComPtr<ID3D12Resource> DX12Buffer::getResource() const
