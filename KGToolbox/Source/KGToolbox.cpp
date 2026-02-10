@@ -5,6 +5,7 @@
 
 #include "KGToolbox.h"
 
+#include <algorithm>
 #include <chrono>
 #include <format>
 
@@ -65,6 +66,12 @@ KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth,
 	mKgxEngine.addSceneUpdateDelegate([this](float deltaTime)
 	{
 		updateWindowTitle(deltaTime);
+	});
+
+	mKgxEngine.addSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
+	{
+		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + deltaTime, DirectX::XM_2PI);
+		mBoxObject->setRotation(0, 0, NewRoll);
 	});
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
@@ -155,17 +162,6 @@ void KGToolboxApp::updateWindowTitle(float deltaTime) const
 		frameCount = 0;
 		timeElapsed -= 1.0f;
 	}
-
-
-	//TODO(KL): Temporary
-	//if (static_cast<int>(deltaTime) % 2 == 0)
-	//{
-	//	mBoxObject->setPosition(1 ,2, 3);
-	//}
-	//else
-	//{
-	//	mBoxObject->setPosition(3, 2, 1);
-	//}
 }
 
 LRESULT KGToolboxApp::msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

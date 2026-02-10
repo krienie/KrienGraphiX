@@ -61,19 +61,19 @@ rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInter
 
 	meshData.indices =
 	{
-		// front face
+		// back face
 		0, 1, 2,
 		0, 2, 3,
 
-		// back face
+		// front face
 		4, 6, 5,
 		4, 7, 6,
 
-		// left face
+		// right face
 		4, 5, 1,
 		4, 1, 0,
 
-		// right face
+		// left face
 		3, 2, 6,
 		3, 6, 7,
 

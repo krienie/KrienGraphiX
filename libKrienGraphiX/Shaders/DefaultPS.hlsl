@@ -1,10 +1,8 @@
 
 cbuffer MainConstants : register(b0)
 {
-	//float4x4 World;
-	//float4x4 View;
-	//float4x4 Proj;
-	float4 randomColor;
+	float4x4 modelMatrix;
+	float4x4 viewProjMatrix;
 }
 
 //Texture2D gbuffDiffuseTexture : register(t0);
@@ -19,5 +17,5 @@ struct PixelInput
 
 float4 main(in PixelInput input) : SV_TARGET
 {
-	return randomColor; //float4(0.0f, 1.0f, 0.0f, 1.0f);
+	return input.color;
 }

@@ -8,6 +8,7 @@
 
 namespace kgx
 {
+class KGXCameraComponent;
 class KGXMeshComponent;
 }
 
@@ -28,13 +29,16 @@ public:
 
 	void addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
 
-	void updateScene(float deltaTime);
+	bool hasActiveCamera() const;
+	void setActiveCamera(KGXCameraComponent* cameraComponent);
 
 	void addMeshComponent(KGXMeshComponent* meshComponent);
 
+	void updateScene(float deltaTime);
 	void enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent);
 
 private:
+	KGXCameraComponent* mActiveCamera = nullptr;
 	std::vector<KGXMeshComponent*> mMeshComponents;
 
 	std::mutex mUpdateDelegateMutex;

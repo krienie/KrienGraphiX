@@ -23,7 +23,7 @@ void RenderCore::startup()
 {
 	++mRefCount;
 
-	if ( !mInst )
+	if (!mInst)
 	{
 		mInst = new RenderCore();
 	}

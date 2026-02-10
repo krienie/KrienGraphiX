@@ -21,10 +21,18 @@ public:
 	[[nodiscard]]
 	Matrix4X4 getInverseTransposeMatrix() const;
 
+	float getPitch() const;
+	float getYaw() const;
+	float getRoll() const;
+
 private:
 	//TODO(KL): Perhaps change into XMVECTOR directly to skip some intermediate store/loads
 	Vector4 mRotation;
 	Vector3 mTranslation;
 	Vector3 mScale;
+
+	float mPitch;
+	float mYaw;
+	float mRoll;
 };
 }

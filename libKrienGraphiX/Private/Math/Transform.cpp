@@ -25,7 +25,8 @@ namespace kgx::math
 using namespace DirectX;
 
 Transform::Transform()
-	: mTranslation(0, 0, 0), mScale(1, 1, 1)
+	: mTranslation(0, 0, 0), mScale(1, 1, 1),
+	mPitch(0), mYaw(0), mRoll(0)
 {
 	const XMVECTOR identityQuat = XMQuaternionIdentity();
 	XMStoreFloat4(&mRotation, identityQuat);
@@ -40,6 +41,10 @@ void Transform::setRotation(float pitch, float yaw, float roll)
 {
 	XMVECTOR newQuat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
 	XMStoreFloat4(&mRotation, newQuat);
+
+	mPitch = pitch;
+	mYaw = yaw;
+	mRoll = roll;
 }
 
 void Transform::setScale(float xScale, float yScale, float zScale)
@@ -67,5 +72,20 @@ XMFLOAT4X4 Transform::getInverseTransposeMatrix() const
 	XMStoreFloat4x4(&inverseTransposeMatrix, normalMat);
 
 	return inverseTransposeMatrix;
+}
+
+float Transform::getPitch() const
+{
+	return mPitch;
+}
+
+float Transform::getYaw() const
+{
+	return mYaw;
+}
+
+float Transform::getRoll() const
+{
+	return mRoll;
 }
 }

@@ -155,6 +155,6 @@ void DX12GraphicsCommandList::drawMeshRenderObject(const rendering::KGXMeshRende
 	mCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	mCommandList->IASetIndexBuffer(dxIndexBuffer->getIndexBufferView());
 	mCommandList->IASetVertexBuffers(0, 1, dxVertexBuffer->getVertexBufferView());
-	mCommandList->DrawInstanced(static_cast<UINT>(renderObject->getNumVertices()), 1, 0, 0);
+	mCommandList->DrawIndexedInstanced(static_cast<UINT>(renderObject->getNumIndices()), 1, 0, 0, 0);
 }
 }

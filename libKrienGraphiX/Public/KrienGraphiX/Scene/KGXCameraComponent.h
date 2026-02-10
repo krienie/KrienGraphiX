@@ -12,13 +12,14 @@ class KGXCameraComponent : public KGXSceneObjectComponent
 public:
 	KGXCameraComponent(KGXSceneObject *owner, const DirectX::XMFLOAT3 &eye, const DirectX::XMFLOAT3 &target, const DirectX::XMFLOAT3 &up);
 	KGXCameraComponent(KGXSceneObject *owner, float fovY, float aspect, float nearZ, float farZ,
-			const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3( 0.0f, 0.0f, 0.0f ),
-			const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3( 0.0f, 0.0f, -1.0f ),
-			const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f ));
+			const DirectX::XMFLOAT3 &eye = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+			const DirectX::XMFLOAT3 &target = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f),
+			const DirectX::XMFLOAT3 &up = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 	~KGXCameraComponent() override = default;
 
 	const DirectX::XMFLOAT4X4& getProjMatrix() const;
 	const DirectX::XMFLOAT4X4& getViewMatrix() const;
+	const DirectX::XMFLOAT4X4& getViewProjMatrix() const;
 	const DirectX::XMFLOAT3& getEye() const;
 	const DirectX::XMFLOAT3& getTarget() const;
 	const DirectX::XMFLOAT3& getUp() const;
@@ -40,17 +41,22 @@ public:
 	void rotateLeft(float degrees);
 	void rotateRight(float degrees);
 
+	void activateCamera();
+
 private:
-	DirectX::XMFLOAT4X4 m_projMatrix;
-	DirectX::XMFLOAT4X4 m_viewMatrix;
+	bool initializeImpl() override;
 
-	DirectX::XMFLOAT3 m_eye;
-	DirectX::XMFLOAT3 m_target;
-	DirectX::XMFLOAT3 m_camUp;
+	DirectX::XMFLOAT4X4 mProjMatrix;
+	DirectX::XMFLOAT4X4 mViewMatrix;
+	DirectX::XMFLOAT4X4 mViewProjMatrix;
 
-	float m_fov;
-	float m_aspectRatio;
-	float m_nearZ;
-	float m_farZ;
+	DirectX::XMFLOAT3 mEye;
+	DirectX::XMFLOAT3 mTarget;
+	DirectX::XMFLOAT3 mCamUp;
+
+	float mFov;
+	float mAspectRatio;
+	float mNearZ;
+	float mFarZ;
 };
 }

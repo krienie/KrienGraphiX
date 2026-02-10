@@ -8,6 +8,7 @@
 
 #include <mutex>
 
+#include "KGXCameraComponent.h"
 #include "Private/Math/MathDefines.h"
 #include "Private/Math/Transform.h"
 
@@ -35,6 +36,8 @@ public:
 
 	[[nodiscard]]
 	std::string getName() const;
+
+	const math::Transform& getTransform() const;
 
 	[[nodiscard]]
 	math::Matrix4X4 getWorldTransform() const;
@@ -81,5 +84,10 @@ class KGXCameraObject : public KGXSceneObject
 {
 public:
 	KGXCameraObject(const std::string& name);
+
+	KGXCameraComponent* getCamera() const;
+
+private:
+	KGXCameraComponent* mCameraComponent;
 };
 }

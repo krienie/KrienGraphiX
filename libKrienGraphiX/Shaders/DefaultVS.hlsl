@@ -1,4 +1,10 @@
 
+cbuffer MainConstants : register(b0)
+{
+	float4x4 modelMatrix;
+	float4x4 viewProjMatrix;
+}
+
 struct VertexInput
 {
 	float3 position : POSITION;
@@ -15,11 +21,8 @@ PixelInput main(in VertexInput vertexInput)
 {
 	PixelInput output;
 
-	// Texture coordinates range [0, 2], but only [0, 1] appears on screen.
-	//output.texCoord = float2(uint2(VertID << 1, VertID) & 2);
-	//output.position = float4(lerp(float2(-1, 1), float2(1, -1), output.texCoord), 0, 1);
-
-	output.position = float4(vertexInput.position, 1);
+	float4x4 mvp = mul(viewProjMatrix, modelMatrix);
+	output.position = mul(mvp, float4(vertexInput.position, 1));
 	output.color = vertexInput.color;
 
 	return output;

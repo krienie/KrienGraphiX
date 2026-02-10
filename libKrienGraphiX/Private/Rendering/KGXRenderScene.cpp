@@ -18,4 +18,14 @@ void KGXRenderScene::updateRenderObjectTransforms(const std::vector<MeshTransfor
 		update.meshToUpdate->updateTransform(update.transform);
 	}
 }
+
+void KGXRenderScene::updateActiveCameraMatrix(const math::Matrix4X4& viewProjection)
+{
+	mActiveCameraMatrix = viewProjection;
+}
+
+const math::Matrix4X4& KGXRenderScene::getActiveCameraMatrix() const
+{
+	return mActiveCameraMatrix;
+}
 }

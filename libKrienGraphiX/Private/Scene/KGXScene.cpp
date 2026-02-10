@@ -9,59 +9,6 @@
 
 namespace kgx::core
 {
-void KGXScene::updateScene(float deltaTime)
-{
-	{
-		//TODO(KL): Are these locks really needed?
-		std::lock_guard lock(mUpdateDelegateMutex);
-		for (const auto& updateDelegate : mSceneUpdateDelegates)
-		{
-			updateDelegate(deltaTime);
-		}
-	}
-
-	if (!mPendingMeshTransformUpdates.empty())
-	{
-		std::vector<rendering::MeshTransformUpdateParams> LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates);
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates]()
-		{
-			mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
-		});
-	}
-
-	//TODO(KL): Implement update tick for SceneObjects
-	//{
-	//    std::lock_guard lock(mUpdateMeshComponentsMutex);
-	//    for (const auto& sceneObject : mMeshComponents)
-	//    {
-	//        sceneObject->update(deltaTime);
-	//    }
-	//}
-}
-
-void KGXScene::addMeshComponent(KGXMeshComponent* meshComponent)
-{
-	mMeshComponents.push_back(meshComponent);
-
-	std::shared_ptr<rendering::KGXMeshRenderObject> newMeshRenderObject = meshComponent->createMeshRenderObject();
-
-	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, newMeshRenderObject]()
-	{
-		mRenderScene.addRenderObject(newMeshRenderObject);
-	});
-}
-
-void KGXScene::enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent)
-{
-	rendering::MeshTransformUpdateParams updateParams =
-	{
-		.meshToUpdate = meshComponent->getMeshRenderObject(),
-		.transform = meshComponent->getWorldTransform()
-	};
-
-	mPendingMeshTransformUpdates.push_back(updateParams);
-}
-
 const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
 {
 	return &mRenderScene;
@@ -76,5 +23,74 @@ void KGXScene::addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)
 		std::lock_guard lock(mUpdateDelegateMutex);
 		mSceneUpdateDelegates.push_back(std::move(updateDelegate));
 	}
+}
+
+bool KGXScene::hasActiveCamera() const
+{
+	return mActiveCamera != nullptr;
+}
+
+void KGXScene::setActiveCamera(KGXCameraComponent* cameraComponent)
+{
+	mActiveCamera = cameraComponent;
+}
+
+void KGXScene::addMeshComponent(KGXMeshComponent* meshComponent)
+{
+	mMeshComponents.push_back(meshComponent);
+
+	std::shared_ptr<rendering::KGXMeshRenderObject> newMeshRenderObject = meshComponent->createMeshRenderObject();
+
+	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, newMeshRenderObject]()
+	{
+		mRenderScene.addRenderObject(newMeshRenderObject);
+	});
+}
+
+void KGXScene::updateScene(float deltaTime)
+{
+	{
+		std::lock_guard lock(mUpdateDelegateMutex);
+		for (const auto& updateDelegate : mSceneUpdateDelegates)
+		{
+			updateDelegate(deltaTime);
+		}
+	}
+
+	if (!mPendingMeshTransformUpdates.empty())
+	{
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates)]()
+		{
+			mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
+		});
+	}
+
+	if (mActiveCamera)
+	{
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalViewProjection = mActiveCamera->getViewProjMatrix()]()
+		{
+			mRenderScene.updateActiveCameraMatrix(LocalViewProjection);
+		});
+	}
+
+	//TODO(KL): Implement update tick for SceneObjects
+	//{
+	//    std::lock_guard lock(mUpdateMeshComponentsMutex);
+	//    for (const auto& sceneObject : mMeshComponents)
+	//    {
+	//        sceneObject->update(deltaTime);
+	//    }
+	//}
+}
+
+void KGXScene::enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent)
+{
+	rendering::MeshTransformUpdateParams updateParams =
+	{
+		.meshToUpdate = meshComponent->getMeshRenderObject(),
+		.transform = meshComponent->getWorldTransform()
+	};
+
+	mPendingMeshTransformUpdates.push_back(updateParams);
 }
 }

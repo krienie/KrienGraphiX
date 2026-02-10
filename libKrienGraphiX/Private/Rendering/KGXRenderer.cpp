@@ -1,7 +1,6 @@
 
 #include "KGXRenderer.h"
 
-#include <cassert>
 #include <filesystem>
 
 #include "Private/Core/RenderCore.h"
@@ -11,7 +10,12 @@
 
 namespace
 {
-//TODO(KL): Temporary defined like this
+_declspec(align(256u)) struct ConstantBufferData
+{
+	kgx::math::Matrix4X4 modelMatrix;
+	kgx::math::Matrix4X4 viewProjMatrix;
+};
+
 std::unique_ptr<kgx::RHI::RHIGraphicsPipelineState> staticPSO;
 std::unique_ptr<kgx::RHI::RHIBuffer> staticConstantBuffer;
 
@@ -52,11 +56,6 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 
 	return staticPSO.get();
 }
-
-_declspec(align(256u)) struct ConstantBufferData
-{
-	kgx::math::Vector4 randomColor;
-};
 
 kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 {
@@ -99,13 +98,6 @@ KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHIResourceView
 void KGXRenderer::RenderFrame()
 {
 	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-
-	//TODO(KL): Update RendererScene objects
-	// Update any meshes
-	// Update any transforms
-	// Flush?
-	//core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
-
 	RHI::RHIGraphicsCommandListHandle commandList = renderThread->getCommandList();
 
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
@@ -114,14 +106,11 @@ void KGXRenderer::RenderFrame()
 	
 	commandList->setViewport(mViewport);
 	
-	//TODO(KL): temporary fixed clear color
 	static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 
-	// Clear the back buffer and depth buffer.
 	commandList->clearRenderTargetView(mOutputRTV, lightSteelBlue);
 	commandList->clearDepthStencilView(mDSV, RHI::DepthStencilFlags::DepthStencilClear, 1.0f, 0);
 
-	// Specify the buffers we are going to render to.
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
 	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
@@ -130,17 +119,15 @@ void KGXRenderer::RenderFrame()
 	const RHI::RHIBuffer* staticConstantBuff = getStaticConstantBuffer();
 	commandList->setConstantBuffer(staticConstantBuff);
 
-	//TODO(KL): record mesh draw commands. Simple for now
 	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
+
+	ConstantBufferData cbData;
+	cbData.viewProjMatrix = renderScene->getActiveCameraMatrix();
+
+	//TODO(KL): record mesh draw commands. Simple for now
 	for (auto& renderObject : *renderScene)
 	{
-		//TODO(KL): Temporary
-		ConstantBufferData cbData;
-		cbData.randomColor.x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		cbData.randomColor.y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		cbData.randomColor.z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		cbData.randomColor.w = 1.0f;
-
+		cbData.modelMatrix = renderObject->getTransform();
 		memcpy(staticConstantBuff->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
 
 		commandList->drawMeshRenderObject(renderObject.get());
