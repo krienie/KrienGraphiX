@@ -91,7 +91,7 @@ RenderCore::RenderCore()
 	{
 		mScene->updateScene(deltaTime);
 
-		//TODO(KL): Add safety to not enqueue a new draw call when the previous draw call has not started yet.
+		//TODO(KL): Perhaps, instead of having a renderscene, implement something like captureSceneState which creates a copy of the current scene state which I can then pass on to the renderthread for processing
 		{
 			std::lock_guard lock(mRenderWindowMutex);
 			for (auto [_, renderWindow]: mRenderWindows)

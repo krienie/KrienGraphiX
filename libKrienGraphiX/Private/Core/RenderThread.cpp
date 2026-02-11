@@ -56,8 +56,6 @@ RHI::RHIGraphicsCommandListHandle RenderThread::getCommandList() const
 
 void RenderThread::enqueueCommand(RenderCommand cmd) const
 {
-	//TODO(KL): encapsulate a lambda here to be able to include things like the commandlist
-	
 	mCommandThread->enqueueCommand(std::move(cmd));
 }
 

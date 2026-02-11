@@ -19,11 +19,16 @@ WinHandle RenderWindow::getWinHandle() const
 	return mKGXRenderWindow->getWinHandle();
 }
 
-void RenderWindow::draw() const
+void RenderWindow::draw()
 {
-	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
+	bool expected = false;
+	if (mIsWindowBeingRendered.compare_exchange_strong(expected, true))
 	{
-		mKGXRenderWindow->draw();
-	});
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
+		{
+			mKGXRenderWindow->draw();
+			mIsWindowBeingRendered = false;
+		});
+	}
 }
 }

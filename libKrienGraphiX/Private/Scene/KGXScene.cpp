@@ -59,17 +59,17 @@ void KGXScene::updateScene(float deltaTime)
 
 	if (!mPendingMeshTransformUpdates.empty())
 	{
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates)]()
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, localPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates)]()
 		{
-			mRenderScene.updateRenderObjectTransforms(LocalPendingMeshTransformUpdates);
+			mRenderScene.updateRenderObjectTransforms(localPendingMeshTransformUpdates);
 		});
 	}
 
 	if (mActiveCamera)
 	{
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, LocalViewProjection = mActiveCamera->getViewProjMatrix()]()
+		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, localViewProjection = mActiveCamera->getViewProjMatrix()]()
 		{
-			mRenderScene.updateActiveCameraMatrix(LocalViewProjection);
+			mRenderScene.updateActiveCameraMatrix(localViewProjection);
 		});
 	}
 

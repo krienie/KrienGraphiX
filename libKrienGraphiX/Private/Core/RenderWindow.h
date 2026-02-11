@@ -20,11 +20,12 @@ public:
 
 	[[nodiscard]] WinHandle getWinHandle() const;
 
-	void draw() const;
+	void draw();
 	
 	//TODO(KL): implement resize
 
 private:
 	std::shared_ptr<rendering::KGXRenderWindow> mKGXRenderWindow;
+	std::atomic_bool mIsWindowBeingRendered = false;
 };
 }

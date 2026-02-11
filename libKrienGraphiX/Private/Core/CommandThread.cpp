@@ -16,7 +16,7 @@ CommandThread::CommandThread(unsigned int numWorkerThreads)
 CommandThread::~CommandThread()
 {
 	{
-		std::lock_guard lock(mEnqueueMutex);
+		std::scoped_lock lock(mEnqueueMutex);
 		mRunning = false;
 		mCvCommand.notify_all();
 	}
@@ -29,8 +29,8 @@ CommandThread::~CommandThread()
 
 void CommandThread::enqueueCommand(ThreadCommand cmd)
 {
-	std::lock_guard lock(mEnqueueMutex);
-	mCommands.emplace_back(std::move(cmd));
+	std::scoped_lock lock(mEnqueueMutex);
+	mCommands.push_back(std::move(cmd));
 	mCvCommand.notify_one();
 }
 
@@ -47,11 +47,12 @@ void CommandThread::processThreadCommands()
 		// wait for commands to show up
 		std::unique_lock lock(mEnqueueMutex);
 		mCvCommand.wait(lock, [this]() { return !mRunning || !mCommands.empty(); });
+
 		if (mRunning && !mCommands.empty())
 		{
 			++mNumBusyThreads;
 
-			ThreadCommand cmd = mCommands.front();
+			ThreadCommand cmd = std::move(mCommands.front());
 			mCommands.pop_front();
 
 			// Run the command
@@ -63,6 +64,9 @@ void CommandThread::processThreadCommands()
 			mCvFinished.notify_one();
 		}
 	} while (mRunning);
+
+	std::scoped_lock lock(mEnqueueMutex);
+	mCommands.clear();
 }
 
 }
