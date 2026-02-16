@@ -11,8 +11,6 @@
 
 #include "Resource.h"
 
-#include "KrienGraphiX/Scene/KGXMeshComponent.h"
-
 namespace
 {
 kgt::KGToolboxApp* KGToolboxPtr = nullptr;
