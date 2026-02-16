@@ -70,7 +70,7 @@ RHI::RHIShader* KGXShaderCache::loadShaderFromFile(const std::string& shaderFile
 	return shaderPtr;
 }
 
-	//TODO(KL): Find a better way to retrieve shaders than to lookup their original file path every time..
+//TODO(KL): Find a better way to retrieve shaders than to lookup their original file path every time
 RHI::RHIShader* KGXShaderCache::getLoadedShader(const std::string& originalShaderFilePath) const
 {
 	if (const auto foundShader = mLoadedShaders.find(originalShaderFilePath); foundShader != mLoadedShaders.end())
