@@ -1,139 +1,80 @@
 
-#include "framework.h"
+#include "KGToolbox.h"
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+
+#include <chrono>
+#include <format>
+#include <iostream>
 #include <string>
 #include <sstream>
 
-#include "KGToolbox.h"
-
-#include <algorithm>
-#include <chrono>
-#include <format>
-
-#include "Resource.h"
-
-namespace
+int SDL_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-kgt::KGToolboxApp* KGToolboxPtr = nullptr;
+	if (!SDL_Init(SDL_INIT_VIDEO))
+	{
+		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		return -1;
+	}
 
-std::wstring loadResourceWString(HINSTANCE hInstance, int resourceId)
-{
-	constexpr int maxLoadStringSize = 100;
-	std::wstring resourceString;
-	resourceString.resize(maxLoadStringSize);
-
-	LoadStringW(hInstance, resourceId, resourceString.data(), maxLoadStringSize);
-
-	return resourceString;
-};
-}
-
-LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-					 _In_opt_ HINSTANCE hPrevInstance,
-					 _In_ LPWSTR    lpCmdLine,
-					 _In_ int       nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
-
-	// Enable run-time memory check for debug builds.
-#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-#endif
-
-	kgt::KGToolboxApp KGTApp(hInstance, 1024, 768);
-
-	KGToolboxPtr = &KGTApp;
+	kgt::KGToolboxApp KGTApp(1024, 768);
 
 	return KGTApp.run();
 }
 
 namespace kgt
 {
-KGToolboxApp::KGToolboxApp(HINSTANCE hInstance, unsigned int initialWindowWidth, unsigned int initialWindowHeight)
-	: mHInstance(hInstance), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
+KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
+	: mSDLWindow(nullptr), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
 {
-	// Init main window
-	mWindowHandle = initWindow();
+	//TODO(KL): add some error handling/logging here
+	SDL_Init(SDL_INIT_VIDEO);
 
-	// Startup KGX
-	mKgxEngine.createRenderWindow(reinterpret_cast<kgx::WinHandle>(mWindowHandle), mClientWidth, mClientHeight);
+	const std::string windowTitle = "KGToolboxApp";
+	mSDLWindow = SDL_CreateWindow(windowTitle.c_str(), mClientWidth, mClientHeight, SDL_WINDOW_RESIZABLE);
+
+	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
+	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+
+	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
+	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
+
+	mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
 	mKgxEngine.addSceneUpdateDelegate([this](float deltaTime)
 	{
 		updateWindowTitle(deltaTime);
 	});
-
+	
 	mKgxEngine.addSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
 		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + deltaTime, DirectX::XM_2PI);
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
-
-	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
-	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 }
 
 int KGToolboxApp::run()
 {
-	MSG msg = {nullptr};
- 
-	while (msg.message != WM_QUIT)
+	bool running = true;
+	while (running)
 	{
-		if(PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ))
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
 		{
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
+			if (event.type == SDL_EVENT_QUIT)
+			{
+				running = false;
+			}
 		}
 	}
 
-	return static_cast<int>(msg.wParam);
-}
-
-HWND KGToolboxApp::initWindow() const
-{
-	const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
-	const std::wstring windowClass = loadResourceWString(mHInstance, IDC_KGTOOLBOX);
-
-	WNDCLASSEXW wndClassEx;
-	wndClassEx.cbSize = sizeof(WNDCLASSEX);
-	wndClassEx.style          = CS_HREDRAW | CS_VREDRAW;
-	wndClassEx.lpfnWndProc    = MainWndProc;
-	wndClassEx.cbClsExtra     = 0;
-	wndClassEx.cbWndExtra     = 0;
-	wndClassEx.hInstance      = mHInstance;
-	wndClassEx.hIcon          = LoadIcon(mHInstance, MAKEINTRESOURCE(IDI_KGTOOLBOX));
-	wndClassEx.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-	wndClassEx.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-	wndClassEx.lpszMenuName   = MAKEINTRESOURCEW(IDC_KGTOOLBOX);
-	wndClassEx.lpszClassName  = windowClass.c_str();
-	wndClassEx.hIconSm        = LoadIcon(wndClassEx.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-	
-	if( !RegisterClassExW(&wndClassEx) )
+	if (mSDLWindow)
 	{
-		MessageBox(0, L"RegisterClass Failed.", nullptr, 0);
-		return nullptr;
+		SDL_DestroyWindow(mSDLWindow);
 	}
+	SDL_Quit();
 
-	// Compute window rectangle dimensions based on requested client area dimensions.
-	RECT clientRect = { 0, 0, static_cast<long>(mClientWidth), static_cast<long>(mClientHeight) };
-	AdjustWindowRect(&clientRect, WS_OVERLAPPEDWINDOW, false);
-	const int width  = clientRect.right - clientRect.left;
-	const int height = clientRect.bottom - clientRect.top;
-	
-	const auto windowHandle = CreateWindow(wndClassEx.lpszClassName, windowTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, nullptr, nullptr, mHInstance, nullptr);
-	if (!windowHandle)
-	{
-		MessageBox(nullptr, L"CreateWindow Failed.", nullptr, 0);
-		return nullptr;
-	}
-
-	ShowWindow(windowHandle, SW_SHOW);
-	UpdateWindow(windowHandle);
-
-	return windowHandle;
+	return 0;
 }
 
 void KGToolboxApp::updateWindowTitle(float deltaTime) const
@@ -149,80 +90,16 @@ void KGToolboxApp::updateWindowTitle(float deltaTime) const
 		const auto fps = static_cast<float>(frameCount);
 		const float mspf = 1000.0f / fps;
 
-		const std::wstring windowTitle = loadResourceWString(mHInstance, IDS_APP_TITLE);
+		const std::string windowTitle = "KGXToolbox";
 
-		std::wstringstream wss;
-		wss << windowTitle.c_str() << L"    fps: " << std::to_wstring(static_cast<int>(fps));
-		wss << L"   mspf: " << std::to_wstring(std::lroundf(mspf));
+		std::stringstream ss;
+		ss << windowTitle.c_str() << "    fps: " << std::to_string(static_cast<int>(fps));
+		ss << "   mspf: " << std::to_string(std::lroundf(mspf));
 
-		SetWindowText(mWindowHandle, wss.str().c_str());
+		SDL_SetWindowTitle(mSDLWindow, ss.str().c_str());
 
 		frameCount = 0;
 		timeElapsed -= 1.0f;
 	}
 }
-
-LRESULT KGToolboxApp::msgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_COMMAND:
-		{
-			int messageId = LOWORD(wParam);
-			// Parse the menu selections:
-			switch (messageId)
-			{
-			case IDM_ABOUT:
-				DialogBox(mHInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-				break;
-			case IDM_EXIT:
-				DestroyWindow(hWnd);
-				break;
-			default:
-				return DefWindowProc(hWnd, message, wParam, lParam);
-			}
-		}
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-	return 0;
-}
-}
-
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	return KGToolboxPtr->msgProc(hWnd, message, wParam, lParam);
-}
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-	{
-		const auto now = std::chrono::system_clock::now();
-		std::wstring formattedText = std::format(L"Copyright © {:%Y}", now);
-		SetDlgItemText(hDlg, IDC_COPYRIGHT, formattedText.c_str());
-		return (INT_PTR)TRUE;
-	}
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-
-	default:
-		break;
-	}
-	return (INT_PTR)FALSE;
 }
