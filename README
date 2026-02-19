@@ -1,4 +1,3 @@
-Redesign in progress for supporting DirectX 12 and other API's.
-See branch dx12.
-
-More to come later.
+Small rendering engine.
+Uses SDL3, Boost and DirectX 12.
+Currently only runs on Windows. Will support more platforms and graphics APIs in the future.
