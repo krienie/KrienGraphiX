@@ -9,8 +9,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_definitions(-D_UNICODE -DUNICODE)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE) 
 
-add_subdirectory(external)
-
 if (MSVC)
     # Remove exceptions flag from the compile options and add the no-version of it
     string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
@@ -20,10 +18,17 @@ if (MSVC)
     add_definitions(-DNOMINMAX)
 
     add_compile_options(/MP /W3 /WX)
-    add_compile_options(/we4100) # unused parameter
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
 else()
-    message( FATAL_ERROR "Only MSVC is supported." )
+    message(FATAL_ERROR "Only MSVC is supported.")
+endif()
+
+add_subdirectory(external)
+
+if (MSVC)
+    add_compile_options(/we4100) # unused parameter
+else()
+    message(FATAL_ERROR "Only MSVC is supported.")
 endif()
 
 add_subdirectory(libshadercompiler)
