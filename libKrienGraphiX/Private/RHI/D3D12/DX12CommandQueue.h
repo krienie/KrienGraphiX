@@ -1,0 +1,33 @@
+
+#pragma once
+
+#include "Private/RHI/RHICommandQueue.h"
+
+#include <d3d12.h>
+#include <wrl\client.h>
+
+#include "DX12Utils.h"
+
+namespace kgx::RHI
+{
+class DX12CommandQueue final : public RHICommandQueue
+{
+public:
+	DX12CommandQueue();
+	~DX12CommandQueue() override = default;
+
+	bool create() override;
+	void executeCommandList(RHIGraphicsCommandList* commandList) override;
+	void flushQueue() override;
+
+	[[nodiscard]] ID3D12CommandQueue* getNativeCommandQueue() const;
+
+private:
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
+
+	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
+	UINT64 mCurrentFence = 0;
+};
+
+DEFINE_RESOURCE_CAST(DX12CommandQueue, RHICommandQueue)
+}
