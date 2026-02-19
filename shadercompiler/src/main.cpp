@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	kgx::CompiledShader compiledShader;
-
 	std::string shaderFilePath = vm["filepath"].as<std::string>();
 	std::string shaderEntry = vm["entry"].as<std::string>();
 	std::string shaderTarget = vm["target"].as<std::string>();
 	
 	try
 	{
+		kgx::CompiledShader compiledShader;
+
 		bool success = kgx::ShaderCompiler::compileShader(shaderFilePath, shaderEntry, shaderTarget, true, compiledShader);
 		if (!success)
 		{

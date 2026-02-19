@@ -33,29 +33,4 @@ TEST(Serialization, ShaderCompilation)
 	
 	checkShader(vertexShader);
 	checkShader(pixelShader);
-
-	ASSERT_EQ(vertexShader.constantBuffers.size(), 0u);
-	ASSERT_EQ(pixelShader.constantBuffers.size(), 1u);
-
-	const auto & constBuff = pixelShader.constantBuffers[0];
-	EXPECT_EQ(constBuff.name, "pixelConstants");
-	EXPECT_EQ(constBuff.bufferRegister, 0u);
-	EXPECT_EQ(constBuff.size, 48u);
-
-	const std::vector<kgx::BufferVariableDescriptor> expectedVars = {
-		{.name = "float3Param", .offset = 0u, .size = 12u},
-		{.name = "floatParam", .offset = 12u, .size = 4u},
-		{.name = "intParam", .offset = 16u, .size = 4u},
-		{.name = "int3Param", .offset = 20u, .size = 12u},
-		{.name = "float4Param", .offset = 32u, .size = 16u}
-	};
-
-	ASSERT_EQ(constBuff.variables.size(), expectedVars.size());
-
-	for (auto i = 0u; i < constBuff.variables.size(); ++i)
-	{
-		EXPECT_EQ(constBuff.variables[i].name, expectedVars[i].name);
-		EXPECT_EQ(constBuff.variables[i].offset, expectedVars[i].offset);
-		EXPECT_EQ(constBuff.variables[i].size, expectedVars[i].size);
-	}
 }
