@@ -34,20 +34,29 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	const std::string windowTitle = "KGToolboxApp";
 	mSDLWindow = SDL_CreateWindow(windowTitle.c_str(), mClientWidth, mClientHeight, SDL_WINDOW_RESIZABLE);
 
+#if _WIN32
+	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
+#elif __APPLE__
+	//TODO(KL): Implement
+	static_assert(false);
+	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_COCOA_WINDOW_POINTER;
+#else
+	//Unsupported platform
+	static_assert(false);
+#endif
+
 	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
-	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, WindowHandlePropertyName, nullptr));
+
+	mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
-
-	mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
-	mKgxEngine.addSceneUpdateDelegate([this](float deltaTime)
+	
+	mKgxEngine.setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
 		updateWindowTitle(deltaTime);
-	});
-	
-	mKgxEngine.addSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
-	{
+
 		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + deltaTime, DirectX::XM_2PI);
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
@@ -65,7 +74,16 @@ int KGToolboxApp::run()
 			{
 				running = false;
 			}
+			else if (event.type == SDL_EVENT_KEY_DOWN)
+			{
+				if (event.key.scancode == SDL_SCANCODE_ESCAPE)
+				{
+					running = false;
+				}
+			}
 		}
+
+
 	}
 
 	if (mSDLWindow)

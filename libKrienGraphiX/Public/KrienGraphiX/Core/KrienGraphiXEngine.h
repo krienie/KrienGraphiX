@@ -13,17 +13,5 @@ public:
 	~KrienGraphiXEngine();
 
 	bool createRenderWindow(kgx::WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const;
-	void addSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const;
-
-	//template<class ObjType,
-	//            std::enable_if_t<std::is_base_of_v<kgx::KGXSceneObject, ObjType>, int> = 0,
-	//            typename... Args>
-	//std::weak_ptr<ObjType> spawnNewObject(const std::string& name, Args... args)
-	//{
-	//    ObjType *newObj = new ObjType(name, args...);
-	//    return spawnNewObjectInternal(newObj);
-	//}
-
-//private:
-//    std::weak_ptr<kgx::KGXSceneObject> spawnNewObjectInternal(kgx::KGXSceneObject* newObject);
+	void setSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const;
 };

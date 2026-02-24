@@ -3,7 +3,7 @@
 
 #include "RenderWindow.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef _DEBUG
 #include <Windows.h>
 #endif

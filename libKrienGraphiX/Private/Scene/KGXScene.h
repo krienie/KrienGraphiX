@@ -27,7 +27,8 @@ public:
 
 	const rendering::KGXRenderScene* getRenderScenePtr() const;
 
-	void addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
+	void setSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
+	void registerObjectUpdate(SceneUpdateDelegate updateDelegate);
 
 	bool hasActiveCamera() const;
 	void setActiveCamera(KGXCameraComponent* cameraComponent);
@@ -42,7 +43,8 @@ private:
 	std::vector<KGXMeshComponent*> mMeshComponents;
 
 	std::mutex mUpdateDelegateMutex;
-	std::vector<SceneUpdateDelegate> mSceneUpdateDelegates;
+	SceneUpdateDelegate mSceneUpdateDelegate;
+	std::vector<SceneUpdateDelegate> mObjectUpdateDelegates;
 
 	rendering::KGXRenderScene mRenderScene;
 

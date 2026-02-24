@@ -16,7 +16,6 @@ class RenderWindow;
 class RenderCore final
 {
 public:
-	//TODO(KL): Maybe just make this a global variable
 	static RenderCore* get();
 	static void startup();
 	static void shutdown();

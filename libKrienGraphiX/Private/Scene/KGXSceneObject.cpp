@@ -14,8 +14,7 @@ KGXSceneObject::KGXSceneObject(const std::string& name)
 {
 	mParentScene = core::RenderCore::get()->getScenePtr();
 
-	//TODO(KL): Think of something better for this..
-	mParentScene->addSceneUpdateDelegate([this](float deltaTime)
+	mParentScene->registerObjectUpdate([this](float deltaTime)
 	{
 		update(deltaTime);
 	});

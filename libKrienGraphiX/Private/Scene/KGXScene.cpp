@@ -14,14 +14,21 @@ const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
 	return &mRenderScene;
 }
 
-void KGXScene::addSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)
+void KGXScene::setSceneUpdateDelegate(SceneUpdateDelegate updateDelegate)
 {
-	//TODO(KL): Implement update priority
-
 	if (updateDelegate)
 	{
 		std::lock_guard lock(mUpdateDelegateMutex);
-		mSceneUpdateDelegates.push_back(std::move(updateDelegate));
+		mSceneUpdateDelegate = std::move(updateDelegate);
+	}
+}
+
+void KGXScene::registerObjectUpdate(SceneUpdateDelegate updateDelegate)
+{
+	if (updateDelegate)
+	{
+		std::lock_guard lock(mUpdateDelegateMutex);
+		mObjectUpdateDelegates.push_back(std::move(updateDelegate));
 	}
 }
 
@@ -51,9 +58,9 @@ void KGXScene::updateScene(float deltaTime)
 {
 	{
 		std::lock_guard lock(mUpdateDelegateMutex);
-		for (const auto& updateDelegate : mSceneUpdateDelegates)
+		if (mSceneUpdateDelegate)
 		{
-			updateDelegate(deltaTime);
+			mSceneUpdateDelegate(deltaTime);
 		}
 	}
 
@@ -73,14 +80,13 @@ void KGXScene::updateScene(float deltaTime)
 		});
 	}
 
-	//TODO(KL): Implement update tick for SceneObjects
-	//{
-	//    std::lock_guard lock(mUpdateMeshComponentsMutex);
-	//    for (const auto& sceneObject : mMeshComponents)
-	//    {
-	//        sceneObject->update(deltaTime);
-	//    }
-	//}
+	{
+		std::lock_guard lock(mUpdateDelegateMutex);
+		for (auto& objectUpdate : mObjectUpdateDelegates)
+		{
+			objectUpdate(deltaTime);
+		}
+	}
 }
 
 void KGXScene::enqueueMeshTransformUpdate(const KGXMeshComponent* meshComponent)
