@@ -1,7 +1,10 @@
 
-add_subdirectory(boost-1.90)
-add_subdirectory(dxc)
-add_subdirectory(gtest-1.17.0)
+if (MSVC)
+    add_subdirectory(windows)
+elseif(APPLE)
+    add_subdirectory(macos)
+endif()
+
 add_subdirectory(SDL EXCLUDE_FROM_ALL)
 
 get_target_property(SDL3_target SDL3::SDL3 ALIASED_TARGET)
@@ -9,7 +12,7 @@ if(MSVC)
     set_target_properties("${SDL3_target}" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/x64/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
     set_target_properties("${SDL3_target}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/x64/Debug)
     set_target_properties("${SDL3_target}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/x64/Release)
-elseif(MACOSX)
+elseif(APPLE)
     set_target_properties("${SDL3_target}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/x64/debug)
     set_target_properties("${SDL3_target}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/x64/release)
 endif()
