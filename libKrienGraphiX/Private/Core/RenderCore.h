@@ -3,7 +3,7 @@
 
 #include "CommandThread.h"
 #include "RenderThread.h"
-#include "Timer.h"
+#include "FrameTimer.h"
 #include "Private/Scene/KGXScene.h"
 
 #include <memory>
@@ -37,7 +37,7 @@ private:
 	static RenderCore* mInst;
 	static int mRefCount;
 
-	std::unique_ptr<Timer> mFrameTimer;
+	std::unique_ptr<FrameTimer> mFrameTimer;
 
 	std::unique_ptr<KGXScene> mScene;
 	std::unique_ptr<RenderThread> mRenderThread;

@@ -86,8 +86,8 @@ RenderCore::RenderCore()
 #endif
 #endif
 
-	constexpr int timeIntervalMilli = 16; // +- 60 FPS
-	mFrameTimer = std::make_unique<Timer>(timeIntervalMilli, [this](float deltaTime)
+	constexpr int targetFPS = 60;
+	mFrameTimer = std::make_unique<FrameTimer>(targetFPS, [this](float deltaTime)
 	{
 		mScene->updateScene(deltaTime);
 

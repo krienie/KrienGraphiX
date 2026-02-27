@@ -24,8 +24,7 @@ private:
 	int mClientWidth;
 	int mClientHeight;
 
-	KrienGraphiXEngine mKgxEngine;
-
+	std::unique_ptr<KrienGraphiXEngine> mKgxEngine;
 	std::unique_ptr<kgx::KGXBoxObject> mBoxObject;
 	std::unique_ptr<kgx::KGXCameraObject> mCameraObject;
 };

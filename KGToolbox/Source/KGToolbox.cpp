@@ -28,6 +28,8 @@ namespace kgt
 KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	: mSDLWindow(nullptr), mClientWidth(initialWindowWidth), mClientHeight(initialWindowHeight)
 {
+	mKgxEngine = std::make_unique<KrienGraphiXEngine>();
+
 	//TODO(KL): add some error handling/logging here
 	SDL_Init(SDL_INIT_VIDEO);
 
@@ -48,16 +50,16 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
 	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, WindowHandlePropertyName, nullptr));
 
-	mKgxEngine.createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
+	mKgxEngine->createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 	
-	mKgxEngine.setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
+	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
 		updateWindowTitle(deltaTime);
 
-		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + deltaTime, DirectX::XM_2PI);
+		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), DirectX::XM_2PI);
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
 }
@@ -85,6 +87,8 @@ int KGToolboxApp::run()
 
 
 	}
+
+	mKgxEngine.reset();
 
 	if (mSDLWindow)
 	{
