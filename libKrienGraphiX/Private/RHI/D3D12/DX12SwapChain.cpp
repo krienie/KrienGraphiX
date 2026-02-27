@@ -17,12 +17,14 @@ namespace kgx::RHI
 {
 DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 	: RHISwapChain(), mSwapChain(nullptr), mRtvHeap(nullptr),
-		mWidth(width), mHeight(height)
+		mWidth(width), mHeight(height), mTearingSupport(false)
 {
 }
 
 bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
+	checkTearingSupport();
+
 	DX12GraphicsDevice* dxDevice = getDX12RHI()->getDX12Device();
 	IDXGIFactory4* nativeFactory = dxDevice->getNativeFactory();
 
@@ -35,6 +37,7 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.Flags = mTearingSupport ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
 	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
 	ID3D12CommandQueue* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
@@ -126,7 +129,20 @@ RHIResourceView* DX12SwapChain::getCurrentBufferView() const
 
 void DX12SwapChain::present()
 {
-	mSwapChain->Present(0, 0);
+	const UINT presentFlags = (mTearingSupport /*&& mWindowedMode*/) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+	mSwapChain->Present(0, presentFlags);
 }
 
+void DX12SwapChain::checkTearingSupport()
+{
+	ComPtr<IDXGIFactory6> factory;
+	HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+	bool allowTearing = false;
+	if (SUCCEEDED(hr))
+	{
+		hr = factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing));
+	}
+
+	mTearingSupport = SUCCEEDED(hr) && allowTearing;
+}
 }
