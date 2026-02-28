@@ -10,3 +10,4 @@ Assets/
 .vs
 build/*
 .DS_Store
+.vscode/
