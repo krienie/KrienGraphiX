@@ -12,10 +12,14 @@ target_link_libraries(${LIB_NAME} PRIVATE libshadercompiler SDL3::SDL3)
 
 if (MSVC)
     target_compile_options(${LIB_NAME} PUBLIC /GR-) # No RTTI
+elseif (APPLE)
+    #TODO(KL): disable RTTI
 endif()
 
 if (WIN32)
     target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib dxgi.lib D3DCompiler.lib)
+elseif (APPLE)
+    #TODO(KL): link to metal libraries?
 else()
     # TODO(KL): other platforms
     message(FATAL_ERROR "Unsupported platform detected.")

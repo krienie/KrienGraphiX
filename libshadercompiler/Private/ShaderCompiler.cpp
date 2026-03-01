@@ -60,23 +60,35 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 		L"-Qstrip_reflect"
 	};
 
+#if __APPLE__
+	//TODO(KL): Use metal shader converter instead of this flag
+	compileArgs.push_back(L"-metal");
+#endif
+
+	const std::wstring stem = fileName.stem().wstring();
+
+	// Set output file
+	compileArgs.push_back(L"-Fo");
+
+#if _WIN32
+	const std::wstring binPath = stem + L".bin";
+#elif defined(__APPLE__)
+	const std::wstring binPath = stem + L".metallib";
+#endif
+	compileArgs.push_back(binPath.c_str());
+
+	std::wstring pdbPath = stem + L".pdb";
+
 	if (includeDebugInfo)
 	{
-		const std::wstring stem = fileName.stem().wstring();
-
+		//TODO(KL): Make this work for MacOS. Use metal shader converter instead of embedding pdb stuff
 		compileArgs.push_back(L"-Zi");
-		compileArgs.push_back(L"-Fo");
+		compileArgs.push_back(L"-Qembed_debug");
 
-		std::wstringstream binSs;
-		binSs << stem << L".bin";
-
-		compileArgs.push_back(binSs.str().c_str());
 		compileArgs.push_back(L"-Fd");
+		compileArgs.push_back(pdbPath.c_str());
 
-		std::wstringstream pdbSs;
-		pdbSs << stem << L".pdb";
-
-		compileArgs.push_back(pdbSs.str().c_str());
+		compileArgs.push_back(L"-O0");
 	}
 	
 	// Open source file.
@@ -105,7 +117,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 #elif __APPLE__
 		pIncludeHandler,
 #endif
-		IID_PPV_ARGS(&pResults)                   // Compiler output status, buffer, and errors.
+		IID_PPV_ARGS(&pResults)               // Compiler output status, buffer, and errors.
 	);
 
 	// Print errors if present.
@@ -141,14 +153,17 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 		std::memcpy(shader.byteCode.data(), pShader->GetBufferPointer(), pShader->GetBufferSize());
 	}
 
-	// Save pdb.
-	ComPtr<IDxcBlob> pPDB = nullptr;
-	ComPtr<IDxcBlobWide> pPDBName = nullptr;
-	pResults->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pPDB), &pPDBName);
+	if (includeDebugInfo)
 	{
-		// Note that if you don't specify -Fd, a pdb name will be automatically generated. Use this file name to save the pdb so that PIX can find it quickly.
-		shader.pdb.resize(pPDB->GetBufferSize());
-		std::memcpy(shader.pdb.data(), pPDB->GetBufferPointer(), pPDB->GetBufferSize());
+		// Save pdb.
+		ComPtr<IDxcBlob> pPDB = nullptr;
+		ComPtr<IDxcBlobWide> pPDBName = nullptr;
+		pResults->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pPDB), &pPDBName);
+		{
+			// Note that if you don't specify -Fd, a pdb name will be automatically generated. Use this file name to save the pdb so that PIX can find it quickly.
+			shader.pdb.resize(pPDB->GetBufferSize());
+			std::memcpy(shader.pdb.data(), pPDB->GetBufferPointer(), pPDB->GetBufferSize());
+		}
 	}
 
 	// Print hash.

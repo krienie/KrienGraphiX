@@ -16,19 +16,25 @@ TEST(Serialization, ShaderCompilation)
 
 	ASSERT_TRUE(std::filesystem::exists(vertexShaderPath));
 	ASSERT_TRUE(std::filesystem::exists(pixelShaderPath));
-	
+
+#ifdef _WIN32
+	constexpr bool includeDebugInfo = true;
+#elif defined(__APPLE__)
+	constexpr bool includeDebugInfo = false;
+#endif
+
 	kgx::CompiledShader vertexShader;
-	bool success = kgx::ShaderCompiler::compileShader(vertexShaderPath.string(), "main", "vs_6_5", true, vertexShader);
+	bool success = kgx::ShaderCompiler::compileShader(vertexShaderPath.string(), "main", "vs_6_5", includeDebugInfo, vertexShader);
 	ASSERT_TRUE(success);
 
 	kgx::CompiledShader pixelShader;
-	success = kgx::ShaderCompiler::compileShader(pixelShaderPath.string(), "main", "ps_6_5", true, pixelShader);
+	success = kgx::ShaderCompiler::compileShader(pixelShaderPath.string(), "main", "ps_6_5", includeDebugInfo, pixelShader);
 	ASSERT_TRUE(success);
 	
-	auto checkShader = [](const kgx::CompiledShader& shader)
+	auto checkShader = [&](const kgx::CompiledShader& shader)
 	{
 		EXPECT_TRUE(!shader.byteCode.empty());
-		EXPECT_TRUE(!shader.pdb.empty());
+		EXPECT_EQ(includeDebugInfo, !shader.pdb.empty());
 	};
 	
 	checkShader(vertexShader);
