@@ -19,6 +19,10 @@ target_link_libraries(${LIB_NAME}
                             Boost::serialization
                             Boost::program_options)
 
+if (APPLE)
+target_link_libraries(${LIB_NAME} PUBLIC MetalShaderConverter)
+endif()
+
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})
 
 add_subdirectory(Test)
