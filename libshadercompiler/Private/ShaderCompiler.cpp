@@ -1,16 +1,22 @@
 
 #include "ShaderCompiler/ShaderCompiler.h"
 
-#include <dxc/d3d12shader.h>
 #include <dxc/dxcapi.h>
+
+#ifdef _WIN32
 #include <wrl/client.h>
+#endif
 
 #include <filesystem>
 #include <iostream>
 #include <sstream>
 
-
+#ifdef _WIN32
 using namespace Microsoft::WRL;
+#elif __APPLE__
+template <class T>
+using ComPtr = CComPtr<T>;
+#endif
 
 namespace
 {
@@ -88,14 +94,17 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	Source.Size = pSource->GetBufferSize();
 	Source.Encoding = DXC_CP_ACP; // Assume BOM says UTF8 or UTF16 or this is ANSI text.
 
-
 	// Compile it with specified arguments.
 	ComPtr<IDxcResult> pResults;
 	mCompiler->Compile(
 		&Source,                                  // Source buffer.
 		compileArgs.data(),                       // Array of pointers to arguments.
 		static_cast<UINT32>(compileArgs.size()),  // Number of arguments.
+#ifdef _WIN32
 		pIncludeHandler.Get(),                    // User-provided interface to handle #include directives (optional).
+#elif __APPLE__
+		pIncludeHandler,
+#endif
 		IID_PPV_ARGS(&pResults)                   // Compiler output status, buffer, and errors.
 	);
 
@@ -124,7 +133,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 	// Save shader binary.
 	ComPtr<IDxcBlob> pShader = nullptr;
-	ComPtr<IDxcBlobUtf16> pShaderName = nullptr;
+	ComPtr<IDxcBlobWide> pShaderName = nullptr;
 	pResults->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&pShader), &pShaderName);
 	if (pShader != nullptr)
 	{
@@ -134,7 +143,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 	// Save pdb.
 	ComPtr<IDxcBlob> pPDB = nullptr;
-	ComPtr<IDxcBlobUtf16> pPDBName = nullptr;
+	ComPtr<IDxcBlobWide> pPDBName = nullptr;
 	pResults->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pPDB), &pPDBName);
 	{
 		// Note that if you don't specify -Fd, a pdb name will be automatically generated. Use this file name to save the pdb so that PIX can find it quickly.
@@ -154,34 +163,6 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 			std::wcout << std::hex << i;
 		}
 		std::wcout << std::endl;
-	}
-
-
-	// Get separate reflection.
-	ComPtr<IDxcBlob> pReflectionData;
-	pResults->GetOutput(DXC_OUT_REFLECTION, IID_PPV_ARGS(&pReflectionData), nullptr);
-	if (pReflectionData != nullptr)
-	{
-		// Optionally, save reflection blob for later here.
-
-		// Create reflection interface.
-		DxcBuffer ReflectionData;
-		ReflectionData.Encoding = DXC_CP_ACP;
-		ReflectionData.Ptr = pReflectionData->GetBufferPointer();
-		ReflectionData.Size = pReflectionData->GetBufferSize();
-
-		ComPtr<ID3D12ShaderReflection> pReflection;
-		mUtils->CreateReflection(&ReflectionData, IID_PPV_ARGS(&pReflection));
-
-		// Use reflection interface here.
-		D3D12_SHADER_DESC shaderDesc;
-		res = pReflection->GetDesc(&shaderDesc);
-		if (FAILED(res))
-		{
-			std::wcout << L"Shader reflection failed.\n";
-			OutCompiledShader = std::move(shader);
-			return false;
-		}
 	}
 
 	OutCompiledShader = std::move(shader);

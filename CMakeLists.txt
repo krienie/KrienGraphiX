@@ -19,16 +19,16 @@ if (MSVC)
 
     add_compile_options(/MP /W3 /WX)
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
+elseif (APPLE)
+    #TODO(KL): Set compiler options for macos
 else()
-    message(FATAL_ERROR "Only MSVC is supported.")
+    message(FATAL_ERROR "Unsupported platform.")
 endif()
 
 add_subdirectory(external)
 
 if (MSVC)
     add_compile_options(/we4100) # unused parameter
-else()
-    message(FATAL_ERROR "Only MSVC is supported.")
 endif()
 
 add_subdirectory(libshadercompiler)
