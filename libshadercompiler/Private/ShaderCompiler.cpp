@@ -1,11 +1,11 @@
 
 #include "ShaderCompiler/ShaderCompiler.h"
 
-#include <dxc/dxcapi.h>
-
 #ifdef _WIN32
 #include <wrl/client.h>
 #endif
+
+#include <dxc/dxcapi.h>
 
 #include <filesystem>
 #include <iostream>
