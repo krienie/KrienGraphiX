@@ -67,8 +67,6 @@ bool RenderCore::createRenderWindow(WinHandle windowHandle, unsigned initialWind
 
 RenderCore::RenderCore()
 {
-	math::initMathDefines();
-
 	mScene = std::make_unique<KGXScene>();
 	mRenderThread = std::make_unique<RenderThread>();
 

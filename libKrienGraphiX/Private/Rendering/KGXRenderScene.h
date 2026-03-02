@@ -38,6 +38,6 @@ public:
 
 private:
 	std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;
-	math::Matrix4X4 mActiveCameraMatrix = math::IdentityMatrix4X4;
+	math::Matrix4X4 mActiveCameraMatrix{1.0f};
 };
 }

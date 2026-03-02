@@ -59,7 +59,7 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	{
 		updateWindowTitle(deltaTime);
 
-		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), DirectX::XM_2PI);
+		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), glm::two_pi<float>());
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
 }

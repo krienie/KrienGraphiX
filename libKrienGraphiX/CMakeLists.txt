@@ -9,6 +9,7 @@ add_library(${LIB_NAME} STATIC ${Src})
 
 target_include_directories(${LIB_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Public>")
 target_link_libraries(${LIB_NAME} PRIVATE libshadercompiler SDL3::SDL3)
+target_link_libraries(${LIB_NAME} PUBLIC glm)
 
 if (MSVC)
     target_compile_options(${LIB_NAME} PUBLIC /GR-) # No RTTI

@@ -26,8 +26,7 @@ public:
 	float getRoll() const;
 
 private:
-	//TODO(KL): Perhaps change into XMVECTOR directly to skip some intermediate store/loads
-	Vector4 mRotation;
+	Quaternion mRotation;
 	Vector3 mTranslation;
 	Vector3 mScale;
 

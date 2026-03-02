@@ -53,7 +53,7 @@ const math::Transform& KGXSceneObject::getTransform() const
 	return mTransform;
 }
 
-DirectX::XMFLOAT4X4 KGXSceneObject::getWorldTransform() const
+math::Matrix4X4 KGXSceneObject::getWorldTransform() const
 {
 	return mTransform.getMatrix();
 }
@@ -92,9 +92,9 @@ KGXCameraObject::KGXCameraObject(const std::string& name)
 	: KGXSceneObject(name)
 {
 	//TODO(KL): Add interface for setting camera settings
-	constexpr DirectX::XMFLOAT3 eye(5, 5, 10);
-	constexpr DirectX::XMFLOAT3 target(0, 0, 0);
-	constexpr DirectX::XMFLOAT3 up(0, 0, 1);
+	constexpr math::Vector3 eye(5, 5, 10);
+	constexpr math::Vector3 target(0, 0, 0);
+	constexpr math::Vector3 up(0, 0, 1);
 	mCameraComponent = addNewComponent<KGXCameraComponent>(eye, target, up);
 }
 

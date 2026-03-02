@@ -1,17 +1,13 @@
 
 #include "KGXMeshRenderObject.h"
 
-#include <DirectXMath.h>
-
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 
 namespace kgx::rendering
 {
-using namespace DirectX;
-
 KGXMeshRenderObject::KGXMeshRenderObject(const RawMeshData& rawMeshData)
-	: mTransform(math::IdentityMatrix4X4), mRawMeshData(rawMeshData)
+	: mTransform(1.0), mRawMeshData(rawMeshData)
 {
 }
 

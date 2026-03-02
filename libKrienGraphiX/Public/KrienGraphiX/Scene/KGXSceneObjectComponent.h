@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "Private/Math/MathDefines.h"
-#include "Private/Math/Transform.h"
+#include "KrienGraphiX/Math/MathDefines.h"
+#include "KrienGraphiX/Math/Transform.h"
 
 namespace kgx
 {

@@ -1,46 +1,39 @@
 
-#include "Transform.h"
-
-#include <DirectXMath.h>
+#include "KrienGraphiX/Math/Transform.h"
 
 namespace
 {
-DirectX::XMMATRIX makeTransformMatrix(DirectX::XMFLOAT4 rotation, DirectX::XMFLOAT3 translation, DirectX::XMFLOAT3 scale)
+kgx::math::Matrix4X4 makeTransformMatrix(const kgx::math::Quaternion& rotQuat, const kgx::math::Vector3& translation, const kgx::math::Vector3& scale)
 {
-	//TODO(KL): Hide this directX stuff behind an abstraction layer
-	const DirectX::XMVECTOR loadedQuat = DirectX::XMLoadFloat4(&rotation);
-	const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationQuaternion(loadedQuat);
+	glm::mat4 transform = glm::mat4_cast(rotQuat);
 
-	const DirectX::XMVECTOR loadedTranslation = DirectX::XMLoadFloat3(&translation);
-	const DirectX::XMMATRIX transMat = DirectX::XMMatrixTranslationFromVector(loadedTranslation);
+	transform[0] *= scale.x;
+	transform[1] *= scale.y;
+	transform[2] *= scale.z;
+	transform[3] = glm::vec4(translation, 1.0f);
 
-	const DirectX::XMVECTOR loadedScale = DirectX::XMLoadFloat3(&scale);
-	const DirectX::XMMATRIX scaleMat = DirectX::XMMatrixScalingFromVector(loadedScale);
-	return XMMatrixMultiply(rotMat, XMMatrixMultiply(scaleMat, transMat));
+	return transform;
 }
 }
 
 namespace kgx::math
 {
-using namespace DirectX;
-
 Transform::Transform()
-	: mTranslation(0, 0, 0), mScale(1, 1, 1),
+	: mRotation(1.0f, 0, 0, 0), mTranslation(0, 0, 0), mScale(1, 1, 1),
 	mPitch(0), mYaw(0), mRoll(0)
 {
-	const XMVECTOR identityQuat = XMQuaternionIdentity();
-	XMStoreFloat4(&mRotation, identityQuat);
 }
 
 void Transform::setTranslation(float xPos, float yPos, float zPos)
 {
-	mTranslation = XMFLOAT3(xPos, yPos, zPos);
+	mTranslation.x = xPos;
+	mTranslation.y = yPos;
+	mTranslation.z = zPos;
 }
 
 void Transform::setRotation(float pitch, float yaw, float roll)
 {
-	XMVECTOR newQuat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
-	XMStoreFloat4(&mRotation, newQuat);
+	mRotation = Quaternion(Vector3(pitch, yaw, roll));
 
 	mPitch = pitch;
 	mYaw = yaw;
@@ -49,29 +42,20 @@ void Transform::setRotation(float pitch, float yaw, float roll)
 
 void Transform::setScale(float xScale, float yScale, float zScale)
 {
-	mScale = XMFLOAT3(xScale, yScale, zScale);
+	mScale.x = xScale;
+	mScale.y = yScale;
+	mScale.z = zScale;
 }
 
-XMFLOAT4X4 Transform::getMatrix() const
+Matrix4X4 Transform::getMatrix() const
 {
-	const XMMATRIX transMat = makeTransformMatrix(mRotation, mTranslation, mScale);
-
-	XMFLOAT4X4 transformMatrix;
-	XMStoreFloat4x4(&transformMatrix, transMat);
-
-	return transformMatrix;
+	return makeTransformMatrix(mRotation, mTranslation, mScale);
 }
 
-XMFLOAT4X4 Transform::getInverseTransposeMatrix() const
+Matrix4X4 Transform::getInverseTransposeMatrix() const
 {
-	const XMMATRIX transMat = makeTransformMatrix(mRotation, mTranslation, mScale);
-	XMMATRIX normalMat = XMMatrixInverse(nullptr, transMat);
-	normalMat = XMMatrixTranspose(normalMat);
-
-	XMFLOAT4X4 inverseTransposeMatrix;
-	XMStoreFloat4x4(&inverseTransposeMatrix, normalMat);
-
-	return inverseTransposeMatrix;
+	const Matrix4X4 transMat = makeTransformMatrix(mRotation, mTranslation, mScale);
+	return glm::transpose(glm::inverse(transMat));
 }
 
 float Transform::getPitch() const

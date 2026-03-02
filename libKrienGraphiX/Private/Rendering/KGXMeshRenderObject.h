@@ -1,17 +1,16 @@
 
 #pragma once
-#include <DirectXMath.h>
 #include <memory>
 
-#include "Private/Math/MathDefines.h"
+#include "KrienGraphiX/Math/MathDefines.h"
 #include "Private/RHI/RHIBuffer.h"
 
 namespace kgx::rendering
 {
 struct Vertex
 {
-	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
+	math::Vector3 Pos;
+	math::Vector4 Color;
 };
 
 class KGXMeshRenderObject

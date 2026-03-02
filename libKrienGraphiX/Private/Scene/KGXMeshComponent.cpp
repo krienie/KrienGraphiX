@@ -49,14 +49,14 @@ rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInter
 	KGXMeshRenderObject::RawMeshData meshData;
 	meshData.vertices = 
 	{
-		Vertex({.Pos = XMFLOAT3(-1.0f, -1.0f, -1.0f), .Color = XMFLOAT4(Colors::White) }),
-		Vertex({.Pos = XMFLOAT3(-1.0f, +1.0f, -1.0f), .Color = XMFLOAT4(Colors::Black) }),
-		Vertex({.Pos = XMFLOAT3(+1.0f, +1.0f, -1.0f), .Color = XMFLOAT4(Colors::Red) }),
-		Vertex({.Pos = XMFLOAT3(+1.0f, -1.0f, -1.0f), .Color = XMFLOAT4(Colors::Green) }),
-		Vertex({.Pos = XMFLOAT3(-1.0f, -1.0f, +1.0f), .Color = XMFLOAT4(Colors::Blue) }),
-		Vertex({.Pos = XMFLOAT3(-1.0f, +1.0f, +1.0f), .Color = XMFLOAT4(Colors::Yellow) }),
-		Vertex({.Pos = XMFLOAT3(+1.0f, +1.0f, +1.0f), .Color = XMFLOAT4(Colors::Cyan) }),
-		Vertex({.Pos = XMFLOAT3(+1.0f, -1.0f, +1.0f), .Color = XMFLOAT4(Colors::Magenta) })
+		Vertex({.Pos = math::Vector3(-1.0f, -1.0f, -1.0f), .Color = math::Vector4(1, 1, 1, 1) }),
+		Vertex({.Pos = math::Vector3(-1.0f, +1.0f, -1.0f), .Color = math::Vector4(0, 0, 0, 1) }),
+		Vertex({.Pos = math::Vector3(+1.0f, +1.0f, -1.0f), .Color = math::Vector4(1, 0, 0, 1) }),
+		Vertex({.Pos = math::Vector3(+1.0f, -1.0f, -1.0f), .Color = math::Vector4(0, 1, 0, 1) }),
+		Vertex({.Pos = math::Vector3(-1.0f, -1.0f, +1.0f), .Color = math::Vector4(0, 0, 1, 1) }),
+		Vertex({.Pos = math::Vector3(-1.0f, +1.0f, +1.0f), .Color = math::Vector4(1, 1, 0, 1) }),
+		Vertex({.Pos = math::Vector3(+1.0f, +1.0f, +1.0f), .Color = math::Vector4(0, 1, 1, 1) }),
+		Vertex({.Pos = math::Vector3(+1.0f, -1.0f, +1.0f), .Color = math::Vector4(1, 0, 1, 1) })
 	};
 
 	meshData.indices =
