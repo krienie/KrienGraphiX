@@ -1,5 +1,6 @@
 
 add_subdirectory(SDL EXCLUDE_FROM_ALL)
+add_subdirectory(glm)
 
 get_target_property(SDL3_target SDL3::SDL3 ALIASED_TARGET)
 if(MSVC)
