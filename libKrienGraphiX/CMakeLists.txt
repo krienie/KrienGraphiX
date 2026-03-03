@@ -1,9 +1,32 @@
 
 set(LIB_NAME libkriengraphix)
 
-file(GLOB_RECURSE Src
-        "*.cpp"
-        "*.h")
+file(GLOB PrivateSrcDirs "Private/*")
+set(PrivateRHIDir "${PrivateSrcDirs}")
+list(FILTER PrivateSrcDirs EXCLUDE REGEX "/RHI$")
+list(FILTER PrivateRHIDir INCLUDE REGEX "/RHI$")
+
+# All directories except for RHI
+foreach(PrivateDir IN LISTS PrivateSrcDirs)
+    file(GLOB PrivateSrc "${PrivateDir}/*.cpp" "${PrivateDir}/*.h")
+    list(APPEND Src "${PrivateSrc}")
+endforeach()
+
+# All files directly in the RHI directory
+file(GLOB RHISrc "${PrivateRHIDir}/*.cpp" "${PrivateRHIDir}/*.h")
+list(APPEND Src "${RHISrc}")
+
+# Platform specific graphics APIs
+if (MSVC)
+    file(GLOB_RECURSE D3D12Src "${PrivateRHIDir}/D3D12/*.cpp" "${PrivateRHIDir}/D3D12/*.h")
+    list(APPEND Src "${D3D12Src}")
+elseif(APPLE)
+    file(GLOB_RECURSE MTLSrc "${PrivateRHIDir}/Metal/*.cpp" "${PrivateRHIDir}/Metal/*.h")
+    list(APPEND Src "${MTLSrc}")
+endif()
+
+file(GLOB_RECURSE PublicSrc "Public/*")
+list(APPEND Src "${PublicSrc}")
 
 add_library(${LIB_NAME} STATIC ${Src})
 

@@ -4,9 +4,6 @@
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 #include "Private/Core/RenderCore.h"
 
-#include <array>
-#include <DirectXColors.h>
-
 namespace kgx
 {
 KGXMeshComponent::KGXMeshComponent(KGXSceneObject *owner)

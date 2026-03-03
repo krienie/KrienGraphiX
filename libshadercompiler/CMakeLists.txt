@@ -5,9 +5,9 @@ find_package(Boost CONFIG REQUIRED COMPONENTS serialization program_options)
 set(LIB_NAME libshadercompiler)
 
 file(GLOB_RECURSE Src
-        "Private/*.cpp"
+		"Private/*.cpp"
 		"Public/*.cpp"
-        "Private/*.h"
+		"Private/*.h"
 		"Public/*.h")
 
 add_library(${LIB_NAME} STATIC ${Src})
