@@ -10,7 +10,7 @@
 
 namespace
 {
-_declspec(align(256u)) struct ConstantBufferData
+__declspec(align(256u)) struct ConstantBufferData
 {
 	kgx::math::Matrix4X4 modelMatrix;
 	kgx::math::Matrix4X4 viewProjMatrix;

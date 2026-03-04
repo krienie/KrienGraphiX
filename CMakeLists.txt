@@ -20,7 +20,7 @@ if (MSVC)
     add_compile_options(/MP /W3 /WX)
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
 elseif (APPLE)
-    #TODO(KL): Set compiler options for macos
+    add_compile_options(-fdeclspec)
 else()
     message(FATAL_ERROR "Unsupported platform.")
 endif()
