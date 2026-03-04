@@ -25,15 +25,13 @@ DX12RenderHardwareInterface::DX12RenderHardwareInterface()
 	mGraphicsDevice->create();
 }
 
+DX12RenderHardwareInterface::~DX12RenderHardwareInterface()
+{
+	mGraphicsDevice.reset();
+}
+
 void DX12RenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	//const auto* renderCore = core::RenderCore::get();
-
-	//RHICommandQueue* commandQueue = renderCore->getRenderThreadPtr()->getCommandQueuePtr();
-	//
-	//DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
-	//dxCommandQueue->getNativeCommandAllocator()->Reset();
-
 	DX12Texture2D* dxTexture2D = dxCast(renderTarget);
 	dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
 }

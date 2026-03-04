@@ -9,7 +9,7 @@ class DX12RenderHardwareInterface : public RenderHardwareInterface
 {
 public:
 	DX12RenderHardwareInterface();
-	~DX12RenderHardwareInterface() override = default;
+	~DX12RenderHardwareInterface() override;
 
 	DX12RenderHardwareInterface(const DX12RenderHardwareInterface&) noexcept            = delete;
 	DX12RenderHardwareInterface& operator=(const DX12RenderHardwareInterface&) noexcept = delete;
@@ -24,7 +24,7 @@ public:
 
 	[[nodiscard]]
 	std::unique_ptr<RHISwapChain> createSwapChain(
-		RHICommandQueue * commandQueue,
+		RHICommandQueue* commandQueue,
 		WinHandle windowHandle,
 		unsigned int width,
 		unsigned int height,
