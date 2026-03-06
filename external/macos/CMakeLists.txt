@@ -3,6 +3,7 @@ add_subdirectory(dxc)
 add_subdirectory(gtest-1.17.0)
 
 if (APPLE)
+add_subdirectory(metal-cpp)
 add_subdirectory(metalshaderconverter)
 endif()
 
