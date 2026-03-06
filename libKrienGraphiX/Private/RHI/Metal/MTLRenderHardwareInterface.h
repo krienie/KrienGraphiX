@@ -2,19 +2,20 @@
 #pragma once
 
 #include "Private/RHI/RenderHardwareInterface.h"
+#include "Private/RHI/Metal/MTLGraphicsDevice.h"
 
 namespace kgx::RHI
 {
-class DX12RenderHardwareInterface : public RenderHardwareInterface
+class MTLRenderHardwareInterface : public RenderHardwareInterface
 {
 public:
-	DX12RenderHardwareInterface();
-	~DX12RenderHardwareInterface() override;
+	MTLRenderHardwareInterface();
+	~MTLRenderHardwareInterface() override = default;
 
-	DX12RenderHardwareInterface(const DX12RenderHardwareInterface&) noexcept            = delete;
-	DX12RenderHardwareInterface& operator=(const DX12RenderHardwareInterface&) noexcept = delete;
-	DX12RenderHardwareInterface(DX12RenderHardwareInterface&&) noexcept                 = delete;
-	DX12RenderHardwareInterface& operator=(DX12RenderHardwareInterface&&) noexcept      = delete;
+	MTLRenderHardwareInterface(const MTLRenderHardwareInterface&) noexcept            = delete;
+	MTLRenderHardwareInterface& operator=(const MTLRenderHardwareInterface&) noexcept = delete;
+	MTLRenderHardwareInterface(MTLRenderHardwareInterface&&) noexcept                 = delete;
+	MTLRenderHardwareInterface& operator=(MTLRenderHardwareInterface&&) noexcept      = delete;
 
 	void beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) override;
 	void endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget) override;
@@ -33,7 +34,7 @@ public:
 	[[nodiscard]]
 	std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const override;
 
-	//TODO(KL): Remove the need for passing CommandListAllocator? integrate it into DX12RenderHardwareInterface
+	//TODO(KL): Remove the need for passing CommandListAllocator? integrate it into MTLRenderHardwareInterface
 	[[nodiscard]]
 	std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState *pipelineState) const override;
 
@@ -50,14 +51,14 @@ public:
 	std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const override;
 
 	[[nodiscard]]
-	class DX12GraphicsDevice* getDX12Device() const { return mGraphicsDevice.get(); }
+	MTLGraphicsDevice* getMTLDevice() const { return mGraphicsDevice.get(); }
 
 private:
-	std::unique_ptr<class DX12GraphicsDevice> mGraphicsDevice;
+	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
 };
 
-inline DX12RenderHardwareInterface* getDX12RHI()
+inline MTLRenderHardwareInterface* getMTLRHI()
 {
-	return static_cast<DX12RenderHardwareInterface*>(PlatformRHI.get());
+	return static_cast<MTLRenderHardwareInterface*>(PlatformRHI.get());
 }
 }

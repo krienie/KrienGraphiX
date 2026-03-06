@@ -3,12 +3,13 @@
 
 #ifdef WIN32
 #include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
+#elif defined(__APPLE__)
+#include "Private/RHI/Metal/MTLRenderHardwareInterface.h"
 #endif
-
-#include <cassert>
 
 #include "CommandThread.h"
 
+#include <cassert>
 #include <utility>
 
 namespace kgx::core
@@ -20,11 +21,18 @@ RenderThread::RenderThread()
 {
 #ifdef WIN32
 	RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
+#elif defined(__APPLE__)
+	RHI::PlatformRHI = std::make_unique<RHI::MTLRenderHardwareInterface>();
 #else
-	static_assert(false, "Only DirectX 12 is currently supported");
+	static_assert(false, "Unsupported platform");
 #endif
 
 	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
+
+#ifdef __APPLE__
+	//TODO(KL): Temporary to avoid crashes because of unimplemented code
+	return;
+#endif
 
 	mCommandQueue = RHI::PlatformRHI->createCommandQueue();
 	mCommandListAllocator = std::make_unique<CommandListAllocator>();

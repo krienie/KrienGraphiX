@@ -41,7 +41,6 @@ KGXBoxMeshComponent::KGXBoxMeshComponent(KGXSceneObject* owner)
 rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInternal()
 {
 	using namespace kgx::rendering;
-	using namespace DirectX;
 
 	KGXMeshRenderObject::RawMeshData meshData;
 	meshData.vertices = 
