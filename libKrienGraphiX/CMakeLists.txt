@@ -37,7 +37,7 @@ target_link_libraries(${LIB_NAME} PUBLIC glm)
 if (MSVC)
     target_compile_options(${LIB_NAME} PUBLIC /GR-) # No RTTI
 elseif (APPLE)
-    #TODO(KL): disable RTTI
+    target_compile_options(${LIB_NAME} PUBLIC -fno-rtti) # No RTTI
 endif()
 
 if (WIN32)
