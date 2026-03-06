@@ -9,7 +9,11 @@ file(GLOB_RECURSE Resources
         "*.ico"
         "*.rc")
 
+if (MSVC)
 add_executable(${EXE_NAME} WIN32 ${Src} ${Resources})
+elseif(APPLE)
+add_executable(${EXE_NAME} MACOSX_BUNDLE ${Src} ${Resources})
+endif()
 
 target_link_libraries(${EXE_NAME} PRIVATE libkriengraphix SDL3::SDL3)
 

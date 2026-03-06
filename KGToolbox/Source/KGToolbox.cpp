@@ -1,17 +1,18 @@
 
 #include "KGToolbox.h"
 
+#define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
 #include <chrono>
-#include <format>
 #include <iostream>
 #include <string>
 #include <sstream>
 
-int SDL_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
+	SDL_SetMainReady();
 	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
 		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
@@ -39,8 +40,6 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 #if _WIN32
 	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
 #elif __APPLE__
-	//TODO(KL): Implement
-	static_assert(false);
 	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_COCOA_WINDOW_POINTER;
 #else
 	//Unsupported platform
@@ -49,6 +48,11 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 
 	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
 	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, WindowHandlePropertyName, nullptr));
+
+#ifdef __APPLE__
+	//TODO(KL): Temporary to avoid crashes because of unimplemented code
+	return;
+#endif
 
 	mKgxEngine->createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
 
