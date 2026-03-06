@@ -14,6 +14,8 @@
 #ifdef _WIN32
 using namespace Microsoft::WRL;
 #elif __APPLE__
+#include "MacOS/DXILToMetalIRConverter.h"
+
 template <class T>
 using ComPtr = CComPtr<T>;
 #endif
@@ -60,21 +62,12 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 		L"-Qstrip_reflect"
 	};
 
-#if __APPLE__
-	//TODO(KL): Use metal shader converter instead of this flag
-	compileArgs.push_back(L"-metal");
-#endif
-
 	const std::wstring stem = fileName.stem().wstring();
 
 	// Set output file
 	compileArgs.push_back(L"-Fo");
 
-#if _WIN32
 	const std::wstring binPath = stem + L".bin";
-#elif defined(__APPLE__)
-	const std::wstring binPath = stem + L".metallib";
-#endif
 	compileArgs.push_back(binPath.c_str());
 
 	std::wstring pdbPath = stem + L".pdb";
@@ -123,7 +116,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	// Print errors if present.
 	ComPtr<IDxcBlobUtf8> pErrors = nullptr;
 	pResults->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&pErrors), nullptr);
-	// Note that d3dcompiler would return null if no errors or warnings are present.  
+	// Note that d3dcompiler would return null if no errors or warnings are present.
 	// IDxcCompiler3::Compile will always return an error buffer, but its length will be zero if there are no warnings or errors.
 	if (pErrors != nullptr && pErrors->GetStringLength() != 0)
 	{
@@ -165,6 +158,16 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 			std::memcpy(shader.pdb.data(), pPDB->GetBufferPointer(), pPDB->GetBufferSize());
 		}
 	}
+
+#if __APPLE__
+	shader.byteCode = DXILToMetalIRConverter::convertToMetalIR(shader.byteCode, mainEntry);
+	if (shader.byteCode.empty())
+	{
+		std::wcout << L"Conversion from DXIL to Metal IR failed.\n";
+		OutCompiledShader = CompiledShader();
+		return false;
+	}
+#endif
 
 	// Print hash.
 	ComPtr<IDxcBlob> pHash = nullptr;
