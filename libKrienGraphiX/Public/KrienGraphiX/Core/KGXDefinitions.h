@@ -5,7 +5,6 @@
 
 namespace kgx
 {
-typedef unsigned int* WinHandle;
-
+using WinHandle = unsigned int*;
 using SceneUpdateDelegate = std::function<void(float deltaTime)>;
 }

@@ -91,7 +91,7 @@ RenderCore::RenderCore()
 
 		{
 			std::lock_guard lock(mRenderWindowMutex);
-			for (auto [_, renderWindow]: mRenderWindows)
+			for (const auto& [_, renderWindow]: mRenderWindows)
 			{
 				renderWindow->draw();
 			}
