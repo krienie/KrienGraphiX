@@ -7,7 +7,7 @@ project(KrienGraphiX CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 add_definitions(-D_UNICODE -DUNICODE)
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE) 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
 if (MSVC)
     # Remove exceptions flag from the compile options and add the no-version of it
@@ -20,7 +20,9 @@ if (MSVC)
     add_compile_options(/MP /W3 /WX)
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
 elseif (APPLE)
+    add_compile_options(-fno-exceptions) # No exceptions
     add_compile_options(-fdeclspec)
+    set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
 else()
     message(FATAL_ERROR "Unsupported platform.")
 endif()

@@ -52,8 +52,8 @@ file(GLOB_RECURSE ShaderFiles
         "Shaders/*")
 foreach(F IN LISTS ShaderFiles)
     get_filename_component(fileName "${F}" NAME)
-    configure_file(${F} ${CMAKE_BINARY_DIR}/x64/Debug/Shaders/${fileName} COPYONLY)
-    configure_file(${F} ${CMAKE_BINARY_DIR}/x64/Release/Shaders/${fileName} COPYONLY)
+    configure_file(${F} ${CMAKE_BINARY_DIR}/Debug/Shaders/${fileName} COPYONLY)
+    configure_file(${F} ${CMAKE_BINARY_DIR}/Release/Shaders/${fileName} COPYONLY)
 endforeach()
 
 target_sources(${LIB_NAME} PRIVATE ${ShaderFiles})
