@@ -13,6 +13,8 @@
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	SDL_SetMainReady();
+	SDL_SetAppMetadata("KGToolbox", "1.0", "com.kgx.KGToolbox");
+
 	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
 		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
@@ -34,27 +36,32 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	//TODO(KL): add some error handling/logging here
 	SDL_Init(SDL_INIT_VIDEO);
 
-	const std::string windowTitle = "KGToolboxApp";
+	SDL_WindowFlags windowFlags = SDL_WINDOW_RESIZABLE;
+#ifdef __APPLE__
+	windowFlags |= SDL_WINDOW_METAL;
+#endif
+
+	constexpr std::string windowTitle = "KGToolboxApp";
 	mSDLWindow = SDL_CreateWindow(windowTitle.c_str(), mClientWidth, mClientHeight, SDL_WINDOW_RESIZABLE);
 
 #if _WIN32
-	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
+	const char* windowHandlePropertyName = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
 #elif __APPLE__
-	const char* WindowHandlePropertyName = SDL_PROP_WINDOW_COCOA_WINDOW_POINTER;
+	const char* windowHandlePropertyName = SDL_PROP_WINDOW_COCOA_WINDOW_POINTER;
 #else
 	//Unsupported platform
 	static_assert(false);
 #endif
 
 	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
-	const kgx::WinHandle mWindowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, WindowHandlePropertyName, nullptr));
+	kgx::WinHandle windowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, windowHandlePropertyName, nullptr));
 
 #ifdef __APPLE__
 	//TODO(KL): Temporary to avoid crashes because of unimplemented code
 	return;
 #endif
 
-	mKgxEngine->createRenderWindow(mWindowHandle, mClientWidth, mClientHeight);
+	mKgxEngine->createRenderWindow(windowHandle, mClientWidth, mClientHeight);
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
