@@ -2,7 +2,7 @@
 #include "DXILToMetalIRConverter.h"
 
 #ifdef __APPLE__
-#include <metal_irconverter/metal_irconverter.h>
+#include <metal_irconverter.h>
 #endif
 
 namespace kgx::DXILToMetalIRConverter
