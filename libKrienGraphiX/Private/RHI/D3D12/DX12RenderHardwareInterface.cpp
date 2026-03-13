@@ -32,14 +32,14 @@ DX12RenderHardwareInterface::~DX12RenderHardwareInterface()
 
 void DX12RenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	DX12Texture2D* dxTexture2D = dxCast(renderTarget);
-	dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
+	DX12Texture2D* dxTexture2D = rcCast(renderTarget);
+	dxTexture2D->transitionToState(rcCast(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
 }
 
 void DX12RenderHardwareInterface::endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	DX12Texture2D* dxTexture2D = dxCast(renderTarget);
-	dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_PRESENT);
+	DX12Texture2D* dxTexture2D = rcCast(renderTarget);
+	dxTexture2D->transitionToState(rcCast(commandList), D3D12_RESOURCE_STATE_PRESENT);
 }
 
 std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue() const
@@ -127,7 +127,7 @@ std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGra
 
 std::unique_ptr<RHIBuffer> DX12RenderHardwareInterface::createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const
 {
-	DX12GraphicsCommandList* dxCommandList = dxCast(commandList);
+	DX12GraphicsCommandList* dxCommandList = rcCast(commandList);
 
 	auto newBuffer = std::make_unique<DX12Buffer>(dxCommandList, descriptor);
 	return std::move(newBuffer);

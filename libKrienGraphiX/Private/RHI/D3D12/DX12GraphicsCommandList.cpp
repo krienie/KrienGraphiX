@@ -47,14 +47,14 @@ bool DX12GraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 
 	if (initialState != nullptr)
 	{
-		nativeInitialState = dxCast(initialState)->getPSO();
+		nativeInitialState = rcCast(initialState)->getPSO();
 	}
 	
 	res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
 	if (SUCCEEDED(res))
 	{
 	    // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
-	    mCommandList->Close();
+	    close();
 	}
 
 	return SUCCEEDED(res);
@@ -71,7 +71,7 @@ void DX12GraphicsCommandList::reset(RHIGraphicsPipelineState* initialState)
 
 	if (initialState != nullptr)
 	{
-		DX12GraphicsPipelineState* dxPipelineState = dxCast(initialState);
+		DX12GraphicsPipelineState* dxPipelineState = rcCast(initialState);
 		nativeInitialState = dxPipelineState->getPSO();
 	}
 
@@ -81,7 +81,7 @@ void DX12GraphicsCommandList::reset(RHIGraphicsPipelineState* initialState)
 
 void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
 {
-	DX12GraphicsPipelineState* dxPipelineState = dxCast(pipelineState);
+	DX12GraphicsPipelineState* dxPipelineState = rcCast(pipelineState);
 	ID3D12PipelineState* nativePipelineState = dxPipelineState->getPSO();
 	mCommandList->SetPipelineState(nativePipelineState);
 	mCommandList->SetGraphicsRootSignature(dxPipelineState->getRootSignature());
@@ -89,7 +89,7 @@ void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelin
 
 void DX12GraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer)
 {
-	const DX12Buffer* dxConstantBuffer = dxCast(constantBuffer);
+	const DX12Buffer* dxConstantBuffer = rcCast(constantBuffer);
 	mCommandList->SetGraphicsRootConstantBufferView(0, dxConstantBuffer->getResource()->GetGPUVirtualAddress());
 }
 
@@ -112,13 +112,13 @@ void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)
 
 void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews, const RHIResourceView* depthStencilView)
 {
-	const DX12ResourceView* dxDsv = dxCast(depthStencilView);
+	const DX12ResourceView* dxDsv = rcCast(depthStencilView);
 	assert(dxDsv->getViewType() == RHIResourceView::Type::DSV);
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvCpuHandles(renderTargetViews.size());
 	for (uint8_t i = 0u; i < static_cast<uint8_t>(renderTargetViews.size()); ++i)
 	{
-		DX12ResourceView* dxRtv = dxCast(renderTargetViews[i]);
+		DX12ResourceView* dxRtv = rcCast(renderTargetViews[i]);
 		assert(dxRtv->getViewType() == RHIResourceView::Type::RTV);
 
 		rtvCpuHandles[i] = dxRtv->getViewHandle();
@@ -131,7 +131,7 @@ void DX12GraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView
 
 void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth, uint8_t stencil)
 {
-	DX12ResourceView* dxDsv = dxCast(dsv);
+	DX12ResourceView* dxDsv = rcCast(dsv);
 	assert(dxDsv->getViewType() == RHIResourceView::Type::DSV);
 	
 	mCommandList->ClearDepthStencilView(dxDsv->getViewHandle(), toDxClearFlags(clearFlags), depth, stencil, 0, nullptr);
@@ -139,7 +139,7 @@ void DX12GraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthS
 
 void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4])
 {
-	DX12ResourceView* dxRtv = dxCast(rtv);
+	DX12ResourceView* dxRtv = rcCast(rtv);
 	assert(dxRtv->getViewType() == RHIResourceView::Type::RTV);
 
 	mCommandList->ClearRenderTargetView(dxRtv->getViewHandle(), colorRGBA, 0, nullptr);
@@ -147,8 +147,8 @@ void DX12GraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const 
 
 void DX12GraphicsCommandList::drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject)
 {
-	DX12Buffer* dxIndexBuffer = dxCast(renderObject->getIndexBuffer());
-	DX12Buffer* dxVertexBuffer = dxCast(renderObject->getVertexBuffer());
+	DX12Buffer* dxIndexBuffer = rcCast(renderObject->getIndexBuffer());
+	DX12Buffer* dxVertexBuffer = rcCast(renderObject->getVertexBuffer());
 
 	//TODO(KL): For now this is grouped together like this. Later will be packed into a drawpacket or something for easy handling
 	//TODO(KL): Hard-coded to triangle list for now

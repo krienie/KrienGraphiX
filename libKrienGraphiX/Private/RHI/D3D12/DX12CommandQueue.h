@@ -6,7 +6,7 @@
 #include <d3d12.h>
 #include <wrl\client.h>
 
-#include "DX12Utils.h"
+#include "Private/RHI/RHIUtils.h"
 
 namespace kgx::RHI
 {

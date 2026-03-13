@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "DX12Utils.h"
+#include "Private/RHI/RHIUtils.h"
 #include "Private/RHI/RHIShader.h"
 
 #include <d3d12.h>

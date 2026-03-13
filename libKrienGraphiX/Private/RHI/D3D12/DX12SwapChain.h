@@ -3,7 +3,7 @@
 
 #include "Private/RHI/RHISwapChain.h"
 
-#include "DX12Utils.h"
+#include "Private/RHI/RHIUtils.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>

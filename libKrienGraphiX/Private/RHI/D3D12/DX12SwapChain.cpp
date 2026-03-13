@@ -9,7 +9,6 @@
 #include "DX12GraphicsDevice.h"
 #include "DX12PixelFormat.h"
 #include "DX12Texture2D.h"
-#include "d3dx12.h"
 #include "DX12Descriptors.h"
 #include "DX12RenderHardwareInterface.h"
 
@@ -41,7 +40,7 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, un
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Flags = mTearingSupport ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
-	DX12CommandQueue* dxCommandQueue = dxCast(commandQueue);
+	DX12CommandQueue* dxCommandQueue = rcCast(commandQueue);
 	ID3D12CommandQueue* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
 
 	ComPtr<IDXGISwapChain1> swapChain;

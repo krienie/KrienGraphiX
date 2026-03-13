@@ -36,7 +36,7 @@ bool DX12CommandQueue::create()
 
 void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
-	DX12GraphicsCommandList* dxCommandList = dxCast(commandList);
+	DX12GraphicsCommandList* dxCommandList = rcCast(commandList);
 
 	ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
 	mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);

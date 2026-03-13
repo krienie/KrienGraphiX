@@ -130,7 +130,6 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 			subResourceData.RowPitch = static_cast<LONG_PTR>(calculatedBufferSize);
 			subResourceData.SlicePitch = subResourceData.RowPitch;
 
-
 			UpdateSubresources<1>(commandList->getCommandList(), mBufferDXResource->getResource().Get(), mBufferUploader.Get(), 0, 0, 1, &subResourceData);
 			mBufferDXResource->transitionToState(commandList, getDXResourceStateFromCreationFlag(mDescriptor.flags));
 		}
