@@ -25,7 +25,7 @@ public:
 	[[nodiscard]]
 	std::unique_ptr<RHISwapChain> createSwapChain(
 		RHICommandQueue* commandQueue,
-		WinHandle windowHandle,
+		SDL_Window* windowHandle,
 		unsigned int width,
 		unsigned int height,
 		unsigned int frameCount) const override;

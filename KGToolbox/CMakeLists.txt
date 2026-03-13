@@ -6,7 +6,7 @@ file(GLOB_RECURSE Src
         "*.h")
 
 if (MSVC)
-add_executable(${EXE_NAME} WIN32 ${Src})
+add_executable(${EXE_NAME} ${Src})
 elseif(APPLE)
 add_executable(${EXE_NAME} MACOSX_BUNDLE ${Src})
 endif()

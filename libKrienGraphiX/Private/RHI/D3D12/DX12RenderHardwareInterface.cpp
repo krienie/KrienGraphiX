@@ -55,7 +55,7 @@ std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue
 
 std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 	RHICommandQueue* commandQueue,
-	WinHandle windowHandle,
+	SDL_Window* windowHandle,
 	unsigned int width,
 	unsigned int height,
 	unsigned int frameCount) const

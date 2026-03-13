@@ -41,7 +41,7 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	windowFlags |= SDL_WINDOW_METAL;
 #endif
 
-	constexpr std::string windowTitle = "KGToolboxApp";
+	const std::string windowTitle = "KGToolboxApp";
 	mSDLWindow = SDL_CreateWindow(windowTitle.c_str(), mClientWidth, mClientHeight, SDL_WINDOW_RESIZABLE);
 
 	mKgxEngine->createRenderWindow(mSDLWindow, mClientWidth, mClientHeight);

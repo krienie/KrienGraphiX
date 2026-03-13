@@ -45,12 +45,12 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, un
 
 	ComPtr<IDXGISwapChain1> swapChain;
 
-	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
-	kgx::WinHandle windowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+	const SDL_PropertiesID props = SDL_GetWindowProperties(window);
+	const HWND windowHandle = static_cast<HWND>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
 
 	HRESULT res = nativeFactory->CreateSwapChainForHwnd(
 		nativeCommandQueue,
-		reinterpret_cast<HWND>(windowHandle),
+		windowHandle,
 		&swapChainDesc,
 		nullptr,
 		nullptr,
@@ -65,7 +65,7 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, un
 	swapChain.As(&mSwapChain);
 
 	// Turn off fullscreen transitions
-	res = nativeFactory->MakeWindowAssociation(reinterpret_cast<HWND>(windowHandle), DXGI_MWA_NO_ALT_ENTER);
+	res = nativeFactory->MakeWindowAssociation(windowHandle, DXGI_MWA_NO_ALT_ENTER);
 	if ((FAILED(res)))
 	{
 		return false;
