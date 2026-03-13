@@ -16,9 +16,9 @@ KrienGraphiXEngine::~KrienGraphiXEngine()
 	RenderCore::shutdown();
 }
 
-bool KrienGraphiXEngine::createRenderWindow(kgx::WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const
+bool KrienGraphiXEngine::createRenderWindow(SDL_Window* window, unsigned int initialWindowWidth, unsigned int initialWindowHeight) const
 {
-	return RenderCore::get()->createRenderWindow(windowHandle, initialWindowWidth, initialWindowHeight);
+	return RenderCore::get()->createRenderWindow(window, initialWindowWidth, initialWindowHeight);
 }
 
 void KrienGraphiXEngine::setSceneUpdateDelegate(kgx::SceneUpdateDelegate updateDelegate) const

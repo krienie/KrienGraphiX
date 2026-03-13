@@ -18,17 +18,17 @@ namespace kgx::rendering
 class KGXRenderWindow final
 {
 public:
-	KGXRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
+	KGXRenderWindow(SDL_Window* window, unsigned int width, unsigned int height);
 	~KGXRenderWindow() = default;
 
-	[[nodiscard]] WinHandle getWinHandle() const { return mWindowHandle; }
+	[[nodiscard]] SDL_Window* getWinHandle() const { return mWindowHandle; }
 
-	void draw();
+	void draw() const;
 
 	//TODO(KL): implement resize
 
 private:
-	WinHandle mWindowHandle;
+	SDL_Window* mWindowHandle;
 
 	std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
 

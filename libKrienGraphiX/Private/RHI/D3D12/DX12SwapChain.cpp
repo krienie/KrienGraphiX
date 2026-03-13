@@ -1,7 +1,9 @@
 
 #include "DX12SwapChain.h"
 
-#include <cassert>
+#include <SDL3/SDL.h>
+
+#include "d3dx12.h"
 
 #include "DX12CommandQueue.h"
 #include "DX12GraphicsDevice.h"
@@ -21,7 +23,7 @@ DX12SwapChain::DX12SwapChain(UINT width, UINT height)
 {
 }
 
-bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat)
+bool DX12SwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
 	checkTearingSupport();
 
@@ -43,6 +45,9 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle
 	ID3D12CommandQueue* nativeCommandQueue = dxCommandQueue->getNativeCommandQueue();
 
 	ComPtr<IDXGISwapChain1> swapChain;
+
+	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
+	kgx::WinHandle windowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
 
 	HRESULT res = nativeFactory->CreateSwapChainForHwnd(
 		nativeCommandQueue,
@@ -122,7 +127,7 @@ bool DX12SwapChain::create(RHICommandQueue* commandQueue, WinHandle windowHandle
 	return SUCCEEDED(res);
 }
 
-RHIResourceView* DX12SwapChain::getCurrentBufferView() const
+RHIResourceView* DX12SwapChain::getCurrentBufferView()
 {
 	return mBufferViews[mSwapChain->GetCurrentBackBufferIndex()].get();
 }

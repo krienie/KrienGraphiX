@@ -44,24 +44,12 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	constexpr std::string windowTitle = "KGToolboxApp";
 	mSDLWindow = SDL_CreateWindow(windowTitle.c_str(), mClientWidth, mClientHeight, SDL_WINDOW_RESIZABLE);
 
-#if _WIN32
-	const char* windowHandlePropertyName = SDL_PROP_WINDOW_WIN32_HWND_POINTER;
-#elif __APPLE__
-	const char* windowHandlePropertyName = SDL_PROP_WINDOW_COCOA_WINDOW_POINTER;
-#else
-	//Unsupported platform
-	static_assert(false);
-#endif
-
-	const SDL_PropertiesID props = SDL_GetWindowProperties(mSDLWindow);
-	kgx::WinHandle windowHandle = static_cast<kgx::WinHandle>(SDL_GetPointerProperty(props, windowHandlePropertyName, nullptr));
+	mKgxEngine->createRenderWindow(mSDLWindow, mClientWidth, mClientHeight);
 
 #ifdef __APPLE__
 	//TODO(KL): Temporary to avoid crashes because of unimplemented code
 	return;
 #endif
-
-	mKgxEngine->createRenderWindow(windowHandle, mClientWidth, mClientHeight);
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");

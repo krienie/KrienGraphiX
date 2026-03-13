@@ -8,13 +8,12 @@ using namespace kgx::rendering;
 
 namespace kgx::core
 {
-RenderWindow::RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
-	: mKGXRenderWindow(std::make_shared<KGXRenderWindow>(windowHandle, width, height))
+RenderWindow::RenderWindow(SDL_Window* window, unsigned int width, unsigned int height)
+	: mKGXRenderWindow(std::make_shared<KGXRenderWindow>(window, width, height))
 {
-	//TODO(KL): create mKGXRenderWindow on the renderthread somehow
 }
 
-WinHandle RenderWindow::getWinHandle() const
+SDL_Window* RenderWindow::getWinHandle() const
 {
 	return mKGXRenderWindow->getWinHandle();
 }

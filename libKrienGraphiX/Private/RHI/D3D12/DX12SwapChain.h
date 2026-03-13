@@ -22,9 +22,9 @@ public:
 	DX12SwapChain(UINT width, UINT height);
 	~DX12SwapChain() override = default;
 
-	bool create(RHICommandQueue* commandQueue, WinHandle windowHandle, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
+	bool create(RHICommandQueue* commandQueue, SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
 
-	[[nodiscard]] RHIResourceView* getCurrentBufferView() const override;
+	[[nodiscard]] RHIResourceView* getCurrentBufferView() override;
 	
 	void present() override;
 

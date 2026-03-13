@@ -9,8 +9,8 @@ using namespace kgx::core;
 
 namespace kgx::rendering
 {
-KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height)
-	: mWindowHandle(windowHandle), mRHISwapChain(nullptr), mViewport{0, 0, width, height, 0.0f, 1.0f}
+KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigned int height)
+	: mWindowHandle(window), mRHISwapChain(nullptr), mViewport{0, 0, width, height, 0.0f, 1.0f}
 {
 	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
 
@@ -41,7 +41,7 @@ KGXRenderWindow::KGXRenderWindow(WinHandle windowHandle, unsigned int width, uns
 	mDSV = PlatformRHI->createResourceView(RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
 }
 
-void KGXRenderWindow::draw()
+void KGXRenderWindow::draw() const
 {
 	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
 

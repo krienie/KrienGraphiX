@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include <SDL3/SDL.h>
+
 #include "KrienGraphiX/Core/KGXDefinitions.h"
 
 namespace kgx::rendering
@@ -15,10 +17,10 @@ namespace kgx::core
 class RenderWindow final
 {
 public:
-	RenderWindow(WinHandle windowHandle, unsigned int width, unsigned int height);
+	RenderWindow(SDL_Window* window, unsigned int width, unsigned int height);
 	~RenderWindow() = default;
 
-	[[nodiscard]] WinHandle getWinHandle() const;
+	[[nodiscard]] SDL_Window* getWinHandle() const;
 
 	void draw();
 	

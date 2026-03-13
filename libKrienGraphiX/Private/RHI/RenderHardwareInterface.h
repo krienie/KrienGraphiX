@@ -33,7 +33,7 @@ public:
 	[[nodiscard]]
 	virtual std::unique_ptr<RHISwapChain> createSwapChain(
 		RHICommandQueue* commandQueue,
-		WinHandle windowHandle,
+		struct SDL_Window* window,
 		unsigned int width,
 		unsigned int height,
 		unsigned int frameCount) const = 0;

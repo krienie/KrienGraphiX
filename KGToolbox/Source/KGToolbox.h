@@ -4,6 +4,7 @@
 #include <SDL3/SDL_video.h>
 
 #include <KrienGraphiX/Core/KrienGraphiXEngine.h>
+#include "KrienGraphiX/Scene/KGXSceneObject.h"
 
 namespace kgt
 {

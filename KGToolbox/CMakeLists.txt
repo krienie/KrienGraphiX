@@ -5,19 +5,15 @@ file(GLOB_RECURSE Src
         "*.cpp"
         "*.h")
 
-file(GLOB_RECURSE Resources
-        "*.ico"
-        "*.rc")
-
 if (MSVC)
-add_executable(${EXE_NAME} WIN32 ${Src} ${Resources})
+add_executable(${EXE_NAME} WIN32 ${Src})
 elseif(APPLE)
-add_executable(${EXE_NAME} MACOSX_BUNDLE ${Src} ${Resources})
+add_executable(${EXE_NAME} MACOSX_BUNDLE ${Src})
 endif()
 
 target_link_libraries(${EXE_NAME} PRIVATE libkriengraphix SDL3::SDL3)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source" PREFIX "Resource Files" FILES ${Resources})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
 if(MSVC)
     set_target_properties("${EXE_NAME}" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>)

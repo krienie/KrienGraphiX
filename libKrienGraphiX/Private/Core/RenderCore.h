@@ -6,6 +6,8 @@
 #include "FrameTimer.h"
 #include "Private/Scene/KGXScene.h"
 
+#include <SDL3/SDL.h>
+
 #include <memory>
 #include <unordered_map>
 
@@ -28,7 +30,7 @@ public:
 	[[nodiscard]] KGXScene* getScenePtr() const;
 	[[nodiscard]] RenderThread* getRenderThreadPtr() const;
 
-	bool createRenderWindow(WinHandle windowHandle, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
+	bool createRenderWindow(SDL_Window* window, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
 
 private:
 	RenderCore();
@@ -43,6 +45,6 @@ private:
 	std::unique_ptr<RenderThread> mRenderThread;
 
 	std::mutex mRenderWindowMutex;
-	std::unordered_map<WinHandle, std::shared_ptr<RenderWindow>> mRenderWindows;
+	std::unordered_map<SDL_Window*, std::shared_ptr<RenderWindow>> mRenderWindows;
 };
 }
