@@ -46,4 +46,9 @@ void DX12Fence::waitForValue(uint64_t value)
 		WaitForSingleObject(mEventHandle, INFINITE);
 	}
 }
+
+uint64_t DX12Fence::getCurrentValue() const
+{
+	return mFence->GetCompletedValue();
+}
 }

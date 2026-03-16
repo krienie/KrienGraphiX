@@ -22,6 +22,7 @@ public:
 	void sync() override;
 	void queueSignal(uint64_t value) override;
 	void waitForValue(uint64_t value) override;
+	uint64_t getCurrentValue() const override;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;

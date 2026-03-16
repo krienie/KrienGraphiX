@@ -135,6 +135,12 @@ RHI::RHIGraphicsCommandList* RenderThread::getCurrentFrameCommandList() const
 
 void RenderThread::nextFrame()
 {
+	// Release any frame resources that have already been processed
+	while (!mFrameResources.empty() && mFrameFence->getCurrentValue() >= mFrameResources.front()->getFrameNumber())
+	{
+		mFrameResources.pop();
+	}
+
 	++mCurrentFrame;
 	mFrameResources.push(std::make_unique<FrameCommandContext>(mCurrentFrame, mFrameFence.get()));
 
