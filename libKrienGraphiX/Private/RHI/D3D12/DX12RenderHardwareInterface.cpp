@@ -1,17 +1,16 @@
 
 #include "DX12RenderHardwareInterface.h"
 
-#include "DX12GraphicsDevice.h"
+#include "DX12Buffer.h"
+#include "DX12CommandAllocator.h"
 #include "DX12CommandQueue.h"
+#include "DX12Descriptors.h"
+#include "DX12Fence.h"
 #include "DX12GraphicsCommandList.h"
+#include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
 #include "DX12Shader.h"
 #include "DX12SwapChain.h"
-
-#include <cassert>
-
-#include "DX12Buffer.h"
-#include "DX12Descriptors.h"
 #include "DX12Texture2D.h"
 #include "Private/Core/RenderCore.h"
 
@@ -69,6 +68,11 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 	return std::move(swapChain);
 }
 
+std::unique_ptr<RHIFence> DX12RenderHardwareInterface::createFence() const
+{
+	return std::move(std::make_unique<DX12Fence>());
+}
+
 std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const
 {
 	auto newShader = std::make_unique<DX12Shader>();
@@ -80,9 +84,14 @@ std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(const Compi
 	return std::move(newShader);
 }
 
-std::shared_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState* pipelineState) const
+std::unique_ptr<RHICommandAllocator> DX12RenderHardwareInterface::createCommandAllocator() const
 {
-	auto graphicsCommandList = std::make_shared<DX12GraphicsCommandList>(allocator);
+	return std::make_unique<DX12CommandAllocator>();
+}
+
+std::unique_ptr<RHIGraphicsCommandList> DX12RenderHardwareInterface::createGraphicsCommandList(RHIGraphicsPipelineState* pipelineState) const
+{
+	auto graphicsCommandList = std::make_unique<DX12GraphicsCommandList>();
 	if (!graphicsCommandList->create(pipelineState))
 	{
 		return nullptr;

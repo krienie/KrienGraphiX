@@ -1,11 +1,8 @@
 
 #include "DX12CommandQueue.h"
 
-#include <cassert>
-
 #include "DX12GraphicsDevice.h"
 #include "DX12RenderHardwareInterface.h"
-#include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/D3D12/DX12GraphicsCommandList.h"
 
 namespace kgx::RHI
@@ -29,7 +26,7 @@ bool DX12CommandQueue::create()
 		return false;
 	}
 
-	nativeDevice->CreateFence(mCurrentFence, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence));
+	mFence = getDX12RHI()->createFence();
 
 	return SUCCEEDED(res);
 }
@@ -44,24 +41,11 @@ void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 
 void DX12CommandQueue::flushQueue()
 {
-	++mCurrentFence;
-	
-	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
-
-	// Wait for fence event if needed
-	if (mFence->GetCompletedValue() < mCurrentFence)
-	{
-		const HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
-
-		mFence->SetEventOnCompletion(mCurrentFence, eventHandle);
-
-		WaitForSingleObject(eventHandle, INFINITE);
-		CloseHandle(eventHandle);
-	}
+	mFence->sync();
 }
 
 ID3D12CommandQueue* DX12CommandQueue::getNativeCommandQueue() const
 {
 	return mCommandQueue.Get();
 }
-} // namespace kgx::RHI
+}

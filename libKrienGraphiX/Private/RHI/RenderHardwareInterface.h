@@ -2,14 +2,15 @@
 #pragma once
 
 #include "RHIBuffer.h"
+#include "RHICommandAllocator.h"
 #include "RHICommandQueue.h"
+#include "RHIFence.h"
 #include "RHIGraphicsCommandList.h"
 #include "RHIShader.h"
 #include "RHISwapChain.h"
+#include "RHIVertexLayout.h"
 
 #include <memory>
-
-#include "RHIVertexLayout.h"
 
 namespace kgx::RHI
 {
@@ -39,11 +40,16 @@ public:
 		unsigned int frameCount) const = 0;
 
 	[[nodiscard]]
+	virtual std::unique_ptr<RHIFence> createFence() const = 0;
+
+	[[nodiscard]]
 	virtual std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const = 0;
 
-	//TODO(KL): Remove the need to pass CommandListAllocator
 	[[nodiscard]]
-	virtual std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState *pipelineState) const = 0;
+	virtual std::unique_ptr<RHICommandAllocator> createCommandAllocator() const = 0;
+
+	[[nodiscard]]
+	virtual std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsPipelineState *pipelineState) const = 0;
 
 	//TODO(KL): Replace with createTexture()
 	[[nodiscard]]

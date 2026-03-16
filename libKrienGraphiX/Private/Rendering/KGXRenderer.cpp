@@ -29,7 +29,7 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 	}
 
 	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	rendering::KGXShaderCache* shaderCache = renderThread->getShaderCache();
+	rendering::KGXShaderCache* shaderCache = renderThread->getShaderCachePtr();
 
 	const auto vertexShaderPath = std::filesystem::absolute("./Shaders/DefaultVS.hlsl");
 	const auto pixelShaderPath = std::filesystem::absolute("./Shaders/DefaultPS.hlsl");
@@ -66,8 +66,8 @@ kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 		return staticConstantBuffer.get();
 	}
 
-	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
-	RHI::RHIGraphicsCommandListHandle commandList = renderThreadPtr->getCommandList();
+	const core::RenderThread* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	RHI::RHIGraphicsCommandList* commandList = renderThread->getCurrentFrameCommandList();
 
 	constexpr RHI::RHIResource::CreationFlags flags = static_cast<RHI::RHIResource::CreationFlags>(RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
 
@@ -82,7 +82,7 @@ kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 		.flags = flags
 	};
 
-	staticConstantBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), cbDesc);
+	staticConstantBuffer = RHI::PlatformRHI->createBuffer(commandList, cbDesc);
 
 	return staticConstantBuffer.get();
 }
@@ -97,12 +97,13 @@ KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHIResourceView
 
 void KGXRenderer::RenderFrame()
 {
-	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	RHI::RHIGraphicsCommandListHandle commandList = renderThread->getCommandList();
+	auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	auto frameContext = renderThread->getCurrentFrameContext();
+	auto commandList = frameContext->getCommandList();
 
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
 
-	RHI::PlatformRHI->beginFrame(commandList.get(), OutputRenderTarget);
+	RHI::PlatformRHI->beginFrame(commandList, OutputRenderTarget);
 	
 	commandList->setViewport(mViewport);
 	
@@ -133,6 +134,7 @@ void KGXRenderer::RenderFrame()
 		commandList->drawMeshRenderObject(renderObject.get());
 	}
 
-	RHI::PlatformRHI->endFrame(commandList.get(), OutputRenderTarget);
+	RHI::PlatformRHI->endFrame(commandList, OutputRenderTarget);
+	frameContext->endFrame();
 }
 }

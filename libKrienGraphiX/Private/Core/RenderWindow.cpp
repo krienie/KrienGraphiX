@@ -23,8 +23,10 @@ void RenderWindow::draw()
 	bool expected = false;
 	if (mIsWindowBeingRendered.compare_exchange_strong(expected, true))
 	{
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this]()
+		auto renderThread = RenderCore::get()->getRenderThreadPtr();
+		renderThread->enqueueCommand([this, renderThread]()
 		{
+			renderThread->nextFrame();
 			mKGXRenderWindow->draw();
 			mIsWindowBeingRendered = false;
 		});

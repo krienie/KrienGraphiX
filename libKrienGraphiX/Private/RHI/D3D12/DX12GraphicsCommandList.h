@@ -13,7 +13,7 @@ namespace kgx::RHI
 class DX12GraphicsCommandList final : public RHIGraphicsCommandList
 {
 public:
-	DX12GraphicsCommandList(core::CommandListAllocator* allocator);
+	DX12GraphicsCommandList();
 	~DX12GraphicsCommandList() override = default;
 
 	[[nodiscard]]
@@ -23,7 +23,7 @@ public:
 
 	void close() override;
 
-	void reset(RHIGraphicsPipelineState* initialState = nullptr) override;
+	void reset(RHICommandAllocator* allocator, RHIGraphicsPipelineState* initialState = nullptr) override;
 
 	void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
 
@@ -39,7 +39,6 @@ public:
 	void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) override;
 
 private:
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
 };
 

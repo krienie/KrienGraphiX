@@ -14,7 +14,5 @@ class RHICommandQueue
 
 		virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
 		virtual void flushQueue() = 0;
-
-	//TODO(KL): add interface to add commands to the queue
 };
 }

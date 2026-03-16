@@ -5,8 +5,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "KrienGraphiX/Core/KGXDefinitions.h"
-
 namespace kgx::rendering
 {
 class KGXRenderWindow;

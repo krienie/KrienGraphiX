@@ -6,7 +6,6 @@
 namespace kgx::RHI
 {
 class RHIBuffer;
-class RHIGraphicsCommandList;
 
 class RHIShader
 {

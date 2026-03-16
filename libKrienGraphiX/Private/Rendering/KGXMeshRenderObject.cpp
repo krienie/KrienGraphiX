@@ -16,9 +16,7 @@ void KGXMeshRenderObject::createRenderResources()
 	const unsigned int vbByteSize = static_cast<unsigned int>(mRawMeshData.vertices.size()) * sizeof(Vertex);
 	const unsigned int ibByteSize = static_cast<unsigned int>(mRawMeshData.indices.size()) * sizeof(std::uint16_t);
 
-	const core::RenderThread* renderThreadPtr = core::RenderCore::get()->getRenderThreadPtr();
-
-	RHI::RHIGraphicsCommandListHandle commandList = renderThreadPtr->getCommandList();
+	core::ImmediateCommandContext immediateCommandContext;
 
 	const RHI::RHIBufferDescriptor vertexBufferDesc
 	{
@@ -31,7 +29,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::VertexBuffer
 	};
 
-	mVertexBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), vertexBufferDesc);
+	mVertexBuffer = RHI::PlatformRHI->createBuffer(immediateCommandContext.getCommandList(), vertexBufferDesc);
 
 	const RHI::RHIBufferDescriptor indexBufferDesc
 	{
@@ -45,7 +43,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::IndexBuffer
 	};
 
-	mIndexBuffer = RHI::PlatformRHI->createBuffer(commandList.get(), indexBufferDesc);
+	mIndexBuffer = RHI::PlatformRHI->createBuffer(immediateCommandContext.getCommandList(), indexBufferDesc);
 }
 
 void KGXMeshRenderObject::updateTransform(const math::Matrix4X4& newTransform)

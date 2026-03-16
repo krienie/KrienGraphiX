@@ -43,14 +43,9 @@ KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigne
 
 void KGXRenderWindow::draw() const
 {
-	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
-
 	KGXRenderer renderer(mViewport, *mRHISwapChain->getCurrentBufferView(), *mDSV);
 	renderer.RenderFrame();
 
 	mRHISwapChain->present();
-
-	//TODO(KL): Niet nodig?
-	renderThread->getCommandQueuePtr()->flushQueue();
 }
 }

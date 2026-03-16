@@ -4,8 +4,10 @@
 #include "Private/RHI/RHICommandQueue.h"
 
 #include <d3d12.h>
+#include <memory>
 #include <wrl\client.h>
 
+#include "Private/RHI/RHIFence.h"
 #include "Private/RHI/RHIUtils.h"
 
 namespace kgx::RHI
@@ -25,8 +27,7 @@ public:
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
 
-	Microsoft::WRL::ComPtr<ID3D12Fence> mFence;
-	UINT64 mCurrentFence = 0;
+	std::unique_ptr<RHIFence> mFence;
 };
 
 DEFINE_RESOURCE_CAST(DX12CommandQueue, RHICommandQueue)

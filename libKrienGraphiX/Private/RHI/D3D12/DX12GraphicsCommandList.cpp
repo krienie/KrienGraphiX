@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "DX12Buffer.h"
-#include "DX12CommandQueue.h"
+#include "DX12CommandAllocator.h"
 #include "DX12GraphicsDevice.h"
 #include "DX12GraphicsPipelineState.h"
 #include "DX12RenderHardwareInterface.h"
@@ -28,8 +28,8 @@ D3D12_CLEAR_FLAGS toDxClearFlags(kgx::RHI::DepthStencilFlags flags)
 
 namespace kgx::RHI
 {
-DX12GraphicsCommandList::DX12GraphicsCommandList(core::CommandListAllocator* allocator)
-	: RHIGraphicsCommandList(*allocator), mCommandAllocator(nullptr), mCommandList(nullptr)
+DX12GraphicsCommandList::DX12GraphicsCommandList()
+	: RHIGraphicsCommandList(), mCommandList(nullptr)
 {
 }
 
@@ -37,7 +37,9 @@ bool DX12GraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 {
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
-	HRESULT res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&mCommandAllocator));
+	// Create a temporary CommandAllocator here. We are going to immediately close the commandlist after this anyways, so it doesn't matter that this allocator is temporary.
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> tempAllocator;
+	HRESULT res = nativeDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&tempAllocator));
 	if (FAILED(res))
 	{
 		return false;
@@ -50,11 +52,10 @@ bool DX12GraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 		nativeInitialState = rcCast(initialState)->getPSO();
 	}
 	
-	res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, mCommandAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
+	res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, tempAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
 	if (SUCCEEDED(res))
 	{
-	    // Start off closed, because the first thing we do when rendering is to close the commandallocator that was used in the previous frame.
-	    close();
+		close();
 	}
 
 	return SUCCEEDED(res);
@@ -65,7 +66,7 @@ void DX12GraphicsCommandList::close()
 	mCommandList->Close();
 }
 
-void DX12GraphicsCommandList::reset(RHIGraphicsPipelineState* initialState)
+void DX12GraphicsCommandList::reset(RHICommandAllocator* allocator, RHIGraphicsPipelineState* initialState)
 {
 	ID3D12PipelineState* nativeInitialState = nullptr;
 
@@ -75,8 +76,8 @@ void DX12GraphicsCommandList::reset(RHIGraphicsPipelineState* initialState)
 		nativeInitialState = dxPipelineState->getPSO();
 	}
 
-	mCommandAllocator->Reset();
-	mCommandList->Reset(mCommandAllocator.Get(), nativeInitialState);
+	const DX12CommandAllocator* dxAllocator = rcCast(allocator);
+	mCommandList->Reset(dxAllocator->getNativeAllocator(), nativeInitialState);
 }
 
 void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)

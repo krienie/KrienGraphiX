@@ -92,7 +92,7 @@ RenderCore::RenderCore()
 		mScene->updateScene(deltaTime);
 
 		{
-			std::lock_guard lock(mRenderWindowMutex);
+			std::scoped_lock lock(mRenderWindowMutex);
 			for (const auto& [_, renderWindow]: mRenderWindows)
 			{
 				renderWindow->draw();
@@ -105,6 +105,9 @@ RenderCore::~RenderCore()
 {
 	// Make sure the frame time is stopped before we destruct everything else
 	mFrameTimer.reset();
+
+	mRenderThread->flush();
+	mRenderThread->shutdown();
 	mRenderThread.reset();
 }
 }

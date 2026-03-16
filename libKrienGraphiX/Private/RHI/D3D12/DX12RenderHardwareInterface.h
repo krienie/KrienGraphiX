@@ -31,11 +31,16 @@ public:
 		unsigned int frameCount) const override;
 
 	[[nodiscard]]
+	std::unique_ptr<RHIFence> createFence() const override;
+
+	[[nodiscard]]
 	std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const override;
 
-	//TODO(KL): Remove the need for passing CommandListAllocator? integrate it into DX12RenderHardwareInterface
 	[[nodiscard]]
-	std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState *pipelineState) const override;
+	std::unique_ptr<RHICommandAllocator> createCommandAllocator() const override;
+
+	[[nodiscard]]
+	std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsPipelineState *pipelineState) const override;
 
 	[[nodiscard]]
 	std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHITexture2DDescriptor descriptor) const override;

@@ -8,27 +8,21 @@
 #include "Private/RHI/RHIDescriptors.h"
 #include "Private/Core/PrivateDefinitions.h"
 
-namespace kgx::core
-{
-class CommandListAllocator;
-}
-
 namespace kgx::rendering
 {
-	class KGXMeshRenderObject;
+class KGXMeshRenderObject;
 }
 
 namespace kgx::RHI
 {
 class RHIResourceView;
+class RHICommandAllocator;
 class RHICommandQueue;
 class RHIGraphicsPipelineState;
 
 class RHIGraphicsCommandList
 {
 public:
-	RHIGraphicsCommandList(core::CommandListAllocator& allocator);
-
 	virtual ~RHIGraphicsCommandList() = default;
 
 	virtual bool create(RHIGraphicsPipelineState* initialState) = 0;
@@ -37,7 +31,7 @@ public:
 
 	virtual void close() = 0;
 
-	virtual void reset(RHIGraphicsPipelineState* initialState = nullptr) = 0;
+	virtual void reset(RHICommandAllocator* allocator, RHIGraphicsPipelineState* initialState = nullptr) = 0;
 
 	virtual void setPipelineState(RHIGraphicsPipelineState* pipelineState) = 0;
 
@@ -51,24 +45,5 @@ public:
 	virtual void clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4]) = 0;
 
 	virtual void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) = 0;
-
-	//TODO(KL): add other commandList methods
-
-private:
-	core::CommandListAllocator* mAllocator;
-};
-
-class RHIGraphicsCommandListHandle
-{
-public:
-	RHIGraphicsCommandListHandle(RHIGraphicsCommandList& commandList);
-	~RHIGraphicsCommandListHandle();
-
-	RHIGraphicsCommandList* get() const { return mCommandList; }
-
-	RHIGraphicsCommandList* operator->() const { return mCommandList; }
-
-private:
-	RHIGraphicsCommandList* mCommandList;
 };
 }

@@ -33,8 +33,6 @@ class DX12GraphicsDevice
 		Microsoft::WRL::ComPtr<ID3D12Device> mDevice;
 		Microsoft::WRL::ComPtr<IDXGIFactory4> mFactory;
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> mHardwareAdapter;
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> mCommandAllocator;
 		D3DX12Residency::ResidencyManager mResidencyManager;
 };
 }
