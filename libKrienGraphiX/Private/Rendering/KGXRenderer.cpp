@@ -69,7 +69,7 @@ kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 	const core::RenderThread* renderThread = core::RenderCore::get()->getRenderThreadPtr();
 	RHI::RHIGraphicsCommandList* commandList = renderThread->getCurrentFrameCommandList();
 
-	constexpr RHI::RHIResource::CreationFlags flags = static_cast<RHI::RHIResource::CreationFlags>(RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
+	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
 
 	RHI::RHIBufferDescriptor cbDesc
 	{
@@ -110,10 +110,13 @@ void KGXRenderer::RenderFrame()
 	static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 
 	commandList->clearRenderTargetView(mOutputRTV, lightSteelBlue);
+#ifndef __APPLE__
 	commandList->clearDepthStencilView(mDSV, RHI::DepthStencilFlags::DepthStencilClear, 1.0f, 0);
+#endif
 
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
+#ifndef __APPLE__
 	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
 	commandList->setPipelineState(staticPSO);
 
@@ -133,6 +136,7 @@ void KGXRenderer::RenderFrame()
 
 		commandList->drawMeshRenderObject(renderObject.get());
 	}
+#endif
 
 	RHI::PlatformRHI->endFrame(commandList, OutputRenderTarget);
 	frameContext->endFrame();

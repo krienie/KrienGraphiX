@@ -51,7 +51,7 @@ bool DX12GraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 	{
 		nativeInitialState = rcCast(initialState)->getPSO();
 	}
-	
+
 	res = nativeDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, tempAllocator.Get(), nativeInitialState, IID_PPV_ARGS(&mCommandList));
 	if (SUCCEEDED(res))
 	{

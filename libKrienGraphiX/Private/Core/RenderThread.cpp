@@ -22,14 +22,14 @@ ImmediateCommandContext::ImmediateCommandContext()
 	mCommandList = renderThread->getCommandListPoolPtr()->getResource();
 	mCommandAllocator = renderThread->getCommandAllocatorPoolPtr()->getResource();
 
-	mCommandList->reset(mCommandAllocator);
+	mCommandList->reset(mCommandAllocator, nullptr);
 }
 
 ImmediateCommandContext::~ImmediateCommandContext()
 {
 	mCommandList->close();
 
-	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
+	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
 	renderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
 	renderThread->getCommandQueuePtr()->flushQueue();
 
@@ -46,7 +46,7 @@ FrameCommandContext::FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* fr
 	mCommandList = renderThread->getCommandListPoolPtr()->getResource();
 	mCommandAllocator = renderThread->getCommandAllocatorPoolPtr()->getResource();
 
-	mCommandList->reset(mCommandAllocator);
+	mCommandList->reset(mCommandAllocator, nullptr);
 }
 
 FrameCommandContext::~FrameCommandContext()
@@ -81,11 +81,6 @@ RenderThread::RenderThread()
 #endif
 
 	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
-
-#ifdef __APPLE__
-	//TODO(KL): Temporary to avoid crashes because of unimplemented code
-	return;
-#endif
 
 	mCommandQueue = RHI::PlatformRHI->createCommandQueue();
 
@@ -165,21 +160,28 @@ void RenderThread::flush() const
 
 void RenderThread::shutdown()
 {
+	// Add the shutdown code as a render command as some graphics APIs use strictly thread-local resources.
+	enqueueCommand([this]()
 	{
-		std::queue<std::unique_ptr<FrameCommandContext>> emptyQueue;
-		mFrameResources.swap(emptyQueue);
-	}
+		{
+			std::queue<std::unique_ptr<FrameCommandContext>> emptyQueue;
+			mFrameResources.swap(emptyQueue);
+		}
 
-	for (int i = 0; i < mFrameResources.size(); ++i)
-	{
-		mFrameResources.pop();
-	}
+		for (int i = 0; i < mFrameResources.size(); ++i)
+		{
+			mFrameResources.pop();
+		}
 
-	mCommandQueue.reset();
-	mFrameFence.reset();
-	mCommandListPool.reset();
-	mCommandAllocatorPool.reset();
+		mCommandQueue.reset();
+		mFrameFence.reset();
+		mCommandListPool.reset();
+		mCommandAllocatorPool.reset();
+		RHI::PlatformRHI.reset();
+	});
+
+	// Shutdown the command thread last
+	mCommandThread->flush();
 	mCommandThread.reset();
-	RHI::PlatformRHI.reset();
 }
 }

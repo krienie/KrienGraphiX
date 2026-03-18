@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <memory>
 
 namespace kgx::RHI
 {
@@ -13,6 +13,6 @@ public:
 	virtual void sync() = 0;
 	virtual void queueSignal(uint64_t value) = 0;
 	virtual void waitForValue(uint64_t value) = 0;
-	virtual uint64_t getCurrentValue() const = 0;
+	[[nodiscard]] virtual uint64_t getCurrentValue() const = 0;
 };
 }

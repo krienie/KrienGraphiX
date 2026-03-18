@@ -36,6 +36,6 @@ private:
 	std::shared_ptr<RHI::RHITexture2D> mDepthStencil;
 	std::shared_ptr<RHI::RHIResourceView> mDSV;
 
-	core::KGXViewport mViewport;
+	core::KGXViewport mViewport{};
 };
 }

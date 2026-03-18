@@ -70,8 +70,8 @@ struct RHIGraphicsPipelineStateDescriptor
 	RHIShader* ds;
 	RHIShader* hs;
 	RHIShader* gs;
-	//RHIShader* AS; // To be implemented later
-	//RHIShader* MS; // To be implemented later
+	//RHIShader* as; // To be implemented later
+	//RHIShader* ms; // To be implemented later
 	//TODO(KL): Implement blendstate
 	//RHIBlendState BlendState;
 	//TODO(KL): Implement rasterizerstate

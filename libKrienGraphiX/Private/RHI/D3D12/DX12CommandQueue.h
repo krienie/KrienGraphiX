@@ -20,14 +20,11 @@ public:
 
 	bool create() override;
 	void executeCommandList(RHIGraphicsCommandList* commandList) override;
-	void flushQueue() override;
 
 	[[nodiscard]] ID3D12CommandQueue* getNativeCommandQueue() const;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> mCommandQueue;
-
-	std::unique_ptr<RHIFence> mFence;
 };
 
 DEFINE_RESOURCE_CAST(DX12CommandQueue, RHICommandQueue)

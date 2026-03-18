@@ -1,18 +1,24 @@
 
 #pragma once
 
+#include "RHIFence.h"
+
 namespace kgx::RHI
 {
 class RHIGraphicsCommandList;
 
 class RHICommandQueue
 {
-	public:
-		virtual ~RHICommandQueue() = default;
+public:
+	RHICommandQueue();
+	virtual ~RHICommandQueue() = default;
 
-		virtual bool create() = 0;
+	virtual bool create() = 0;
 
-		virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
-		virtual void flushQueue() = 0;
+	virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
+	void flushQueue();
+
+private:
+	std::unique_ptr<RHIFence> mFence;
 };
 }

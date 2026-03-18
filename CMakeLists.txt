@@ -23,6 +23,7 @@ elseif (APPLE)
     add_compile_options(-fno-exceptions) # No exceptions
     add_compile_options(-fdeclspec)
     set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0")
 else()
     message(FATAL_ERROR "Unsupported platform.")
 endif()

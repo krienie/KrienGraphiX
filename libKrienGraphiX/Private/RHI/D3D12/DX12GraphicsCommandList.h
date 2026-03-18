@@ -42,5 +42,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> mCommandList;
 };
 
-DEFINE_RESOURCE_CAST(DX12GraphicsCommandList, RHIGraphicsCommandList)
+DEFINE_RESOURCE_CAST(DX12GraphicsCommandList, RHIGraphicsCommandList);
 }

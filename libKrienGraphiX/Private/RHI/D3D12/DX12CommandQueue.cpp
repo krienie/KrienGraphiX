@@ -26,8 +26,6 @@ bool DX12CommandQueue::create()
 		return false;
 	}
 
-	mFence = getDX12RHI()->createFence();
-
 	return SUCCEEDED(res);
 }
 
@@ -37,11 +35,6 @@ void DX12CommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 
 	ID3D12CommandList* ppCommandLists[] = { dxCommandList->getCommandList() };
 	mCommandQueue->ExecuteCommandLists(1u, ppCommandLists);
-}
-
-void DX12CommandQueue::flushQueue()
-{
-	mFence->sync();
 }
 
 ID3D12CommandQueue* DX12CommandQueue::getNativeCommandQueue() const

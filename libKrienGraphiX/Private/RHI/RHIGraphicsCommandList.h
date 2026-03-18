@@ -31,7 +31,7 @@ public:
 
 	virtual void close() = 0;
 
-	virtual void reset(RHICommandAllocator* allocator, RHIGraphicsPipelineState* initialState = nullptr) = 0;
+	virtual void reset(RHICommandAllocator* allocator, RHIGraphicsPipelineState* initialState) = 0;
 
 	virtual void setPipelineState(RHIGraphicsPipelineState* pipelineState) = 0;
 

@@ -1,8 +1,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include "Metal/MTLDevice.hpp"
 #include "Private/RHI/RenderHardwareInterface.h"
-#include "Private/RHI/Metal/MTLGraphicsDevice.h"
 
 namespace kgx::RHI
 {
@@ -10,7 +12,7 @@ class MTLRenderHardwareInterface : public RenderHardwareInterface
 {
 public:
 	MTLRenderHardwareInterface();
-	~MTLRenderHardwareInterface() override = default;
+	~MTLRenderHardwareInterface() override;
 
 	MTLRenderHardwareInterface(const MTLRenderHardwareInterface&) noexcept            = delete;
 	MTLRenderHardwareInterface& operator=(const MTLRenderHardwareInterface&) noexcept = delete;
@@ -26,17 +28,22 @@ public:
 	[[nodiscard]]
 	std::unique_ptr<RHISwapChain> createSwapChain(
 		RHICommandQueue* commandQueue,
-		WinHandle windowHandle,
+		struct SDL_Window* window,
 		unsigned int width,
 		unsigned int height,
 		unsigned int frameCount) const override;
 
 	[[nodiscard]]
+	std::unique_ptr<RHIFence> createFence() const override;
+
+	[[nodiscard]]
 	std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const override;
 
-	//TODO(KL): Remove the need for passing CommandListAllocator? integrate it into MTLRenderHardwareInterface
 	[[nodiscard]]
-	std::shared_ptr<RHIGraphicsCommandList> createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState *pipelineState) const override;
+	std::unique_ptr<RHICommandAllocator> createCommandAllocator() const override;
+
+	[[nodiscard]]
+	std::unique_ptr<RHIGraphicsCommandList> createGraphicsCommandList(RHIGraphicsPipelineState *pipelineState) const override;
 
 	[[nodiscard]]
 	std::unique_ptr<RHITexture2D> createDepthStencilBuffer(RHITexture2DDescriptor descriptor) const override;
@@ -51,10 +58,11 @@ public:
 	std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const override;
 
 	[[nodiscard]]
-	MTLGraphicsDevice* getMTLDevice() const { return mGraphicsDevice.get(); }
+	MTL::Device* getMTLDevice() const { return mGraphicsDevice.get(); }
 
 private:
-	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
+	NS::SharedPtr<MTL::Device> mGraphicsDevice;
+	NS::AutoreleasePool* mAutoReleasePool;
 };
 
 inline MTLRenderHardwareInterface* getMTLRHI()

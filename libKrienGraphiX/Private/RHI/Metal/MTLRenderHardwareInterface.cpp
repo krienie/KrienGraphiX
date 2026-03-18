@@ -1,18 +1,19 @@
 
 #include "MTLRenderHardwareInterface.h"
 
-#include "MTLGraphicsDevice.h"
-//#include "MTLCommandQueue.h"
-//#include "MTLGraphicsCommandList.h"
+#include <cassert>
+#include <SDL3/SDL.h>
+
+#include "MTLCommandQueue.h"
+#include "MTLCommandAllocator.h"
+#include "MTLFence.h"
+#include "MTLGraphicsCommandList.h"
 //#include "MTLGraphicsPipelineState.h"
 //#include "MTLShader.h"
-//#include "MTLSwapChain.h"
-
-#include <cassert>
-
+#include "MTLSwapChain.h"
 //#include "MTLBuffer.h"
-//#include "MTLDescriptors.h"
-//#include "MTLTexture2D.h"
+#include "MTLTexture2D.h"
+
 #include "Private/Core/RenderCore.h"
 
 namespace kgx::RHI
@@ -20,60 +21,65 @@ namespace kgx::RHI
 //TODO(KL): log errors when any of these inits fail
 
 MTLRenderHardwareInterface::MTLRenderHardwareInterface()
+	: mAutoReleasePool(nullptr)
 {
-	mGraphicsDevice = std::make_unique<MTLGraphicsDevice>();
-	mGraphicsDevice->create();
+	mGraphicsDevice = NS::TransferPtr(MTL::CreateSystemDefaultDevice());
+}
+
+MTLRenderHardwareInterface::~MTLRenderHardwareInterface()
+{
+	if (mAutoReleasePool)
+	{
+		mAutoReleasePool->release();
+	}
+
+	mGraphicsDevice.reset();
 }
 
 void MTLRenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	//TODO(KL): Implement
-	assert(false);
-	//DX12Texture2D* dxTexture2D = dxCast(renderTarget);
-	//dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_RENDER_TARGET);
+	if (mAutoReleasePool)
+	{
+		mAutoReleasePool->release();
+        mAutoReleasePool = nullptr;
+	}
+	mAutoReleasePool = NS::AutoreleasePool::alloc()->init();
 }
 
 void MTLRenderHardwareInterface::endFrame(RHIGraphicsCommandList* commandList, RHITexture2D* renderTarget)
 {
-	//TODO(KL): Implement
-	assert(false);
-	//DX12Texture2D* dxTexture2D = dxCast(renderTarget);
-	//dxTexture2D->transitionToState(dxCast(commandList), D3D12_RESOURCE_STATE_PRESENT);
 }
 
 std::unique_ptr<RHICommandQueue> MTLRenderHardwareInterface::createCommandQueue() const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	/*auto commandQueue = std::make_unique<DX12CommandQueue>();
+	auto commandQueue = std::make_unique<MTLCommandQueue>();
 	if (!commandQueue->create())
 	{
 		return nullptr;
 	}
 
-	return std::move(commandQueue);*/
+	return std::move(commandQueue);
 }
 
 std::unique_ptr<RHISwapChain> MTLRenderHardwareInterface::createSwapChain(
 	RHICommandQueue* commandQueue,
-	WinHandle windowHandle,
+	SDL_Window* window,
 	unsigned int width,
 	unsigned int height,
 	unsigned int frameCount) const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	/*auto swapChain = std::make_unique<DX12SwapChain>(width, height);
-	if (!swapChain->create(commandQueue, windowHandle, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
+	auto swapChain = std::make_unique<MTLSwapChain>(width, height);
+	if (!swapChain->create(commandQueue, window, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
 	{
 		return nullptr;
 	}
 
-	return std::move(swapChain);*/
+	return std::move(swapChain);
+}
+
+std::unique_ptr<RHIFence> MTLRenderHardwareInterface::createFence() const
+{
+	return std::make_unique<MTLFence>();
 }
 
 std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const
@@ -91,19 +97,20 @@ std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const Compil
 	return std::move(newShader);*/
 }
 
-std::shared_ptr<RHIGraphicsCommandList> MTLRenderHardwareInterface::createGraphicsCommandList(core::CommandListAllocator* allocator, RHIGraphicsPipelineState* pipelineState) const
+std::unique_ptr<RHICommandAllocator> MTLRenderHardwareInterface::createCommandAllocator() const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
+	return std::make_unique<MTLCommandAllocator>();
+}
 
-	/*auto graphicsCommandList = std::make_shared<DX12GraphicsCommandList>(allocator);
+std::unique_ptr<RHIGraphicsCommandList> MTLRenderHardwareInterface::createGraphicsCommandList(RHIGraphicsPipelineState *pipelineState) const
+{
+	auto graphicsCommandList = std::make_unique<MTLGraphicsCommandList>();
 	if (!graphicsCommandList->create(pipelineState))
 	{
 		return nullptr;
 	}
 
-	return graphicsCommandList;*/
+	return graphicsCommandList;
 }
 
 std::unique_ptr<RHITexture2D> MTLRenderHardwareInterface::createDepthStencilBuffer(RHITexture2DDescriptor descriptor) const
