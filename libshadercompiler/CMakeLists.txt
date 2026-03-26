@@ -2,7 +2,7 @@
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost CONFIG REQUIRED COMPONENTS serialization program_options)
 
-set(LIB_NAME libshadercompiler)
+set(LIB_NAME shadercompiler)
 
 file(GLOB_RECURSE Src
 		"Private/*.cpp"

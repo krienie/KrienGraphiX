@@ -3,7 +3,7 @@ enable_testing()
 
 find_package(GTest)
 
-set(EXE_NAME libshadercompiler.test)
+set(EXE_NAME shadercompiler.test)
 
 file(GLOB_RECURSE Src
         "*.cpp"
@@ -14,7 +14,7 @@ add_executable(${EXE_NAME} ${Src})
 target_include_directories(${EXE_NAME} PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
 target_link_libraries(${EXE_NAME}
                         PUBLIC
-                            libshadercompiler
+                            shadercompiler
                         PRIVATE
                             GTest::gtest)
 

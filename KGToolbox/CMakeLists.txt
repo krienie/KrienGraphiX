@@ -9,9 +9,16 @@ if (MSVC)
 add_executable(${EXE_NAME} ${Src})
 elseif(APPLE)
 add_executable(${EXE_NAME} MACOSX_BUNDLE ${Src})
+
+set_target_properties(${EXE_NAME} PROPERTIES
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.kriengraphix.${EXE_NAME}"
+        MACOSX_BUNDLE_BUNDLE_NAME "${EXE_NAME}"
+        MACOSX_BUNDLE_BUNDLE_VERSION "1.0.0"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0"
+)
 endif()
 
-target_link_libraries(${EXE_NAME} PRIVATE libkriengraphix SDL3::SDL3)
+target_link_libraries(${EXE_NAME} PRIVATE kriengraphix SDL3::SDL3)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
