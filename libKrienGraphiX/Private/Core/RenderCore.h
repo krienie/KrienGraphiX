@@ -28,7 +28,6 @@ public:
 	RenderCore& operator=(RenderCore&&) noexcept      = delete;
 
 	[[nodiscard]] KGXScene* getScenePtr() const;
-	[[nodiscard]] RenderThread* getRenderThreadPtr() const;
 
 	bool createRenderWindow(SDL_Window* window, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
 
@@ -42,7 +41,6 @@ private:
 	std::unique_ptr<FrameTimer> mFrameTimer;
 
 	std::unique_ptr<KGXScene> mScene;
-	std::unique_ptr<RenderThread> mRenderThread;
 
 	std::mutex mRenderWindowMutex;
 	std::unordered_map<SDL_Window*, std::shared_ptr<RenderWindow>> mRenderWindows;

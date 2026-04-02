@@ -9,7 +9,7 @@ namespace kgx::RHI
 {
 MTLFence::MTLFence()
 {
-	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice();
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mEvent = NS::TransferPtr(mtlDevice->newSharedEvent());
 }
 
@@ -22,13 +22,13 @@ void MTLFence::sync()
 
 void MTLFence::queueSignal(uint64_t value)
 {
-	MTLCommandQueue* commandQueue = rcCast(core::RenderCore::get()->getRenderThreadPtr()->getCommandQueuePtr());
-	commandQueue->getNativeCommandQueue()->signalEvent(mEvent.get(), mFenceValue);
+	MTLCommandQueue* commandQueue = rcCast(core::gRenderThread->getCommandQueuePtr());
+	commandQueue->getNativeCommandQueue()->signalEvent(mEvent.get(), value);
 }
 
 void MTLFence::waitForValue(uint64_t value)
 {
-	mEvent->waitUntilSignaledValue(mFenceValue, UINT64_MAX);
+	mEvent->waitUntilSignaledValue(value, UINT64_MAX);
 }
 
 uint64_t MTLFence::getCurrentValue() const

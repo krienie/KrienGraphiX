@@ -4,10 +4,15 @@
 #include <vector>
 #include <string>
 
+namespace kgx
+{
+struct CompiledShader;
+}
+
 namespace kgx::DXILToMetalIRConverter
 {
 #ifdef __APPLE__
-std::vector<char> convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& entryPoint);
+bool convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& entryPoint, CompiledShader& outShader);
 #endif
 }
 

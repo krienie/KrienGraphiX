@@ -5,6 +5,8 @@
 #include <queue>
 #include <unordered_map>
 
+#include <Metal/Metal.hpp>
+#include <metal_irconverter_runtime.h>
 #include <Metal/MTL4CommandAllocator.hpp>
 #include <Metal/MTL4CommandBuffer.hpp>
 
@@ -20,7 +22,8 @@ struct MTLPassTextureDescriptor
 	MTLTexture2D* texture = nullptr;
 	MTL::LoadAction loadAction = MTL::LoadActionDontCare;
 	MTL::StoreAction storeAction = MTL::StoreActionDontCare;
-	MTL::ClearColor clearColor = MTL::ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	RHIClearValue clearValue = {0, 0, 0, 0};
+	DepthStencilFlags dsClearFlags;
 };
 
 struct MTLPassCompilationContext
@@ -28,6 +31,8 @@ struct MTLPassCompilationContext
 	std::unordered_map<MTLTexture2D*, MTLPassTextureDescriptor> usedTextures;
 	std::vector<MTLTexture2D*> renderTargets;
 	MTLPassTextureDescriptor depthStencilTexture;
+	std::vector<IRDescriptorTableEntry> topLevelBufferEntries;
+	class MTLGraphicsPipelineState* mtlPipelineState = nullptr;
 };
 
 class MTLGraphicsCommandList final : public RHIGraphicsCommandList
@@ -59,13 +64,10 @@ public:
 	void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) override;
 
 private:
-	template <typename M, typename... Args>
-	void recordEncodercommand(M memberFunc, Args... args)
+	template <typename F>
+	void recordEncoderCommand(F&& func)
 	{
-		mRecordedEncoderCommands.push([=](MTL4::RenderCommandEncoder* encoder)
-		{
-			(*encoder.*memberFunc)(args...);
-		});
+		mRecordedEncoderCommands.push(std::forward<F>(func));
 	}
 
 	[[nodiscard]]
@@ -75,7 +77,7 @@ private:
 	MTL4::RenderCommandEncoder* mEncoder = nullptr;
 	MTL4::RenderPassDescriptor* mPassDescriptor = nullptr;
 
-	MTLPassCompilationContext mPassCompilationContext;
+	MTLPassCompilationContext mPassContext;
 	std::queue<std::function<void(MTL4::RenderCommandEncoder*)>> mRecordedEncoderCommands;
 };
 

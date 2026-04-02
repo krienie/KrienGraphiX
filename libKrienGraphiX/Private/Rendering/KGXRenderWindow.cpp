@@ -12,16 +12,13 @@ namespace kgx::rendering
 KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigned int height)
 	: mWindowHandle(window), mRHISwapChain(nullptr)
 {
-	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
-
-	//TODO(KL): Integrate the swapchain into KGXRenderWindow? or KGXViewport? as an interface
 	using namespace RHI;
-	mRHISwapChain = PlatformRHI->createSwapChain(
-		renderThread->getCommandQueuePtr(),
+	mRHISwapChain = gPlatformRHI->createSwapChain(
+		gRenderThread->getCommandQueuePtr(),
 		mWindowHandle,
 		width,
 		height,
-		2); // Front- and back-buffer
+		core::RenderThread::maxNumBufferedFrames);
 
 	mViewport =
 	{
@@ -47,10 +44,10 @@ KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigne
 
 #ifndef __APPLE__
 	//TODO(KL): Create a global rendertarget pool where this one comes out of and move it into KGXRenderer.
-	mDepthStencil = PlatformRHI->createDepthStencilBuffer(texDesc);
+	mDepthStencil = gPlatformRHI->createDepthStencilBuffer(texDesc);
 
 	constexpr bool isShaderVisible = false;
-	mDSV = PlatformRHI->createResourceView(RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
+	mDSV = gPlatformRHI->createResourceView(RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
 #endif
 }
 

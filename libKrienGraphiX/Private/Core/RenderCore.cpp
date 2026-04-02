@@ -46,11 +46,6 @@ KGXScene* RenderCore::getScenePtr() const
 	return mScene.get();
 }
 
-RenderThread* RenderCore::getRenderThreadPtr() const
-{
-	return mRenderThread.get();
-}
-
 bool RenderCore::createRenderWindow(SDL_Window* window, unsigned initialWindowWidth, unsigned initialWindowHeight)
 {
 	std::lock_guard lock(mRenderWindowMutex);
@@ -70,7 +65,7 @@ bool RenderCore::createRenderWindow(SDL_Window* window, unsigned initialWindowWi
 RenderCore::RenderCore()
 {
 	mScene = std::make_unique<KGXScene>();
-	mRenderThread = std::make_unique<RenderThread>();
+	gRenderThread = std::make_unique<RenderThread>();
 
 #ifdef WIN32
 #ifdef _DEBUG
@@ -106,8 +101,8 @@ RenderCore::~RenderCore()
 	// Make sure the frame time is stopped before we destruct everything else
 	mFrameTimer.reset();
 
-	mRenderThread->flush();
-	mRenderThread->shutdown();
-	mRenderThread.reset();
+	gRenderThread->flush();
+	gRenderThread->shutdown();
+	gRenderThread.reset();
 }
 }

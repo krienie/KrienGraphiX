@@ -13,7 +13,7 @@
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	SDL_SetMainReady();
-	SDL_SetAppMetadata("KGToolbox", "1.0", "com.kgx.KGToolbox");
+	SDL_SetAppMetadata("KGToolbox", "1.0", "com.kgx.kgtoolbox");
 
 	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
@@ -46,17 +46,12 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 
 	mKgxEngine->createRenderWindow(mSDLWindow, mClientWidth, mClientHeight);
 
-#ifdef __APPLE__
-	//TODO(KL): Temporary to avoid crashes because of unimplemented code
-	return;
-#endif
-
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 	
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
-		updateWindowTitle(deltaTime);
+		//updateWindowTitle(deltaTime);
 
 		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), glm::two_pi<float>());
 		mBoxObject->setRotation(0, 0, NewRoll);
@@ -83,8 +78,6 @@ int KGToolboxApp::run()
 				}
 			}
 		}
-
-
 	}
 
 	mKgxEngine.reset();

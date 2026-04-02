@@ -7,7 +7,7 @@ namespace kgx::RHI
 {
 RHICommandQueue::RHICommandQueue()
 {
-	mFence = PlatformRHI->createFence();
+	mFence = gPlatformRHI->createFence();
 }
 
 void RHICommandQueue::flushQueue()

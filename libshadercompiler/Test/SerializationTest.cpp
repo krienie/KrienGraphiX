@@ -35,6 +35,7 @@ TEST(Serialization, ShaderCompilation)
 	{
 		EXPECT_TRUE(!shader.byteCode.empty());
 		EXPECT_EQ(includeDebugInfo, !shader.pdb.empty());
+		EXPECT_EQ(shader.mainEntry, "main");
 	};
 	
 	checkShader(vertexShader);

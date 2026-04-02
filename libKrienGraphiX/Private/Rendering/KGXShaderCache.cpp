@@ -58,7 +58,7 @@ RHI::RHIShader* KGXShaderCache::loadShaderFromFile(const std::string& shaderFile
 		return nullptr;
 	}
 
-	std::unique_ptr<RHI::RHIShader> newShader = RHI::PlatformRHI->createShader(compiledShader, type);
+	std::unique_ptr<RHI::RHIShader> newShader = RHI::gPlatformRHI->createShader(compiledShader, type);
 	if (!newShader)
 	{
 		return nullptr;

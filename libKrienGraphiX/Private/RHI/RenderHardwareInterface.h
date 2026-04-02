@@ -65,5 +65,5 @@ public:
 	virtual std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const = 0;
 };
 
-inline std::unique_ptr<RenderHardwareInterface> PlatformRHI = nullptr;
+inline std::unique_ptr<RenderHardwareInterface> gPlatformRHI = nullptr;
 }

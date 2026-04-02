@@ -8,6 +8,11 @@
 #include "Private/RHI/RHIDescriptors.h"
 #include "Private/RHI/RHIGraphicsPipelineState.h"
 
+#ifdef __APPLE__
+#include <filesystem>
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 namespace
 {
 __declspec(align(256u)) struct ConstantBufferData
@@ -19,6 +24,44 @@ __declspec(align(256u)) struct ConstantBufferData
 std::unique_ptr<kgx::RHI::RHIGraphicsPipelineState> staticPSO;
 std::unique_ptr<kgx::RHI::RHIBuffer> staticConstantBuffer;
 
+//TODO(KL): Move this to a separate file/class. Something like a resource manager
+#ifdef __APPLE__
+std::string getFullPath(const std::string& relativePathStr)
+{
+	namespace fs = std::filesystem;
+
+	const fs::path relativePath = relativePathStr;
+
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+
+	const CFStringRef resName = CFStringCreateWithCString(nullptr, relativePath.stem().c_str(), kCFStringEncodingUTF8);
+	const CFStringRef subDirName = CFStringCreateWithCString(nullptr, relativePath.parent_path().c_str(), kCFStringEncodingUTF8);
+	const CFStringRef resExt  = CFStringCreateWithCString(nullptr, relativePath.extension().c_str(), kCFStringEncodingUTF8);
+
+	const CFURLRef fileURL = CFBundleCopyResourceURL(mainBundle, resName, resExt, subDirName);
+
+	CFRelease(resName);
+	CFRelease(subDirName);
+	CFRelease(resExt);
+
+	if (!fileURL)
+	{
+		return "";
+	}
+
+	// 3. Convert URL to a POSIX path
+	char path[PATH_MAX];
+	if (CFURLGetFileSystemRepresentation(fileURL, true, reinterpret_cast<UInt8*>(path), PATH_MAX))
+	{
+		CFRelease(fileURL);
+		return {path};
+	}
+
+	CFRelease(fileURL);
+	return "";
+}
+#endif
+
 kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 {
 	using namespace kgx;
@@ -28,14 +71,18 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 		return staticPSO.get();
 	}
 
-	const auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	rendering::KGXShaderCache* shaderCache = renderThread->getShaderCachePtr();
+	rendering::KGXShaderCache* shaderCache = core::gRenderThread->getShaderCachePtr();
 
-	const auto vertexShaderPath = std::filesystem::absolute("./Shaders/DefaultVS.hlsl");
-	const auto pixelShaderPath = std::filesystem::absolute("./Shaders/DefaultPS.hlsl");
+#ifdef __APPLE__
+	const auto vertexShaderPath = getFullPath("Shaders/DefaultVS.hlsl");
+	const auto pixelShaderPath = getFullPath("Shaders/DefaultPS.hlsl");
+#else
+	const auto vertexShaderPath = std::filesystem::absolute("./Shaders/DefaultVS.hlsl").string();
+	const auto pixelShaderPath = std::filesystem::absolute("./Shaders/DefaultPS.hlsl").string();
+#endif
 
-	auto* vertexShader = shaderCache->loadShaderFromFile(vertexShaderPath.string(), "main", RHI::RHIShader::ShaderType::Vertex);
-	auto* pixelShader = shaderCache->loadShaderFromFile(pixelShaderPath.string(), "main", RHI::RHIShader::ShaderType::Pixel);
+	auto* vertexShader = shaderCache->loadShaderFromFile(vertexShaderPath, "main", RHI::RHIShader::ShaderType::Vertex);
+	auto* pixelShader = shaderCache->loadShaderFromFile(pixelShaderPath, "main", RHI::RHIShader::ShaderType::Pixel);
 
 	std::vector<VertexInputElement> layoutDesc = {VertexPositionInput, VertexColorInput};
 	vertexShader->setVertexInputLayout(layoutDesc);
@@ -52,7 +99,7 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 	//TODO(KL): Get these pixelformats from the buffers themselves
 	psoDesc.renderTargetFormats[0] = RHI::RHIPixelFormat::R10G10B10A2_unorm;
 
-	staticPSO = RHI::PlatformRHI->createGraphicsPipelineState(psoDesc);
+	staticPSO = RHI::gPlatformRHI->createGraphicsPipelineState(psoDesc);
 
 	return staticPSO.get();
 }
@@ -66,10 +113,10 @@ kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 		return staticConstantBuffer.get();
 	}
 
-	const core::RenderThread* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	RHI::RHIGraphicsCommandList* commandList = renderThread->getCurrentFrameCommandList();
+	RHI::RHIGraphicsCommandList* commandList = core::gRenderThread->getCurrentFrameCommandList();
 
-	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
+	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
+		RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
 
 	RHI::RHIBufferDescriptor cbDesc
 	{
@@ -82,7 +129,7 @@ kgx::RHI::RHIBuffer* getStaticConstantBuffer()
 		.flags = flags
 	};
 
-	staticConstantBuffer = RHI::PlatformRHI->createBuffer(commandList, cbDesc);
+	staticConstantBuffer = RHI::gPlatformRHI->createBuffer(commandList, cbDesc);
 
 	return staticConstantBuffer.get();
 }
@@ -97,16 +144,15 @@ KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHIResourceView
 
 void KGXRenderer::RenderFrame()
 {
-	auto* renderThread = core::RenderCore::get()->getRenderThreadPtr();
-	auto frameContext = renderThread->getCurrentFrameContext();
+	auto frameContext = core::gRenderThread->getCurrentFrameContext();
 	auto commandList = frameContext->getCommandList();
 
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
 
-	RHI::PlatformRHI->beginFrame(commandList, OutputRenderTarget);
-	
+	RHI::gPlatformRHI->beginFrame(commandList, OutputRenderTarget);
+
 	commandList->setViewport(mViewport);
-	
+
 	static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 
 	commandList->clearRenderTargetView(mOutputRTV, lightSteelBlue);
@@ -116,7 +162,6 @@ void KGXRenderer::RenderFrame()
 
 	commandList->setRenderTargets({ mOutputRTV }, mDSV);
 
-#ifndef __APPLE__
 	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
 	commandList->setPipelineState(staticPSO);
 
@@ -131,14 +176,14 @@ void KGXRenderer::RenderFrame()
 	//TODO(KL): record mesh draw commands. Simple for now
 	for (auto& renderObject : *renderScene)
 	{
+		//TODO(KL): Create a small abstraction for using RootConstants/PushConstants instead of filling a CB for these small values.
 		cbData.modelMatrix = renderObject->getTransform();
 		memcpy(staticConstantBuff->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
 
 		commandList->drawMeshRenderObject(renderObject.get());
 	}
-#endif
 
-	RHI::PlatformRHI->endFrame(commandList, OutputRenderTarget);
+	RHI::gPlatformRHI->endFrame(commandList, OutputRenderTarget);
 	frameContext->endFrame();
 }
 }

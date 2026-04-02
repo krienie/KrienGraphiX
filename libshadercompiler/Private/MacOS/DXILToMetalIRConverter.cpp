@@ -1,6 +1,8 @@
 
 #include "DXILToMetalIRConverter.h"
 
+#include "ShaderCompiler/ShaderCompiler.h"
+
 #ifdef __APPLE__
 #include <metal_irconverter.h>
 #endif
@@ -8,41 +10,46 @@
 namespace kgx::DXILToMetalIRConverter
 {
 #ifdef __APPLE__
-std::vector<char> convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& entryPoint)
+bool convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& entryPoint, CompiledShader& outShader)
 {
-    std::vector<char> metalIrOut;
+	IRCompiler* irCompiler = IRCompilerCreate();
+	IRCompilerSetEntryPointName(irCompiler, entryPoint.c_str());
 
-    IRCompiler* pCompiler = IRCompilerCreate();
-    IRCompilerSetEntryPointName(pCompiler, entryPoint.c_str());
+	IRCompilerSetStageInGenerationMode(irCompiler, IRStageInCodeGenerationModeUseMetalVertexFetch);
 
-    IRObject* pDXIL = IRObjectCreateFromDXIL((uint8_t*)dxilByteCode.data(), dxilByteCode.size(), IRBytecodeOwnershipNone);
+	IRObject* dxilObj = IRObjectCreateFromDXIL((uint8_t*)dxilByteCode.data(), dxilByteCode.size(), IRBytecodeOwnershipNone);
 
-    // Compile DXIL to Metal IR:
-    IRError* pError = nullptr;
-    IRObject* pOutIR = IRCompilerAllocCompileAndLink(pCompiler, NULL,  pDXIL, &pError);
+	IRError* error = nullptr;
+	IRObject* mtlIRObj = IRCompilerAllocCompileAndLink(irCompiler, entryPoint.c_str(), dxilObj, &error);
 
-    if (!pOutIR)
-    {
-        //TODO(KL): Do something with the error
-        IRErrorDestroy(pError);
-        return metalIrOut;
-    }
+	if (!mtlIRObj)
+	{
+		//TODO(KL): Do something with the error
+		IRErrorDestroy(error);
+		return false;
+	}
 
-    const IRShaderStage shaderStage = IRObjectGetMetalIRShaderStage(pOutIR);
+	const IRShaderStage shaderStage = IRObjectGetMetalIRShaderStage(mtlIRObj);
 
-    IRMetalLibBinary* pMetallib = IRMetalLibBinaryCreate();
-    IRObjectGetMetalLibBinary(pOutIR, shaderStage, pMetallib);
-    const size_t metallibSize = IRMetalLibGetBytecodeSize(pMetallib);
+	IRShaderReflection* reflection = IRShaderReflectionCreate();
+	IRObjectGetReflection(mtlIRObj, IRShaderStageVertex, reflection);
 
-    metalIrOut.resize(metallibSize);
-    IRMetalLibGetBytecode(pMetallib, (uint8_t*)metalIrOut.data());
+	outShader.reflection.numResources = static_cast<unsigned int>(IRShaderReflectionGetResourceCount(reflection));
 
-    IRMetalLibBinaryDestroy(pMetallib);
-    IRObjectDestroy(pDXIL);
-    IRObjectDestroy(pOutIR);
-    IRCompilerDestroy(pCompiler);
+	IRMetalLibBinary* metalLib = IRMetalLibBinaryCreate();
+	IRObjectGetMetalLibBinary(mtlIRObj, shaderStage, metalLib);
+	const size_t metalLibSize = IRMetalLibGetBytecodeSize(metalLib);
 
-    return metalIrOut;
+	outShader.byteCode.resize(metalLibSize);
+	IRMetalLibGetBytecode(metalLib, reinterpret_cast<uint8_t*>(outShader.byteCode.data()));
+
+	IRCompilerDestroy(irCompiler);
+	IRShaderReflectionDestroy(reflection);
+	IRMetalLibBinaryDestroy(metalLib);
+	IRObjectDestroy(dxilObj);
+	IRObjectDestroy(mtlIRObj);
+
+	return true;
 }
 #endif
 }

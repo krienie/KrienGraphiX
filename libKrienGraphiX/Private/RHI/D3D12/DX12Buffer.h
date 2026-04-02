@@ -26,8 +26,7 @@ public:
 private:
 	void* mapImpl(MapType type) override;
 	void unmapImpl() override;
-	
-	RHIBufferDescriptor mDescriptor;
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> mBufferUploader = nullptr;
 	std::unique_ptr<DX12Resource> mBufferDXResource = nullptr;
 

@@ -160,8 +160,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	}
 
 #if __APPLE__
-	shader.byteCode = DXILToMetalIRConverter::convertToMetalIR(shader.byteCode, mainEntry);
-	if (shader.byteCode.empty())
+	if (!DXILToMetalIRConverter::convertToMetalIR(shader.byteCode, mainEntry, shader))
 	{
 		std::wcout << L"Conversion from DXIL to Metal IR failed.\n";
 		OutCompiledShader = CompiledShader();
@@ -182,6 +181,8 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 		}
 		std::wcout << std::endl;
 	}
+
+	shader.reflection.mainEntry = mainEntry;
 
 	OutCompiledShader = std::move(shader);
 

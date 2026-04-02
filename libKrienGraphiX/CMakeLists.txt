@@ -44,21 +44,30 @@ if (WIN32)
     target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib dxgi.lib D3DCompiler.lib)
 elseif (APPLE)
     target_link_libraries(${LIB_NAME} PUBLIC metalcpp)
+
+    find_library(CORE_FOUNDATION CoreFoundation)
+    target_link_libraries(${LIB_NAME} PRIVATE ${CORE_FOUNDATION})
 else()
     message(FATAL_ERROR "Unsupported platform detected.")
 endif()
 
-file(GLOB_RECURSE ShaderFiles
-        "Shaders/*")
-foreach(F IN LISTS ShaderFiles)
-    get_filename_component(fileName "${F}" NAME)
-    configure_file(${F} ${CMAKE_BINARY_DIR}/Debug/Shaders/${fileName} COPYONLY)
-    configure_file(${F} ${CMAKE_BINARY_DIR}/Release/Shaders/${fileName} COPYONLY)
-endforeach()
+file(GLOB_RECURSE ShaderFiles "Shaders/*")
+
+if (WIN32)
+    foreach(F IN LISTS ShaderFiles)
+        get_filename_component(fileName "${F}" NAME)
+        configure_file(${F} ${CMAKE_BINARY_DIR}/Debug/Shaders/${fileName} COPYONLY)
+        configure_file(${F} ${CMAKE_BINARY_DIR}/Release/Shaders/${fileName} COPYONLY)
+    endforeach()
+
+    # Don't try to compile any shader files
+    set_property(SOURCE ${ShaderFiles} PROPERTY VS_SETTINGS "ExcludedFromBuild=true")
+elseif (APPLE)
+    set_target_properties(${LIB_NAME} PROPERTIES SHADER_FILES "${ShaderFiles}")
+endif()
 
 target_sources(${LIB_NAME} PRIVATE ${ShaderFiles})
+
 source_group(Shaders FILES ${ShaderFiles})
-# Don't try to compile any shader files
-set_property(SOURCE ${ShaderFiles} PROPERTY VS_SETTINGS "ExcludedFromBuild=true")
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Src})

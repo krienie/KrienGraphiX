@@ -41,10 +41,17 @@ struct BufferVariableDescriptor
 	unsigned int size = 0;
 };
 
+struct ShaderReflection
+{
+	std::string mainEntry;
+	unsigned int numResources = 0;
+};
+
 struct CompiledShader
 {
 	std::vector<char> byteCode;
 	std::vector<char> pdb;
+	ShaderReflection reflection;
 };
 
 class ShaderCompiler final

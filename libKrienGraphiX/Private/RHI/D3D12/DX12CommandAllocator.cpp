@@ -4,7 +4,6 @@
 #include "DX12GraphicsDevice.h"
 #include "DX12RenderHardwareInterface.h"
 
-
 namespace kgx::RHI
 {
 DX12CommandAllocator::DX12CommandAllocator()

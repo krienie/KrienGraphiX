@@ -1,27 +1,42 @@
 
 #include "MTLGraphicsCommandList.h"
 
+#include <Metal/Metal.hpp>
 #include <Metal/MTL4CommandBuffer.hpp>
 
+#include "MTLBuffer.h"
 #include "MTLCommandAllocator.h"
-#include "MTLCommandQueue.h"
+#include "MTLGraphicsPipelineState.h"
 #include "MTLRenderHardwareInterface.h"
 #include "MTLTexture2D.h"
+#include "MTLShader.h"
 #include "Metal/MTL4RenderPass.hpp"
 
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RHIGraphicsCommandList.h"
 
+namespace
+{
+MTL::ClearColor toMTLClearColor(const kgx::RHI::RHIClearValue& rhiClearValue)
+{
+	return MTL::ClearColor::Make(
+		rhiClearValue.colorClear[0],
+		rhiClearValue.colorClear[1],
+		rhiClearValue.colorClear[2],
+		rhiClearValue.colorClear[3]);
+}
+}
+
 namespace kgx::RHI
 {
 MTLGraphicsCommandList::MTLGraphicsCommandList()
-	: RHIGraphicsCommandList()
+	: RHIGraphicsCommandList(), mPassContext()
 {
 }
 
 bool MTLGraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 {
-	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice();
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 
 	mCommandBuffer = NS::TransferPtr(mtlDevice->newCommandBuffer());
 	if (!mCommandBuffer)
@@ -29,11 +44,25 @@ bool MTLGraphicsCommandList::create(RHIGraphicsPipelineState* initialState)
 		return false;
 	}
 
+	//TODO(KL): Pass in optional label to be used via constructor
+	mCommandBuffer->setLabel(NS::String::string("RenderThreadCommandBuffer", NS::UTF8StringEncoding));
+
 	return true;
 }
 
 void MTLGraphicsCommandList::close()
 {
+	if (mRecordedEncoderCommands.empty())
+	{
+		mCommandBuffer->endCommandBuffer();
+		return;
+	}
+	
+	if (mPassContext.mtlPipelineState && !mPassContext.topLevelBufferEntries.empty())
+	{
+		mPassContext.mtlPipelineState->setTopLevelBufferEntries(mPassContext.topLevelBufferEntries);
+	}
+
 	NS::SharedPtr<MTL4::RenderPassDescriptor> renderPassDescriptor = compileToRenderPassDescriptor();
 
 	MTL4::RenderCommandEncoder* renderEncoder = mCommandBuffer->renderCommandEncoder(renderPassDescriptor.get(), MTL4::RenderEncoderOptionNone);
@@ -57,20 +86,59 @@ void MTLGraphicsCommandList::reset(RHICommandAllocator* allocator, RHIGraphicsPi
 	const MTLCommandAllocator* mtlAllocator = rcCast(allocator);
 	mCommandBuffer->beginCommandBuffer(mtlAllocator->getNativeAllocator());
 
-	mPassCompilationContext = MTLPassCompilationContext();
+	mPassContext = MTLPassCompilationContext();
 	mPassDescriptor = reinterpret_cast<MTL4::RenderPassDescriptor*>(MTL::RenderPassDescriptor::renderPassDescriptor());
 }
 
 void MTLGraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelineState)
 {
-	//TODO(KL): Implement
-	assert(false);
+	mPassContext.mtlPipelineState = rcCast(pipelineState);
+
+	recordEncoderCommand([=, this](MTL4::RenderCommandEncoder* encoder)
+	{
+		encoder->setRenderPipelineState(mPassContext.mtlPipelineState->getPSO());
+	});
+
+	const RHIGraphicsPipelineStateDescriptor& psoDescriptor = mPassContext.mtlPipelineState->getDescriptor();
+
+	if (auto argumentTable = mPassContext.mtlPipelineState->getArgumentTable())
+	{
+		if (psoDescriptor.vs)
+		{
+			recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+			{
+				encoder->setArgumentTable(argumentTable, MTL::RenderStageVertex);
+			});
+		}
+
+		if (psoDescriptor.ps)
+		{
+			recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+			{
+				encoder->setArgumentTable(argumentTable, MTL::RenderStageFragment);
+			});
+		}
+
+		recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+		{
+			encoder->setFrontFacingWinding(MTL::WindingClockwise);
+		});
+		recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+		{
+			encoder->setCullMode(MTL::CullModeBack);
+		});
+	}
 }
 
+//TODO(KL): Abstract setting of a constant buffer away from this interface.
+//Or perhaps create a layer above this where you set the shader together with it's constants.
 void MTLGraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer)
 {
-	//TODO(KL): Implement
-	assert(false);
+	const MTLBuffer* mtlBuffer = rcCast(constantBuffer);
+
+	IRDescriptorTableEntry entry;
+	IRDescriptorTableSetBuffer(&entry, mtlBuffer->getGPUAddress(), 0);
+	mPassContext.topLevelBufferEntries.push_back(entry);
 }
 
 void MTLGraphicsCommandList::setViewport(const core::KGXViewport& viewport)
@@ -84,7 +152,19 @@ void MTLGraphicsCommandList::setViewport(const core::KGXViewport& viewport)
 		.znear = static_cast<double>(viewport.minDepth),
 		.zfar = static_cast<double>(viewport.maxDepth),
 	};
-	recordEncodercommand(&MTL4::RenderCommandEncoder::setViewport, mtlViewport);
+	recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+	{
+		encoder->setViewport(mtlViewport);
+	});
+
+	MTL::ScissorRect mtlScissorRect =
+	{
+		.x = 0, .y = 0, .width = viewport.width, .height = viewport.height
+	};
+	recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+	{
+		encoder->setScissorRect(mtlScissorRect);
+	});
 }
 
 void MTLGraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*>& renderTargetViews,
@@ -96,38 +176,36 @@ void MTLGraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*
 		return;
 	}
 
-	mPassCompilationContext.renderTargets.reserve(renderTargetViews.size());
+	mPassContext.renderTargets.reserve(renderTargetViews.size());
 	for (RHIResourceView* renderTexture : renderTargetViews)
 	{
 		MTLTexture2D* mtlTexture = rcCast(renderTexture->getViewedResource());
-		MTLPassTextureDescriptor& passTexture = mPassCompilationContext.usedTextures[mtlTexture];
+		MTLPassTextureDescriptor& passTexture = mPassContext.usedTextures[mtlTexture];
 		passTexture.storeAction = MTL::StoreActionStore;
 
-		mPassCompilationContext.renderTargets.push_back(mtlTexture);
+		mPassContext.renderTargets.push_back(mtlTexture);
 	}
 
 	//MTLTexture2D* mtlDepthStencil = rcCast(depthStencilView->getViewedResource());
 	//mPassCompilationContext.depthStencilTexture.texture = mtlDepthStencil;
 	//mPassCompilationContext.depthStencilTexture.storeAction = MTL::StoreActionStore;
+
+	//TODO(KL): Create DepthStencilState to be set in the renderencoder
 }
 
 void MTLGraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthStencilFlags clearFlags, float depth,
 	uint8_t stencil)
 {
-	//TODO(KL): Implement
-	assert(false);
-
 	if (!dsv->IsTextureView() || dsv->getViewType() != RHIResourceView::Type::DSV)
 	{
 		assert(false);
 		return;
 	}
 
-	//mPassDescriptor->depthAttachment()
-	//mPassDescriptor->stencilAttachment()
-
-	//MTLTexture2D* mtlTexture = rcCast(dsv->getViewedResource());
-	//mPassCompilationContext.depthStencilTexture.clearColor.
+	mPassContext.depthStencilTexture.loadAction = MTL::LoadActionClear;
+	mPassContext.depthStencilTexture.clearValue.depthClear.depth = depth;
+	mPassContext.depthStencilTexture.clearValue.depthClear.stencil = stencil;
+	mPassContext.depthStencilTexture.dsClearFlags = clearFlags;
 }
 
 void MTLGraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const float colorRGBA[4])
@@ -139,37 +217,87 @@ void MTLGraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const f
 	}
 
 	MTLTexture2D* mtlTexture = rcCast(rtv->getViewedResource());
-	MTLPassTextureDescriptor& passTexture = mPassCompilationContext.usedTextures[mtlTexture];
+	MTLPassTextureDescriptor& passTexture = mPassContext.usedTextures[mtlTexture];
 	passTexture.texture = mtlTexture;
-	passTexture.clearColor = MTL::ClearColor::Make(colorRGBA[0], colorRGBA[1], colorRGBA[2], colorRGBA[3]);
 	passTexture.loadAction = MTL::LoadActionClear;
+
+	std::memcpy(passTexture.clearValue.colorClear, colorRGBA, sizeof(passTexture.clearValue.colorClear));
 }
 
 void MTLGraphicsCommandList::drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject)
 {
-	//TODO(KL): Implement
-	assert(false);
+	if (auto argumentTable = mPassContext.mtlPipelineState->getArgumentTable())
+	{
+		MTLBuffer* vertexBuffer = rcCast(renderObject->getVertexBuffer());
+		MTLBuffer* indexBuffer = rcCast(renderObject->getIndexBuffer());
+
+		argumentTable->setAddress(vertexBuffer->getGPUAddress(), kIRVertexBufferBindPoint);
+
+		recordEncoderCommand([=](MTL4::RenderCommandEncoder* encoder)
+		{
+			encoder->drawIndexedPrimitives(
+				MTL::PrimitiveTypeTriangle,
+				renderObject->getNumIndices(),
+				MTL::IndexTypeUInt16,
+				indexBuffer->getGPUAddress(),
+				indexBuffer->bufferSize()
+			);
+		});
+	}
 }
 
 NS::SharedPtr<MTL4::RenderPassDescriptor> MTLGraphicsCommandList::compileToRenderPassDescriptor() const
 {
 	NS::SharedPtr<MTL4::RenderPassDescriptor> renderPassDescriptor = NS::TransferPtr(MTL4::RenderPassDescriptor::alloc()->init());
 
-	assert(mPassCompilationContext.renderTargets.size() == mPassCompilationContext.usedTextures.size());
+	assert(mPassContext.renderTargets.size() == mPassContext.usedTextures.size());
 
-	for (int i = 0; i < mPassCompilationContext.renderTargets.size(); ++i)
+	for (int i = 0; i < mPassContext.renderTargets.size(); ++i)
 	{
 		// We are making the assumption here that the texture is always found, as we already did a loose assert above.
-		auto passTextureDesc = mPassCompilationContext.usedTextures.find(mPassCompilationContext.renderTargets[i])->second;
+		auto passTextureDesc = mPassContext.usedTextures.find(mPassContext.renderTargets[i])->second;
 
 		MTL::RenderPassColorAttachmentDescriptor* colorAttach = renderPassDescriptor->colorAttachments()->object(i);
 		colorAttach->setTexture(passTextureDesc.texture->getNativeResource());
 		colorAttach->setLoadAction(passTextureDesc.loadAction);
 		colorAttach->setStoreAction(passTextureDesc.storeAction);
-		colorAttach->setClearColor(passTextureDesc.clearColor);
+		colorAttach->setClearColor(toMTLClearColor(passTextureDesc.clearValue));
 	}
 
-	//TODO(KL): add DepthStencil and the rest
+	if (mPassContext.depthStencilTexture.texture)
+	{
+		const MTLPassTextureDescriptor& dsContext = mPassContext.depthStencilTexture;
+
+		if (dsContext.dsClearFlags == (dsContext.dsClearFlags & DepthStencilFlags::DepthClear))
+		{
+			MTL::RenderPassDepthAttachmentDescriptor* depthAttach = renderPassDescriptor->depthAttachment();
+			depthAttach->setClearDepth(dsContext.clearValue.depthClear.depth);
+			depthAttach->setLoadAction(MTL::LoadActionClear);
+			depthAttach->setStoreAction(MTL::StoreActionStore);
+		}
+		else
+		{
+			//TODO(KL): This isn't correct, but it will have to do for now
+			renderPassDescriptor->depthAttachment()->setLoadAction(MTL::LoadActionLoad);
+			renderPassDescriptor->depthAttachment()->setStoreAction(MTL::StoreActionDontCare);
+		}
+
+		if (dsContext.dsClearFlags == (dsContext.dsClearFlags & DepthStencilFlags::StencilClear))
+		{
+			MTL::RenderPassStencilAttachmentDescriptor* stencilAttach = renderPassDescriptor->stencilAttachment();
+			stencilAttach->setClearStencil(dsContext.clearValue.depthClear.stencil);
+			stencilAttach->setLoadAction(MTL::LoadActionClear);
+			stencilAttach->setStoreAction(MTL::StoreActionStore);
+		}
+		else
+		{
+			//TODO(KL): This isn't correct, but it will have to do for now
+			renderPassDescriptor->stencilAttachment()->setLoadAction(MTL::LoadActionLoad);
+			renderPassDescriptor->stencilAttachment()->setStoreAction(MTL::StoreActionDontCare);
+		}
+	}
+
+	renderPassDescriptor->setDefaultRasterSampleCount(1);
 
 	return renderPassDescriptor;
 }

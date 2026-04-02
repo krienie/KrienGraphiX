@@ -15,13 +15,14 @@ public:
 	DX12VertexLayout() = default;
 	~DX12VertexLayout() override = default;
 
-	void addInputElement(const VertexInputElement& vertexInputElement) override;
 	void setFromInputElementVector(const std::vector<VertexInputElement>& vertexInputLayout) override;
 
 	[[nodiscard]]
 	std::vector<D3D12_INPUT_ELEMENT_DESC> getDX12VertexLayout() const { return mInputLayoutDesc; }
 
 private:
+	void addInputElement(const VertexInputElement& vertexInputElement);
+
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayoutDesc;
 };
 

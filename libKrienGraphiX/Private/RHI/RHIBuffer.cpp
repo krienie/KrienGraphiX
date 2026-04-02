@@ -7,6 +7,7 @@ namespace kgx::RHI
 {
 RHIBuffer::RHIBuffer(const RHIBufferDescriptor& descriptor)
 	: RHIViewableResource(descriptor.flags),
+	mDescriptor(descriptor),
 	mBufferName(descriptor.name),
 	mBufferSize(descriptor.bufferSize),
 	mRegister(descriptor.bufferRegister)

@@ -4,14 +4,14 @@
 #include <cassert>
 #include <SDL3/SDL.h>
 
-#include "MTLCommandQueue.h"
+#include "MTLBuffer.h"
 #include "MTLCommandAllocator.h"
+#include "MTLCommandQueue.h"
 #include "MTLFence.h"
 #include "MTLGraphicsCommandList.h"
-//#include "MTLGraphicsPipelineState.h"
-//#include "MTLShader.h"
+#include "MTLGraphicsPipelineState.h"
+#include "MTLShader.h"
 #include "MTLSwapChain.h"
-//#include "MTLBuffer.h"
 #include "MTLTexture2D.h"
 
 #include "Private/Core/RenderCore.h"
@@ -23,7 +23,7 @@ namespace kgx::RHI
 MTLRenderHardwareInterface::MTLRenderHardwareInterface()
 	: mAutoReleasePool(nullptr)
 {
-	mGraphicsDevice = NS::TransferPtr(MTL::CreateSystemDefaultDevice());
+	mGraphicsDevice = std::make_unique<MTLGraphicsDevice>();
 }
 
 MTLRenderHardwareInterface::~MTLRenderHardwareInterface()
@@ -41,7 +41,7 @@ void MTLRenderHardwareInterface::beginFrame(RHIGraphicsCommandList* commandList,
 	if (mAutoReleasePool)
 	{
 		mAutoReleasePool->release();
-        mAutoReleasePool = nullptr;
+		mAutoReleasePool = nullptr;
 	}
 	mAutoReleasePool = NS::AutoreleasePool::alloc()->init();
 }
@@ -84,17 +84,13 @@ std::unique_ptr<RHIFence> MTLRenderHardwareInterface::createFence() const
 
 std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	/*auto newShader = std::make_unique<DX12Shader>();
+	auto newShader = std::make_unique<MTLShader>();
 	if (!newShader->create(compiledShader, type))
 	{
 		return nullptr;
 	}
 
-	return std::move(newShader);*/
+	return std::move(newShader);
 }
 
 std::unique_ptr<RHICommandAllocator> MTLRenderHardwareInterface::createCommandAllocator() const
@@ -137,37 +133,25 @@ std::unique_ptr<RHITexture2D> MTLRenderHardwareInterface::createDepthStencilBuff
 
 std::shared_ptr<RHIResourceView> MTLRenderHardwareInterface::createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	//return std::make_shared<DX12ResourceView>(type, viewedResource, isShaderVisible);
+	//TODO(KL): DSV only for now
+	assert(type == RHIResourceView::Type::DSV);
+	return std::make_shared<MTLTextureView>(type, viewedResource);
 }
 
 std::unique_ptr<RHIGraphicsPipelineState> MTLRenderHardwareInterface::createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc) const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	/*auto graphicsPipelineState = std::make_unique<DX12GraphicsPipelineState>(desc);
+	auto graphicsPipelineState = std::make_unique<MTLGraphicsPipelineState>(desc);
 	if (!graphicsPipelineState->create())
 	{
 		return nullptr;
 	}
 
-	return std::move(graphicsPipelineState);*/
+	return std::move(graphicsPipelineState);
 }
 
 std::unique_ptr<RHIBuffer> MTLRenderHardwareInterface::createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const
 {
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	/*DX12GraphicsCommandList* dxCommandList = dxCast(commandList);
-
-	auto newBuffer = std::make_unique<DX12Buffer>(dxCommandList, descriptor);
-	return std::move(newBuffer);*/
+	auto newBuffer = std::make_unique<MTLBuffer>(descriptor);
+	return std::move(newBuffer);
 }
 }

@@ -22,6 +22,9 @@ public:
 	~RHIBuffer() override = default;
 
 	[[nodiscard]]
+	RHIBufferDescriptor getDescriptor() const { return mDescriptor; }
+
+	[[nodiscard]]
 	std::string name() const { return mBufferName; }
 
 	[[nodiscard]]
@@ -34,7 +37,7 @@ public:
 	size_t bufferRegister() const { return mRegister; }
 
 	[[nodiscard]]
-	void* mappedDataPtr() const { return mMappedDataPtr; }
+	virtual void* mappedDataPtr() const { return mMappedDataPtr; }
 	
 	void* map(MapType type);
 	void unmap();
@@ -46,6 +49,8 @@ protected:
 	MapType currentMappedType() const { return static_cast<MapType>(mCurrentMappedType); }
 
 private:
+	RHIBufferDescriptor mDescriptor;
+
 	std::string mBufferName;
 	size_t mBufferSize = 0u;
 

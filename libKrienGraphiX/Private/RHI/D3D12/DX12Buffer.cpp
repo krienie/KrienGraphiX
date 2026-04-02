@@ -6,8 +6,8 @@
 #include "DX12Descriptors.h"
 #include "DX12GraphicsCommandList.h"
 #include "DX12GraphicsDevice.h"
-#include "DX12MemoryUtils.h"
 #include "DX12RenderHardwareInterface.h"
+#include "Private/RHI/RHIMemoryUtils.h"
 #include "Private/Rendering/KGXMeshRenderObject.h"
 
 namespace
@@ -22,7 +22,7 @@ kgx::RHI::RHIBufferDescriptor getAlignedBufferDescriptor(const kgx::RHI::RHIBuff
 	kgx::RHI::RHIBufferDescriptor alignedDesc = descriptor;
 	if (descriptor.isBufferAligned)
 	{
-		alignedDesc.bufferSize = static_cast<unsigned>(kgx::RHI::DX12MemoryUtils::alignTo256Bytes(alignedDesc.bufferSize));
+		alignedDesc.bufferSize = static_cast<unsigned>(kgx::RHI::MemoryUtils::alignTo256Bytes(alignedDesc.bufferSize));
 	}
 
 	return alignedDesc;
@@ -53,6 +53,8 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	: RHIBuffer(getAlignedBufferDescriptor(descriptor)),
 		mDescriptor(descriptor)
 {
+	//TODO(KL): If the buffer is dynamic, create a copy for every frame to avoid race conditions
+
 	//TODO(KL): Add descriptor sanitation check
 
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
@@ -63,14 +65,14 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	//TODO(KL): refactor... this is a bit messy
 
 	//D3D12_RESOURCE_STATE_COMMON
-	if (mDescriptor.initialData)
+	if (descriptor.initialData)
 	{
 		initialResourceState = D3D12_RESOURCE_STATE_COPY_DEST;
 	}
 
 	size_t calculatedBufferSize = bufferSize();
 
-	if (!mDescriptor.isDynamic)
+	if (!descriptor.isDynamic)
 	{
 		// Create upload buffer to help with the buffer update
 		const CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_UPLOAD);
@@ -111,38 +113,38 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	mBufferDXResource = std::make_unique<DX12Resource>(defaultBufferResource, nullptr, D3D12_RESOURCE_STATE_COMMON);
 	mBufferDXResource->transitionToState(commandList, initialResourceState);
 
-	if (mDescriptor.isDynamic)
+	if (descriptor.isDynamic)
 	{
 		map(MapType::WRITE);
 	}
 
-	if (mDescriptor.initialData)
+	if (descriptor.initialData)
 	{
-		if (mDescriptor.isDynamic)
+		if (descriptor.isDynamic)
 		{
 			auto mappedData = mappedDataPtr();
-			std::memcpy(mappedData, mDescriptor.initialData, calculatedBufferSize);
+			std::memcpy(mappedData, descriptor.initialData, calculatedBufferSize);
 		}
 		else
 		{
 			D3D12_SUBRESOURCE_DATA subResourceData = {};
-			subResourceData.pData = mDescriptor.initialData;
+			subResourceData.pData = descriptor.initialData;
 			subResourceData.RowPitch = static_cast<LONG_PTR>(calculatedBufferSize);
 			subResourceData.SlicePitch = subResourceData.RowPitch;
 
 			UpdateSubresources<1>(commandList->getCommandList(), mBufferDXResource->getResource().Get(), mBufferUploader.Get(), 0, 0, 1, &subResourceData);
-			mBufferDXResource->transitionToState(commandList, getDXResourceStateFromCreationFlag(mDescriptor.flags));
+			mBufferDXResource->transitionToState(commandList, getDXResourceStateFromCreationFlag(descriptor.flags));
 		}
 	}
 
 	// Init buffer views if needed
-	if (hasFlag(mDescriptor.flags, RHIResource::IndexBuffer))
+	if (hasFlag(descriptor.flags, RHIResource::IndexBuffer))
 	{
 		mIndexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
 		mIndexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
 		mIndexBufferView.Format = DXGI_FORMAT_R16_UINT;
 	}
-	else if (hasFlag(mDescriptor.flags, RHIResource::VertexBuffer))
+	else if (hasFlag(descriptor.flags, RHIResource::VertexBuffer))
 	{
 		mVertexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
 		mVertexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
@@ -158,13 +160,13 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DX12Buffer::getResource() const
 
 const D3D12_INDEX_BUFFER_VIEW* DX12Buffer::getIndexBufferView() const
 {
-	assert(hasFlag(mDescriptor.flags, RHIResource::IndexBuffer));
+	assert(hasFlag(getCreationFlags(), RHIResource::IndexBuffer));
 	return &mIndexBufferView;
 }
 
 const D3D12_VERTEX_BUFFER_VIEW* DX12Buffer::getVertexBufferView() const
 {
-	assert(hasFlag(mDescriptor.flags, RHIResource::VertexBuffer));
+	assert(hasFlag(getCreationFlags(), RHIResource::VertexBuffer));
 	return &mVertexBufferView;
 }
 

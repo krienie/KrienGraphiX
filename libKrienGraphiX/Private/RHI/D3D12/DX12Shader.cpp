@@ -15,11 +15,6 @@
 
 namespace kgx::RHI
 {
-DX12Shader::DX12Shader()
-	: RHIShader()
-{
-}
-
 bool DX12Shader::create(const CompiledShader& compiledShader, ShaderType type)
 {
 	mShaderType = type;
@@ -33,7 +28,6 @@ bool DX12Shader::create(const CompiledShader& compiledShader, ShaderType type)
 
 void DX12Shader::setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout)
 {
-	//TODO(KL): DX12VertexLayout can prob be just a static method if it's only used like this
 	DX12VertexLayout dxVertexLayout;
 	dxVertexLayout.setFromInputElementVector(vertexInputLayout);
 
@@ -47,6 +41,8 @@ const std::vector<D3D12_INPUT_ELEMENT_DESC>& DX12Shader::getVertexInputLayout() 
 
 bool DX12Shader::createRootSignature()
 {
+	//TODO(KL): Create a root signature per frame
+
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
 	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};

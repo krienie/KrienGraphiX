@@ -1,6 +1,8 @@
 
 #include "KGXMeshRenderObject.h"
 
+#include <utility>
+
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 
@@ -29,7 +31,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::VertexBuffer
 	};
 
-	mVertexBuffer = RHI::PlatformRHI->createBuffer(immediateCommandContext.getCommandList(), vertexBufferDesc);
+	mVertexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getCommandList(), vertexBufferDesc);
 
 	const RHI::RHIBufferDescriptor indexBufferDesc
 	{
@@ -43,7 +45,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::IndexBuffer
 	};
 
-	mIndexBuffer = RHI::PlatformRHI->createBuffer(immediateCommandContext.getCommandList(), indexBufferDesc);
+	mIndexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getCommandList(), indexBufferDesc);
 }
 
 void KGXMeshRenderObject::updateTransform(const math::Matrix4X4& newTransform)

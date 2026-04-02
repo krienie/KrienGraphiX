@@ -7,7 +7,7 @@ namespace kgx::RHI
 {
 MTLCommandAllocator::MTLCommandAllocator()
 {
-	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice();
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 
 	mCommandAllocator = NS::TransferPtr(mtlDevice->newCommandAllocator());
 }

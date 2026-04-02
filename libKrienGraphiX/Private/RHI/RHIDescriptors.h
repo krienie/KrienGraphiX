@@ -22,8 +22,8 @@ struct RHIBufferDescriptor
 
 enum DepthStencilFlags
 {
-	DepthClear = 1,
-	StencilClear = 2,
+	DepthClear = 0x1,
+	StencilClear = 0x1 << 1,
 
 	DepthStencilClear = DepthClear | StencilClear
 };

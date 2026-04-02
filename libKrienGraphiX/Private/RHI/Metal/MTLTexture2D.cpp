@@ -36,7 +36,8 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 	desc->setUsage(toMTLTextureUsage(descriptor.flags));
 	desc->setStorageMode(MTL::StorageModePrivate);
 
-	mTextureResource = NS::TransferPtr(getMTLRHI()->getMTLDevice()->newTexture(desc));
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
+	mTextureResource = NS::TransferPtr(mtlDevice->newTexture(desc));
 }
 
 MTL::Texture* MTLTexture2D::getNativeResource() const

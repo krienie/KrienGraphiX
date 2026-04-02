@@ -15,7 +15,7 @@ class DX12GraphicsCommandList;
 class DX12Shader : public RHIShader
 {
 public:
-	DX12Shader();
+	DX12Shader() = default;
 	~DX12Shader() override = default;
 
 	bool create(const CompiledShader& compiledShader, ShaderType type) override;

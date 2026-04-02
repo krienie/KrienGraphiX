@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "MTLGraphicsDevice.h"
 #include "Metal/MTLDevice.hpp"
 #include "Private/RHI/RenderHardwareInterface.h"
 
@@ -58,15 +59,15 @@ public:
 	std::unique_ptr<RHIBuffer> createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const override;
 
 	[[nodiscard]]
-	MTL::Device* getMTLDevice() const { return mGraphicsDevice.get(); }
+	MTLGraphicsDevice* getMTLDevice() const { return mGraphicsDevice.get(); }
 
 private:
-	NS::SharedPtr<MTL::Device> mGraphicsDevice;
+	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
 	NS::AutoreleasePool* mAutoReleasePool;
 };
 
 inline MTLRenderHardwareInterface* getMTLRHI()
 {
-	return static_cast<MTLRenderHardwareInterface*>(PlatformRHI.get());
+	return static_cast<MTLRenderHardwareInterface*>(gPlatformRHI.get());
 }
 }

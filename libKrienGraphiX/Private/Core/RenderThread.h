@@ -5,6 +5,7 @@
 #include <memory>
 #include <queue>
 
+#include "CommandThread.h"
 #include "ResourcePool.h"
 #include "Private/Rendering/KGXShaderCache.h"
 #include "Private/RHI/RHICommandAllocator.h"
@@ -23,6 +24,7 @@ public:
 	ImmediateCommandContext();
 	~ImmediateCommandContext();
 
+	[[nodiscard]]
 	RHI::RHIGraphicsCommandList* getCommandList() const { return mCommandList; }
 
 private:
@@ -36,9 +38,9 @@ public:
 	FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* frameFence);
 	~FrameCommandContext();
 
-	RHI::RHIGraphicsCommandList* getCommandList() const { return mCommandList; }
+	[[nodiscard]] RHI::RHIGraphicsCommandList* getCommandList() const { return mCommandList; }
+	[[nodiscard]] uint64_t getFrameNumber() const { return mFrameNumber; }
 
-	uint64_t getFrameNumber() const { return mFrameNumber; }
 	void endFrame() const;
 
 private:
@@ -71,17 +73,32 @@ public:
 	[[nodiscard]] FrameCommandContext* getCurrentFrameContext() const;
 	[[nodiscard]] RHI::RHIGraphicsCommandList* getCurrentFrameCommandList() const;
 
+	template <typename F>
+	void enqueueCommand(F&& cmd) const
+	{
+		mCommandThread->enqueueCommand(std::forward<F>(cmd));
+	}
+
 	void nextFrame();
-	void enqueueCommand(RenderCommand cmd) const;
 	void flush() const;
 	void shutdown();
+
+	[[nodiscard]]
+	uint64_t getCurrentFrameNumber() const { return mCurrentFrame; }
+
+	[[nodiscard]]
+	int getBufferedFrameIndex() const;
+
+	static constexpr int maxNumBufferedFrames = 3;
+	
+	static_assert(maxNumBufferedFrames >= 2 && maxNumBufferedFrames <= 3);
 
 private:
 	std::unique_ptr<CommandThread> mCommandThread;
 
 	std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
 	std::unique_ptr<CommandListPool> mCommandListPool;
-	std::unique_ptr<ResourcePool<RHI::RHICommandAllocator>> mCommandAllocatorPool;
+	std::unique_ptr<CommandAllocatorPool> mCommandAllocatorPool;
 
 	std::unique_ptr<rendering::KGXShaderCache> mShaderCache;
 
@@ -89,4 +106,6 @@ private:
 	std::unique_ptr<RHI::RHIFence> mFrameFence;
 	std::queue<std::unique_ptr<FrameCommandContext>> mFrameResources;
 };
+
+inline std::unique_ptr<RenderThread> gRenderThread = nullptr;
 }

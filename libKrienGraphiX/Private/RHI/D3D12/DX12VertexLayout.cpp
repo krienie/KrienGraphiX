@@ -43,6 +43,17 @@ DXGI_FORMAT toDxgiFormat(const kgx::VertexInputElementFormat& vertexInputElement
 
 namespace kgx::RHI
 {
+void DX12VertexLayout::setFromInputElementVector(const std::vector<VertexInputElement>& vertexInputLayout)
+{
+	mInputLayoutDesc.clear();
+	mInputLayoutDesc.reserve(vertexInputLayout.size());
+
+	for (auto& vertexInputElement : vertexInputLayout)
+	{
+		addInputElement(vertexInputElement);
+	}
+}
+
 void DX12VertexLayout::addInputElement(const VertexInputElement& vertexInputElement)
 {
 	const DXGI_FORMAT dxgiFormat = toDxgiFormat(vertexInputElement.format);
@@ -59,16 +70,5 @@ void DX12VertexLayout::addInputElement(const VertexInputElement& vertexInputElem
 	};
 
 	mInputLayoutDesc.push_back(inputDesc);
-}
-
-void DX12VertexLayout::setFromInputElementVector(const std::vector<VertexInputElement>& vertexInputLayout)
-{
-	mInputLayoutDesc.clear();
-	mInputLayoutDesc.reserve(vertexInputLayout.size());
-
-	for (auto& vertexInputElement : vertexInputLayout)
-	{
-		addInputElement(vertexInputElement);
-	}
 }
 }

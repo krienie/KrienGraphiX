@@ -24,8 +24,8 @@ public:
 	void setRotation(float pitch, float yaw, float roll);
 	void setScale(float xScale, float yScale, float zScale);
 
-	math::Matrix4X4 getRelativeTransform() const;
-	math::Matrix4X4 getWorldTransform() const;
+	[[nodiscard]] math::Matrix4X4 getRelativeTransform() const;
+	[[nodiscard]] math::Matrix4X4 getWorldTransform() const;
 
 protected:
 	bool hasTransformChangedThisFrame() const;

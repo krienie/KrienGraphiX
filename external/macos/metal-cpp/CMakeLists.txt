@@ -10,9 +10,3 @@ target_link_libraries(${LIB_NAME}
         "-framework MetalFX"
         "-framework Foundation"
         "-framework QuartzCore")
-
-#target_compile_definitions(${LIB_NAME} PUBLIC
-#        -DNS_PRIVATE_IMPLEMENTATION
-#        -DMTL_PRIVATE_IMPLEMENTATION
-#        -DMTLFX_PRIVATE_IMPLEMENTATION
-#        -DCA_PRIVATE_IMPLEMENTATION)

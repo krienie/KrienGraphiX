@@ -48,7 +48,7 @@ void KGXScene::addMeshComponent(KGXMeshComponent* meshComponent)
 
 	std::shared_ptr<rendering::KGXMeshRenderObject> newMeshRenderObject = meshComponent->createMeshRenderObject();
 
-	RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, newMeshRenderObject]()
+	gRenderThread->enqueueCommand([this, newMeshRenderObject]()
 	{
 		mRenderScene.addRenderObject(newMeshRenderObject);
 	});
@@ -66,7 +66,7 @@ void KGXScene::updateScene(float deltaTime)
 
 	if (!mPendingMeshTransformUpdates.empty())
 	{
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, localPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates)]()
+		gRenderThread->enqueueCommand([this, localPendingMeshTransformUpdates = std::move(mPendingMeshTransformUpdates)]()
 		{
 			mRenderScene.updateRenderObjectTransforms(localPendingMeshTransformUpdates);
 		});
@@ -74,7 +74,7 @@ void KGXScene::updateScene(float deltaTime)
 
 	if (mActiveCamera)
 	{
-		RenderCore::get()->getRenderThreadPtr()->enqueueCommand([this, localViewProjection = mActiveCamera->getViewProjMatrix()]()
+		gRenderThread->enqueueCommand([this, localViewProjection = mActiveCamera->getViewProjMatrix()]()
 		{
 			mRenderScene.updateActiveCameraMatrix(localViewProjection);
 		});

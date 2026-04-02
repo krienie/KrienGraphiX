@@ -63,6 +63,6 @@ private:
 
 inline DX12RenderHardwareInterface* getDX12RHI()
 {
-	return static_cast<DX12RenderHardwareInterface*>(PlatformRHI.get());
+	return static_cast<DX12RenderHardwareInterface*>(gPlatformRHI.get());
 }
 }

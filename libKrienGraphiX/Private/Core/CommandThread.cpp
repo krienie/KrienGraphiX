@@ -27,13 +27,6 @@ CommandThread::~CommandThread()
 	}
 }
 
-void CommandThread::enqueueCommand(ThreadCommand cmd)
-{
-	std::scoped_lock lock(mEnqueueMutex);
-	mCommands.push_back(std::move(cmd));
-	mCvCommand.notify_one();
-}
-
 void CommandThread::flush()
 {
 	std::unique_lock lock(mEnqueueMutex);

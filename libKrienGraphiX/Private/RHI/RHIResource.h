@@ -16,7 +16,7 @@ public:
 		IndexBuffer = 1 << 5,
 		VertexBuffer = 1 << 6,
 		ConstantBuffer = 1 << 7,
-		Atomic = 1 << 8, // Metal only
+		Atomic = 1 << 8 // Metal only
 	};
 
 	// Based on D3D12_RESOURCE_STATES
@@ -58,8 +58,8 @@ public:
 
 	[[nodiscard]] CreationFlags getCreationFlags() const { return mCreationFlags; }
 
-	virtual bool IsBuffer() const { return false; }
-	virtual bool IsTexture() const { return false; }
+	[[nodiscard]] virtual bool IsBuffer() const { return false; }
+	[[nodiscard]] virtual bool IsTexture() const { return false; }
 
 private:
 	CreationFlags mCreationFlags;

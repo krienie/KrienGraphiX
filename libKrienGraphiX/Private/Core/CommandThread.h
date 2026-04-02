@@ -25,7 +25,14 @@ class CommandThread final
 		CommandThread& operator=(const CommandThread&) noexcept = delete;
 		CommandThread& operator=(CommandThread&&) noexcept      = delete;
 
-		void enqueueCommand(ThreadCommand cmd);
+		template <typename F>
+		void enqueueCommand(F&& cmd)
+		{
+			std::scoped_lock lock(mEnqueueMutex);
+			mCommands.emplace_back(std::forward<F>(cmd));
+			mCvCommand.notify_one();
+		}
+
 		void flush();
 
 	private:

@@ -53,7 +53,7 @@ bool DX12GraphicsPipelineState::create()
 
 	if (mGraphicsDescriptor.vs)
 	{
-		const auto dxVertexShader = static_cast<DX12Shader*>(mGraphicsDescriptor.vs);
+		const DX12Shader* dxVertexShader = rcCast(mGraphicsDescriptor.vs);
 		const auto& InputLayout = dxVertexShader->getVertexInputLayout();
 
 		psoDesc.InputLayout = { InputLayout.data(), static_cast<UINT>(InputLayout.size()) };
@@ -64,7 +64,7 @@ bool DX12GraphicsPipelineState::create()
 
 	if (mGraphicsDescriptor.ps)
 	{
-		const auto dxPixelShader = static_cast<DX12Shader*>(mGraphicsDescriptor.ps);
+		const DX12Shader* dxPixelShader = rcCast(mGraphicsDescriptor.ps);
 		psoDesc.PS = toD3D12ShaderBytecode(dxPixelShader);
 		psoDesc.pRootSignature = dxPixelShader->getRootSignature();
 	}

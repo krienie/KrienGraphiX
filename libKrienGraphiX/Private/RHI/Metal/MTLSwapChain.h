@@ -37,6 +37,8 @@ private:
 	MTLCommandQueue* mCommandQueue = nullptr;
 	SDL_MetalView mMetalView = nullptr;
 
+	//TODO(KL): move offscreen texture rendering to RHI layer, so all graphics apis do this
+	uint8_t mNextPresentTextureIndex = 0;
 	uint8_t mCurrentTextureIndex = 0;
 	std::vector<std::shared_ptr<MTLTexture2D>> mOffscreenTextures;
 	std::vector<std::shared_ptr<MTLTextureView>> mTextureViews;

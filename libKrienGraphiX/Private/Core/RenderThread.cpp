@@ -18,9 +18,8 @@ namespace kgx::core
 {
 ImmediateCommandContext::ImmediateCommandContext()
 {
-	RenderThread* renderThread = RenderCore::get()->getRenderThreadPtr();
-	mCommandList = renderThread->getCommandListPoolPtr()->getResource();
-	mCommandAllocator = renderThread->getCommandAllocatorPoolPtr()->getResource();
+	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
+	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
 
 	mCommandList->reset(mCommandAllocator, nullptr);
 }
@@ -29,9 +28,8 @@ ImmediateCommandContext::~ImmediateCommandContext()
 {
 	mCommandList->close();
 
-	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
-	renderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
-	renderThread->getCommandQueuePtr()->flushQueue();
+	gRenderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
+	gRenderThread->getCommandQueuePtr()->flushQueue();
 
 	mCommandAllocator->reset();
 
@@ -42,15 +40,15 @@ ImmediateCommandContext::~ImmediateCommandContext()
 FrameCommandContext::FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* frameFence)
 	: mFrameNumber(frameNumber), mFrameFence(frameFence)
 {
-	RenderThread* renderThread = RenderCore::get()->getRenderThreadPtr();
-	mCommandList = renderThread->getCommandListPoolPtr()->getResource();
-	mCommandAllocator = renderThread->getCommandAllocatorPoolPtr()->getResource();
+	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
+	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
 
 	mCommandList->reset(mCommandAllocator, nullptr);
 }
 
 FrameCommandContext::~FrameCommandContext()
 {
+	mCommandList->release();
 	mCommandAllocator->reset();
 	mCommandAllocator->release();
 }
@@ -59,12 +57,9 @@ void FrameCommandContext::endFrame() const
 {
 	mCommandList->close();
 
-	const auto* renderThread = RenderCore::get()->getRenderThreadPtr();
-	renderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
+	gRenderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
 
 	mFrameFence->queueSignal(mFrameNumber);
-
-	mCommandList->release();
 }
 
 RenderThread::RenderThread()
@@ -73,29 +68,29 @@ RenderThread::RenderThread()
 		mShaderCache(nullptr)
 {
 #ifdef WIN32
-	RHI::PlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
+	RHI::gPlatformRHI = std::make_unique<RHI::DX12RenderHardwareInterface>();
 #elif defined(__APPLE__)
-	RHI::PlatformRHI = std::make_unique<RHI::MTLRenderHardwareInterface>();
+	RHI::gPlatformRHI = std::make_unique<RHI::MTLRenderHardwareInterface>();
 #else
 	static_assert(false, "Unsupported platform");
 #endif
 
-	assert(RHI::PlatformRHI != nullptr && "Error creating RHI!");
+	assert(RHI::gPlatformRHI != nullptr && "Error creating RHI!");
 
-	mCommandQueue = RHI::PlatformRHI->createCommandQueue();
+	mCommandQueue = RHI::gPlatformRHI->createCommandQueue();
 
 	mCommandListPool = std::make_unique<CommandListPool>(5, []()
 	{
-		return RHI::PlatformRHI->createGraphicsCommandList(nullptr);
+		return RHI::gPlatformRHI->createGraphicsCommandList(nullptr);
 	});
 
 	mCommandAllocatorPool = std::make_unique<CommandAllocatorPool>(5, []()
 	{
-		return RHI::PlatformRHI->createCommandAllocator();
+		return RHI::gPlatformRHI->createCommandAllocator();
 	});
 
 	mShaderCache = std::make_unique<rendering::KGXShaderCache>();
-	mFrameFence = RHI::PlatformRHI->createFence();
+	mFrameFence = RHI::gPlatformRHI->createFence();
 }
 
 RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
@@ -130,26 +125,14 @@ RHI::RHIGraphicsCommandList* RenderThread::getCurrentFrameCommandList() const
 
 void RenderThread::nextFrame()
 {
-	// Release any frame resources that have already been processed
-	while (!mFrameResources.empty() && mFrameFence->getCurrentValue() >= mFrameResources.front()->getFrameNumber())
+	if (mFrameResources.size() >= maxNumBufferedFrames)
 	{
+		mFrameFence->waitForValue(mFrameResources.front()->getFrameNumber());
 		mFrameResources.pop();
 	}
 
 	++mCurrentFrame;
 	mFrameResources.push(std::make_unique<FrameCommandContext>(mCurrentFrame, mFrameFence.get()));
-
-	constexpr int maxFrameResourcesSize = 3;
-	if (mFrameResources.size() > maxFrameResourcesSize)
-	{
-		mFrameFence->waitForValue(mFrameResources.front()->getFrameNumber());
-		mFrameResources.pop();
-	}
-}
-
-void RenderThread::enqueueCommand(RenderCommand cmd) const
-{
-	mCommandThread->enqueueCommand(std::move(cmd));
 }
 
 void RenderThread::flush() const
@@ -177,11 +160,16 @@ void RenderThread::shutdown()
 		mFrameFence.reset();
 		mCommandListPool.reset();
 		mCommandAllocatorPool.reset();
-		RHI::PlatformRHI.reset();
+		RHI::gPlatformRHI.reset();
 	});
 
 	// Shutdown the command thread last
 	mCommandThread->flush();
 	mCommandThread.reset();
+}
+
+int RenderThread::getBufferedFrameIndex() const
+{
+	return static_cast<int>(getCurrentFrameNumber() % maxNumBufferedFrames);
 }
 }
