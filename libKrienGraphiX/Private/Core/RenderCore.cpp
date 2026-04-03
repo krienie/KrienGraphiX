@@ -1,9 +1,10 @@
 
 #include "RenderCore.h"
 
-#include "RenderWindow.h"
-
+#include <iostream>
 #include <memory>
+
+#include "RenderWindow.h"
 
 #ifdef _WIN32
 #ifdef _DEBUG
@@ -50,16 +51,14 @@ bool RenderCore::createRenderWindow(SDL_Window* window, unsigned initialWindowWi
 {
 	std::lock_guard lock(mRenderWindowMutex);
 
-	if (const auto it = mRenderWindows.find(window); it != mRenderWindows.end())
+	if (mRenderWindow)
 	{
-		// RenderWindow with handle windowHandle already exists. Just exit here
-		//TODO(KL): log error
+		std::cerr << "[RenderCore]: Render Window already created" << std::endl;
 		return false;
 	}
 
-	//TODO(KL): Perhaps only allow one active RenderWindow for now
-	mRenderWindows[window] = std::make_shared<RenderWindow>(window, initialWindowWidth, initialWindowHeight);
-	return true;
+	mRenderWindow = std::make_shared<RenderWindow>(window, initialWindowWidth, initialWindowHeight);
+	return mRenderWindow != nullptr;
 }
 
 RenderCore::RenderCore()
@@ -88,9 +87,9 @@ RenderCore::RenderCore()
 
 		{
 			std::scoped_lock lock(mRenderWindowMutex);
-			for (const auto& [_, renderWindow]: mRenderWindows)
+			if (mRenderWindow)
 			{
-				renderWindow->draw();
+				mRenderWindow->draw();
 			}
 		}
 	});

@@ -43,6 +43,6 @@ private:
 	std::unique_ptr<KGXScene> mScene;
 
 	std::mutex mRenderWindowMutex;
-	std::unordered_map<SDL_Window*, std::shared_ptr<RenderWindow>> mRenderWindows;
+	std::shared_ptr<RenderWindow> mRenderWindow;
 };
 }
