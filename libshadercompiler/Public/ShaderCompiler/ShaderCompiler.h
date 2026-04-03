@@ -58,6 +58,6 @@ class ShaderCompiler final
 {
 public:
 	[[nodiscard]]
-	static bool compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader);
+	static bool compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& outCompiledShader);
 };
 }

@@ -22,30 +22,30 @@ using ComPtr = CComPtr<T>;
 
 namespace
 {
-ComPtr<IDxcUtils> mUtils = nullptr;
-ComPtr<IDxcCompiler3> mCompiler = nullptr;
+ComPtr<IDxcUtils> utils = nullptr;
+ComPtr<IDxcCompiler3> compiler = nullptr;
 }
 
 namespace kgx
 {
-bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& OutCompiledShader)
+bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::string& mainEntry, const std::string& target, bool includeDebugInfo, CompiledShader& outCompiledShader)
 {
 	if (!std::filesystem::exists(sourceFile))
 	{
-		OutCompiledShader = CompiledShader();
+		outCompiledShader = CompiledShader();
 		return false;
 	}
 
-	if (!mUtils || !mCompiler)
+	if (!utils || !compiler)
 	{
 		// Create compiler and utils.
-		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&mUtils));
-		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&mCompiler));
+		DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&utils));
+		DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&compiler));
 	}
 
 	// Create default include handler
-	ComPtr<IDxcIncludeHandler> pIncludeHandler;
-	mUtils->CreateDefaultIncludeHandler(&pIncludeHandler);
+	ComPtr<IDxcIncludeHandler> includeHandler;
+	utils->CreateDefaultIncludeHandler(&includeHandler);
 
 	const std::filesystem::path fileName = std::filesystem::path(sourceFile).filename();
 
@@ -74,7 +74,6 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 	if (includeDebugInfo)
 	{
-		//TODO(KL): Make this work for MacOS. Use metal shader converter instead of embedding pdb stuff
 		compileArgs.push_back(L"-Zi");
 		compileArgs.push_back(L"-Qembed_debug");
 
@@ -83,53 +82,49 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 		compileArgs.push_back(L"-O0");
 	}
-	
-	// Open source file.
-	ComPtr<IDxcBlobEncoding> pSource = nullptr;
-	HRESULT res = mUtils->LoadFile(wSourceFile.c_str(), nullptr, &pSource);
+
+	ComPtr<IDxcBlobEncoding> sourceBlob = nullptr;
+	HRESULT res = utils->LoadFile(wSourceFile.c_str(), nullptr, &sourceBlob);
 	if (FAILED(res))
 	{
 		std::cout << "ShaderCompiler::compileShader: failed to load file " << sourceFile << "\n";
-		OutCompiledShader = CompiledShader();
+		outCompiledShader = CompiledShader();
 		return false;
 	}
 
-	DxcBuffer Source;
-	Source.Ptr = pSource->GetBufferPointer();
-	Source.Size = pSource->GetBufferSize();
-	Source.Encoding = DXC_CP_ACP; // Assume BOM says UTF8 or UTF16 or this is ANSI text.
+	DxcBuffer sourceBuffer;
+	sourceBuffer.Ptr = sourceBlob->GetBufferPointer();
+	sourceBuffer.Size = sourceBlob->GetBufferSize();
+	sourceBuffer.Encoding = DXC_CP_ACP; // Assume BOM says UTF8 or UTF16 or this is ANSI text.
 
 	// Compile it with specified arguments.
-	ComPtr<IDxcResult> pResults;
-	mCompiler->Compile(
-		&Source,                                  // Source buffer.
-		compileArgs.data(),                       // Array of pointers to arguments.
-		static_cast<UINT32>(compileArgs.size()),  // Number of arguments.
+	ComPtr<IDxcResult> results;
+	compiler->Compile(
+		&sourceBuffer,
+		compileArgs.data(),
+		static_cast<UINT32>(compileArgs.size()),
 #ifdef _WIN32
-		pIncludeHandler.Get(),                    // User-provided interface to handle #include directives (optional).
+		includeHandler.Get(),
 #elif __APPLE__
-		pIncludeHandler,
+		includeHandler,
 #endif
-		IID_PPV_ARGS(&pResults)               // Compiler output status, buffer, and errors.
+		IID_PPV_ARGS(&results)
 	);
 
-	// Print errors if present.
-	ComPtr<IDxcBlobUtf8> pErrors = nullptr;
-	pResults->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&pErrors), nullptr);
-	// Note that d3dcompiler would return null if no errors or warnings are present.
+	ComPtr<IDxcBlobUtf8> errors = nullptr;
+	results->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
 	// IDxcCompiler3::Compile will always return an error buffer, but its length will be zero if there are no warnings or errors.
-	if (pErrors != nullptr && pErrors->GetStringLength() != 0)
+	if (errors != nullptr && errors->GetStringLength() != 0)
 	{
-		std::wcout << L"Warnings and Errors: " << pErrors->GetStringPointer() << "\n";
+		std::wcout << L"Warnings and Errors: " << errors->GetStringPointer() << "\n";
 	}
 
-	// Quit if the compilation failed.
 	HRESULT hrStatus;
-	pResults->GetStatus(&hrStatus);
+	results->GetStatus(&hrStatus);
 	if (FAILED(hrStatus))
 	{
 		std::wcout << L"Compilation Failed\n";
-		OutCompiledShader = CompiledShader();
+		outCompiledShader = CompiledShader();
 		return false;
 	}
 
@@ -137,25 +132,23 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	CompiledShader shader;
 
 	// Save shader binary.
-	ComPtr<IDxcBlob> pShader = nullptr;
-	ComPtr<IDxcBlobWide> pShaderName = nullptr;
-	pResults->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&pShader), &pShaderName);
-	if (pShader != nullptr)
+	ComPtr<IDxcBlob> shaderBlob = nullptr;
+	ComPtr<IDxcBlobWide> shaderName = nullptr;
+	results->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), &shaderName);
+	if (shaderBlob != nullptr)
 	{
-		shader.byteCode.resize(pShader->GetBufferSize());
-		std::memcpy(shader.byteCode.data(), pShader->GetBufferPointer(), pShader->GetBufferSize());
+		shader.byteCode.resize(shaderBlob->GetBufferSize());
+		std::memcpy(shader.byteCode.data(), shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize());
 	}
 
 	if (includeDebugInfo)
 	{
-		// Save pdb.
-		ComPtr<IDxcBlob> pPDB = nullptr;
-		ComPtr<IDxcBlobWide> pPDBName = nullptr;
-		pResults->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pPDB), &pPDBName);
+		ComPtr<IDxcBlob> pdb = nullptr;
+		ComPtr<IDxcBlobWide> pdbName = nullptr;
+		results->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pdb), &pdbName);
 		{
-			// Note that if you don't specify -Fd, a pdb name will be automatically generated. Use this file name to save the pdb so that PIX can find it quickly.
-			shader.pdb.resize(pPDB->GetBufferSize());
-			std::memcpy(shader.pdb.data(), pPDB->GetBufferPointer(), pPDB->GetBufferSize());
+			shader.pdb.resize(pdb->GetBufferSize());
+			std::memcpy(shader.pdb.data(), pdb->GetBufferPointer(), pdb->GetBufferSize());
 		}
 	}
 
@@ -163,19 +156,18 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 	if (!DXILToMetalIRConverter::convertToMetalIR(shader.byteCode, mainEntry, shader))
 	{
 		std::wcout << L"Conversion from DXIL to Metal IR failed.\n";
-		OutCompiledShader = CompiledShader();
+		outCompiledShader = CompiledShader();
 		return false;
 	}
 #endif
 
-	// Print hash.
-	ComPtr<IDxcBlob> pHash = nullptr;
-	pResults->GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(&pHash), nullptr);
-	if (pHash != nullptr)
+	ComPtr<IDxcBlob> shaderHash = nullptr;
+	results->GetOutput(DXC_OUT_SHADER_HASH, IID_PPV_ARGS(&shaderHash), nullptr);
+	if (shaderHash != nullptr)
 	{
 		std::wcout << L"Shader hash: ";
-		auto * pHashBuf = static_cast<DxcShaderHash*>(pHash->GetBufferPointer());
-		for (unsigned char i : pHashBuf->HashDigest)
+		auto* hashBuf = static_cast<DxcShaderHash*>(shaderHash->GetBufferPointer());
+		for (unsigned char i : hashBuf->HashDigest)
 		{
 			std::wcout << std::hex << i;
 		}
@@ -184,7 +176,7 @@ bool ShaderCompiler::compileShader(const std::string& sourceFile, const std::str
 
 	shader.reflection.mainEntry = mainEntry;
 
-	OutCompiledShader = std::move(shader);
+	outCompiledShader = std::move(shader);
 
 	return true;
 }
