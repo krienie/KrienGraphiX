@@ -10,6 +10,7 @@
 
 #include "MTLCommandQueue.h"
 #include "MTLRenderHardwareInterface.h"
+#include "MTLUtils.h"
 #include "Private/Core/RenderThread.h"
 
 namespace kgx::RHI
@@ -24,8 +25,9 @@ bool MTLShader::create(const CompiledShader& compiledShader, ShaderType type)
 
 	auto mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 
-	NS::Error* pError = nullptr;
-	mLibrary = NS::TransferPtr(mtlDevice->newLibrary(dispatchData, &pError));
+	NS::Error* error = nullptr;
+	mLibrary = NS::TransferPtr(mtlDevice->newLibrary(dispatchData, &error));
+	MTLUtils::printIfNSError(error);
 
 	mLibraryFunctionDesc = NS::TransferPtr(
 		MTL4::LibraryFunctionDescriptor::alloc()->init());
@@ -95,6 +97,8 @@ bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
 
 		NS::Error* error = nullptr;
 		mArgumentTables.push_back(NS::TransferPtr(mtlDevice->newArgumentTable(argDesc.get(), &error)));
+		MTLUtils::printIfNSError(error);
+
 		assert(mArgumentTables[i].get() != nullptr);
 		mArgumentTables[i]->setAddress(mTopLevelBuffers[i]->gpuAddress(), kIRArgumentBufferBindPoint);
 	}

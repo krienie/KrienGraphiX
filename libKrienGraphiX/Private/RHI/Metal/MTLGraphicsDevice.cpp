@@ -1,6 +1,7 @@
 
 #include "MTLGraphicsDevice.h"
 
+#include "MTLUtils.h"
 #include "Metal/MTL4Compiler.hpp"
 
 namespace kgx::RHI
@@ -13,7 +14,7 @@ MTLGraphicsDevice::MTLGraphicsDevice()
 	auto compilerDesc = NS::TransferPtr(MTL4::CompilerDescriptor::alloc()->init());
 	mCompiler = NS::TransferPtr(mDevice->newCompiler(compilerDesc.get(), &error));
 
-	//TODO(KL): Handle error
+	MTLUtils::printIfNSError(error);
 }
 
 MTL::Device* MTLGraphicsDevice::getNativeDevice() const
