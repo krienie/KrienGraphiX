@@ -10,7 +10,7 @@ RHICommandQueue::RHICommandQueue()
 	mFence = gPlatformRHI->createFence();
 }
 
-void RHICommandQueue::flushQueue()
+void RHICommandQueue::waitForCompletion()
 {
 	mFence->sync();
 }

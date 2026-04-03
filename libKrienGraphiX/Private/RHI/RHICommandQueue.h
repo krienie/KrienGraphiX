@@ -16,7 +16,7 @@ public:
 	virtual bool create() = 0;
 
 	virtual void executeCommandList(RHIGraphicsCommandList* commandList) = 0;
-	void flushQueue();
+	void waitForCompletion();
 
 private:
 	std::unique_ptr<RHIFence> mFence;

@@ -31,6 +31,8 @@ public:
 	void present() override;
 
 private:
+	void clearOffscreenTextures() const;
+
 	uint32_t mWidth;
 	uint32_t mHeight;
 	CA::MetalLayer* mDrawLayer = nullptr;

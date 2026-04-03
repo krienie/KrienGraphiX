@@ -75,10 +75,10 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 	}
 	
 	mCommandQueue->getNativeCommandQueue()->addResidencySet(mDrawLayer->residencySet());
-
 	mCommandQueue->getResidencySet()->commit();
-	
 	autoReleasePool->release();
+
+	clearOffscreenTextures();
 
 	return true;
 }
@@ -118,5 +118,38 @@ void MTLSwapChain::present()
 
 	mCurrentTextureIndex = (mCurrentTextureIndex + 1) % mTextureViews.size();
 	mNextPresentTextureIndex = (mNextPresentTextureIndex + 1) % mTextureViews.size();
+}
+
+void MTLSwapChain::clearOffscreenTextures() const
+{
+	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();
+
+	MTL::RenderPassDescriptor* pRpd = MTL::RenderPassDescriptor::renderPassDescriptor();
+
+	for (int i = 0; i < mTextureViews.size(); ++i)
+	{
+		auto colorAttach = pRpd->colorAttachments()->object(i);
+
+		MTLTexture2D* offscreenTexture = rcCast(mTextureViews[i]->getViewedResource());
+		colorAttach->setTexture(offscreenTexture->getNativeResource());
+		colorAttach->setLoadAction(MTL::LoadActionClear);
+		colorAttach->setClearColor(MTL::ClearColor::Make(0, 0, 0, 1)); // Black with alpha 1
+		colorAttach->setStoreAction(MTL::StoreActionStore);
+	}
+
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
+
+	auto commandAllocator = NS::TransferPtr(mtlDevice->newCommandAllocator());
+	auto commandBuffer = NS::TransferPtr(mtlDevice->newCommandBuffer());
+	commandBuffer->beginCommandBuffer(commandAllocator.get());
+	auto commandEncoder = commandBuffer->renderCommandEncoder(reinterpret_cast<MTL4::RenderPassDescriptor*>(pRpd));
+	commandEncoder->endEncoding();
+	commandBuffer->endCommandBuffer();
+
+	MTL4::CommandBuffer* cmdBuffPtr = commandBuffer.get();
+	mCommandQueue->getNativeCommandQueue()->commit(&cmdBuffPtr, 1);
+	mCommandQueue->waitForCompletion();
+
+	autoReleasePool->release();
 }
 }

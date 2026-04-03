@@ -29,7 +29,7 @@ ImmediateCommandContext::~ImmediateCommandContext()
 	mCommandList->close();
 
 	gRenderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
-	gRenderThread->getCommandQueuePtr()->flushQueue();
+	gRenderThread->getCommandQueuePtr()->waitForCompletion();
 
 	mCommandAllocator->reset();
 
@@ -138,7 +138,7 @@ void RenderThread::nextFrame()
 void RenderThread::flush() const
 {
 	mCommandThread->flush();
-	mCommandQueue->flushQueue();
+	mCommandQueue->waitForCompletion();
 }
 
 void RenderThread::shutdown()
