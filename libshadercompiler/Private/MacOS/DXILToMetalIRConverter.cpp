@@ -4,8 +4,38 @@
 #include "ShaderCompiler/ShaderCompiler.h"
 
 #ifdef __APPLE__
+#include <iostream>
 #include <metal_irconverter.h>
 #endif
+
+namespace
+{
+#ifdef __APPLE__
+void printError(IRError* error)
+{
+	if (!error)
+	{
+		return;
+	}
+
+	const uint32_t errorCode = IRErrorGetCode(error);
+
+	const void* payload = IRErrorGetPayload(error);
+
+	std::cerr << "--- Metal Shader Converter Error ---" << std::endl;
+	std::cerr << "Code: " << errorCode << std::endl;
+
+	if (payload != nullptr)
+	{
+		// Most errors in this library return a C-string as the payload
+		const char* errorMessage = static_cast<const char*>(payload);
+		std::cerr << "Message: " << errorMessage << std::endl;
+	}
+
+	IRErrorDestroy(error);
+}
+#endif
+}
 
 namespace kgx::DXILToMetalIRConverter
 {
@@ -24,8 +54,7 @@ bool convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& 
 
 	if (!mtlIRObj)
 	{
-		//TODO(KL): Do something with the error
-		IRErrorDestroy(error);
+		printError(error);
 		return false;
 	}
 
