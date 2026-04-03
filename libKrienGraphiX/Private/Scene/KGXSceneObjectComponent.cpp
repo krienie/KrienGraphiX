@@ -65,7 +65,6 @@ math::Matrix4X4 KGXSceneObjectComponent::getWorldTransform() const
 	const math::Matrix4X4 parentTransform = mOwner->getWorldTransform();
 	const math::Matrix4X4 componentTransform = getRelativeTransform();
 
-	//TODO(KL): Double check the order of this
 	return parentTransform * componentTransform;
 }
 

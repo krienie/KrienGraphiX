@@ -19,8 +19,6 @@ public:
 	int run();
 
 private:
-	void updateWindowTitle(float deltaTime) const;
-
 	SDL_Window* mSDLWindow;
 	int mClientWidth;
 	int mClientHeight;

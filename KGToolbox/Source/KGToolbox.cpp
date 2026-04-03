@@ -33,8 +33,11 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 {
 	mKgxEngine = std::make_unique<KrienGraphiXEngine>();
 
-	//TODO(KL): add some error handling/logging here
-	SDL_Init(SDL_INIT_VIDEO);
+	if (!SDL_Init(SDL_INIT_VIDEO))
+	{
+		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		return;
+	}
 
 	SDL_WindowFlags windowFlags = SDL_WINDOW_RESIZABLE;
 #ifdef __APPLE__
@@ -51,8 +54,6 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
-		//updateWindowTitle(deltaTime);
-
 		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), glm::two_pi<float>());
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
@@ -89,31 +90,5 @@ int KGToolboxApp::run()
 	SDL_Quit();
 
 	return 0;
-}
-
-void KGToolboxApp::updateWindowTitle(float deltaTime) const
-{
-	static int frameCount = 0;
-	static float timeElapsed = 0.0;
-
-	timeElapsed += deltaTime;
-	++frameCount;
-
-	if (timeElapsed >= 1.0f)
-	{
-		const auto fps = static_cast<float>(frameCount);
-		const float mspf = 1000.0f / fps;
-
-		const std::string windowTitle = "KGXToolbox";
-
-		std::stringstream ss;
-		ss << windowTitle.c_str() << "    fps: " << std::to_string(static_cast<int>(fps));
-		ss << "   mspf: " << std::to_string(std::lroundf(mspf));
-
-		SDL_SetWindowTitle(mSDLWindow, ss.str().c_str());
-
-		frameCount = 0;
-		timeElapsed -= 1.0f;
-	}
 }
 }
