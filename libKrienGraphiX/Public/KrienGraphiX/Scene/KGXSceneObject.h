@@ -45,9 +45,9 @@ public:
 	template<class Comp,
 				std::enable_if_t<std::is_base_of_v<KGXSceneObjectComponent, Comp>, int> = 0,
 				typename... Args>
-	Comp* addNewComponent(Args... args)
+	Comp* addNewComponent(Args&&... args)
 	{
-		Comp *newObj = new Comp(this, args...);
+		Comp *newObj = new Comp(this, std::forward<Args>(args)...);
 		addNewComponentInternal(newObj);
 
 		return newObj;
