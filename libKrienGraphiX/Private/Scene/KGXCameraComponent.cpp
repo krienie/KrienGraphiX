@@ -13,7 +13,7 @@ KGXCameraComponent::KGXCameraComponent(KGXSceneObject* owner, const math::Vector
 
 KGXCameraComponent::KGXCameraComponent(KGXSceneObject* owner, float fovY, float aspect, float nearZ, float farZ,
 				const math::Vector3& eye, const math::Vector3& target, const math::Vector3& up)
-	: KGXSceneObjectComponent(owner), mProjMatrix(), mViewMatrix(), mEye(eye), mTarget(target), mCamUp(up),
+	: KGXSceneObjectComponent(owner), mProjMatrix(), mViewMatrix(), mViewProjMatrix(), mEye(eye), mTarget(target), mCamUp(up),
 	mFov(fovY), mAspectRatio(aspect), mNearZ(nearZ), mFarZ(farZ)
 {
 	mProjMatrix = glm::perspectiveLH_ZO(mFov, mAspectRatio, mNearZ, mFarZ);

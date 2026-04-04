@@ -25,12 +25,12 @@ public:
 	KGXScene& operator=(const KGXScene&) noexcept = delete;
 	KGXScene& operator=(KGXScene&&) noexcept      = delete;
 
-	const rendering::KGXRenderScene* getRenderScenePtr() const;
+	[[nodiscard]] const rendering::KGXRenderScene* getRenderScenePtr() const;
 
 	void setSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
 	void registerObjectUpdate(SceneUpdateDelegate updateDelegate);
 
-	bool hasActiveCamera() const;
+	[[nodiscard]] bool hasActiveCamera() const;
 	void setActiveCamera(KGXCameraComponent* cameraComponent);
 
 	void addMeshComponent(KGXMeshComponent* meshComponent);

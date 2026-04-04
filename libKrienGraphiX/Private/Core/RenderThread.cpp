@@ -12,7 +12,6 @@
 #include "CommandThread.h"
 
 #include <cassert>
-#include <utility>
 
 namespace kgx::core
 {
