@@ -13,16 +13,20 @@ MTLCommandQueue::MTLCommandQueue()
 
 bool MTLCommandQueue::create()
 {
+	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();
+
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mCommandQueue = NS::TransferPtr(mtlDevice->newMTL4CommandQueue());
 
 	NS::SharedPtr<MTL::ResidencySetDescriptor> resDesc = NS::TransferPtr(MTL::ResidencySetDescriptor::alloc()->init());
 	resDesc->setLabel(NS::String::string("GlobalQueueResidencySet", NS::UTF8StringEncoding));
 
-	NS::Error* pError = nullptr;
-	mResidencySet = NS::TransferPtr(mtlDevice->newResidencySet(resDesc.get(), &pError));
+	NS::Error* error = nullptr;
+	mResidencySet = NS::TransferPtr(mtlDevice->newResidencySet(resDesc.get(), &error));
 
 	mCommandQueue->addResidencySet(mResidencySet.get());
+
+	autoReleasePool->release();
 
 	return mCommandQueue.get() != nullptr;
 }
