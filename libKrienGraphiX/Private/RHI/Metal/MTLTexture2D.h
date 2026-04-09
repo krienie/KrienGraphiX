@@ -18,7 +18,9 @@ public:
 	MTLTexture2D(const MTLTexture2DDescriptor& descriptor);
 	~MTLTexture2D() override = default;
 
-	[[nodiscard]] MTL::Texture* getNativeResource() const;
+	[[nodiscard]] void* getNativeResource() const override;
+
+	[[nodiscard]] MTL::Texture* getTextureResource() const;
 
 private:
 	NS::SharedPtr<MTL::Texture> mTextureResource;

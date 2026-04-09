@@ -93,7 +93,7 @@ bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
 	for (int i = 0; i < core::RenderThread::maxNumBufferedFrames; i++)
 	{
 		mTopLevelBuffers.push_back(NS::TransferPtr(mtlDevice->newBuffer(topLevelBufferSize, MTL::ResourceStorageModeShared)));
-		mtlCommandQueue->getResidencySet()->addAllocation(mTopLevelBuffers[i].get());
+		mtlCommandQueue->addGlobalResidency(mTopLevelBuffers[i].get());
 
 		NS::Error* error = nullptr;
 		mArgumentTables.push_back(NS::TransferPtr(mtlDevice->newArgumentTable(argDesc.get(), &error)));

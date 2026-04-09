@@ -22,6 +22,8 @@ public:
 	MTLBuffer& operator=(MTLBuffer&) = delete;
 	MTLBuffer& operator=(MTLBuffer&&) noexcept = default;
 
+	[[nodiscard]] void* getNativeResource() const override;
+
 	[[nodiscard]]
 	MTL::GPUAddress getGPUAddress() const;
 	

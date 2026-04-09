@@ -11,6 +11,12 @@ MTLCommandQueue::MTLCommandQueue()
 {
 }
 
+void MTLCommandQueue::addGlobalResidency(const MTL::Allocation* allocation)
+{
+	mResidencySetDirty = true;
+	mResidencySet->addAllocation(allocation);
+}
+
 bool MTLCommandQueue::create()
 {
 	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();
@@ -33,6 +39,12 @@ bool MTLCommandQueue::create()
 
 void MTLCommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 {
+	if (mResidencySetDirty)
+	{
+		mResidencySet->commit();
+		mResidencySetDirty = false;
+	}
+
 	MTLGraphicsCommandList* mtlCommandList = rcCast(commandList);
 
 	MTL4::CommandBuffer* ppCommandLists[] = { mtlCommandList->getCommandBuffer() };

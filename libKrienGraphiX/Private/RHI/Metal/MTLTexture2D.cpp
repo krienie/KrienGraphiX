@@ -38,9 +38,18 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mTextureResource = NS::TransferPtr(mtlDevice->newTexture(desc));
+
+	//TODO(KL): For now everything is permanently resident.
+	//Will change for a different system later when scene orginisation is more developed.
+	getMTLRHI()->getMTLResidencyManager()->addGlobalResidency(*this);
 }
 
-MTL::Texture* MTLTexture2D::getNativeResource() const
+void* MTLTexture2D::getNativeResource() const
+{
+	return mTextureResource.get();
+}
+
+MTL::Texture* MTLTexture2D::getTextureResource() const
 {
 	return mTextureResource.get();
 }

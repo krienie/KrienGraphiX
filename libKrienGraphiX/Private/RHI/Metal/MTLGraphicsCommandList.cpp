@@ -258,7 +258,7 @@ NS::SharedPtr<MTL4::RenderPassDescriptor> MTLGraphicsCommandList::compileToRende
 		auto passTextureDesc = mPassContext.usedTextures.find(mPassContext.renderTargets[i])->second;
 
 		MTL::RenderPassColorAttachmentDescriptor* colorAttach = renderPassDescriptor->colorAttachments()->object(i);
-		colorAttach->setTexture(passTextureDesc.texture->getNativeResource());
+		colorAttach->setTexture(passTextureDesc.texture->getTextureResource());
 		colorAttach->setLoadAction(passTextureDesc.loadAction);
 		colorAttach->setStoreAction(passTextureDesc.storeAction);
 		colorAttach->setClearColor(toMTLClearColor(passTextureDesc.clearValue));

@@ -24,6 +24,7 @@ MTLRenderHardwareInterface::MTLRenderHardwareInterface()
 	: mAutoReleasePool(nullptr)
 {
 	mGraphicsDevice = std::make_unique<MTLGraphicsDevice>();
+	mResidencyManager = std::make_unique<MTLResidencyManager>();
 }
 
 MTLRenderHardwareInterface::~MTLRenderHardwareInterface()

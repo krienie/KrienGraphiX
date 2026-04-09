@@ -66,16 +66,13 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 		const std::string textureLabel = "OffscreenTexture_" + std::to_string(i);
 		
 		auto newTexture = std::make_shared<MTLTexture2D>(textureDesc);
-		newTexture->getNativeResource()->setLabel(NS::String::string(textureLabel.c_str(), NS::UTF8StringEncoding));
+		newTexture->getTextureResource()->setLabel(NS::String::string(textureLabel.c_str(), NS::UTF8StringEncoding));
 		mOffscreenTextures.push_back(newTexture);
 		mTextureViews.push_back(std::make_shared<MTLTextureView>(RHIResourceView::Type::RTV, newTexture));
 		mCommandAllocators.push_back(NS::TransferPtr(mtlDevice->newCommandAllocator()));
-
-		mCommandQueue->getResidencySet()->addAllocation(newTexture->getNativeResource());
 	}
 	
 	mCommandQueue->getNativeCommandQueue()->addResidencySet(mDrawLayer->residencySet());
-	mCommandQueue->getResidencySet()->commit();
 	autoReleasePool->release();
 
 	clearOffscreenTextures();
@@ -105,7 +102,7 @@ void MTLSwapChain::present()
 	mCommandBuffer->beginCommandBuffer(currentAllocator);
 
 	MTL4::ComputeCommandEncoder* computeEncoder = mCommandBuffer->computeCommandEncoder();
-	computeEncoder->copyFromTexture(mOffscreenTextures[mNextPresentTextureIndex]->getNativeResource(),
+	computeEncoder->copyFromTexture(mOffscreenTextures[mNextPresentTextureIndex]->getTextureResource(),
 		drawable->texture());
 	computeEncoder->endEncoding();
 
@@ -131,7 +128,7 @@ void MTLSwapChain::clearOffscreenTextures() const
 		auto colorAttach = pRpd->colorAttachments()->object(i);
 
 		MTLTexture2D* offscreenTexture = rcCast(mTextureViews[i]->getViewedResource());
-		colorAttach->setTexture(offscreenTexture->getNativeResource());
+		colorAttach->setTexture(offscreenTexture->getTextureResource());
 		colorAttach->setLoadAction(MTL::LoadActionClear);
 		colorAttach->setClearColor(MTL::ClearColor::Make(0, 0, 0, 1)); // Black with alpha 1
 		colorAttach->setStoreAction(MTL::StoreActionStore);

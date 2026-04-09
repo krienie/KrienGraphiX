@@ -4,6 +4,7 @@
 #include "MTLCommandQueue.h"
 #include "MTLRenderHardwareInterface.h"
 #include "Private/Core/RenderThread.h"
+#include "Private/RHI/RHIResource.h"
 
 namespace kgx::RHI
 {
@@ -48,11 +49,14 @@ MTLBuffer::MTLBuffer(const RHIBufferDescriptor& descriptor)
 		mResource = NS::TransferPtr(mtlDevice->newBuffer(totalBufferSize, storageMode));
 	}
 
-	//TODO(KL): All buffers are temporarily added to the global commandqueue residency set
-	MTLCommandQueue* mtlCommandQueue = rcCast(core::gRenderThread->getCommandQueuePtr());
+	//TODO(KL): For now everything is permanently resident.
+	//Will change for a different system later when scene orginisation is more developed.
+	getMTLRHI()->getMTLResidencyManager()->addGlobalResidency(*this);
+}
 
-	mtlCommandQueue->getResidencySet()->addAllocation(mResource.get());
-	mtlCommandQueue->getResidencySet()->commit();
+void* MTLBuffer::getNativeResource() const
+{
+	return mResource.get();
 }
 
 MTL::GPUAddress MTLBuffer::getGPUAddress() const

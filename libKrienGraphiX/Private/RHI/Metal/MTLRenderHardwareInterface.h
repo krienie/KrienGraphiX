@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "MTLGraphicsDevice.h"
+#include "MTLResidencyManager.h"
 #include "Metal/MTLDevice.hpp"
 #include "Private/RHI/RenderHardwareInterface.h"
 
@@ -61,9 +62,13 @@ public:
 	[[nodiscard]]
 	MTLGraphicsDevice* getMTLDevice() const { return mGraphicsDevice.get(); }
 
+	[[nodiscard]]
+	MTLResidencyManager* getMTLResidencyManager() const { return mResidencyManager.get(); }
+
 private:
-	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
 	NS::AutoreleasePool* mAutoReleasePool;
+	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
+	std::unique_ptr<MTLResidencyManager> mResidencyManager;
 };
 
 inline MTLRenderHardwareInterface* getMTLRHI()
