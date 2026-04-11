@@ -27,7 +27,6 @@ void printError(IRError* error)
 
 	if (payload != nullptr)
 	{
-		// Most errors in this library return a C-string as the payload
 		const char* errorMessage = static_cast<const char*>(payload);
 		std::cerr << "Message: " << errorMessage << std::endl;
 	}

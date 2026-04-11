@@ -2,6 +2,7 @@
 #include "RenderThread.h"
 
 #include "RenderCore.h"
+#include "KrienGraphiX/Core/Logging.h"
 
 #ifdef WIN32
 #include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
@@ -17,6 +18,8 @@ namespace kgx::core
 {
 ImmediateCommandContext::ImmediateCommandContext()
 {
+	KGXLOG_TRACE("ImmediateCommandContext");
+
 	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
 	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
 
@@ -39,6 +42,8 @@ ImmediateCommandContext::~ImmediateCommandContext()
 FrameCommandContext::FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* frameFence)
 	: mFrameNumber(frameNumber), mFrameFence(frameFence)
 {
+	KGXLOG_TRACE("FrameCommandContext {}", frameNumber);
+
 	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
 	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
 
@@ -74,6 +79,7 @@ RenderThread::RenderThread()
 	static_assert(false, "Unsupported platform");
 #endif
 
+	KGXLOG_CRITICAL_IF(RHI::gPlatformRHI == nullptr, "Error creating RHI!");
 	assert(RHI::gPlatformRHI != nullptr && "Error creating RHI!");
 
 	mCommandQueue = RHI::gPlatformRHI->createCommandQueue();
@@ -126,6 +132,7 @@ void RenderThread::nextFrame()
 {
 	if (mFrameResources.size() >= maxNumBufferedFrames)
 	{
+		KGXLOG_TRACE("Waiting for frame fence {}", mFrameResources.front()->getFrameNumber());
 		mFrameFence->waitForValue(mFrameResources.front()->getFrameNumber());
 		mFrameResources.pop();
 	}
@@ -136,6 +143,7 @@ void RenderThread::nextFrame()
 
 void RenderThread::flush() const
 {
+	KGXLOG_TRACE("RenderThread::flush()");
 	mCommandThread->flush();
 	mCommandQueue->waitForCompletion();
 }

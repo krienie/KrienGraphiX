@@ -10,6 +10,7 @@
 #include "MTLRenderHardwareInterface.h"
 #include "MTLTexture2D.h"
 #include "MTLShader.h"
+#include "KrienGraphiX/Core/Logging.h"
 #include "Metal/MTL4RenderPass.hpp"
 
 #include "Private/Core/RenderCore.h"
@@ -172,6 +173,7 @@ void MTLGraphicsCommandList::setRenderTargets(const std::vector<RHIResourceView*
 {
 	if (renderTargetViews.empty())
 	{
+		KGXLOG_ERROR("[MTL] No RenderTargetViews found for setRenderTargets().");
 		assert(false);
 		return;
 	}
@@ -198,6 +200,7 @@ void MTLGraphicsCommandList::clearDepthStencilView(RHIResourceView* dsv, DepthSt
 {
 	if (!dsv->IsTextureView() || dsv->getViewType() != RHIResourceView::Type::DSV)
 	{
+		KGXLOG_ERROR("[MTL] DepthStencilView is not of type DepthStencilView for clearDepthStencilView()");
 		assert(false);
 		return;
 	}
@@ -212,6 +215,7 @@ void MTLGraphicsCommandList::clearRenderTargetView(RHIResourceView* rtv, const f
 {
 	if (!rtv->IsTextureView() || rtv->getViewType() != RHIResourceView::Type::RTV)
 	{
+		KGXLOG_ERROR("[MTL] RenderTargetView is not of type RenderTargetView for clearRenderTargetView()");
 		assert(false);
 		return;
 	}

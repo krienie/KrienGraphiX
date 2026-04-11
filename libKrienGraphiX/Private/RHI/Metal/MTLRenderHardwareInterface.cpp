@@ -13,6 +13,7 @@
 #include "MTLShader.h"
 #include "MTLSwapChain.h"
 #include "MTLTexture2D.h"
+#include "KrienGraphiX/Core/Logging.h"
 
 #include "Private/Core/RenderCore.h"
 
@@ -56,6 +57,7 @@ std::unique_ptr<RHICommandQueue> MTLRenderHardwareInterface::createCommandQueue(
 	auto commandQueue = std::make_unique<MTLCommandQueue>();
 	if (!commandQueue->create())
 	{
+		KGXLOG_ERROR("[MTL] Failed to create CommandQueue");
 		return nullptr;
 	}
 
@@ -72,6 +74,7 @@ std::unique_ptr<RHISwapChain> MTLRenderHardwareInterface::createSwapChain(
 	auto swapChain = std::make_unique<MTLSwapChain>(width, height);
 	if (!swapChain->create(commandQueue, window, frameCount, RHIPixelFormat::R10G10B10A2_unorm))
 	{
+		KGXLOG_ERROR("[MTL] Failed to create SwapChain");
 		return nullptr;
 	}
 
@@ -88,6 +91,7 @@ std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const Compil
 	auto newShader = std::make_unique<MTLShader>();
 	if (!newShader->create(compiledShader, type))
 	{
+		KGXLOG_ERROR("[MTL] Failed to create Shader");
 		return nullptr;
 	}
 
@@ -104,6 +108,7 @@ std::unique_ptr<RHIGraphicsCommandList> MTLRenderHardwareInterface::createGraphi
 	auto graphicsCommandList = std::make_unique<MTLGraphicsCommandList>();
 	if (!graphicsCommandList->create(pipelineState))
 	{
+		KGXLOG_ERROR("[MTL] Failed to create GraphicsCommandList");
 		return nullptr;
 	}
 
@@ -144,6 +149,7 @@ std::unique_ptr<RHIGraphicsPipelineState> MTLRenderHardwareInterface::createGrap
 	auto graphicsPipelineState = std::make_unique<MTLGraphicsPipelineState>(desc);
 	if (!graphicsPipelineState->create())
 	{
+		KGXLOG_ERROR("[MTL] Failed to create GraphicsPipelineState");
 		return nullptr;
 	}
 

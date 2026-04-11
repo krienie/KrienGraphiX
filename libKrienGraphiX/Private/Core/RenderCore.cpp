@@ -6,6 +6,8 @@
 
 #include "RenderWindow.h"
 
+#include "KrienGraphiX/Core/Logging.h"
+
 #ifdef _WIN32
 #ifdef _DEBUG
 #include <Windows.h>
@@ -53,7 +55,7 @@ bool RenderCore::createRenderWindow(SDL_Window* window, unsigned initialWindowWi
 
 	if (mRenderWindow)
 	{
-		std::cerr << "[RenderCore]: Render Window already created" << std::endl;
+		KGXLOG_WARN("Render Window already created.");
 		return false;
 	}
 
@@ -63,6 +65,9 @@ bool RenderCore::createRenderWindow(SDL_Window* window, unsigned initialWindowWi
 
 RenderCore::RenderCore()
 {
+	mLogger = std::make_unique<Logger>();
+	KGXLOG_INFO("Initializing RenderCore...");
+
 	mScene = std::make_unique<KGXScene>();
 	gRenderThread = std::make_unique<RenderThread>();
 
@@ -81,6 +86,8 @@ RenderCore::RenderCore()
 #endif
 
 	constexpr int targetFPS = 60;
+	KGXLOG_INFO("TargetFPS: {}", targetFPS);
+
 	mFrameTimer = std::make_unique<FrameTimer>(targetFPS, [this](float deltaTime)
 	{
 		mScene->updateScene(deltaTime);
@@ -93,6 +100,8 @@ RenderCore::RenderCore()
 			}
 		}
 	});
+
+	KGXLOG_INFO("RenderCore fully initialized.");
 }
 
 RenderCore::~RenderCore()
@@ -103,5 +112,7 @@ RenderCore::~RenderCore()
 	gRenderThread->flush();
 	gRenderThread->shutdown();
 	gRenderThread.reset();
+
+	mLogger.reset();
 }
 }

@@ -30,9 +30,11 @@ list(APPEND Src "${PublicSrc}")
 
 add_library(${LIB_NAME} STATIC ${Src})
 
+find_package(spdlog REQUIRED)
+
 target_include_directories(${LIB_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Public>")
 target_link_libraries(${LIB_NAME} PRIVATE shadercompiler SDL3::SDL3)
-target_link_libraries(${LIB_NAME} PUBLIC glm)
+target_link_libraries(${LIB_NAME} PUBLIC glm spdlog::spdlog)
 
 if (MSVC)
     target_compile_options(${LIB_NAME} PUBLIC /GR-) # No RTTI

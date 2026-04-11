@@ -57,7 +57,7 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 			flags
 		}
 	};
-	
+
 	mNextPresentTextureIndex = bufferCount - 1;
 
 	mOffscreenTextures.reserve(bufferCount);
@@ -71,7 +71,7 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 		mTextureViews.push_back(std::make_shared<MTLTextureView>(RHIResourceView::Type::RTV, newTexture));
 		mCommandAllocators.push_back(NS::TransferPtr(mtlDevice->newCommandAllocator()));
 	}
-	
+
 	mCommandQueue->getNativeCommandQueue()->addResidencySet(mDrawLayer->residencySet());
 	autoReleasePool->release();
 

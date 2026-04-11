@@ -3,6 +3,7 @@
 
 #include <filesystem>
 
+#include "KrienGraphiX/Core/Logging.h"
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "Private/RHI/RHIDescriptors.h"
@@ -144,6 +145,8 @@ KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHIResourceView
 
 void KGXRenderer::RenderFrame()
 {
+	KGXLOG_TRACE("Starting RenderFrame");
+
 	auto frameContext = core::gRenderThread->getCurrentFrameContext();
 	auto commandList = frameContext->getCommandList();
 
@@ -185,5 +188,7 @@ void KGXRenderer::RenderFrame()
 
 	RHI::gPlatformRHI->endFrame(commandList, OutputRenderTarget);
 	frameContext->endFrame();
+
+	KGXLOG_TRACE("End RenderFrame");
 }
 }

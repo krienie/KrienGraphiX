@@ -1,15 +1,15 @@
 
 #pragma once
 
-#include "CommandThread.h"
-#include "RenderThread.h"
-#include "FrameTimer.h"
-#include "Private/Scene/KGXScene.h"
+#include <memory>
 
 #include <SDL3/SDL.h>
 
-#include <memory>
-#include <unordered_map>
+#include "CommandThread.h"
+#include "RenderThread.h"
+#include "FrameTimer.h"
+#include "Logger.h"
+#include "Private/Scene/KGXScene.h"
 
 namespace kgx::core
 {
@@ -38,8 +38,8 @@ private:
 	static RenderCore* mInst;
 	static int mRefCount;
 
+	std::unique_ptr<Logger> mLogger;
 	std::unique_ptr<FrameTimer> mFrameTimer;
-
 	std::unique_ptr<KGXScene> mScene;
 
 	std::mutex mRenderWindowMutex;

@@ -6,8 +6,11 @@ include(cmake/functions.cmake)
 project(KrienGraphiX CXX)
 
 set(CMAKE_CXX_STANDARD 20)
-add_definitions(-D_UNICODE -DUNICODE)
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+add_definitions(-D_UNICODE -DUNICODE)
+add_compile_definitions($<$<CONFIG:Debug>:DEBUG>)
+add_compile_definitions($<$<CONFIG:Debug>:-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_DEBUG>$<$<CONFIG:Release>:-DSPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_INFO>)
 
 if (MSVC)
     # Remove exceptions flag from the compile options and add the no-version of it

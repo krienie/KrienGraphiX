@@ -3,9 +3,11 @@
 
 #include <iostream>
 
-#include "Foundation/NSDictionary.hpp"
-#include "Foundation/NSError.hpp"
-#include "Foundation/NSString.hpp"
+#include <Foundation/NSDictionary.hpp>
+#include <Foundation/NSError.hpp>
+#include <Foundation/NSString.hpp>
+
+#include "KrienGraphiX/Core/Logging.h"
 
 namespace kgx::RHI::MTLUtils
 {
@@ -20,18 +22,20 @@ void printIfNSError(NS::Error* error)
 	const char* domain = error->domain()->utf8String();
 	const NS::Integer code = error->code();
 
-	std::cerr << "--- NS::Error Details ---" << std::endl;
-	std::cerr << "Domain:  " << domain << std::endl;
-	std::cerr << "Code:    " << code << std::endl;
-	std::cerr << "Message: " << description << std::endl;
+	std::string errorString = std::format("--- NS::Error Details ---\n"
+		"Domain: {0}\n"
+		"Code: {1}\n"
+		"Message: {2}\n", domain, code, description);
 
 	if (NS::Dictionary* userInfo = error->userInfo())
 	{
 		if (NS::Object* reason = userInfo->object(NS::String::string("NSLocalizedFailureReason", NS::UTF8StringEncoding)))
 		{
-			const char* reasonStr = static_cast<NS::String*>(reason)->utf8String();
-			std::cerr << "Reason:  " << reasonStr << std::endl;
+			const std::string reasonString = static_cast<NS::String*>(reason)->utf8String();
+			errorString += std::format("Reason: {0}", reasonString);
 		}
 	}
+
+	KGXLOG_ERROR(errorString);
 }
 }

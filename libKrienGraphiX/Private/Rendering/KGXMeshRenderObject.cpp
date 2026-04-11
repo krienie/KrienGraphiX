@@ -1,8 +1,7 @@
 
 #include "KGXMeshRenderObject.h"
 
-#include <utility>
-
+#include "KrienGraphiX/Core/Logging.h"
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 
@@ -15,6 +14,9 @@ KGXMeshRenderObject::KGXMeshRenderObject(const RawMeshData& rawMeshData)
 
 void KGXMeshRenderObject::createRenderResources()
 {
+	//TODO(KL): Allow to give names to objects so we can log it here
+	KGXLOG_INFO("Creating KGXMeshRenderObject");
+
 	const unsigned int vbByteSize = static_cast<unsigned int>(mRawMeshData.vertices.size()) * sizeof(Vertex);
 	const unsigned int ibByteSize = static_cast<unsigned int>(mRawMeshData.indices.size()) * sizeof(std::uint16_t);
 

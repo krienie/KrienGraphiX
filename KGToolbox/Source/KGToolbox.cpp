@@ -8,18 +8,13 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <sstream>
+
+#include "KrienGraphiX/Core/Logging.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	SDL_SetMainReady();
 	SDL_SetAppMetadata("KGToolbox", "1.0", "com.kgx.kgtoolbox");
-
-	if (!SDL_Init(SDL_INIT_VIDEO))
-	{
-		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
-		return -1;
-	}
 
 	kgt::KGToolboxApp KGTApp(1024, 768);
 
@@ -35,7 +30,7 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 
 	if (!SDL_Init(SDL_INIT_VIDEO))
 	{
-		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		KGXLOG_CRITICAL("SDL_Init failed: {}", SDL_GetError());
 		return;
 	}
 
