@@ -40,4 +40,8 @@ DX12Texture2D::DX12Texture2D(const DX12Texture2DDescriptor& descriptor)
 			IID_PPV_ARGS(&mResource));
 	}
 }
+void* DX12Texture2D::getNativeResource() const
+{
+	return mResource.Get();
+}
 }

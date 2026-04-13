@@ -33,7 +33,7 @@ void DX12Fence::sync()
 
 void DX12Fence::queueSignal(uint64_t value)
 {
-	DX12CommandQueue* commandQueue = rcCast(core::RenderCore::get()->getRenderThreadPtr()->getCommandQueuePtr());
+	DX12CommandQueue* commandQueue = rcCast(core::gRenderThread->getCommandQueuePtr());
 	commandQueue->getNativeCommandQueue()->Signal(mFence.Get(), value);
 }
 

@@ -50,8 +50,7 @@ D3D12_RESOURCE_STATES getDXResourceStateFromCreationFlag(kgx::RHI::RHIResource::
 namespace kgx::RHI
 {
 DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor)
-	: RHIBuffer(getAlignedBufferDescriptor(descriptor)),
-		mDescriptor(descriptor)
+	: RHIBuffer(getAlignedBufferDescriptor(descriptor))
 {
 	//TODO(KL): If the buffer is dynamic, create a copy for every frame to avoid race conditions
 
@@ -59,7 +58,7 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 
 	ID3D12Device* nativeDevice = getDX12RHI()->getDX12Device()->getNativeDevice();
 
-	D3D12_HEAP_TYPE heapType = mDescriptor.isDynamic ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
+	D3D12_HEAP_TYPE heapType = descriptor.isDynamic ? D3D12_HEAP_TYPE_UPLOAD : D3D12_HEAP_TYPE_DEFAULT;
 	D3D12_RESOURCE_STATES initialResourceState = D3D12_RESOURCE_STATE_GENERIC_READ;
 
 	//TODO(KL): refactor... this is a bit messy
@@ -168,6 +167,11 @@ const D3D12_VERTEX_BUFFER_VIEW* DX12Buffer::getVertexBufferView() const
 {
 	assert(hasFlag(getCreationFlags(), RHIResource::VertexBuffer));
 	return &mVertexBufferView;
+}
+
+void* DX12Buffer::getNativeResource() const
+{
+	return mBufferDXResource->getResource().Get();
 }
 
 void* DX12Buffer::mapImpl(MapType type)

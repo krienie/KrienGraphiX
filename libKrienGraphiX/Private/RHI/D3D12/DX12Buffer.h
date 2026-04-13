@@ -23,6 +23,8 @@ public:
 	const D3D12_INDEX_BUFFER_VIEW* getIndexBufferView() const;
 	const D3D12_VERTEX_BUFFER_VIEW* getVertexBufferView() const;
 
+	[[nodiscard]] void* getNativeResource() const override;
+
 private:
 	void* mapImpl(MapType type) override;
 	void unmapImpl() override;
