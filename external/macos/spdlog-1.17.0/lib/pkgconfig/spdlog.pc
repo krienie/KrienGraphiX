@@ -7,7 +7,7 @@ Name: libspdlog
 Description: Fast C++ logging library.
 URL: https://github.com/gabime/spdlog
 Version: 1.17.0
-CFlags: -I${includedir} -DSPDLOG_COMPILED_LIB
+CFlags: -I${includedir} -DSPDLOG_COMPILED_LIB -DSPDLOG_NO_EXCEPTIONS -DFMT_USE_EXCEPTIONS=0
 Libs: -L${libdir} -lspdlog -pthread
 Requires: 
 

@@ -59,7 +59,7 @@ endif()
 add_library(spdlog::spdlog STATIC IMPORTED)
 
 set_target_properties(spdlog::spdlog PROPERTIES
-  INTERFACE_COMPILE_DEFINITIONS "SPDLOG_COMPILED_LIB"
+  INTERFACE_COMPILE_DEFINITIONS "SPDLOG_COMPILED_LIB;SPDLOG_NO_EXCEPTIONS;FMT_USE_EXCEPTIONS=0"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
   INTERFACE_LINK_LIBRARIES "Threads::Threads"
 )
@@ -68,6 +68,7 @@ set_target_properties(spdlog::spdlog PROPERTIES
 add_library(spdlog::spdlog_header_only INTERFACE IMPORTED)
 
 set_target_properties(spdlog::spdlog_header_only PROPERTIES
+  INTERFACE_COMPILE_DEFINITIONS "SPDLOG_NO_EXCEPTIONS"
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
   INTERFACE_LINK_LIBRARIES "Threads::Threads"
 )
