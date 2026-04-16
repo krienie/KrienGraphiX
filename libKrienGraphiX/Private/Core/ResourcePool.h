@@ -39,7 +39,7 @@ public:
 		return addNewResource();
 	}
 
-	void release(PooledType* resource)
+	void returnResource(PooledType* resource)
 	{
 		mAvailable.push_back(resource);
 	}

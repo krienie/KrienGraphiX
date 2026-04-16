@@ -7,6 +7,6 @@ namespace kgx::RHI
 {
 void RHIGraphicsCommandList::release()
 {
-	core::gRenderThread->getCommandListPoolPtr()->release(this);
+	core::gRenderThread->getCommandListPoolPtr()->returnResource(this);
 }
 }

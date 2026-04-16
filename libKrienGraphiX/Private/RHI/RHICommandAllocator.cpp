@@ -7,6 +7,6 @@ namespace kgx::RHI
 {
 void RHICommandAllocator::release()
 {
-	core::gRenderThread->getCommandAllocatorPoolPtr()->release(this);
+	core::gRenderThread->getCommandAllocatorPoolPtr()->returnResource(this);
 }
 }
