@@ -61,7 +61,7 @@ std::unique_ptr<RHICommandQueue> MTLRenderHardwareInterface::createCommandQueue(
 		return nullptr;
 	}
 
-	return std::move(commandQueue);
+	return commandQueue;
 }
 
 std::unique_ptr<RHISwapChain> MTLRenderHardwareInterface::createSwapChain(
@@ -78,7 +78,7 @@ std::unique_ptr<RHISwapChain> MTLRenderHardwareInterface::createSwapChain(
 		return nullptr;
 	}
 
-	return std::move(swapChain);
+	return swapChain;
 }
 
 std::unique_ptr<RHIFence> MTLRenderHardwareInterface::createFence() const
@@ -95,7 +95,7 @@ std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const Compil
 		return nullptr;
 	}
 
-	return std::move(newShader);
+	return newShader;
 }
 
 std::unique_ptr<RHICommandAllocator> MTLRenderHardwareInterface::createCommandAllocator() const
@@ -134,7 +134,7 @@ std::unique_ptr<RHITexture2D> MTLRenderHardwareInterface::createDepthStencilBuff
 
 	auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dx12Desc);
 
-	return std::move(depthStencilBuffer);*/
+	return depthStencilBuffer;*/
 }
 
 std::shared_ptr<RHIResourceView> MTLRenderHardwareInterface::createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) const
@@ -153,12 +153,11 @@ std::unique_ptr<RHIGraphicsPipelineState> MTLRenderHardwareInterface::createGrap
 		return nullptr;
 	}
 
-	return std::move(graphicsPipelineState);
+	return graphicsPipelineState;
 }
 
 std::unique_ptr<RHIBuffer> MTLRenderHardwareInterface::createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const
 {
-	auto newBuffer = std::make_unique<MTLBuffer>(descriptor);
-	return std::move(newBuffer);
+	return std::make_unique<MTLBuffer>(descriptor);
 }
 }

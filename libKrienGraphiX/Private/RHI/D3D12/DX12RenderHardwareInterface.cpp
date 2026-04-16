@@ -49,7 +49,7 @@ std::unique_ptr<RHICommandQueue> DX12RenderHardwareInterface::createCommandQueue
 		return nullptr;
 	}
 
-	return std::move(commandQueue);
+	return commandQueue;
 }
 
 std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
@@ -65,12 +65,12 @@ std::unique_ptr<RHISwapChain> DX12RenderHardwareInterface::createSwapChain(
 		return nullptr;
 	}
 
-	return std::move(swapChain);
+	return swapChain;
 }
 
 std::unique_ptr<RHIFence> DX12RenderHardwareInterface::createFence() const
 {
-	return std::move(std::make_unique<DX12Fence>());
+	return std::make_unique<DX12Fence>();
 }
 
 std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const
@@ -81,7 +81,7 @@ std::unique_ptr<RHIShader> DX12RenderHardwareInterface::createShader(const Compi
 		return nullptr;
 	}
 
-	return std::move(newShader);
+	return newShader;
 }
 
 std::unique_ptr<RHICommandAllocator> DX12RenderHardwareInterface::createCommandAllocator() const
@@ -115,7 +115,7 @@ std::unique_ptr<RHITexture2D> DX12RenderHardwareInterface::createDepthStencilBuf
 
 	auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dx12Desc);
 
-	return std::move(depthStencilBuffer);
+	return depthStencilBuffer;
 }
 
 std::shared_ptr<RHIResourceView> DX12RenderHardwareInterface::createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) const
@@ -131,14 +131,13 @@ std::unique_ptr<RHIGraphicsPipelineState> DX12RenderHardwareInterface::createGra
 		return nullptr;
 	}
 
-	return std::move(graphicsPipelineState);
+	return graphicsPipelineState;
 }
 
 std::unique_ptr<RHIBuffer> DX12RenderHardwareInterface::createBuffer(RHIGraphicsCommandList* commandList, const RHIBufferDescriptor& descriptor) const
 {
 	DX12GraphicsCommandList* dxCommandList = rcCast(commandList);
 
-	auto newBuffer = std::make_unique<DX12Buffer>(dxCommandList, descriptor);
-	return std::move(newBuffer);
+	return std::make_unique<DX12Buffer>(dxCommandList, descriptor);
 }
 }
