@@ -6,14 +6,11 @@
 
 namespace kgx::core
 {
-class CommandThread;
-class PooledResource;
-
 template<class PooledType>
 class ResourcePool final
 {
 public:
-	ResourcePool(int initialPoolSize, std::function<std::unique_ptr<PooledType>()> creationFunction)
+	ResourcePool(int initialPoolSize, const std::function<std::unique_ptr<PooledType>()>& creationFunction)
 		: mCreationFunction(creationFunction)
 	{
 		for (int i = 0; i < initialPoolSize; ++i)
