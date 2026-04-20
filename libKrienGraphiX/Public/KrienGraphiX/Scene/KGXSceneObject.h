@@ -27,12 +27,12 @@ public:
 	explicit KGXSceneObject(const std::string& name);
 	virtual ~KGXSceneObject() = default;
 
-	core::KGXScene* getParentScene() const;
+	[[nodiscard]] core::KGXScene* getParentScene() const;
 	void setPosition(float xPos, float yPos, float zPos);
 	void setRotation(float pitch, float yaw, float roll);
 	void setScale(float xScale, float yScale, float zScale);
 
-	bool hasTransformChangedThisFrame() const { return mHasTransformChanged; }
+	[[nodiscard]] bool hasTransformChangedThisFrame() const { return mHasTransformChanged; }
 
 	[[nodiscard]]
 	std::string getName() const;
@@ -85,7 +85,7 @@ class KGXCameraObject : public KGXSceneObject
 public:
 	KGXCameraObject(const std::string& name);
 
-	KGXCameraComponent* getCamera() const;
+	[[nodiscard]] KGXCameraComponent* getCamera() const;
 
 private:
 	KGXCameraComponent* mCameraComponent;

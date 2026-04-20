@@ -22,7 +22,7 @@ public:
 
 	std::shared_ptr<rendering::KGXMeshRenderObject> createMeshRenderObject();
 
-	rendering::KGXMeshRenderObject* getMeshRenderObject() const { return mMeshRenderObject.get(); }
+	[[nodiscard]] rendering::KGXMeshRenderObject* getMeshRenderObject() const { return mMeshRenderObject.get(); }
 
 	//void setMaterial(const Material& material);
 	//Material getMaterial() const;
@@ -42,8 +42,6 @@ class KGXBoxMeshComponent : public KGXMeshComponent
 public:
 	KGXBoxMeshComponent(KGXSceneObject *owner);
 	~KGXBoxMeshComponent() override = default;
-
-	//void initialize() override;
 
 private:
 	rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
