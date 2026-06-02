@@ -3,6 +3,7 @@ add_subdirectory(dxc)
 add_subdirectory(gtest-1.17.0)
 add_subdirectory(spdlog-1.17.0)
 add_subdirectory(fastgltf)
+add_subdirectory(xxhash-0.8.3)
 add_subdirectory(metal-cpp)
 add_subdirectory(metalshaderconverter)
 
