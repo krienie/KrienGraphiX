@@ -1,8 +1,6 @@
 
 cmake_minimum_required(VERSION 3.18)
 
-include(cmake/functions.cmake)
-
 project(KrienGraphiX CXX)
 
 set(CMAKE_CXX_STANDARD 20)
