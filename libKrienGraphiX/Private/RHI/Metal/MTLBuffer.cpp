@@ -49,6 +49,9 @@ MTLBuffer::MTLBuffer(const RHIBufferDescriptor& descriptor)
 		mResource = NS::TransferPtr(mtlDevice->newBuffer(totalBufferSize, storageMode));
 	}
 
+	NS::String* pLabel = NS::String::string(descriptor.name.c_str(), NS::UTF8StringEncoding);
+	mResource->setLabel(pLabel);
+
 	//TODO(KL): For now everything is permanently resident.
 	//Will change for a different system later when scene orginisation is more developed.
 	getMTLRHI()->getMTLResidencyManager()->addGlobalResidency(*this);
