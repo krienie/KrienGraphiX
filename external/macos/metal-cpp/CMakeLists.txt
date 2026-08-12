@@ -1,7 +1,7 @@
 
 set(LIB_NAME metalcpp)
 
-add_library(${LIB_NAME} STATIC "Source/MetalCPPDefinitions.cpp")
+add_library(${LIB_NAME} STATIC "source/MetalCPPDefinitions.cpp")
 
 target_include_directories(${LIB_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
