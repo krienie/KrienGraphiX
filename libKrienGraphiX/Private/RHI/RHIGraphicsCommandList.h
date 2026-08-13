@@ -5,11 +5,12 @@
 #include <vector>
 
 #include "RHIResourceView.h"
-#include "Private/RHI/RHIDescriptors.h"
+#include "Private/RHI/RHIDefinitions.h"
 #include "Private/Core/PrivateDefinitions.h"
 
 namespace kgx::rendering
 {
+struct KGXDrawStatePackage;
 class KGXMeshRenderObject;
 }
 
@@ -35,7 +36,7 @@ public:
 
 	virtual void setPipelineState(RHIGraphicsPipelineState* pipelineState) = 0;
 
-	virtual void setConstantBuffer(const RHIBuffer* constantBuffer) = 0;
+	virtual void setConstantBuffer(const RHIBuffer* constantBuffer, uint32_t bufferIndex) = 0;
 
 	virtual void setViewport(const core::KGXViewport& viewport) = 0;
 

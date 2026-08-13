@@ -1,6 +1,9 @@
 
 #include "RenderThread.h"
 
+#include <cassert>
+
+#include "CommandThread.h"
 #include "RenderCore.h"
 #include "KrienGraphiX/Core/Logging.h"
 
@@ -9,10 +12,6 @@
 #elif defined(__APPLE__)
 #include "Private/RHI/Metal/MTLRenderHardwareInterface.h"
 #endif
-
-#include "CommandThread.h"
-
-#include <cassert>
 
 namespace kgx::core
 {

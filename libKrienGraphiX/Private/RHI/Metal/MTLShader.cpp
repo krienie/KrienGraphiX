@@ -65,7 +65,12 @@ void MTLShader::setTopLevelBufferEntries(const std::vector<IRDescriptorTableEntr
 	const size_t entriesByteSize = entries.size() * sizeof(IRDescriptorTableEntry);
 	const uint64_t bufferIndex = core::gRenderThread->getBufferedFrameIndex();
 
-	assert(mTopLevelBuffers[bufferIndex]->length() == entriesByteSize);
+	if (mTopLevelBuffers[bufferIndex]->length() != entriesByteSize)
+	{
+		//TODO(KL): Temporary crash fix. Will be improved later.
+		return;
+	}
+
 	memcpy(mTopLevelBuffers[bufferIndex]->contents(), entries.data(), entriesByteSize);
 }
 

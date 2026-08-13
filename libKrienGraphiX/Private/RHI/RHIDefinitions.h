@@ -1,14 +1,26 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
+
+#include <xxh3.h>
 
 #include "RHIShader.h"
 #include "RHIPixelFormat.h"
 #include "RHIResource.h"
+#include "KrienGraphiX/Core/Logging.h"
 
 namespace kgx::RHI
 {
+struct RHIHeapHandle
+{
+	uint32_t index = -1;
+	uint32_t generation = 0;
+
+	[[nodiscard]] bool isValid() const { return index > -1; }
+};
+
 struct RHIBufferDescriptor
 {
 	std::string name;
@@ -84,4 +96,9 @@ struct RHIGraphicsPipelineStateDescriptor
 	//SampleDesc.Quality
 	RHIPixelFormat depthStencilFormat;
 };
+}
+
+namespace kgx
+{
+XXH64_hash_t hash(const RHI::RHIGraphicsPipelineStateDescriptor& psoDescriptor);
 }

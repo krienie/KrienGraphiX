@@ -2,12 +2,11 @@
 #pragma once
 
 #include <functional>
-#include <queue>
 #include <unordered_map>
+#include <queue>
 
 #include <Metal/Metal.hpp>
 #include <metal_irconverter_runtime.h>
-#include <Metal/MTL4CommandAllocator.hpp>
 #include <Metal/MTL4CommandBuffer.hpp>
 
 #include "MTLTexture2D.h"
@@ -52,7 +51,7 @@ public:
 
 	void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
 
-	void setConstantBuffer(const RHIBuffer* constantBuffer) override;
+	void setConstantBuffer(const RHIBuffer* constantBuffer, uint32_t bufferIndex) override;
 
 	void setViewport(const core::KGXViewport &viewport) override;
 

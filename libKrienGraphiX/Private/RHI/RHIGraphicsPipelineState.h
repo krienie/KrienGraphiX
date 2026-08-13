@@ -1,7 +1,9 @@
 
 #pragma once
 
-#include "RHIDescriptors.h"
+#include <xxh3.h>
+
+#include "RHIDefinitions.h"
 
 namespace kgx::RHI
 {
@@ -15,11 +17,19 @@ public:
 
 	virtual ~RHIGraphicsPipelineState() = default;
 
-	const RHIGraphicsPipelineStateDescriptor& getDescriptor() const { return mGraphicsDescriptor; }
+	[[nodiscard]] const RHIGraphicsPipelineStateDescriptor& getDescriptor() const { return mGraphicsDescriptor; }
 
 	virtual bool create() = 0;
 
 protected:
 	RHIGraphicsPipelineStateDescriptor mGraphicsDescriptor;
 };
+}
+
+namespace kgx
+{
+inline XXH64_hash_t hash(const RHI::RHIGraphicsPipelineState& graphicsPipelineState)
+{
+	return hash(graphicsPipelineState.getDescriptor());
+}
 }

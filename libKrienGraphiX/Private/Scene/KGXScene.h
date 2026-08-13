@@ -25,7 +25,7 @@ public:
 	KGXScene& operator=(const KGXScene&) noexcept = delete;
 	KGXScene& operator=(KGXScene&&) noexcept      = delete;
 
-	[[nodiscard]] const rendering::KGXRenderScene* getRenderScenePtr() const;
+	[[nodiscard]] rendering::KGXRenderScene* getRenderScenePtr();
 
 	void setSceneUpdateDelegate(SceneUpdateDelegate updateDelegate);
 	void registerObjectUpdate(SceneUpdateDelegate updateDelegate);

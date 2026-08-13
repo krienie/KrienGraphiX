@@ -88,10 +88,10 @@ void DX12GraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipelin
 	mCommandList->SetGraphicsRootSignature(dxPipelineState->getRootSignature());
 }
 
-void DX12GraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer)
+void DX12GraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer, uint32_t bufferIndex)
 {
 	const DX12Buffer* dxConstantBuffer = rcCast(constantBuffer);
-	mCommandList->SetGraphicsRootConstantBufferView(0, dxConstantBuffer->getResource()->GetGPUVirtualAddress());
+	mCommandList->SetGraphicsRootConstantBufferView(bufferIndex, dxConstantBuffer->getResource()->GetGPUVirtualAddress());
 }
 
 void DX12GraphicsCommandList::setViewport(const core::KGXViewport& viewport)

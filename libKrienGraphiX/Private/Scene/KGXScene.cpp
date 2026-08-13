@@ -9,7 +9,7 @@
 
 namespace kgx::core
 {
-const rendering::KGXRenderScene* KGXScene::getRenderScenePtr() const
+rendering::KGXRenderScene* KGXScene::getRenderScenePtr()
 {
 	return &mRenderScene;
 }

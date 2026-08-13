@@ -24,7 +24,9 @@ public:
 	void updateRenderObjectTransforms(const std::vector<MeshTransformUpdateParams>& transformUpdates);
 	void updateActiveCameraMatrix(const math::Matrix4X4& viewProjection);
 
-	const math::Matrix4X4& getActiveCameraMatrix() const;
+	[[nodiscard]] const math::Matrix4X4& getActiveCameraMatrix() const;
+	[[nodiscard]] RHI::RHIBuffer* getSceneConstantBuffer();
+	[[nodiscard]] RHI::RHIBuffer* updateAndGetSceneConstantBuffer();
 
 	typedef std::vector<std::shared_ptr<KGXMeshRenderObject>>::const_iterator RenderObjectConstIterator;
 	[[nodiscard]] constexpr RenderObjectConstIterator begin() const noexcept
@@ -39,5 +41,7 @@ public:
 private:
 	std::vector<std::shared_ptr<KGXMeshRenderObject>> mRenderObjects;
 	math::Matrix4X4 mActiveCameraMatrix{1.0f};
+
+	std::unique_ptr<RHI::RHIBuffer> mSceneConstantBuffer;
 };
 }

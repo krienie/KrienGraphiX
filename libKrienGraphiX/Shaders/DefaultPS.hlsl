@@ -1,8 +1,12 @@
 
-cbuffer MainConstants : register(b0)
+cbuffer SceneConstants : register(b0)
+{
+	column_major float4x4 viewProjMatrix;
+}
+
+cbuffer InstanceConstants : register(b1)
 {
 	column_major float4x4 modelMatrix;
-	column_major float4x4 viewProjMatrix;
 }
 
 //Texture2D gbuffDiffuseTexture : register(t0);

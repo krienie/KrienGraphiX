@@ -44,6 +44,9 @@ bool convertToMetalIR(const std::vector<char>& dxilByteCode, const std::string& 
 	IRCompiler* irCompiler = IRCompilerCreate();
 	IRCompilerSetEntryPointName(irCompiler, entryPoint.c_str());
 
+	// We are using space10 for framebuffer fetch resources
+	IRCompilerSetFramebufferFetchResourceSpace(irCompiler, 10);
+
 	IRCompilerSetStageInGenerationMode(irCompiler, IRStageInCodeGenerationModeUseMetalVertexFetch);
 
 	IRObject* dxilObj = IRObjectCreateFromDXIL((uint8_t*)dxilByteCode.data(), dxilByteCode.size(), IRBytecodeOwnershipNone);

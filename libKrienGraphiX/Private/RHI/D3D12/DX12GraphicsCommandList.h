@@ -27,7 +27,7 @@ public:
 
 	void setPipelineState(RHIGraphicsPipelineState* pipelineState) override;
 
-	void setConstantBuffer(const RHIBuffer* constantBuffer) override;
+	void setConstantBuffer(const RHIBuffer* constantBuffer, uint32_t bufferIndex) override;
 
 	void setViewport(const core::KGXViewport &viewport) override;
 

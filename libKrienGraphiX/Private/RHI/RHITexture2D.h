@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RHITexture.h"
-#include "RHIDescriptors.h"
+#include "RHIDefinitions.h"
 
 namespace kgx::RHI
 {

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Private/RHI/RHIDescriptors.h"
+#include "Private/RHI/RHIDefinitions.h"
 
 namespace kgx::RHI
 {

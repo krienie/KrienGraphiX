@@ -131,15 +131,19 @@ void MTLGraphicsCommandList::setPipelineState(RHIGraphicsPipelineState* pipeline
 	}
 }
 
-//TODO(KL): Abstract setting of a constant buffer away from this interface.
-//Or perhaps create a layer above this where you set the shader together with it's constants.
-void MTLGraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer)
+void MTLGraphicsCommandList::setConstantBuffer(const RHIBuffer* constantBuffer, uint32_t bufferIndex)
 {
 	const MTLBuffer* mtlBuffer = rcCast(constantBuffer);
 
 	IRDescriptorTableEntry entry;
 	IRDescriptorTableSetBuffer(&entry, mtlBuffer->getGPUAddress(), 0);
-	mPassContext.topLevelBufferEntries.push_back(entry);
+
+	if (bufferIndex >= mPassContext.topLevelBufferEntries.size())
+	{
+		mPassContext.topLevelBufferEntries.resize(bufferIndex + 1);
+	}
+
+	mPassContext.topLevelBufferEntries[bufferIndex] = entry;
 }
 
 void MTLGraphicsCommandList::setViewport(const core::KGXViewport& viewport)

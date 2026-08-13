@@ -1,12 +1,16 @@
 
 #include "KGXRenderer.h"
 
+#include <array>
 #include <filesystem>
 
+#include "KGXDrawPackage.h"
+#include "KGXRenderCommandContext.h"
+#include "KGXRenderPass.h"
 #include "KrienGraphiX/Core/Logging.h"
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
-#include "Private/RHI/RHIDescriptors.h"
+#include "Private/RHI/RHIDefinitions.h"
 #include "Private/RHI/RHIGraphicsPipelineState.h"
 
 #ifdef __APPLE__
@@ -16,14 +20,7 @@
 
 namespace
 {
-__declspec(align(256u)) struct ConstantBufferData
-{
-	kgx::math::Matrix4X4 modelMatrix;
-	kgx::math::Matrix4X4 viewProjMatrix;
-};
-
 std::unique_ptr<kgx::RHI::RHIGraphicsPipelineState> staticPSO;
-std::unique_ptr<kgx::RHI::RHIBuffer> staticConstantBuffer;
 
 //TODO(KL): Move this to a separate file/class. Something like a resource manager
 #ifdef __APPLE__
@@ -104,36 +101,6 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 
 	return staticPSO.get();
 }
-
-kgx::RHI::RHIBuffer* getStaticConstantBuffer()
-{
-	using namespace kgx;
-
-	if (staticConstantBuffer)
-	{
-		return staticConstantBuffer.get();
-	}
-
-	RHI::RHIGraphicsCommandList* commandList = core::gRenderThread->getCurrentFrameCommandList();
-
-	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
-		RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
-
-	RHI::RHIBufferDescriptor cbDesc
-	{
-		.name = "StaticConstantBuffer",
-		.bufferSize = sizeof(ConstantBufferData),
-		.bufferRegister = 0,
-		.isBufferAligned = true,
-		.isDynamic = true,
-		.initialData = nullptr,
-		.flags = flags
-	};
-
-	staticConstantBuffer = RHI::gPlatformRHI->createBuffer(commandList, cbDesc);
-
-	return staticConstantBuffer.get();
-}
 }
 
 namespace kgx::rendering
@@ -152,39 +119,37 @@ void KGXRenderer::RenderFrame()
 
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
 
+	KGXRenderCommandContext renderContext(*frameContext);
+	TextureHandle outTargetHandle = renderContext.registerTexture(mOutputRTV);
+
 	RHI::gPlatformRHI->beginFrame(commandList, OutputRenderTarget);
 
-	commandList->setViewport(mViewport);
+	auto* mainPass = renderContext.addNewRenderPass("mainPass");
 
-	static float lightSteelBlue[4] = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
+	static std::array<float, 4> lightSteelBlue = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
+	TextureBinding outTargetBinding
+	{
+		.texture = outTargetHandle,
+		.loadAction = TextureLoadAction::Clear,
+		.storeAction = TextureStoreAction::Store,
+		.clearColor = lightSteelBlue
+	};
 
-	commandList->clearRenderTargetView(mOutputRTV, lightSteelBlue);
-#ifndef __APPLE__
-	commandList->clearDepthStencilView(mDSV, RHI::DepthStencilFlags::DepthStencilClear, 1.0f, 0);
-#endif
-
-	commandList->setRenderTargets({ mOutputRTV }, mDSV);
-
-	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
-	commandList->setPipelineState(staticPSO);
-
-	const RHI::RHIBuffer* staticConstantBuff = getStaticConstantBuffer();
-	commandList->setConstantBuffer(staticConstantBuff);
+	mainPass->initPass({}, {outTargetBinding}, mViewport, mDSV);
 
 	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
 
-	ConstantBufferData cbData;
-	cbData.viewProjMatrix = renderScene->getActiveCameraMatrix();
+	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
 
-	//TODO(KL): record mesh draw commands. Simple for now
+	//TODO(KL): Not used right now
+	KGXConstantBufferUpdatePackage dummy;
+
 	for (auto& renderObject : *renderScene)
 	{
-		//TODO(KL): Create a small abstraction for using RootConstants/PushConstants instead of filling a CB for these small values.
-		cbData.modelMatrix = renderObject->getTransform();
-		memcpy(staticConstantBuff->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
-
-		commandList->drawMeshRenderObject(renderObject.get());
+		mainPass->drawMesh(staticPSO, dummy, renderObject.get());
 	}
+
+	renderContext.runCommands();
 
 	RHI::gPlatformRHI->endFrame(commandList, OutputRenderTarget);
 	frameContext->endFrame();

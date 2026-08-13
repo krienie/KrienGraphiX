@@ -27,10 +27,12 @@ public:
 
 	void createRenderResources();
 	void updateTransform(const math::Matrix4X4& newTransform);
+	void updateConstantBufferData() const;
 
 	[[nodiscard]] const math::Matrix4X4& getTransform() const { return mTransform; }
 	[[nodiscard]] RHI::RHIBuffer* getVertexBuffer() const { return mVertexBuffer.get(); }
 	[[nodiscard]] RHI::RHIBuffer* getIndexBuffer() const { return mIndexBuffer.get(); }
+	[[nodiscard]] RHI::RHIBuffer* getConstantBuffer() const { return mConstantBuffer.get(); }
 	[[nodiscard]] size_t getNumVertices() const { return mRawMeshData.vertices.size(); }
 	[[nodiscard]] size_t getNumIndices() const { return mRawMeshData.indices.size(); }
 
@@ -40,5 +42,6 @@ private:
 	RawMeshData mRawMeshData;
 	std::unique_ptr<RHI::RHIBuffer> mVertexBuffer;
 	std::unique_ptr<RHI::RHIBuffer> mIndexBuffer;
+	std::unique_ptr<RHI::RHIBuffer> mConstantBuffer;
 };
 }

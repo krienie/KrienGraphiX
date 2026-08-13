@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "RHIDescriptors.h"
+#include "RHIDefinitions.h"
 #include "RHIViewableResource.h"
 
 namespace kgx::RHI

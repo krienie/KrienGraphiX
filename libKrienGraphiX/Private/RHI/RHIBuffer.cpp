@@ -43,7 +43,7 @@ void RHIBuffer::copyBufferData(const void* data, unsigned sizeInBytes, bool keep
 		map(MapType::WRITE);
 	}
 	
-	memcpy(mMappedDataPtr, data, sizeInBytes);
+	memcpy(mappedDataPtr(), data, sizeInBytes);
 
 	if (!keepMapped)
 	{
