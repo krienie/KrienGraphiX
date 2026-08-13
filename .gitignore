@@ -14,3 +14,4 @@ build/*
 .idea/
 cmake-build-debug/
 cmake-build-release/
+[Xx][Cc]ode[Bb]uild
