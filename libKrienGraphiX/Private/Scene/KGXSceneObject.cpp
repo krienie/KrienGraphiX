@@ -92,10 +92,15 @@ KGXCameraObject::KGXCameraObject(const std::string& name)
 	: KGXSceneObject(name)
 {
 	//TODO(KL): Add interface for setting camera settings
-	constexpr math::Vector3 eye(5, 5, 10);
+	constexpr float fov = glm::half_pi<float>();
+	//TODO(KL): Hard-coded for now.
+	constexpr float aspectRatio = 1024.0f / 768.0f;
+	constexpr float near = 0.001f;
+	constexpr float far = 5000.0f;
+	constexpr math::Vector3 eye(5, 5, 5);
 	constexpr math::Vector3 target(0, 0, 0);
 	constexpr math::Vector3 up(0, 0, 1);
-	mCameraComponent = addNewComponent<KGXCameraComponent>(eye, target, up);
+	mCameraComponent = addNewComponent<KGXCameraComponent>(fov, aspectRatio, near, far, eye, target, up);
 }
 
 KGXCameraComponent* KGXCameraObject::getCamera() const

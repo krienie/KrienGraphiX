@@ -6,6 +6,7 @@
 
 namespace kgx
 {
+//TODO(KL): Fix aspect ratio
 KGXCameraComponent::KGXCameraComponent(KGXSceneObject* owner, const math::Vector3& eye, const math::Vector3& target, const math::Vector3& up)
 	: KGXCameraComponent(owner, glm::half_pi<float>(), 1.0f, 0.001f, 5000.0f, eye, target, up)
 {
