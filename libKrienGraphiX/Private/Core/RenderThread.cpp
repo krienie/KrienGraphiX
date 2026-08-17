@@ -136,6 +136,7 @@ void RenderThread::nextFrame()
 		mFrameResources.pop();
 	}
 
+	//TODO(KL): See if I can get rid of the make_unique here. Just use raw memory without constantly allocating new every frame.
 	++mCurrentFrame;
 	mFrameResources.push(std::make_unique<FrameCommandContext>(mCurrentFrame, mFrameFence.get()));
 }

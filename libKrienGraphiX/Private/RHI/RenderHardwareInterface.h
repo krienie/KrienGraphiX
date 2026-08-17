@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "RHIBuffer.h"
 #include "RHICommandAllocator.h"
 #include "RHICommandQueue.h"
@@ -9,8 +11,6 @@
 #include "RHIShader.h"
 #include "RHISwapChain.h"
 #include "RHIVertexLayout.h"
-
-#include <memory>
 
 namespace kgx::RHI
 {

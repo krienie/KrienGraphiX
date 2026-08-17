@@ -17,10 +17,32 @@ KGXRenderCommandContext::KGXRenderCommandContext(core::FrameCommandContext& fram
 TextureHandle KGXRenderCommandContext::registerTexture(RHI::RHIResourceView* texture)
 {
 	TextureHandle handle;
-	handle.index = mTextureRegistry.size();
+	handle.index = static_cast<int>(mTextureRegistry.size());
 	mTextureRegistry.push_back(texture);
 
 	return handle;
+}
+
+void KGXRenderCommandContext::addRenderPass(const KGXRenderPassParameters& renderPassParameters)
+{
+	mRenderPasses.push_back(renderPassParameters);
+}
+
+void KGXRenderCommandContext::runPasses()
+{
+	if (mRenderPasses.empty())
+	{
+		KGXLOG_WARN("No RenderPasses are registered.");
+		return;
+	}
+
+	auto sceneConstantBuffer = mRenderScene->updateAndGetSceneConstantBuffer();
+	mFrameContext.getCommandList()->setConstantBuffer(sceneConstantBuffer, 0);
+
+	for (auto& pass : mRenderPasses)
+	{
+		executeRenderPass(pass);
+	}
 }
 
 RHI::RHIResourceView* KGXRenderCommandContext::resolveTextureHandle(TextureHandle textureHandle) const
@@ -34,66 +56,41 @@ RHI::RHIResourceView* KGXRenderCommandContext::resolveTextureHandle(TextureHandl
 	return nullptr;
 }
 
-KGXRenderPass* KGXRenderCommandContext::addNewRenderPass(const std::string& passName)
+void KGXRenderCommandContext::executeRenderPass(const KGXRenderPassParameters& renderPassParameters)
 {
-	return &mRenderPasses.emplace_back(passName, *this);
-}
+	auto* commandList = mFrameContext.getCommandList();
 
-void KGXRenderCommandContext::runCommands()
-{
-	if (!validateRenderPasses())
+	commandList->setViewport(renderPassParameters.viewport);
+
+	//TODO(KL): directly pass in the TextureBindings to the commandlist and let the RHI handle it
+
+	std::vector<RHI::RHIResourceView*> renderTargets;
+	renderTargets.reserve(renderPassParameters.outputTextures.size());
+	for (auto& renderTargetBinding : renderPassParameters.outputTextures)
 	{
-		KGXLOG_ERROR("Error validating renderpasses. Aborting runCommands()");
-		return;
-	}
-
-	if (mRenderPasses.empty())
-	{
-		KGXLOG_WARN("No RenderPasses are registered.");
-		return;
-	}
-
-	auto sceneConstantBuffer = mRenderScene->updateAndGetSceneConstantBuffer();
-	mFrameContext.getCommandList()->setConstantBuffer(sceneConstantBuffer, 0);
-
-	for (auto& pass : mRenderPasses)
-	{
-		pass.runPass(mFrameContext);
-	}
-}
-
-bool KGXRenderCommandContext::validateRenderPasses() const
-{
-	for (auto& renderPass : mRenderPasses)
-	{
-		if (!renderPass.isInitialized())
+		if (auto* texture = resolveTextureHandle(renderTargetBinding.texture))
 		{
-			KGXLOG_ERROR("Error! RenderPass {} is not initialized.", renderPass.getPassName());
-			return false;
+			if (renderTargetBinding.loadAction == TextureLoadAction::Clear)
+			{
+				commandList->clearRenderTargetView(texture, renderTargetBinding.clearColor.data());
+			}
+
+			renderTargets.emplace_back(texture);
 		}
 	}
+	//TODO(KL): implement clearDepthStencilView
+	//commandList->clearDepthStencilView(mDSV, RHI::DepthStencilFlags::DepthStencilClear, 1.0f, 0);
 
-	// - Make a graph of input and output textures of all registered renderpasses
-	// - optional: purge renderpasses that do not contribute to the final output texture
-	// - optional: allow culled renderpasses to not be culled
-	// - run remaining renderpasses in order
+	commandList->setRenderTargets(renderTargets, renderPassParameters.depthStencilView);
 
+	commandList->setPipelineState(renderPassParameters.pso);
 
-	// Validation pass
-	// Graph building:
-	// - Walk from back to front, recursively. Only the renderpasses that are left over are kept.
-	// - The last added renderpass is assumed to be the final output pass
-
-	/*std::vector<KGXRenderPass*> liveRenderPasses;
-	liveRenderPasses.reserve(mRenderPasses.size());
-	liveRenderPasses.push_back(&mRenderPasses.back());
-
-	// Walking back to front, skipping the renderpass at the back
-	for (int i = static_cast<int>(mRenderPasses.size()) - 2; i >= 0; --i)
+	for (auto& renderObject : *mRenderScene)
 	{
+		renderObject->updateConstantBufferData();
+		commandList->setConstantBuffer(renderObject->getConstantBuffer(), 1);
 
-	}*/
-
-	return true;
+		commandList->drawMeshRenderObject(renderObject.get());
+	}
 }
 }

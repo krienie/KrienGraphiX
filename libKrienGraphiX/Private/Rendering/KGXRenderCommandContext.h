@@ -1,15 +1,13 @@
 
 #pragma once
 
-#include <unordered_map>
-
 #include "KGXRenderCommandContextUtils.h"
 #include "Private/Core/RenderThread.h"
-#include "Private/RHI/RHITexture2D.h"
+#include "Private/Rendering/KGXRenderPass.h"
+#include "Private/RHI/RHIResourceView.h"
 
 namespace kgx::rendering
 {
-class KGXRenderPass;
 class KGXRenderScene;
 
 class KGXRenderCommandContext
@@ -19,17 +17,15 @@ public:
 	//~KGXRenderCommandContext();
 
 	TextureHandle registerTexture(RHI::RHIResourceView* texture);
-	[[nodiscard]] RHI::RHIResourceView* resolveTextureHandle(TextureHandle textureHandle) const;
 
-	KGXRenderPass* addNewRenderPass(const std::string& passName);
-
-	void runCommands();
+	void addRenderPass(const KGXRenderPassParameters& renderPassParameters);
+	void runPasses();
 
 private:
-	[[nodiscard]] bool validateRenderPasses() const;
+	[[nodiscard]] RHI::RHIResourceView* resolveTextureHandle(TextureHandle textureHandle) const;
+	void executeRenderPass(const KGXRenderPassParameters& renderPassParameters);
 
-	//TODO(KL): Make sure the renderpasses can be sorted by I/O textures
-	std::vector<KGXRenderPass> mRenderPasses;
+	std::vector<KGXRenderPassParameters> mRenderPasses;
 	std::vector<RHI::RHIResourceView*> mTextureRegistry;
 
 	KGXRenderScene* mRenderScene = nullptr;

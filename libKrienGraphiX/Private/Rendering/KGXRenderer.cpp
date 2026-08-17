@@ -117,6 +117,8 @@ void KGXRenderer::RenderFrame()
 	auto frameContext = core::gRenderThread->getCurrentFrameContext();
 	auto commandList = frameContext->getCommandList();
 
+	//TODO(KL): Process meshes: view culling
+
 	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
 
 	KGXRenderCommandContext renderContext(*frameContext);
@@ -124,32 +126,31 @@ void KGXRenderer::RenderFrame()
 
 	RHI::gPlatformRHI->beginFrame(commandList, OutputRenderTarget);
 
-	auto* mainPass = renderContext.addNewRenderPass("mainPass");
-
-	static std::array<float, 4> lightSteelBlue = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
-	TextureBinding outTargetBinding
+	// Main pass
 	{
-		.texture = outTargetHandle,
-		.loadAction = TextureLoadAction::Clear,
-		.storeAction = TextureStoreAction::Store,
-		.clearColor = lightSteelBlue
-	};
+		static std::array<float, 4> lightSteelBlue = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
+		TextureBinding outTargetBinding
+		{
+			.texture = outTargetHandle,
+			.loadAction = TextureLoadAction::Clear,
+			.storeAction = TextureStoreAction::Store,
+			.clearColor = lightSteelBlue
+		};
 
-	mainPass->initPass({}, {outTargetBinding}, mViewport, mDSV);
+		KGXRenderPassParameters mainPassParameters
+		{
+			.name = "mainPass",
+			.viewport = mViewport,
+			.depthStencilView = mDSV,
+			.inputTextures = {},
+			.outputTextures = {outTargetBinding},
+			.pso = getStaticPSO()
+		};
 
-	auto* renderScene = core::RenderCore::get()->getScenePtr()->getRenderScenePtr();
-
-	RHI::RHIGraphicsPipelineState* staticPSO = getStaticPSO();
-
-	//TODO(KL): Not used right now
-	KGXConstantBufferUpdatePackage dummy;
-
-	for (auto& renderObject : *renderScene)
-	{
-		mainPass->drawMesh(staticPSO, dummy, renderObject.get());
+		renderContext.addRenderPass(mainPassParameters);
 	}
 
-	renderContext.runCommands();
+	renderContext.runPasses();
 
 	RHI::gPlatformRHI->endFrame(commandList, OutputRenderTarget);
 	frameContext->endFrame();
