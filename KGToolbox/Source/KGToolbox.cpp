@@ -49,7 +49,7 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
-		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 10.0f), glm::two_pi<float>());
+		const float NewRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 40.0f), glm::two_pi<float>());
 		mBoxObject->setRotation(0, 0, NewRoll);
 	});
 }
