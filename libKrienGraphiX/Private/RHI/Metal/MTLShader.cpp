@@ -9,6 +9,7 @@
 #include <Metal/MTL4LibraryFunctionDescriptor.hpp>
 
 #include "MTLCommandQueue.h"
+#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
 #include "MTLUtils.h"
 #include "Private/Core/RenderThread.h"
@@ -54,15 +55,16 @@ MTL4::LibraryFunctionDescriptor* MTLShader::getLibraryFunctionDescriptor() const
 	return mLibraryFunctionDesc.get();
 }
 
+//TODO(KL): Move argument table to MTLRenderContext
 MTL4::ArgumentTable* MTLShader::getArgumentTable() const
 {
 	const uint64_t argTableIndex = core::gRenderThread->getBufferedFrameIndex();
 	return mArgumentTables[argTableIndex].get();
 }
 
-void MTLShader::setTopLevelBufferEntries(const std::vector<IRDescriptorTableEntry>& entries) const
+void MTLShader::setTopLevelBufferEntries(const std::array<IRDescriptorTableEntry, 2>& bufferEntries) const
 {
-	const size_t entriesByteSize = entries.size() * sizeof(IRDescriptorTableEntry);
+	const size_t entriesByteSize = bufferEntries.size() * sizeof(IRDescriptorTableEntry);
 	const uint64_t bufferIndex = core::gRenderThread->getBufferedFrameIndex();
 
 	if (mTopLevelBuffers[bufferIndex]->length() != entriesByteSize)
@@ -71,7 +73,7 @@ void MTLShader::setTopLevelBufferEntries(const std::vector<IRDescriptorTableEntr
 		return;
 	}
 
-	memcpy(mTopLevelBuffers[bufferIndex]->contents(), entries.data(), entriesByteSize);
+	memcpy(mTopLevelBuffers[bufferIndex]->contents(), bufferEntries.data(), entriesByteSize);
 }
 
 bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
@@ -81,7 +83,7 @@ bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
 		mArgumentTables.resize(core::RenderThread::maxNumBufferedFrames);
 		return true;
 	}
-	
+
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 
 	NS::SharedPtr<MTL4::ArgumentTableDescriptor> argDesc = NS::TransferPtr(
@@ -93,7 +95,8 @@ bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
 	mArgumentTables.reserve(core::RenderThread::maxNumBufferedFrames);
 
 	//TODO(KL): Temporarily added to global residence set
-	MTLCommandQueue* mtlCommandQueue = rcCast(core::gRenderThread->getCommandQueuePtr());
+	auto* mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
+	MTLCommandQueue* mtlCommandQueue = &mtlPlatform->getCommandQueue();
 
 	for (int i = 0; i < core::RenderThread::maxNumBufferedFrames; i++)
 	{

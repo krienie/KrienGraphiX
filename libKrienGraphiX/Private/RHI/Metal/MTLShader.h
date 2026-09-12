@@ -32,7 +32,7 @@ public:
 	[[nodiscard]]
 	MTL4::ArgumentTable* getArgumentTable() const;
 
-	void setTopLevelBufferEntries(const std::vector<IRDescriptorTableEntry>& entries) const;
+	void setTopLevelBufferEntries(const std::array<IRDescriptorTableEntry, 2>& bufferEntries) const;
 
 private:
 	bool createArgumentTables(const CompiledShader& compiledShader);

@@ -2,27 +2,26 @@
 #pragma once
 
 #include <memory>
+
 #include <Foundation/NSSharedPtr.hpp>
 #include <Metal/MTL4CommandAllocator.hpp>
 
-#include "Private/RHI/RHICommandAllocator.h"
-#include "Private/RHI/RHIUtils.h"
+#include "Private/Core/ResourcePool.h"
 
 namespace kgx::RHI
 {
-class MTLCommandAllocator : public RHICommandAllocator
+class MTLCommandAllocator : public core::PooledType<MTLCommandAllocator>
 {
 public:
-	MTLCommandAllocator();
-	~MTLCommandAllocator() override = default;
+	MTLCommandAllocator(core::ResourcePool<MTLCommandAllocator>& parentPool);
+	~MTLCommandAllocator() = default;
 
 	[[nodiscard]]
 	MTL4::CommandAllocator* getNativeAllocator() const;
 
-	void reset() override;
+	void reset();
+
 private:
 	NS::SharedPtr<MTL4::CommandAllocator> mCommandAllocator;
 };
-
-DEFINE_RESOURCE_CAST(MTLCommandAllocator, RHICommandAllocator);
 }

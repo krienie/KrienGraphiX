@@ -109,7 +109,6 @@ RenderCore::~RenderCore()
 	// Make sure the frame time is stopped before we destruct everything else
 	mFrameTimer.reset();
 
-	gRenderThread->flush();
 	gRenderThread->shutdown();
 	gRenderThread.reset();
 

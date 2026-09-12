@@ -41,7 +41,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::VertexBuffer
 	};
 
-	mVertexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getCommandList(), vertexBufferDesc);
+	mVertexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getRenderContext(), vertexBufferDesc);
 
 	const RHI::RHIBufferDescriptor indexBufferDesc
 	{
@@ -55,7 +55,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = RHI::RHIResource::CreationFlags::IndexBuffer
 	};
 
-	mIndexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getCommandList(), indexBufferDesc);
+	mIndexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getRenderContext(), indexBufferDesc);
 
 	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
 	RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
@@ -71,7 +71,7 @@ void KGXMeshRenderObject::createRenderResources()
 		.flags = flags
 	};
 
-	mConstantBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getCommandList(), cbDesc);
+	mConstantBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getRenderContext(), cbDesc);
 }
 
 void KGXMeshRenderObject::updateTransform(const math::Matrix4X4& newTransform)

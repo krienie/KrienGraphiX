@@ -5,7 +5,8 @@
 
 namespace kgx::RHI
 {
-MTLCommandAllocator::MTLCommandAllocator()
+MTLCommandAllocator::MTLCommandAllocator(core::ResourcePool<MTLCommandAllocator>& parentPool)
+	: PooledType(parentPool)
 {
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 

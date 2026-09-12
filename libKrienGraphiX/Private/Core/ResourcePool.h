@@ -7,10 +7,35 @@
 namespace kgx::core
 {
 template<class PooledType>
+class ResourcePool;
+
+template<class ResourceType>
+class PooledType
+{
+public:
+	virtual ~PooledType() = default;
+
+	PooledType(ResourcePool<ResourceType>& parentPool)
+		: mParentPool(parentPool) {}
+
+	void release()
+	{
+		releaseImpl();
+		mParentPool.returnResource(this);
+	}
+
+private:
+	virtual void releaseImpl() {}
+
+	ResourcePool<ResourceType>& mParentPool;
+};
+
+template<class ResourceType>
 class ResourcePool final
 {
 public:
-	ResourcePool(int initialPoolSize, const std::function<std::unique_ptr<PooledType>()>& creationFunction)
+	using CreationFunction = std::function<std::unique_ptr<PooledType<ResourceType>>(ResourcePool& parentPool)>;
+	ResourcePool(int initialPoolSize, const CreationFunction& creationFunction)
 		: mCreationFunction(creationFunction)
 	{
 		for (int i = 0; i < initialPoolSize; ++i)
@@ -27,35 +52,35 @@ public:
 	ResourcePool& operator=(ResourcePool&&) noexcept      = delete;
 
 	[[nodiscard]]
-	PooledType* getResource()
+	ResourceType* getResource()
 	{
 		if (!mAvailable.empty())
 		{
-			PooledType* resource = mAvailable.back();
+			PooledType<ResourceType>* resource = mAvailable.back();
 			mAvailable.pop_back();
-			return resource;
+			return static_cast<ResourceType*>(resource);
 		}
 
 		return addNewResource();
 	}
 
-	void returnResource(PooledType* resource)
+	void returnResource(PooledType<ResourceType>* resource)
 	{
 		mAvailable.push_back(resource);
 	}
 
 private:
-	PooledType* addNewResource()
+	ResourceType* addNewResource()
 	{
-		mAllResources.push_back(mCreationFunction());
-		PooledType* resource = mAllResources.back().get();
+		mAllResources.push_back(mCreationFunction(*this));
+		PooledType<ResourceType>* resource = mAllResources.back().get();
 		mAvailable.push_back(resource);
 
-		return resource;
+		return static_cast<ResourceType*>(resource);
 	}
 
-	std::function<std::unique_ptr<PooledType>()> mCreationFunction;
-	std::list<PooledType*> mAvailable;
-	std::list<std::unique_ptr<PooledType>> mAllResources;
+	CreationFunction mCreationFunction;
+	std::list<PooledType<ResourceType>*> mAvailable;
+	std::list<std::unique_ptr<PooledType<ResourceType>>> mAllResources;
 };
 }

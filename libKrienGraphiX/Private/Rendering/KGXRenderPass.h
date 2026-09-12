@@ -1,11 +1,10 @@
 
 #pragma once
 
-#include <array>
 #include <vector>
 
-#include "KGXRenderCommandContextUtils.h"
 #include "Private/Core/PrivateDefinitions.h"
+#include "Private/RHI/RHIDefinitions.h"
 #include "Private/RHI/RHIGraphicsPipelineState.h"
 #include "Private/RHI/RHIResourceView.h"
 
@@ -26,17 +25,17 @@ enum class TextureStoreAction
 
 struct TextureBinding
 {
-	TextureHandle texture;
+	RHI::RHITextureHandle texture;
 	TextureLoadAction loadAction = TextureLoadAction::DoNothing;
 	TextureStoreAction storeAction = TextureStoreAction::DoNothing;
-	std::array<float, 4> clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+	RHI::RHIClearValue clearValue = { 0.0f, 0.0f, 0.0f, 0.0f };
 };
 
 struct KGXRenderPassParameters
 {
 	std::string name;
 	core::KGXViewport viewport{};
-	RHI::RHIResourceView* depthStencilView;
+	RHI::RHITextureHandle depthStencilView;
 	std::vector<TextureBinding> inputTextures;
 	std::vector<TextureBinding> outputTextures;
 	RHI::RHIGraphicsPipelineState* pso;

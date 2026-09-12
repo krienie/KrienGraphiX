@@ -74,8 +74,8 @@ MTL4::ArgumentTable* MTLGraphicsPipelineState::getArgumentTable() const
 	return mMainShader->getArgumentTable();
 }
 
-void MTLGraphicsPipelineState::setTopLevelBufferEntries(const std::vector<IRDescriptorTableEntry>& entries) const
+void MTLGraphicsPipelineState::setTopLevelBufferEntries(const std::array<IRDescriptorTableEntry, 2>& bufferEntries) const
 {
-	mMainShader->setTopLevelBufferEntries(entries);
+	mMainShader->setTopLevelBufferEntries(bufferEntries);
 }
 }

@@ -14,7 +14,6 @@ KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigne
 {
 	using namespace RHI;
 	mRHISwapChain = gPlatformRHI->createSwapChain(
-		gRenderThread->getCommandQueuePtr(),
 		mWindowHandle,
 		width,
 		height,
@@ -53,7 +52,7 @@ KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigne
 
 void KGXRenderWindow::draw() const
 {
-	KGXRenderer renderer(mViewport, *mRHISwapChain->getCurrentBufferView(), *mDSV);
+	KGXRenderer renderer(mViewport, mRHISwapChain->getCurrentBufferView(), mDepthStencil);
 	renderer.RenderFrame();
 
 	mRHISwapChain->present();

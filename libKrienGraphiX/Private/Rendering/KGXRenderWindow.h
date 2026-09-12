@@ -33,8 +33,7 @@ private:
 	std::shared_ptr<RHI::RHISwapChain> mRHISwapChain;
 
 	//TODO(KL): Temporarily here. Move to KGXRenderer
-	std::shared_ptr<RHI::RHITexture2D> mDepthStencil;
-	std::shared_ptr<RHI::RHIResourceView> mDSV;
+	RHI::RHITextureHandle mDepthStencil;
 
 	core::KGXViewport mViewport{};
 };

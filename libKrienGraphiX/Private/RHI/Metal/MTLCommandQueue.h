@@ -6,30 +6,30 @@
 #include <Metal/MTL4CommandQueue.hpp>
 #include <Metal/MTLResidencySet.hpp>
 
-#include "Private/RHI/RHICommandQueue.h"
-#include "Private/RHI/RHIResource.h"
-#include "Private/RHI/RHIUtils.h"
+#include "MTLFence.h"
 
 namespace kgx::RHI
 {
-class MTLCommandQueue final : public RHICommandQueue
+class MTLCommandQueue final
 {
 public:
-	MTLCommandQueue();
+	MTLCommandQueue(MTLPlatform& platform);
 
 	[[nodiscard]]
 	MTL4::CommandQueue* getNativeCommandQueue() const { return mCommandQueue.get(); }
 
 	void addGlobalResidency(const MTL::Allocation* allocation);
 
-	bool create() override;
-	void executeCommandList(RHIGraphicsCommandList* commandList) override;
+	bool create();
+	void executeCommandBuffer(MTL4::CommandBuffer* commandBuffer, bool waitForCompletion);
+	void waitForCompletion() const;
 
 private:
 	bool mResidencySetDirty = false;
 	NS::SharedPtr<MTL4::CommandQueue> mCommandQueue;
 	NS::SharedPtr<MTL::ResidencySet> mResidencySet;
-};
+	std::unique_ptr<MTLFence> mFence;
 
-DEFINE_RESOURCE_CAST(MTLCommandQueue, RHICommandQueue);
+	MTLPlatform& mPlatform;
+};
 }

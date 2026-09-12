@@ -9,10 +9,13 @@
 
 namespace kgx::RHI
 {
+class MTLPlatform;
+class MTLCommandQueue;
+
 class MTLFence : public RHIFence
 {
 public:
-	MTLFence();
+	MTLFence(MTLPlatform& platform);
 	~MTLFence() override = default;
 
 	void sync() override;
@@ -23,5 +26,6 @@ public:
 private:
 	NS::SharedPtr<MTL::SharedEvent> mEvent;
 	uint64_t mFenceValue = 0;
+	MTLCommandQueue* mCommandQueue;
 };
 }

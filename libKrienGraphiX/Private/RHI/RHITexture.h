@@ -10,13 +10,8 @@ namespace kgx::RHI
 class RHITexture : public RHIViewableResource
 {
 public:
-	RHITexture(CreationFlags flags, unsigned int numMips, unsigned int numSamples, RHIPixelFormat pixelFormat)
-		: RHIViewableResource(flags), mNumMips(numMips), mNumSamples(numSamples), mPixelFormat(pixelFormat)
-	{
-	}
-
 	~RHITexture() override = default;
-	
+
 	[[nodiscard]]
 	unsigned int numMips() const { return mNumMips; }
 
@@ -28,6 +23,11 @@ public:
 
 	[[nodiscard]]
 	bool IsTexture() const override { return true; }
+
+protected:
+	RHITexture(CreationFlags flags, unsigned int numMips, unsigned int numSamples, RHIPixelFormat pixelFormat)
+	: RHIViewableResource(flags), mNumMips(numMips), mNumSamples(numSamples), mPixelFormat(pixelFormat)
+	{}
 
 private:
 	unsigned int mNumMips;

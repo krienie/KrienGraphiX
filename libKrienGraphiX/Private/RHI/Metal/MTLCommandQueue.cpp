@@ -1,13 +1,13 @@
 
 #include "MTLCommandQueue.h"
 
-#include "MTLGraphicsCommandList.h"
 #include "MTLRenderHardwareInterface.h"
+#include "MTLFence.h"
 
 namespace kgx::RHI
 {
-MTLCommandQueue::MTLCommandQueue()
-	: RHICommandQueue(), mCommandQueue(nullptr)
+MTLCommandQueue::MTLCommandQueue(MTLPlatform& platform)
+	: mCommandQueue(nullptr), mPlatform(platform)
 {
 }
 
@@ -20,6 +20,8 @@ void MTLCommandQueue::addGlobalResidency(const MTL::Allocation* allocation)
 bool MTLCommandQueue::create()
 {
 	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();
+
+	mFence = std::make_unique<MTLFence>(mPlatform);
 
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mCommandQueue = NS::TransferPtr(mtlDevice->newMTL4CommandQueue());
@@ -37,7 +39,7 @@ bool MTLCommandQueue::create()
 	return mCommandQueue.get() != nullptr;
 }
 
-void MTLCommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
+void MTLCommandQueue::executeCommandBuffer(MTL4::CommandBuffer* commandBuffer, bool waitForCompletion)
 {
 	if (mResidencySetDirty)
 	{
@@ -45,9 +47,17 @@ void MTLCommandQueue::executeCommandList(RHIGraphicsCommandList* commandList)
 		mResidencySetDirty = false;
 	}
 
-	MTLGraphicsCommandList* mtlCommandList = rcCast(commandList);
-
-	MTL4::CommandBuffer* ppCommandLists[] = { mtlCommandList->getCommandBuffer() };
+	MTL4::CommandBuffer* ppCommandLists[] = { commandBuffer };
 	mCommandQueue->commit(ppCommandLists, 1);
+
+	if (waitForCompletion)
+	{
+		mFence->sync();
+	}
+}
+
+void MTLCommandQueue::waitForCompletion() const
+{
+	mFence->sync();
 }
 }

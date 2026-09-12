@@ -2,13 +2,15 @@
 #include "MTLFence.h"
 
 #include "MTLCommandQueue.h"
+#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
-#include "Private/Core/RenderCore.h"
 
 namespace kgx::RHI
 {
-MTLFence::MTLFence()
+MTLFence::MTLFence(MTLPlatform& platform)
 {
+	mCommandQueue = &platform.getCommandQueue();
+
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mEvent = NS::TransferPtr(mtlDevice->newSharedEvent());
 }
@@ -22,8 +24,7 @@ void MTLFence::sync()
 
 void MTLFence::queueSignal(uint64_t value)
 {
-	MTLCommandQueue* commandQueue = rcCast(core::gRenderThread->getCommandQueuePtr());
-	commandQueue->getNativeCommandQueue()->signalEvent(mEvent.get(), value);
+	mCommandQueue->getNativeCommandQueue()->signalEvent(mEvent.get(), value);
 }
 
 void MTLFence::waitForValue(uint64_t value)

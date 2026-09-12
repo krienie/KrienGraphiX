@@ -50,7 +50,7 @@ struct RHIClearValue final
 
 	union
 	{
-		float colorClear[4];
+		std::array<float, 4> colorClear;
 		DepthClear depthClear;
 	};
 };

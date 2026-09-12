@@ -4,7 +4,6 @@
 #include "KGXDrawPackage.h"
 #include "Private/Core/RenderThread.h"
 #include "Private/RHI/RenderHardwareInterface.h"
-#include "Private/RHI/RHIGraphicsCommandList.h"
 
 namespace
 {
@@ -50,7 +49,6 @@ RHI::RHIBuffer* KGXRenderScene::getSceneConstantBuffer()
 		return mSceneConstantBuffer.get();
 	}
 
-	RHI::RHIGraphicsCommandList* commandList = core::gRenderThread->getCurrentFrameCommandList();
 
 	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
 		RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
@@ -66,7 +64,8 @@ RHI::RHIBuffer* KGXRenderScene::getSceneConstantBuffer()
 		.flags = flags
 	};
 
-	mSceneConstantBuffer = RHI::gPlatformRHI->createBuffer(commandList, cbDesc);
+	core::FrameCommandContext* frameContext = core::gRenderThread->getCurrentFrameContext();
+	mSceneConstantBuffer = RHI::gPlatformRHI->createBuffer(frameContext->getRenderContext(), cbDesc);
 
 	return mSceneConstantBuffer.get();
 }

@@ -6,6 +6,7 @@
 #include "CommandThread.h"
 #include "RenderCore.h"
 #include "KrienGraphiX/Core/Logging.h"
+#include "Private/RHI/RHIRenderContext.h"
 
 #ifdef WIN32
 #include "Private/RHI/D3D12/DX12RenderHardwareInterface.h"
@@ -19,23 +20,18 @@ ImmediateCommandContext::ImmediateCommandContext()
 {
 	KGXLOG_TRACE("ImmediateCommandContext");
 
-	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
-	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
-
-	mCommandList->reset(mCommandAllocator, nullptr);
+	mRenderContext = gRenderThread->getRHIPlatformPtr()->getRenderContext();
+	mRenderContext->reset();
 }
 
 ImmediateCommandContext::~ImmediateCommandContext()
 {
-	mCommandList->close();
+	mRenderContext->close();
 
-	gRenderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
-	gRenderThread->getCommandQueuePtr()->waitForCompletion();
+	constexpr bool waitForCompletion = true;
+	mRenderContext->execute(waitForCompletion);
 
-	mCommandAllocator->reset();
-
-	mCommandList->release();
-	mCommandAllocator->release();
+	mRenderContext->release();
 }
 
 FrameCommandContext::FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* frameFence)
@@ -43,31 +39,27 @@ FrameCommandContext::FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* fr
 {
 	KGXLOG_TRACE("FrameCommandContext {}", frameNumber);
 
-	mCommandList = gRenderThread->getCommandListPoolPtr()->getResource();
-	mCommandAllocator = gRenderThread->getCommandAllocatorPoolPtr()->getResource();
-
-	mCommandList->reset(mCommandAllocator, nullptr);
+	mRenderContext = gRenderThread->getRHIPlatformPtr()->getRenderContext();
+	mRenderContext->reset();
 }
 
 FrameCommandContext::~FrameCommandContext()
 {
-	mCommandList->release();
-	mCommandAllocator->reset();
-	mCommandAllocator->release();
+	mRenderContext->release();
 }
 
 void FrameCommandContext::endFrame() const
 {
-	mCommandList->close();
+	mRenderContext->close();
 
-	gRenderThread->getCommandQueuePtr()->executeCommandList(mCommandList);
+	constexpr bool waitForCompletion = false;
+	mRenderContext->execute(waitForCompletion);
 
 	mFrameFence->queueSignal(mFrameNumber);
 }
 
 RenderThread::RenderThread()
 	: mCommandThread(std::make_unique<CommandThread>(1)),
-		mCommandListPool(nullptr),
 		mShaderCache(nullptr)
 {
 #ifdef WIN32
@@ -81,25 +73,11 @@ RenderThread::RenderThread()
 	KGXLOG_CRITICAL_IF(RHI::gPlatformRHI == nullptr, "Error creating RHI!");
 	assert(RHI::gPlatformRHI != nullptr && "Error creating RHI!");
 
-	mCommandQueue = RHI::gPlatformRHI->createCommandQueue();
-
-	mCommandListPool = std::make_unique<CommandListPool>(5, []()
-	{
-		return RHI::gPlatformRHI->createGraphicsCommandList(nullptr);
-	});
-
-	mCommandAllocatorPool = std::make_unique<CommandAllocatorPool>(5, []()
-	{
-		return RHI::gPlatformRHI->createCommandAllocator();
-	});
-
 	mShaderCache = std::make_unique<rendering::KGXShaderCache>();
-	mFrameFence = RHI::gPlatformRHI->createFence();
-}
+	mRHIPlatform = RHI::gPlatformRHI->createPlatform();
+	mRHIPlatform->init();
 
-RHI::RHICommandQueue* RenderThread::getCommandQueuePtr() const
-{
-	return mCommandQueue.get();
+	mFrameFence = RHI::gPlatformRHI->createFence(*mRHIPlatform);
 }
 
 rendering::KGXShaderCache* RenderThread::getShaderCachePtr() const
@@ -107,24 +85,14 @@ rendering::KGXShaderCache* RenderThread::getShaderCachePtr() const
 	return mShaderCache.get();
 }
 
-RenderThread::CommandListPool* RenderThread::getCommandListPoolPtr() const
+RHI::RHIPlatform* RenderThread::getRHIPlatformPtr() const
 {
-	return mCommandListPool.get();
-}
-
-RenderThread::CommandAllocatorPool* RenderThread::getCommandAllocatorPoolPtr() const
-{
-	return mCommandAllocatorPool.get();
+	return mRHIPlatform.get();
 }
 
 FrameCommandContext* RenderThread::getCurrentFrameContext() const
 {
 	return mFrameResources.back().get();
-}
-
-RHI::RHIGraphicsCommandList* RenderThread::getCurrentFrameCommandList() const
-{
-	return getCurrentFrameContext()->getCommandList();
 }
 
 void RenderThread::nextFrame()
@@ -139,13 +107,6 @@ void RenderThread::nextFrame()
 	//TODO(KL): See if I can get rid of the make_unique here. Just use raw memory without constantly allocating new every frame.
 	++mCurrentFrame;
 	mFrameResources.push(std::make_unique<FrameCommandContext>(mCurrentFrame, mFrameFence.get()));
-}
-
-void RenderThread::flush() const
-{
-	KGXLOG_TRACE("RenderThread::flush()");
-	mCommandThread->flush();
-	mCommandQueue->waitForCompletion();
 }
 
 void RenderThread::shutdown()
@@ -163,10 +124,8 @@ void RenderThread::shutdown()
 			mFrameResources.pop();
 		}
 
-		mCommandQueue.reset();
+		mRHIPlatform.reset();
 		mFrameFence.reset();
-		mCommandListPool.reset();
-		mCommandAllocatorPool.reset();
 		RHI::gPlatformRHI.reset();
 	});
 

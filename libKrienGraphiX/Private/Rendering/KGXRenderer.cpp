@@ -105,8 +105,11 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 
 namespace kgx::rendering
 {
-KGXRenderer::KGXRenderer(const core::KGXViewport& Viewport, RHI::RHIResourceView& OutputRenderTarget, RHI::RHIResourceView& DepthStencil)
-	: mViewport(Viewport), mOutputRTV(&OutputRenderTarget), mDSV(&DepthStencil)
+KGXRenderer::KGXRenderer(
+	const core::KGXViewport& Viewport,
+	const RHI::RHITextureHandle& OutputRenderTarget,
+	const RHI::RHITextureHandle& DepthStencil)
+	: mViewport(Viewport), mOutputRTV(OutputRenderTarget), mDSV(DepthStencil)
 {
 }
 
@@ -115,26 +118,23 @@ void KGXRenderer::RenderFrame()
 	KGXLOG_TRACE("Starting RenderFrame");
 
 	auto frameContext = core::gRenderThread->getCurrentFrameContext();
-	auto commandList = frameContext->getCommandList();
 
 	//TODO(KL): Process meshes: view culling
 
-	auto* OutputRenderTarget = static_cast<RHI::RHITexture2D*>(mOutputRTV->getViewedResource());
-
 	KGXRenderCommandContext renderContext(*frameContext);
-	TextureHandle outTargetHandle = renderContext.registerTexture(mOutputRTV);
 
-	RHI::gPlatformRHI->beginFrame(commandList, OutputRenderTarget);
+	auto* rhiPlatform = core::gRenderThread->getRHIPlatformPtr();
+	rhiPlatform->beginFrame(frameContext->getRenderContext(), mOutputRTV);
 
 	// Main pass
 	{
 		static std::array<float, 4> lightSteelBlue = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 		TextureBinding outTargetBinding
 		{
-			.texture = outTargetHandle,
+			.texture = mOutputRTV,
 			.loadAction = TextureLoadAction::Clear,
 			.storeAction = TextureStoreAction::Store,
-			.clearColor = lightSteelBlue
+			.clearValue = { lightSteelBlue }
 		};
 
 		KGXRenderPassParameters mainPassParameters
@@ -152,7 +152,7 @@ void KGXRenderer::RenderFrame()
 
 	renderContext.runPasses();
 
-	RHI::gPlatformRHI->endFrame(commandList, OutputRenderTarget);
+	rhiPlatform->endFrame(frameContext->getRenderContext(), mOutputRTV);
 	frameContext->endFrame();
 
 	KGXLOG_TRACE("End RenderFrame");

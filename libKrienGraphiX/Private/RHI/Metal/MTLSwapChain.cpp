@@ -7,7 +7,9 @@
 #include "MTLDescriptors.h"
 #include "MTLFence.h"
 #include "MTLPixelFormat.h"
+#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
+#include "Private/Core/RenderThread.h"
 
 namespace kgx::RHI
 {
@@ -24,15 +26,17 @@ MTLSwapChain::~MTLSwapChain()
 	}
 }
 
-bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat)
+bool MTLSwapChain::create(SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat)
 {
 	assert(bufferCount >= 1);
 	
 	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();
-	
-	mCommandQueue = rcCast(commandQueue);
 
-	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
+	auto* mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
+	mCommandQueue = &mtlPlatform->getCommandQueue();
+
+	auto* mtlRHI = getMTLRHI();
+	MTL::Device* mtlDevice = mtlRHI->getMTLDevice()->getNativeDevice();
 	mCommandBuffer = NS::TransferPtr(mtlDevice->newCommandBuffer());
 
 	mMetalView = SDL_Metal_CreateView(window);
@@ -64,11 +68,13 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 	for (unsigned int i = 0; i < bufferCount; ++i)
 	{
 		const std::string textureLabel = "OffscreenTexture_" + std::to_string(i);
-		
-		auto newTexture = std::make_shared<MTLTexture2D>(textureDesc);
+
+		auto newTextureHandle = mtlRHI->createTexture2D(textureDesc);
+		mOffscreenTexturesHandles.push_back(newTextureHandle);
+
+		auto newTexture = static_cast<MTLTexture2D*>(mtlPlatform->getTexture2D(newTextureHandle));
 		newTexture->getTextureResource()->setLabel(NS::String::string(textureLabel.c_str(), NS::UTF8StringEncoding));
 		mOffscreenTextures.push_back(newTexture);
-		mTextureViews.push_back(std::make_shared<MTLTextureView>(RHIResourceView::Type::RTV, newTexture));
 		mCommandAllocators.push_back(NS::TransferPtr(mtlDevice->newCommandAllocator()));
 	}
 
@@ -80,9 +86,9 @@ bool MTLSwapChain::create(RHICommandQueue* commandQueue, SDL_Window* window, uns
 	return true;
 }
 
-RHIResourceView* MTLSwapChain::getCurrentBufferView()
+RHITextureHandle MTLSwapChain::getCurrentBufferView()
 {
-	return mTextureViews[mCurrentTextureIndex].get();
+	return mOffscreenTexturesHandles[mCurrentTextureIndex];
 }
 
 void MTLSwapChain::present()
@@ -113,8 +119,8 @@ void MTLSwapChain::present()
 	mCommandQueue->getNativeCommandQueue()->signalDrawable(drawable);
 	drawable->present();
 
-	mCurrentTextureIndex = (mCurrentTextureIndex + 1) % mTextureViews.size();
-	mNextPresentTextureIndex = (mNextPresentTextureIndex + 1) % mTextureViews.size();
+	mCurrentTextureIndex = (mCurrentTextureIndex + 1) % mOffscreenTextures.size();
+	mNextPresentTextureIndex = (mNextPresentTextureIndex + 1) % mOffscreenTextures.size();
 }
 
 void MTLSwapChain::clearOffscreenTextures() const
@@ -123,12 +129,11 @@ void MTLSwapChain::clearOffscreenTextures() const
 
 	MTL::RenderPassDescriptor* pRpd = MTL::RenderPassDescriptor::renderPassDescriptor();
 
-	for (int i = 0; i < mTextureViews.size(); ++i)
+	for (int i = 0; i < mOffscreenTextures.size(); ++i)
 	{
 		auto colorAttach = pRpd->colorAttachments()->object(i);
 
-		MTLTexture2D* offscreenTexture = rcCast(mTextureViews[i]->getViewedResource());
-		colorAttach->setTexture(offscreenTexture->getTextureResource());
+		colorAttach->setTexture(mOffscreenTextures[i]->getTextureResource());
 		colorAttach->setLoadAction(MTL::LoadActionClear);
 		colorAttach->setClearColor(MTL::ClearColor::Make(0, 0, 0, 1)); // Black with alpha 1
 		colorAttach->setStoreAction(MTL::StoreActionStore);

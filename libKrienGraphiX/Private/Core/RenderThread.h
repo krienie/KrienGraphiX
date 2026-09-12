@@ -6,13 +6,16 @@
 #include <queue>
 
 #include "CommandThread.h"
-#include "ResourcePool.h"
 #include "Private/Rendering/KGXShaderCache.h"
-#include "Private/RHI/RHICommandAllocator.h"
-#include "Private/RHI/RHIGraphicsCommandList.h"
 #include "Private/RHI/RHIFence.h"
+#include "Private/RHI/RHIPlatform.h"
 
 #include "Private/RHI/RHISwapChain.h"
+
+namespace kgx::RHI
+{
+class RHIRenderContext;
+}
 
 namespace kgx::core
 {
@@ -25,11 +28,10 @@ public:
 	~ImmediateCommandContext();
 
 	[[nodiscard]]
-	RHI::RHIGraphicsCommandList* getCommandList() const { return mCommandList; }
+	RHI::RHIRenderContext* getRenderContext() const { return mRenderContext; }
 
 private:
-	RHI::RHIGraphicsCommandList* mCommandList;
-	RHI::RHICommandAllocator* mCommandAllocator;
+	RHI::RHIRenderContext* mRenderContext;
 };
 
 class FrameCommandContext final
@@ -38,7 +40,7 @@ public:
 	FrameCommandContext(uint64_t frameNumber, RHI::RHIFence* frameFence);
 	~FrameCommandContext();
 
-	[[nodiscard]] RHI::RHIGraphicsCommandList* getCommandList() const { return mCommandList; }
+	[[nodiscard]] RHI::RHIRenderContext* getRenderContext() const { return mRenderContext; }
 	[[nodiscard]] uint64_t getFrameNumber() const { return mFrameNumber; }
 
 	void endFrame() const;
@@ -46,16 +48,13 @@ public:
 private:
 	uint64_t mFrameNumber;
 	RHI::RHIFence* mFrameFence;
-	RHI::RHIGraphicsCommandList* mCommandList;
-	RHI::RHICommandAllocator* mCommandAllocator;
+	RHI::RHIRenderContext* mRenderContext;
 };
 
 class RenderThread final
 {
 public:
 	using RenderCommand = std::function<void()>;
-	using CommandListPool = ResourcePool<RHI::RHIGraphicsCommandList>;
-	using CommandAllocatorPool = ResourcePool<RHI::RHICommandAllocator>;
 
 	RenderThread();
 	~RenderThread() = default;
@@ -65,13 +64,10 @@ public:
 	RenderThread& operator=(const RenderThread&) noexcept = delete;
 	RenderThread& operator=(RenderThread&&) noexcept      = delete;
 
-	[[nodiscard]] RHI::RHICommandQueue* getCommandQueuePtr() const;
 	[[nodiscard]] rendering::KGXShaderCache* getShaderCachePtr() const;
-	[[nodiscard]] CommandListPool* getCommandListPoolPtr() const;
-	[[nodiscard]] CommandAllocatorPool* getCommandAllocatorPoolPtr() const;
+	[[nodiscard]] RHI::RHIPlatform* getRHIPlatformPtr() const;
 
 	[[nodiscard]] FrameCommandContext* getCurrentFrameContext() const;
-	[[nodiscard]] RHI::RHIGraphicsCommandList* getCurrentFrameCommandList() const;
 
 	template <typename F>
 	void enqueueCommand(F&& cmd) const
@@ -80,7 +76,6 @@ public:
 	}
 
 	void nextFrame();
-	void flush() const;
 	void shutdown();
 
 	[[nodiscard]]
@@ -90,16 +85,11 @@ public:
 	int getBufferedFrameIndex() const;
 
 	static constexpr int maxNumBufferedFrames = 3;
-	
-	static_assert(maxNumBufferedFrames >= 2 && maxNumBufferedFrames <= 3);
+	static_assert(maxNumBufferedFrames == 2 || maxNumBufferedFrames == 3);
 
 private:
 	std::unique_ptr<CommandThread> mCommandThread;
-
-	std::unique_ptr<RHI::RHICommandQueue> mCommandQueue;
-	std::unique_ptr<CommandListPool> mCommandListPool;
-	std::unique_ptr<CommandAllocatorPool> mCommandAllocatorPool;
-
+	std::unique_ptr<RHI::RHIPlatform> mRHIPlatform;
 	std::unique_ptr<rendering::KGXShaderCache> mShaderCache;
 
 	uint64_t mCurrentFrame = -1;

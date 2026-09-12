@@ -24,9 +24,9 @@ public:
 	MTLSwapChain(uint32_t width, uint32_t height);
 	~MTLSwapChain() override;
 
-	bool create(RHICommandQueue* commandQueue, SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
+	bool create(SDL_Window* window, unsigned int bufferCount, RHIPixelFormat pixelFormat) override;
 
-	[[nodiscard]] RHIResourceView* getCurrentBufferView() override;
+	[[nodiscard]] RHITextureHandle getCurrentBufferView() override;
 
 	void present() override;
 
@@ -39,11 +39,10 @@ private:
 	MTLCommandQueue* mCommandQueue = nullptr;
 	SDL_MetalView mMetalView = nullptr;
 
-	//TODO(KL): move offscreen texture rendering to RHI layer, so all graphics apis do this
 	uint8_t mNextPresentTextureIndex = 0;
 	uint8_t mCurrentTextureIndex = 0;
-	std::vector<std::shared_ptr<MTLTexture2D>> mOffscreenTextures;
-	std::vector<std::shared_ptr<MTLTextureView>> mTextureViews;
+	std::vector<MTLTexture2D*> mOffscreenTextures;
+	std::vector<RHITextureHandle> mOffscreenTexturesHandles;
 
 	NS::SharedPtr<MTL4::CommandBuffer> mCommandBuffer = nullptr;
 	std::vector<NS::SharedPtr<MTL4::CommandAllocator>> mCommandAllocators;
