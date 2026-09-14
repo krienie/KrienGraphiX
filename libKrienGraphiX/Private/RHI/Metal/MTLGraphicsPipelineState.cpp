@@ -26,7 +26,7 @@ bool MTLGraphicsPipelineState::create()
 		psoDesc->setVertexDescriptor(mtlVertexShader->getMTLVertexDescriptor());
 		psoDesc->setVertexFunctionDescriptor(mtlVertexShader->getLibraryFunctionDescriptor());
 
-		//TODO(KL): Create a system where every shader uses their own root signature
+		//TODO(KL): Create a system where every shader uses its own root signature
 		if (mtlVertexShader->getArgumentTable())
 		{
 			mMainShader = mtlVertexShader;

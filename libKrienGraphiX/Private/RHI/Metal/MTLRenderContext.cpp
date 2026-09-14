@@ -106,6 +106,9 @@ void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParamete
 
 	mEncoder->setFrontFacingWinding(MTL::WindingClockwise);
 	mEncoder->setCullMode(MTL::CullModeBack);
+
+	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
+	mEncoder->setRenderPipelineState(activePSO->getPSO());
 }
 
 void MTLRenderContext::drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject)
@@ -117,14 +120,12 @@ void MTLRenderContext::drawMeshRenderObject(const rendering::KGXMeshRenderObject
 	const MTLBuffer* mtlBuffer = rcCast(renderObject->getConstantBuffer());
 	IRDescriptorTableSetBuffer(&bufferEntries[1], mtlBuffer->getGPUAddress(), 0);
 
-	auto mtlPSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
-	mtlPSO->setTopLevelBufferEntries(bufferEntries);
+	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
+	activePSO->setTopLevelBufferEntries(bufferEntries);
 
-	mEncoder->setRenderPipelineState(mtlPSO->getPSO());
-
-	if (auto argumentTable = mtlPSO->getArgumentTable())
+	if (auto argumentTable = activePSO->getArgumentTable())
 	{
-		const RHIGraphicsPipelineStateDescriptor& psoDescriptor = mtlPSO->getDescriptor();
+		const RHIGraphicsPipelineStateDescriptor& psoDescriptor = activePSO->getDescriptor();
 
 		if (psoDescriptor.vs)
 		{
@@ -137,7 +138,7 @@ void MTLRenderContext::drawMeshRenderObject(const rendering::KGXMeshRenderObject
 		}
 	}
 
-	if (auto argumentTable = mtlPSO->getArgumentTable())
+	if (auto argumentTable = activePSO->getArgumentTable())
 	{
 		MTLBuffer* vertexBuffer = rcCast(renderObject->getVertexBuffer());
 		MTLBuffer* indexBuffer = rcCast(renderObject->getIndexBuffer());
