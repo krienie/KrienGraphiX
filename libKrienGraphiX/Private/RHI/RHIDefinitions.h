@@ -25,7 +25,6 @@ struct RHIBufferDescriptor
 {
 	std::string name;
 	unsigned int bufferSize;
-	unsigned int bufferRegister;
 	bool isBufferAligned;
 	bool isDynamic;
 	void* initialData;

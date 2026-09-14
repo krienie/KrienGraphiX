@@ -57,7 +57,6 @@ RHI::RHIBuffer* KGXRenderScene::getSceneConstantBuffer()
 	{
 		.name = "SceneConstantBuffer",
 		.bufferSize = sizeof(SceneConstantBufferData),
-		.bufferRegister = 0,
 		.isBufferAligned = true,
 		.isDynamic = true,
 		.initialData = nullptr,

@@ -34,7 +34,6 @@ void KGXMeshRenderObject::createRenderResources()
 	{
 		.name = "VertexBuffer",
 		.bufferSize = vbByteSize,
-		.bufferRegister = 0,
 		.isBufferAligned = false,
 		.isDynamic = false,
 		.initialData = mRawMeshData.vertices.data(),
@@ -47,7 +46,6 @@ void KGXMeshRenderObject::createRenderResources()
 	{
 		.name = "IndexBuffer",
 		.bufferSize = ibByteSize,
-		.bufferRegister = 0,
 		.isBufferAligned = false,
 		.isDynamic = false,
 		
@@ -64,7 +62,6 @@ void KGXMeshRenderObject::createRenderResources()
 	{
 		.name = "MeshRenderObjectConstantBuffer",
 		.bufferSize = sizeof(ConstantBufferData),
-		.bufferRegister = 0,
 		.isBufferAligned = true,
 		.isDynamic = true,
 		.initialData = nullptr,

@@ -34,9 +34,6 @@ public:
 	bool IsBuffer() const override { return true; }
 
 	[[nodiscard]]
-	size_t bufferRegister() const { return mRegister; }
-
-	[[nodiscard]]
 	virtual void* mappedDataPtr() const { return mMappedDataPtr; }
 	
 	void* map(MapType type);
@@ -57,8 +54,6 @@ private:
 	[[nodiscard]]
 	virtual void* mapImpl(MapType type) = 0;
 	virtual void unmapImpl() = 0;
-	
-	size_t mRegister = 0u;
 
 	void* mMappedDataPtr = nullptr;
 	uint8_t mCurrentMappedType = MapType::READ_WRITE;
