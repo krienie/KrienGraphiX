@@ -19,12 +19,14 @@ if (MSVC)
     add_definitions(-DNOMINMAX)
 
     add_compile_options(/MP /W3 /WX)
+    add_compile_options(/GR-) # No RTTI
     add_link_options(/IGNORE:4099) # PDB 'filename' was not found with 'object/library' or at 'path'; linking object as if no debug info
 elseif (APPLE)
+    add_compile_options(-fno-rtti)
     add_compile_options(-fno-exceptions) # No exceptions
     add_compile_options(-fdeclspec)
     set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "27.0")
 else()
     message(FATAL_ERROR "Unsupported platform.")
 endif()

@@ -38,12 +38,6 @@ target_include_directories(${LIB_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT
 target_link_libraries(${LIB_NAME} PRIVATE shadercompiler SDL3::SDL3 ufbx fastgltf::fastgltf xxHash::xxhash)
 target_link_libraries(${LIB_NAME} PUBLIC glm spdlog::spdlog)
 
-if (MSVC)
-    target_compile_options(${LIB_NAME} PUBLIC /GR-) # No RTTI
-elseif (APPLE)
-    target_compile_options(${LIB_NAME} PUBLIC -fno-rtti) # No RTTI
-endif()
-
 if (WIN32)
     target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib dxgi.lib D3DCompiler.lib)
 elseif (APPLE)

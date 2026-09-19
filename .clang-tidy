@@ -1,0 +1,4 @@
+---
+# Disabled because RTTI is turned off project-wide,
+# making static_cast the intended way to downcast.
+Checks: '-cppcoreguidelines-pro-type-static-cast-downcast'
