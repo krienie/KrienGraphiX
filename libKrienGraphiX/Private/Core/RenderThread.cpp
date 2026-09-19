@@ -112,7 +112,7 @@ void RenderThread::nextFrame()
 void RenderThread::shutdown()
 {
 	// Add the shutdown code as a render command as some graphics APIs use strictly thread-local resources.
-	enqueueCommand([this]()
+	mCommandThread->enqueueCommandAndStop([this]()
 	{
 		{
 			std::queue<std::unique_ptr<FrameCommandContext>> emptyQueue;

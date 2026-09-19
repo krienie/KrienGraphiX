@@ -17,6 +17,12 @@ void MTLCommandQueue::addGlobalResidency(const MTL::Allocation* allocation)
 	mResidencySet->addAllocation(allocation);
 }
 
+void MTLCommandQueue::removeGlobalResidency(const MTL::Allocation* allocation)
+{
+	mResidencySetDirty = true;
+	mResidencySet->removeAllocation(allocation);
+}
+
 bool MTLCommandQueue::create()
 {
 	auto autoReleasePool = NS::AutoreleasePool::alloc()->init();

@@ -3,11 +3,14 @@
 
 namespace kgx::RHI
 {
+class RHIResource;
+
 class MTLResidencyManager final
 {
 public:
 	MTLResidencyManager() = default;
 
-	void addGlobalResidency(const class RHIResource& resource);
+	static void addGlobalResidency(const RHIResource& resource);
+	static void removeGlobalResidency(const RHIResource& resource);
 };
 }

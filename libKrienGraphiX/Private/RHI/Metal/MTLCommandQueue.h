@@ -19,6 +19,7 @@ public:
 	MTL4::CommandQueue* getNativeCommandQueue() const { return mCommandQueue.get(); }
 
 	void addGlobalResidency(const MTL::Allocation* allocation);
+	void removeGlobalResidency(const MTL::Allocation* allocation);
 
 	bool create();
 	void executeCommandBuffer(MTL4::CommandBuffer* commandBuffer, bool waitForCompletion);

@@ -4,7 +4,7 @@
 namespace kgx::core
 {
 CommandThread::CommandThread(unsigned int numWorkerThreads)
-	: mRunning(true), mNumBusyThreads(0u)
+	: mRunning(true), mIsAcceptingCommands(true), mNumBusyThreads(0u)
 {
 	mWorkerThreads.reserve(numWorkerThreads);
 	for (unsigned int i = 0u; i < numWorkerThreads; ++i)

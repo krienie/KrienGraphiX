@@ -14,37 +14,51 @@ namespace kgx::core
 
 class CommandThread final
 {
-	public:
-		using ThreadCommand = std::function<void()>;
+public:
+	using ThreadCommand = std::function<void()>;
 
-		CommandThread(unsigned int numWorkerThreads = std::thread::hardware_concurrency());
-		~CommandThread();
+	CommandThread(unsigned int numWorkerThreads = std::thread::hardware_concurrency());
+	~CommandThread();
 
-		CommandThread(const CommandThread&) noexcept            = delete;
-		CommandThread(CommandThread&&) noexcept                 = delete;
-		CommandThread& operator=(const CommandThread&) noexcept = delete;
-		CommandThread& operator=(CommandThread&&) noexcept      = delete;
+	CommandThread(const CommandThread&) noexcept            = delete;
+	CommandThread(CommandThread&&) noexcept                 = delete;
+	CommandThread& operator=(const CommandThread&) noexcept = delete;
+	CommandThread& operator=(CommandThread&&) noexcept      = delete;
 
-		template <typename F>
-		void enqueueCommand(F&& cmd)
+	template<typename F>
+	void enqueueCommand(F&& cmd)
+	{
+		std::scoped_lock lock(mEnqueueMutex);
+		if (mIsAcceptingCommands)
 		{
-			std::scoped_lock lock(mEnqueueMutex);
 			mCommands.emplace_back(std::forward<F>(cmd));
 			mCvCommand.notify_one();
 		}
+	}
 
-		void flush();
+	template<typename F>
+	void enqueueCommandAndStop(F&& cmd)
+	{
+		std::scoped_lock lock(mEnqueueMutex);
+		mIsAcceptingCommands = false;
 
-	private:
-		void processThreadCommands();
+		mCommands.emplace_back(std::forward<F>(cmd));
+		mCvCommand.notify_one();
+	}
 
-		bool mRunning;
-		std::vector<std::thread> mWorkerThreads;
-		std::mutex mEnqueueMutex;
+	void flush();
 
-		std::deque<ThreadCommand> mCommands;
-		std::condition_variable mCvCommand;
-		std::condition_variable mCvFinished;
-		unsigned int mNumBusyThreads;
+private:
+	void processThreadCommands();
+
+	bool mIsAcceptingCommands;
+	bool mRunning;
+	std::vector<std::thread> mWorkerThreads;
+	std::mutex mEnqueueMutex;
+
+	std::deque<ThreadCommand> mCommands;
+	std::condition_variable mCvCommand;
+	std::condition_variable mCvFinished;
+	unsigned int mNumBusyThreads;
 };
 }

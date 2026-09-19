@@ -41,7 +41,12 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 
 	//TODO(KL): For now everything is permanently resident.
 	//Will change for a different system later when scene organisation is more developed.
-	getMTLRHI()->getMTLResidencyManager()->addGlobalResidency(*this);
+	MTLResidencyManager::addGlobalResidency(*this);
+}
+
+MTLTexture2D::~MTLTexture2D()
+{
+	MTLResidencyManager::removeGlobalResidency(*this);
 }
 
 void* MTLTexture2D::getNativeResource() const

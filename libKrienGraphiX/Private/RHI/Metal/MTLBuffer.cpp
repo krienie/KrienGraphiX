@@ -20,7 +20,7 @@ MTLBuffer::MTLBuffer(const RHIBufferDescriptor& descriptor)
 	//TODO(KL): Add a staging buffer system so non-dynamic buffers can be made private
 	constexpr MTL::ResourceOptions storageMode = MTL::ResourceStorageModeShared;
 	
-	uint32_t totalBufferSize = descriptor.bufferSize;
+	size_t totalBufferSize = descriptor.bufferSize;
 
 	if (getDescriptor().isDynamic)
 	{
@@ -53,8 +53,13 @@ MTLBuffer::MTLBuffer(const RHIBufferDescriptor& descriptor)
 	mResource->setLabel(pLabel);
 
 	//TODO(KL): For now everything is permanently resident.
-	//Will change for a different system later when scene orginisation is more developed.
-	getMTLRHI()->getMTLResidencyManager()->addGlobalResidency(*this);
+	//Will change for a different system later when scene organisation is more developed.
+	MTLResidencyManager::addGlobalResidency(*this);
+}
+
+MTLBuffer::~MTLBuffer()
+{
+	MTLResidencyManager::removeGlobalResidency(*this);
 }
 
 void* MTLBuffer::getNativeResource() const

@@ -15,7 +15,7 @@ class MTLBuffer final : public RHIBuffer
 {
 public:
 	MTLBuffer(const RHIBufferDescriptor& descriptor);
-	~MTLBuffer() override = default;
+	~MTLBuffer() override;
 
 	MTLBuffer(MTLBuffer&) = delete;
 	MTLBuffer(MTLBuffer&&) noexcept = default;

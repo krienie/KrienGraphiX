@@ -57,12 +57,8 @@ public:
 	[[nodiscard]]
 	MTLGraphicsDevice* getMTLDevice() const { return mGraphicsDevice.get(); }
 
-	[[nodiscard]]
-	MTLResidencyManager* getMTLResidencyManager() const { return mResidencyManager.get(); }
-
 private:
 	std::unique_ptr<MTLGraphicsDevice> mGraphicsDevice;
-	std::unique_ptr<MTLResidencyManager> mResidencyManager;
 };
 
 inline MTLRenderHardwareInterface* getMTLRHI()

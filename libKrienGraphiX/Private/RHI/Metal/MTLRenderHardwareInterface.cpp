@@ -23,7 +23,6 @@ namespace kgx::RHI
 MTLRenderHardwareInterface::MTLRenderHardwareInterface()
 {
 	mGraphicsDevice = std::make_unique<MTLGraphicsDevice>();
-	mResidencyManager = std::make_unique<MTLResidencyManager>();
 }
 
 MTLRenderHardwareInterface::~MTLRenderHardwareInterface()

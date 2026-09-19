@@ -16,7 +16,7 @@ class MTLTexture2D : public RHITexture2D
 {
 public:
 	MTLTexture2D(const MTLTexture2DDescriptor& descriptor);
-	~MTLTexture2D() override = default;
+	~MTLTexture2D() override;
 
 	[[nodiscard]] void* getNativeResource() const override;
 

@@ -46,6 +46,9 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 
 	mCameraObject = std::make_unique<kgx::KGXCameraObject>("CameraObject");
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
+
+	mBoxObject2 = std::make_unique<kgx::KGXBoxObject>("BoxObject2");
+	mBoxObject2->setPosition(0.3, 0, 0);
 	
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
@@ -76,7 +79,7 @@ int KGToolboxApp::run()
 		}
 	}
 
-	mKgxEngine.reset();
+	shutdown();
 
 	if (mSDLWindow)
 	{
@@ -85,5 +88,12 @@ int KGToolboxApp::run()
 	SDL_Quit();
 
 	return 0;
+}
+
+void KGToolboxApp::shutdown()
+{
+	mBoxObject.reset();
+	mBoxObject2.reset();
+	mKgxEngine.reset();
 }
 }
