@@ -51,13 +51,24 @@ private:
 	RHI::RHIRenderContext* mRenderContext;
 };
 
+class DeferredRenderCommand
+{
+public:
+	DeferredRenderCommand(unsigned int numFramesToExecute, CommandThread::ThreadCommand&& deferredCommand);
+
+	void operator()();
+
+private:
+	unsigned int mNumFramesToExecute;
+	CommandThread::ThreadCommand mCommand;
+};
+
 class RenderThread final
 {
 public:
 	using RenderCommand = std::function<void()>;
 
 	RenderThread();
-	~RenderThread() = default;
 
 	RenderThread(const RenderThread&) noexcept            = delete;
 	RenderThread(RenderThread&&) noexcept                 = delete;
@@ -69,11 +80,7 @@ public:
 
 	[[nodiscard]] FrameCommandContext* getCurrentFrameContext() const;
 
-	template <typename F>
-	void enqueueCommand(F&& cmd) const
-	{
-		mCommandThread->enqueueCommand(std::forward<F>(cmd));
-	}
+	void enqueueCommand(CommandThread::ThreadCommand&& cmd) const;
 
 	void nextFrame();
 	void shutdown();

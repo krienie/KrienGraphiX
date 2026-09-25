@@ -136,6 +136,19 @@ NS::UInteger getNSVertexFormatSize(const MTL::VertexFormat& format)
 		return 0;
 	}
 }
+
+MTL::VertexStepFunction toNSVertexStepFunction(const kgx::VertexInputClassification& classification)
+{
+	switch (classification)
+	{
+	case kgx::VertexInputClassification::PerVertex:
+		return MTL::VertexStepFunction::VertexStepFunctionPerVertex;
+	case kgx::VertexInputClassification::PerInstance:
+		return MTL::VertexStepFunction::VertexStepFunctionPerInstance;
+	}
+
+	return MTL::VertexStepFunction::VertexStepFunctionPerVertex;
+}
 }
 
 namespace kgx::RHI
@@ -149,23 +162,31 @@ void MTLVertexLayout::setFromInputElementVector(const std::vector<VertexInputEle
 {
 	mVertexDescriptor = NS::TransferPtr(MTL::VertexDescriptor::alloc()->init());
 
-	uint64_t vertexStride = 0;
+	std::array<uint64_t, 2> strides = {0 , 0};
+
 	for (int i = 0; i < vertexInputLayout.size(); ++i)
 	{
 		auto& kgxVertexLayout = vertexInputLayout[i];
 
+		const int classificationSlot = static_cast<int>(kgxVertexLayout.classification);
+
 		const MTL::VertexFormat nsVertexFormat = toNSVertexFormat(kgxVertexLayout.format);
 		MTL::VertexAttributeDescriptor* attributeDesc = mVertexDescriptor->attributes()->object(kIRStageInAttributeStartIndex + i);
 		attributeDesc->setFormat(nsVertexFormat);
-		attributeDesc->setOffset(vertexStride);
-		attributeDesc->setBufferIndex(kIRVertexBufferBindPoint);
+		attributeDesc->setOffset(strides[classificationSlot]);
+		attributeDesc->setBufferIndex(kIRVertexBufferBindPoint + classificationSlot);
 
-		vertexStride += getNSVertexFormatSize(nsVertexFormat);
+		strides[classificationSlot] += getNSVertexFormatSize(nsVertexFormat);
 	}
 
-	vertexStride = MemoryUtils::alignToBytes(vertexStride, 4);
-	mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint)->setStride(vertexStride);
-	mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint)->setStepRate(1);
-	mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint)->setStepFunction(MTL::VertexStepFunctionPerVertex);
+	for (int i = 0; i < strides.size(); ++i)
+	{
+		const MTL::VertexStepFunction stepFunction = toNSVertexStepFunction(static_cast<VertexInputClassification>(i));
+		const uint64_t alignedStride = MemoryUtils::alignToBytes(strides[i], 4);
+
+		mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint + i)->setStride(alignedStride);
+		mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint + i)->setStepRate(1);
+		mVertexDescriptor->layouts()->object(kIRVertexBufferBindPoint + i)->setStepFunction(stepFunction);
+	}
 }
 }

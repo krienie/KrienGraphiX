@@ -48,7 +48,7 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 
 	mBoxObject2 = std::make_unique<kgx::KGXBoxObject>("BoxObject2");
-	mBoxObject2->setPosition(0.3, 0, 0);
+	mBoxObject2->setPosition(4.0, 0, 0);
 	
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{

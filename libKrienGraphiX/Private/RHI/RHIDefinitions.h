@@ -24,7 +24,7 @@ struct RHIHeapHandle
 struct RHIBufferDescriptor
 {
 	std::string name;
-	unsigned int bufferSize;
+	size_t bufferSize;
 	bool isBufferAligned;
 	bool isDynamic;
 	void* initialData;

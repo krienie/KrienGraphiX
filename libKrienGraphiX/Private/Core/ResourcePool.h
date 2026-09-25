@@ -24,10 +24,11 @@ public:
 		mParentPool.returnResource(this);
 	}
 
+protected:
+	ResourcePool<ResourceType>& mParentPool;
+
 private:
 	virtual void releaseImpl() {}
-
-	ResourcePool<ResourceType>& mParentPool;
 };
 
 template<class ResourceType>

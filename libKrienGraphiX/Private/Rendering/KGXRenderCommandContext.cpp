@@ -28,7 +28,9 @@ void KGXRenderCommandContext::runPasses()
 	}
 
 	auto sceneConstantBuffer = mRenderScene->updateAndGetSceneConstantBuffer();
-	mFrameContext.getRenderContext()->setGlobalConstantBuffer(sceneConstantBuffer);
+	auto meshInstanceConstantBuffer = mRenderScene->getMeshInstanceConstantBuffer();
+	auto objectIdsBuffer = mRenderScene->getObjectIdsBuffer();
+	mFrameContext.getRenderContext()->setConstantBuffers(sceneConstantBuffer, meshInstanceConstantBuffer, objectIdsBuffer);
 
 	for (auto& pass : mRenderPasses)
 	{
@@ -42,7 +44,10 @@ void KGXRenderCommandContext::executeRenderPass(const KGXRenderPassParameters& r
 
 	for (auto& renderObject : *mRenderScene)
 	{
-		renderObject->updateConstantBufferData();
+		// Update the renderObject's instance data
+		auto* instances = static_cast<MeshInstanceData*>(mRenderScene->getMeshInstanceConstantBuffer()->mappedDataPtr());
+		instances[renderObject->getObjectId()] = MeshInstanceData{ renderObject->getTransform() };
+
 		mFrameContext.getRenderContext()->drawMeshRenderObject(renderObject.get());
 	}
 }

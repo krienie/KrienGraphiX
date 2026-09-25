@@ -6,6 +6,8 @@
 #include "MTLGraphicsDevice.h"
 #include "MTLGraphicsPipelineState.h"
 #include "MTLTexture2D.h"
+#include "MTLUtils.h"
+#include "Private/Core/RenderThread.h"
 #include "Private/Rendering/KGXMeshRenderObject.h"
 #include "Private/Rendering/KGXRenderPass.h"
 
@@ -69,12 +71,17 @@ bool MTLRenderContext::create()
 	//TODO(KL): Pass in optional label to be used via constructor
 	mCommandBuffer->setLabel(NS::String::string("MTLRenderContext_commandBuffer", NS::UTF8StringEncoding));
 
-	return true;
+	return createArgumentTables();
 }
 
-void MTLRenderContext::setGlobalConstantBuffer(const RHIBuffer* constantBuffer)
+	void MTLRenderContext::setConstantBuffers(
+		const RHIBuffer* sceneConstantBuffer,
+		const RHIBuffer* meshInstanceConstantBuffer,
+		const RHIBuffer* objectIdsBuffer)
 {
-	mGlobalConstantBuffer = static_cast<const MTLBuffer*>(constantBuffer);
+	mSceneConstantBuffer = static_cast<const MTLBuffer*>(sceneConstantBuffer);
+	mMeshInstanceConstantBuffer = static_cast<const MTLBuffer*>(meshInstanceConstantBuffer);
+	mObjectIdsBuffer = static_cast<const MTLBuffer*>(objectIdsBuffer);
 }
 
 void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParameters& renderPassParameters)
@@ -109,50 +116,54 @@ void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParamete
 
 	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
 	mEncoder->setRenderPipelineState(activePSO->getPSO());
+
+	std::array<IRDescriptorTableEntry, 2> bufferEntries{};
+
+	IRDescriptorTableSetBuffer(&bufferEntries[0],
+		mMeshInstanceConstantBuffer->getGPUAddress(),
+		mMeshInstanceConstantBuffer->bufferSize());
+
+	IRDescriptorTableSetBuffer(&bufferEntries[1],
+		mSceneConstantBuffer->getGPUAddress(),
+		mSceneConstantBuffer->bufferSize());
+
+	//TODO(KL): Do this only once per frame so this has to be done by the KGXRenderScene somehow or perhaps the platform?
+	setTopLevelBufferEntries(bufferEntries);
+
+	MTL4::ArgumentTable* argumentTable = getArgumentTable();
+
+	const RHIGraphicsPipelineStateDescriptor& psoDescriptor = activePSO->getDescriptor();
+
+	if (psoDescriptor.vs)
+	{
+		mEncoder->setArgumentTable(argumentTable, MTL::RenderStageVertex);
+	}
+
+	if (psoDescriptor.ps)
+	{
+		mEncoder->setArgumentTable(argumentTable, MTL::RenderStageFragment);
+	}
 }
 
 void MTLRenderContext::drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject)
 {
-	std::array<IRDescriptorTableEntry, 2> bufferEntries{};
+	MTLBuffer* vertexBuffer = rcCast(renderObject->getVertexBuffer());
+	MTLBuffer* indexBuffer = rcCast(renderObject->getIndexBuffer());
 
-	IRDescriptorTableSetBuffer(&bufferEntries[0], mGlobalConstantBuffer->getGPUAddress(), 0);
+	auto argumentTable = getArgumentTable();
+	argumentTable->setAddress(vertexBuffer->getGPUAddress(), kIRVertexBufferBindPoint);
+	argumentTable->setAddress(mObjectIdsBuffer->getGPUAddress(), kIRVertexBufferBindPoint + 1);
 
-	const MTLBuffer* mtlBuffer = rcCast(renderObject->getConstantBuffer());
-	IRDescriptorTableSetBuffer(&bufferEntries[1], mtlBuffer->getGPUAddress(), 0);
-
-	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
-	activePSO->setTopLevelBufferEntries(bufferEntries);
-
-	if (auto argumentTable = activePSO->getArgumentTable())
-	{
-		const RHIGraphicsPipelineStateDescriptor& psoDescriptor = activePSO->getDescriptor();
-
-		if (psoDescriptor.vs)
-		{
-			mEncoder->setArgumentTable(argumentTable, MTL::RenderStageVertex);
-		}
-
-		if (psoDescriptor.ps)
-		{
-			mEncoder->setArgumentTable(argumentTable, MTL::RenderStageFragment);
-		}
-	}
-
-	if (auto argumentTable = activePSO->getArgumentTable())
-	{
-		MTLBuffer* vertexBuffer = rcCast(renderObject->getVertexBuffer());
-		MTLBuffer* indexBuffer = rcCast(renderObject->getIndexBuffer());
-
-		argumentTable->setAddress(vertexBuffer->getGPUAddress(), kIRVertexBufferBindPoint);
-
-		mEncoder->drawIndexedPrimitives(
-			MTL::PrimitiveTypeTriangle,
-			renderObject->getNumIndices(),
-			MTL::IndexTypeUInt16,
-			indexBuffer->getGPUAddress(),
-			indexBuffer->bufferSize()
-		);
-	}
+	mEncoder->drawIndexedPrimitives(
+		MTL::PrimitiveTypeTriangle,
+		renderObject->getNumIndices(),
+		MTL::IndexTypeUInt16,
+		indexBuffer->getGPUAddress(),
+		indexBuffer->bufferSize(),
+		1,
+		0,
+		renderObject->getObjectId()
+	);
 }
 
 void MTLRenderContext::close()
@@ -172,7 +183,8 @@ void MTLRenderContext::execute(bool waitForCompletion)
 
 void MTLRenderContext::reset()
 {
-	mGlobalConstantBuffer = nullptr;
+	mSceneConstantBuffer = nullptr;
+	mMeshInstanceConstantBuffer = nullptr;
 	mEncoder = nullptr;
 	mCommandAllocator = mPlatform.getCommandAllocator();
 	mCommandBuffer->beginCommandBuffer(mCommandAllocator->getNativeAllocator());
@@ -244,5 +256,69 @@ NS::SharedPtr<MTL4::RenderPassDescriptor> MTLRenderContext::toMTLRenderPassDescr
 	renderPassDescriptor->setDefaultRasterSampleCount(1);
 
 	return renderPassDescriptor;
+}
+
+MTL4::ArgumentTable* MTLRenderContext::getArgumentTable() const
+{
+	const uint64_t argTableIndex = core::gRenderThread->getBufferedFrameIndex();
+	return mArgumentTables[argTableIndex].get();
+}
+
+void MTLRenderContext::setTopLevelBufferEntries(const std::array<IRDescriptorTableEntry, 2>& bufferEntries) const
+{
+	const size_t entriesByteSize = bufferEntries.size() * sizeof(IRDescriptorTableEntry);
+	const uint64_t bufferIndex = core::gRenderThread->getBufferedFrameIndex();
+
+	if (mTopLevelBuffers[bufferIndex]->length() != entriesByteSize)
+	{
+		//TODO(KL): Temporary crash fix. Will be improved later.
+		return;
+	}
+
+	memcpy(mTopLevelBuffers[bufferIndex]->contents(), bufferEntries.data(), entriesByteSize);
+}
+
+bool MTLRenderContext::createArgumentTables()
+{
+	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
+
+	NS::SharedPtr<MTL4::ArgumentTableDescriptor> argDesc = NS::TransferPtr(
+		MTL4::ArgumentTableDescriptor::alloc()->init());
+	argDesc->setMaxBufferBindCount(8);
+
+	// Scene buffer and instance buffer
+	constexpr int numShaderBuffers = 2;
+
+	constexpr size_t topLevelBufferSize = numShaderBuffers * sizeof(IRDescriptorTableEntry);
+	mTopLevelBuffers.reserve(core::RenderThread::maxNumBufferedFrames);
+	mArgumentTables.reserve(core::RenderThread::maxNumBufferedFrames);
+
+	//TODO(KL): Temporarily added to global residence set
+	MTLCommandQueue& mtlCommandQueue = mPlatform.getCommandQueue();
+
+	for (int i = 0; i < core::RenderThread::maxNumBufferedFrames; i++)
+	{
+		mTopLevelBuffers.push_back(NS::TransferPtr(mtlDevice->newBuffer(topLevelBufferSize, MTL::ResourceStorageModeShared)));
+
+		auto& topLevelBuffer = mTopLevelBuffers.back();
+
+		const std::string topLevelBufferName = std::format("TopLevelBuffer_{}", i);
+		NS::String* topLevelBufferLabel = NS::String::string(topLevelBufferName.c_str(), NS::UTF8StringEncoding);
+		topLevelBuffer->setLabel(topLevelBufferLabel);
+
+		mtlCommandQueue.addGlobalResidency(topLevelBuffer.get());
+
+		const std::string argumentBufferName = std::format("ArgumentBuffer_{}", i);
+		NS::String* argumentBufferLabel = NS::String::string(topLevelBufferName.c_str(), NS::UTF8StringEncoding);
+		argDesc->setLabel(argumentBufferLabel);
+
+		NS::Error* error = nullptr;
+		mArgumentTables.push_back(NS::TransferPtr(mtlDevice->newArgumentTable(argDesc.get(), &error)));
+		MTLUtils::printIfNSError(error);
+
+		mArgumentTables[i]->setAddress(mTopLevelBuffers[i]->gpuAddress(), kIRArgumentBufferBindPoint);
+	}
+
+	return mArgumentTables.size() == core::RenderThread::maxNumBufferedFrames;
 }
 }

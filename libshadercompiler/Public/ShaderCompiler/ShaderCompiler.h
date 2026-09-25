@@ -22,17 +22,55 @@ enum class VertexInputElementFormat
 	UINT4
 };
 
+enum class VertexInputClassification
+{
+	PerVertex   = 0,
+	PerInstance = 1
+};
+
 struct VertexInputElement
 {
 	std::string semanticName;
 	VertexInputElementFormat format;
+	VertexInputClassification classification;
 };
 
-const VertexInputElement VertexPositionInput = { .semanticName = "POSITION", .format = VertexInputElementFormat::FLOAT3 };
-const VertexInputElement VertexTexCoordInput = { .semanticName = "TEXCOORD", .format = VertexInputElementFormat::FLOAT2 };
-const VertexInputElement VertexNormalInput   = { .semanticName = "NORMAL",   .format = VertexInputElementFormat::FLOAT3 };
-const VertexInputElement VertexTangentInput  = { .semanticName = "TANGENT",  .format = VertexInputElementFormat::FLOAT3 };
-const VertexInputElement VertexColorInput    = { .semanticName = "COLOR",    .format = VertexInputElementFormat::FLOAT4 };
+const VertexInputElement VertexPositionInput =
+{
+	.semanticName = "POSITION",
+	.format = VertexInputElementFormat::FLOAT3,
+	.classification = VertexInputClassification::PerVertex
+};
+const VertexInputElement VertexTexCoordInput =
+{
+	.semanticName = "TEXCOORD",
+	.format = VertexInputElementFormat::FLOAT2,
+	.classification = VertexInputClassification::PerVertex
+};
+const VertexInputElement VertexNormalInput =
+{
+	.semanticName = "NORMAL",
+	.format = VertexInputElementFormat::FLOAT3,
+	.classification = VertexInputClassification::PerVertex
+};
+const VertexInputElement VertexTangentInput =
+{
+	.semanticName = "TANGENT",
+	.format = VertexInputElementFormat::FLOAT3,
+	.classification = VertexInputClassification::PerVertex
+};
+const VertexInputElement VertexColorInput =
+{
+	.semanticName = "COLOR",
+	.format = VertexInputElementFormat::FLOAT4,
+	.classification = VertexInputClassification::PerVertex
+};
+const VertexInputElement VertexObjectIDInput =
+{
+	.semanticName = "OBJECT_ID",
+	.format = VertexInputElementFormat::UINT,
+	.classification = VertexInputClassification::PerInstance
+};
 
 struct BufferVariableDescriptor
 {

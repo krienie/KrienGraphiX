@@ -33,9 +33,10 @@ public:
 	[[nodiscard]]
 	bool IsBuffer() const override { return true; }
 
+	//TODO(KL): make the RHIBuffer triple buffered like MTLBuffer is now
 	[[nodiscard]]
 	virtual void* mappedDataPtr() const { return mMappedDataPtr; }
-	
+
 	void* map(MapType type);
 	void unmap();
 

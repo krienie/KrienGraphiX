@@ -82,7 +82,10 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 	auto* vertexShader = shaderCache->loadShaderFromFile(vertexShaderPath, "main", RHI::RHIShader::ShaderType::Vertex);
 	auto* pixelShader = shaderCache->loadShaderFromFile(pixelShaderPath, "main", RHI::RHIShader::ShaderType::Pixel);
 
-	std::vector<VertexInputElement> layoutDesc = {VertexPositionInput, VertexColorInput};
+	assert(vertexShader);
+	assert(pixelShader);
+
+	std::vector<VertexInputElement> layoutDesc = {VertexPositionInput, VertexColorInput, VertexObjectIDInput};
 	vertexShader->setVertexInputLayout(layoutDesc);
 
 	RHI::RHIGraphicsPipelineStateDescriptor psoDesc =

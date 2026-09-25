@@ -18,17 +18,18 @@ class RHIRenderContext : public core::PooledType<RHIRenderContext>
 {
 public:
 	RHIRenderContext(core::ResourcePool<RHIRenderContext>& parentPool);
-	virtual ~RHIRenderContext() = default;
+	~RHIRenderContext() override = default;
 
-	virtual void setGlobalConstantBuffer(const RHIBuffer* constantBuffer) = 0;
+	virtual void setConstantBuffers(
+		const RHIBuffer* sceneConstantBuffer,
+		const RHIBuffer* meshInstanceConstantBuffer,
+		const RHIBuffer* objectIdsBuffer) = 0;
+
 	virtual void activateRenderPass(const rendering::KGXRenderPassParameters& renderPassParameters) = 0;
 	virtual void drawMeshRenderObject(const rendering::KGXMeshRenderObject* renderObject) = 0;
 
 	virtual void close() = 0;
 	virtual void execute(bool waitForCompletion) = 0;
 	virtual void reset() = 0;
-
-protected:
-	core::ResourcePool<RHIRenderContext>* mParentPool = nullptr;
 };
 }

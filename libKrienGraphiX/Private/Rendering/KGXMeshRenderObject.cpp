@@ -5,19 +5,21 @@
 #include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 
-namespace
-{
-__declspec(align(256u)) struct ConstantBufferData
-{
-	kgx::math::Matrix4X4 modelMatrix;
-};
-}
-
 namespace kgx::rendering
 {
 KGXMeshRenderObject::KGXMeshRenderObject(const RawMeshData& rawMeshData)
 	: mTransform(1.0), mRawMeshData(rawMeshData)
 {
+}
+
+void KGXMeshRenderObject::setObjectId(uint32_t objectId)
+{
+	mObjectId = objectId;
+}
+
+uint32_t KGXMeshRenderObject::getObjectId() const
+{
+	return mObjectId;
 }
 
 void KGXMeshRenderObject::createRenderResources()
@@ -54,31 +56,10 @@ void KGXMeshRenderObject::createRenderResources()
 	};
 
 	mIndexBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getRenderContext(), indexBufferDesc);
-
-	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
-	RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
-
-	RHI::RHIBufferDescriptor cbDesc
-	{
-		.name = "MeshRenderObjectConstantBuffer",
-		.bufferSize = sizeof(ConstantBufferData),
-		.isBufferAligned = true,
-		.isDynamic = true,
-		.initialData = nullptr,
-		.flags = flags
-	};
-
-	mConstantBuffer = RHI::gPlatformRHI->createBuffer(immediateCommandContext.getRenderContext(), cbDesc);
 }
 
 void KGXMeshRenderObject::updateTransform(const math::Matrix4X4& newTransform)
 {
 	mTransform = newTransform;
-}
-
-void KGXMeshRenderObject::updateConstantBufferData() const
-{
-	ConstantBufferData cbData { getTransform() };
-	memcpy(mConstantBuffer->mappedDataPtr(), &cbData, sizeof(ConstantBufferData));
 }
 }

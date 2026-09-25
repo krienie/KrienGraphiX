@@ -7,7 +7,7 @@
 
 namespace
 {
-__declspec(align(256u)) struct SceneConstantBufferData
+struct SceneConstantBufferData
 {
 	kgx::math::Matrix4X4 viewProjMatrix;
 };
@@ -17,6 +17,7 @@ namespace kgx::rendering
 {
 void KGXRenderScene::addRenderObject(const std::shared_ptr<KGXMeshRenderObject>& renderObject)
 {
+	renderObject->setObjectId(static_cast<uint32_t>(mRenderObjects.size()));
 	mRenderObjects.push_back(renderObject);
 
 	renderObject->createRenderResources();
@@ -49,7 +50,6 @@ RHI::RHIBuffer* KGXRenderScene::getSceneConstantBuffer()
 		return mSceneConstantBuffer.get();
 	}
 
-
 	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
 		RHI::RHIResource::ShaderResource | RHI::RHIResource::ConstantBuffer);
 
@@ -77,5 +77,91 @@ RHI::RHIBuffer* KGXRenderScene::updateAndGetSceneConstantBuffer()
 	constantBuffer->copyBufferData(&uploadData, sizeof(SceneConstantBufferData), true);
 
 	return constantBuffer;
+}
+
+RHI::RHIBuffer* KGXRenderScene::getMeshInstanceConstantBuffer()
+{
+	using namespace kgx;
+
+	const size_t requiredBufferSize = std::max(mRenderObjects.size() * sizeof(MeshInstanceData), sizeof(MeshInstanceData));
+
+	if (mMeshInstanceConstantBuffer && mMeshInstanceConstantBuffer->bufferSize() == requiredBufferSize)
+	{
+		return mMeshInstanceConstantBuffer.get();
+	}
+
+	if (mMeshInstanceConstantBuffer)
+	{
+		// Delete the old buffer after a couple of frames when it is not used anymore
+		core::gRenderThread->enqueueCommand(core::DeferredRenderCommand(core::RenderThread::maxNumBufferedFrames,
+			[oldBuffer = mMeshInstanceConstantBuffer.release()]()
+			{
+				delete oldBuffer;
+			}));
+	}
+
+	constexpr auto flags = static_cast<RHI::RHIResource::CreationFlags>(
+		RHI::RHIResource::ShaderResource | RHI::RHIResource::UnorderedAccess | RHI::RHIResource::ConstantBuffer);
+
+	RHI::RHIBufferDescriptor cbDesc
+	{
+		.name = "MeshInstanceConstantBuffer",
+		.bufferSize = requiredBufferSize,
+		.isBufferAligned = true,
+		.isDynamic = true,
+		.initialData = nullptr,
+		.flags = flags
+	};
+
+	core::FrameCommandContext* frameContext = core::gRenderThread->getCurrentFrameContext();
+	mMeshInstanceConstantBuffer = RHI::gPlatformRHI->createBuffer(frameContext->getRenderContext(), cbDesc);
+
+	return mMeshInstanceConstantBuffer.get();
+}
+
+RHI::RHIBuffer* KGXRenderScene::getObjectIdsBuffer()
+{
+	using namespace kgx;
+
+	const size_t requiredBufferSize = std::max(mRenderObjects.size() * sizeof(uint32_t), sizeof(uint32_t));
+
+	if (mObjectIdsBuffer && mObjectIdsBuffer->bufferSize() == requiredBufferSize)
+	{
+		return mObjectIdsBuffer.get();
+	}
+
+	if (mObjectIdsBuffer)
+	{
+		// Delete the old buffer after a couple of frames when it is not used anymore
+		core::gRenderThread->enqueueCommand(core::DeferredRenderCommand(core::RenderThread::maxNumBufferedFrames,
+			[oldBuffer = mObjectIdsBuffer.release()]()
+			{
+				delete oldBuffer;
+			}));
+	}
+
+	constexpr RHI::RHIResource::CreationFlags flags = RHI::RHIResource::VertexBuffer;
+
+	std::vector<uint32_t> objectIds;
+	objectIds.resize(mRenderObjects.size());
+	for (size_t i = 0; i < mRenderObjects.size(); ++i)
+	{
+		objectIds[i] = mRenderObjects[i]->getObjectId();
+	}
+
+	RHI::RHIBufferDescriptor cbDesc
+	{
+		.name = "ObjectIdsBuffer",
+		.bufferSize = requiredBufferSize,
+		.isBufferAligned = true,
+		.isDynamic = true,
+		.initialData = objectIds.data(),
+		.flags = flags
+	};
+
+	core::FrameCommandContext* frameContext = core::gRenderThread->getCurrentFrameContext();
+	mObjectIdsBuffer = RHI::gPlatformRHI->createBuffer(frameContext->getRenderContext(), cbDesc);
+
+	return mObjectIdsBuffer.get();
 }
 }

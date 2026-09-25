@@ -1,13 +1,17 @@
 
-cbuffer SceneConstants : register(b0)
+struct SceneData
 {
 	column_major float4x4 viewProjMatrix;
-}
+};
 
-cbuffer InstanceConstants : register(b1)
+struct MeshInstanceData
 {
 	column_major float4x4 modelMatrix;
-}
+};
+
+//TODO(KL): Move these buffers to common shader data file that is shared amongst shaders
+ConstantBuffer<SceneData> SceneConstants : register(b0);
+StructuredBuffer<MeshInstanceData> meshInstances : register(t0);
 
 //Texture2D gbuffDiffuseTexture : register(t0);
 //Texture2D gbuffDepthTexture   : register(t1);

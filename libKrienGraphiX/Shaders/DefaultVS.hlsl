@@ -1,18 +1,23 @@
 
-cbuffer SceneConstants : register(b0)
+struct SceneData
 {
-	column_major float4x4 viewProjMatrix;
-}
+	float4x4 viewProjMatrix;
+};
 
-cbuffer InstanceConstants : register(b1)
+struct MeshInstanceData
 {
-	column_major float4x4 modelMatrix;
-}
+	float4x4 modelMatrix;
+};
+
+//TODO(KL): Move these buffers to common shader data file that is shared amongst shaders
+ConstantBuffer<SceneData> sceneConstants : register(b0);
+StructuredBuffer<MeshInstanceData> meshInstances : register(t0);
 
 struct VertexInput
 {
 	float3 position : POSITION;
 	float4 color : COLOR;
+	uint objectID : OBJECT_ID;
 };
 
 struct PixelInput
@@ -25,8 +30,8 @@ PixelInput main(in VertexInput vertexInput)
 {
 	PixelInput output;
 
-	float4x4 mvp = mul(viewProjMatrix, modelMatrix);
-	output.position = mul(mvp, float4(vertexInput.position, 1));
+	float4 worldPos = mul(meshInstances[vertexInput.objectID].modelMatrix, float4(vertexInput.position, 1));
+	output.position = mul(sceneConstants.viewProjMatrix, worldPos);
 	output.color = vertexInput.color;
 
 	return output;

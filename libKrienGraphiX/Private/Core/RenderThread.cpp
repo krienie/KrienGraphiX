@@ -58,6 +58,27 @@ void FrameCommandContext::endFrame() const
 	mFrameFence->queueSignal(mFrameNumber);
 }
 
+DeferredRenderCommand::DeferredRenderCommand(unsigned int numFramesToExecute,
+	CommandThread::ThreadCommand&& deferredCommand)
+		: mNumFramesToExecute(numFramesToExecute), mCommand(std::move(deferredCommand))
+{
+}
+
+void DeferredRenderCommand::operator()()
+{
+	if (mNumFramesToExecute == 0)
+	{
+		KGXLOG_TRACE("DeferredRenderCommand executing");
+		mCommand();
+		return;
+	}
+
+	KGXLOG_TRACE("DeferredRenderCommand {}", mNumFramesToExecute);
+
+	mNumFramesToExecute--;
+	gRenderThread->enqueueCommand(DeferredRenderCommand(mNumFramesToExecute, std::move(mCommand)));
+}
+
 RenderThread::RenderThread()
 	: mCommandThread(std::make_unique<CommandThread>(1)),
 		mShaderCache(nullptr)
@@ -93,6 +114,11 @@ RHI::RHIPlatform* RenderThread::getRHIPlatformPtr() const
 FrameCommandContext* RenderThread::getCurrentFrameContext() const
 {
 	return mFrameResources.back().get();
+}
+
+void RenderThread::enqueueCommand(CommandThread::ThreadCommand&& cmd) const
+{
+	mCommandThread->enqueueCommand(std::forward<CommandThread::ThreadCommand>(cmd));
 }
 
 void RenderThread::nextFrame()

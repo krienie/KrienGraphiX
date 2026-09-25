@@ -3,13 +3,10 @@
 
 #include <Metal/Metal.hpp>
 #include <metal_irconverter.h>
-#include <metal_irconverter_runtime.h>
 #include <Metal/MTLLibrary.hpp>
-#include <Metal/MTL4ArgumentTable.hpp>
 #include <Metal/MTL4LibraryFunctionDescriptor.hpp>
 
 #include "MTLCommandQueue.h"
-#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
 #include "MTLUtils.h"
 #include "Private/Core/RenderThread.h"
@@ -37,7 +34,7 @@ bool MTLShader::create(const CompiledShader& compiledShader, ShaderType type)
 	NS::String* mainEntry = NS::String::string(compiledShader.reflection.mainEntry.c_str(), NS::UTF8StringEncoding);
 	mLibraryFunctionDesc->setName(mainEntry);
 
-	return createArgumentTables(compiledShader);
+	return true;
 }
 
 void MTLShader::setVertexInputLayout(const std::vector<VertexInputElement>& vertexInputLayout)
@@ -53,64 +50,5 @@ MTL::VertexDescriptor* MTLShader::getMTLVertexDescriptor() const
 MTL4::LibraryFunctionDescriptor* MTLShader::getLibraryFunctionDescriptor() const
 {
 	return mLibraryFunctionDesc.get();
-}
-
-//TODO(KL): Move argument table to MTLRenderContext
-MTL4::ArgumentTable* MTLShader::getArgumentTable() const
-{
-	const uint64_t argTableIndex = core::gRenderThread->getBufferedFrameIndex();
-	return mArgumentTables[argTableIndex].get();
-}
-
-void MTLShader::setTopLevelBufferEntries(const std::array<IRDescriptorTableEntry, 2>& bufferEntries) const
-{
-	const size_t entriesByteSize = bufferEntries.size() * sizeof(IRDescriptorTableEntry);
-	const uint64_t bufferIndex = core::gRenderThread->getBufferedFrameIndex();
-
-	if (mTopLevelBuffers[bufferIndex]->length() != entriesByteSize)
-	{
-		//TODO(KL): Temporary crash fix. Will be improved later.
-		return;
-	}
-
-	memcpy(mTopLevelBuffers[bufferIndex]->contents(), bufferEntries.data(), entriesByteSize);
-}
-
-bool MTLShader::createArgumentTables(const CompiledShader& compiledShader)
-{
-	if (compiledShader.reflection.numResources <= 0)
-	{
-		mArgumentTables.resize(core::RenderThread::maxNumBufferedFrames);
-		return true;
-	}
-
-	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
-
-	NS::SharedPtr<MTL4::ArgumentTableDescriptor> argDesc = NS::TransferPtr(
-		MTL4::ArgumentTableDescriptor::alloc()->init());
-	argDesc->setMaxBufferBindCount(7);
-
-	const size_t topLevelBufferSize = compiledShader.reflection.numResources * sizeof(IRDescriptorTableEntry);
-	mTopLevelBuffers.reserve(core::RenderThread::maxNumBufferedFrames);
-	mArgumentTables.reserve(core::RenderThread::maxNumBufferedFrames);
-
-	//TODO(KL): Temporarily added to global residence set
-	auto* mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
-	MTLCommandQueue* mtlCommandQueue = &mtlPlatform->getCommandQueue();
-
-	for (int i = 0; i < core::RenderThread::maxNumBufferedFrames; i++)
-	{
-		mTopLevelBuffers.push_back(NS::TransferPtr(mtlDevice->newBuffer(topLevelBufferSize, MTL::ResourceStorageModeShared)));
-		mtlCommandQueue->addGlobalResidency(mTopLevelBuffers[i].get());
-
-		NS::Error* error = nullptr;
-		mArgumentTables.push_back(NS::TransferPtr(mtlDevice->newArgumentTable(argDesc.get(), &error)));
-		MTLUtils::printIfNSError(error);
-
-		assert(mArgumentTables[i].get() != nullptr);
-		mArgumentTables[i]->setAddress(mTopLevelBuffers[i]->gpuAddress(), kIRArgumentBufferBindPoint);
-	}
-
-	return mArgumentTables.size() == core::RenderThread::maxNumBufferedFrames;
 }
 }
