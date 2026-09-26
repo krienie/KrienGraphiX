@@ -4,8 +4,10 @@
 #include <Metal/MTL4RenderPipeline.hpp>
 
 #include "MTLPixelFormat.h"
+#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
 #include "MTLShader.h"
+#include "Private/Core/RenderThread.h"
 
 namespace kgx::RHI
 {
@@ -41,8 +43,9 @@ bool MTLGraphicsPipelineState::create()
 	}
 
 	psoDesc->setRasterizationEnabled(true);
-	//TODO(KL): Implement MSAA support
-	psoDesc->setRasterSampleCount(1);
+
+	auto mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
+	psoDesc->setRasterSampleCount(mtlPlatform->getMultisampleCount());
 
 	MTLGraphicsDevice* mtlDevice = getMTLRHI()->getMTLDevice();
 	MTL4::Compiler* compiler = mtlDevice->getCompiler();

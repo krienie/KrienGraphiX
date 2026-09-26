@@ -15,8 +15,7 @@ public:
 		DepthStencil = 1 << 4,
 		IndexBuffer = 1 << 5,
 		VertexBuffer = 1 << 6,
-		ConstantBuffer = 1 << 7,
-		Atomic = 1 << 8 // Metal only
+		ConstantBuffer = 1 << 7
 	};
 
 	explicit RHIResource(CreationFlags flags)

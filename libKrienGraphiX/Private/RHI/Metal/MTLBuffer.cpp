@@ -54,12 +54,12 @@ MTLBuffer::MTLBuffer(const RHIBufferDescriptor& descriptor)
 
 	//TODO(KL): For now everything is permanently resident.
 	//Will change for a different system later when scene organisation is more developed.
-	MTLResidencyManager::addGlobalResidency(*this);
+	MTLResidencyManager::addGlobalResidency(mResource.get());
 }
 
 MTLBuffer::~MTLBuffer()
 {
-	MTLResidencyManager::removeGlobalResidency(*this);
+	MTLResidencyManager::removeGlobalResidency(mResource.get());
 }
 
 void* MTLBuffer::getNativeResource() const

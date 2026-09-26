@@ -7,27 +7,23 @@
 
 namespace kgx::RHI
 {
-void MTLResidencyManager::addGlobalResidency(const RHIResource& resource)
+void MTLResidencyManager::addGlobalResidency(const MTL::Allocation* allocation)
 {
-	const auto mtlAllocation = static_cast<MTL::Allocation*>(resource.getNativeResource());
-
-	core::gRenderThread->enqueueCommand([mtlAllocation]()
+	core::gRenderThread->enqueueCommand([allocation]()
 	{
 		auto* mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
 		MTLCommandQueue& mtlCommandQueue = mtlPlatform->getCommandQueue();
-		mtlCommandQueue.addGlobalResidency(mtlAllocation);
+		mtlCommandQueue.addGlobalResidency(allocation);
 	});
 }
 
-void MTLResidencyManager::removeGlobalResidency(const RHIResource& resource)
+void MTLResidencyManager::removeGlobalResidency(const MTL::Allocation* allocation)
 {
-	const auto mtlAllocation = static_cast<MTL::Allocation*>(resource.getNativeResource());
-
-	core::gRenderThread->enqueueCommand([mtlAllocation]()
+	core::gRenderThread->enqueueCommand([allocation]()
 	{
 		auto* mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
 		MTLCommandQueue& mtlCommandQueue = mtlPlatform->getCommandQueue();
-		mtlCommandQueue.removeGlobalResidency(mtlAllocation);
+		mtlCommandQueue.removeGlobalResidency(allocation);
 	});
 }
 }

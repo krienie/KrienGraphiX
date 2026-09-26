@@ -212,9 +212,20 @@ NS::SharedPtr<MTL4::RenderPassDescriptor> MTLRenderContext::toMTLRenderPassDescr
 		}
 
 		MTL::RenderPassColorAttachmentDescriptor* colorAttach = renderPassDescriptor->colorAttachments()->object(i);
-		colorAttach->setTexture(tex2D->getTextureResource());
+
+		if (tex2D->isMultisampled())
+		{
+			colorAttach->setTexture(tex2D->getMultisampledTextureResource());
+			colorAttach->setResolveTexture(tex2D->getTextureResource());
+			colorAttach->setStoreAction(MTL::StoreActionMultisampleResolve);
+		}
+		else
+		{
+			colorAttach->setTexture(tex2D->getTextureResource());
+			colorAttach->setStoreAction(toMTLStoreAction(textureBinding.storeAction));
+		}
+
 		colorAttach->setLoadAction(toMTLLoadAction(textureBinding.loadAction));
-		colorAttach->setStoreAction(toMTLStoreAction(textureBinding.storeAction));
 		colorAttach->setClearColor(toMTLClearColor(textureBinding.clearValue));
 	}
 
@@ -252,8 +263,6 @@ NS::SharedPtr<MTL4::RenderPassDescriptor> MTLRenderContext::toMTLRenderPassDescr
 			renderPassDescriptor->stencilAttachment()->setStoreAction(MTL::StoreActionDontCare);
 		}
 	}*/
-
-	renderPassDescriptor->setDefaultRasterSampleCount(1);
 
 	return renderPassDescriptor;
 }

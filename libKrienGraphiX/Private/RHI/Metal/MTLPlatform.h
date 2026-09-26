@@ -10,7 +10,7 @@ namespace kgx::RHI
 class MTLPlatform : public RHIPlatform
 {
 public:
-	MTLPlatform();
+	MTLPlatform(const class MTLGraphicsDevice* mtlDevice);
 	~MTLPlatform() override;
 
 	void beginFrame(RHIRenderContext* renderContext, const RHITextureHandle& renderTarget) override;
@@ -18,6 +18,8 @@ public:
 
 	[[nodiscard]] MTLCommandQueue& getCommandQueue();
 	[[nodiscard]] MTLCommandAllocator* getCommandAllocator() const;
+
+	[[nodiscard]] unsigned int getMultisampleCount() const;
 
 private:
 	using CommandAllocatorPool = core::ResourcePool<MTLCommandAllocator>;
@@ -28,5 +30,7 @@ private:
 	NS::AutoreleasePool* mAutoReleasePool;
 	MTLCommandQueue mCommandQueue;
 	std::unique_ptr<CommandAllocatorPool> mCommandAllocatorPool;
+
+	unsigned int mMultisampleCount;
 };
 }

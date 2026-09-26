@@ -21,9 +21,14 @@ public:
 	[[nodiscard]] void* getNativeResource() const override;
 
 	[[nodiscard]] MTL::Texture* getTextureResource() const;
+	[[nodiscard]] MTL::Texture* getMultisampledTextureResource() const;
+
+	[[nodiscard]] bool isMultisampled() const;
 
 private:
-	NS::SharedPtr<MTL::Texture> mTextureResource;
+	NS::SharedPtr<MTL::Texture> mTextureResource = nullptr;
+	NS::SharedPtr<MTL::Texture> mMultisampledTextureResource = nullptr;
+	bool mIsMultisampled = false;
 };
 
 DEFINE_RESOURCE_CAST(MTLTexture2D, RHITexture2D)

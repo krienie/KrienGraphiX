@@ -1,13 +1,27 @@
 
 #include "MTLPlatform.h"
 
+#include "MTLGraphicsDevice.h"
 #include "MTLRenderContext.h"
 
 namespace kgx::RHI
 {
-MTLPlatform::MTLPlatform()
-	: mAutoReleasePool(nullptr), mCommandQueue(*this)
+MTLPlatform::MTLPlatform(const MTLGraphicsDevice* mtlDevice)
+	: mAutoReleasePool(nullptr), mCommandQueue(*this), mMultisampleCount(4)
 {
+	if (mtlDevice->getNativeDevice()->supportsTextureSampleCount(4))
+	{
+		mMultisampleCount = 4;
+	}
+	else if (mtlDevice->getNativeDevice()->supportsTextureSampleCount(2))
+	{
+		mMultisampleCount = 2;
+	}
+	else
+	{
+		mMultisampleCount = 1;
+	}
+
 	mCommandAllocatorPool = std::make_unique<CommandAllocatorPool>(5,
 	[](core::ResourcePool<MTLCommandAllocator>& parentPool)
 	{
@@ -50,6 +64,11 @@ MTLCommandQueue& MTLPlatform::getCommandQueue()
 MTLCommandAllocator* MTLPlatform::getCommandAllocator() const
 {
 	return mCommandAllocatorPool->getResource();
+}
+
+unsigned int MTLPlatform::getMultisampleCount() const
+{
+	return mMultisampleCount;
 }
 
 std::unique_ptr<RHIRenderContext> MTLPlatform::createRenderContext(core::ResourcePool<RHIRenderContext>& parentPool) const

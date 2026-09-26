@@ -11,6 +11,8 @@
 
 namespace kgx::RHI
 {
+//TODO(KL): Refactor this so that the RHIRenderHardwareInterface is merged into this class where all the creation functions
+// are stored in a single factory class.
 class RHIPlatform
 {
 public:

@@ -57,7 +57,7 @@ bool MTLSwapChain::create(SDL_Window* window, unsigned int bufferCount, RHIPixel
 			mWidth,
 			mHeight,
 			1,
-			1,
+			mtlPlatform->getMultisampleCount(),
 			flags
 		}
 	};

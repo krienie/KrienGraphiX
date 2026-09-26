@@ -56,10 +56,10 @@ struct RHIClearValue final
 
 struct RHITexture2DDescriptor
 {
-	RHIClearValue clearValue;
-	RHIPixelFormat pixelFormat;
-	unsigned int width;
-	unsigned int height;
+	RHIClearValue clearValue{};
+	RHIPixelFormat pixelFormat = RHIPixelFormat::Unknown;
+	unsigned int width = 1;
+	unsigned int height = 1;
 	unsigned int numMips = 1;
 	unsigned int numSamples = 1;
 	RHIResource::CreationFlags flags = RHIResource::None;
@@ -90,9 +90,7 @@ struct RHIGraphicsPipelineStateDescriptor
 	RHIPrimitiveTopologyType primitiveTopology;
 	unsigned int numRenderTargets;
 	RHIPixelFormat renderTargetFormats[8];
-	//TODO(KL): Implement MSAA support
-	//SampleDesc.Count
-	//SampleDesc.Quality
+	unsigned int numSamples;
 	RHIPixelFormat depthStencilFormat;
 };
 }

@@ -95,6 +95,8 @@ RenderThread::RenderThread()
 	assert(RHI::gPlatformRHI != nullptr && "Error creating RHI!");
 
 	mShaderCache = std::make_unique<rendering::KGXShaderCache>();
+
+	//TODO(KL): Perhaps store the RHIPlatform also in a global variable just like the RHI
 	mRHIPlatform = RHI::gPlatformRHI->createPlatform();
 	mRHIPlatform->init();
 

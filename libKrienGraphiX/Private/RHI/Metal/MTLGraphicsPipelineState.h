@@ -5,12 +5,9 @@
 #include <vector>
 
 #include <Metal/Metal.hpp>
-#include <metal_irconverter_runtime.h>
 #include <Foundation/NSSharedPtr.hpp>
-#include <Metal/MTL4ArgumentTable.hpp>
 #include <Metal/MTLRenderPipeline.hpp>
 
-#include "MTLShader.h"
 #include "Private/RHI/RHIGraphicsPipelineState.h"
 #include "Private/RHI/RHIUtils.h"
 

@@ -32,7 +32,7 @@ MTLRenderHardwareInterface::~MTLRenderHardwareInterface()
 
 std::unique_ptr<RHIPlatform> MTLRenderHardwareInterface::createPlatform() const
 {
-	return std::make_unique<MTLPlatform>();
+	return std::make_unique<MTLPlatform>(mGraphicsDevice.get());
 }
 
 std::unique_ptr<RHISwapChain> MTLRenderHardwareInterface::createSwapChain(
