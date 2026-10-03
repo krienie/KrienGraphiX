@@ -46,7 +46,7 @@ void FrameTimer::timerTick() const
 	do
 	{
 		const uint64_t currentFrameTime = SDL_GetTicksNS();
-		const float deltaTime = static_cast<float>(currentFrameTime - prevFrameTime) / static_cast<float>(nsPerFrame);
+		const float deltaTime = static_cast<float>(static_cast<double>(currentFrameTime - prevFrameTime) / static_cast<double>(nsPerSecond));
 		prevFrameTime = currentFrameTime;
 
 		mOnFrameTickEvent(deltaTime);
@@ -54,7 +54,6 @@ void FrameTimer::timerTick() const
 		const uint64_t now = SDL_GetTicksNS();
 		if (now < nextFrameTime)
 		{
-
 			SDL_DelayPrecise(nextFrameTime - now);
 		}
 
