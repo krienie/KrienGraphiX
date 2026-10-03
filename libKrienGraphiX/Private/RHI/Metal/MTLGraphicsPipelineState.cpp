@@ -7,6 +7,7 @@
 #include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
 #include "MTLShader.h"
+#include "MTLUtils.h"
 #include "Private/Core/RenderThread.h"
 
 namespace kgx::RHI
@@ -50,9 +51,10 @@ bool MTLGraphicsPipelineState::create()
 	MTLGraphicsDevice* mtlDevice = getMTLRHI()->getMTLDevice();
 	MTL4::Compiler* compiler = mtlDevice->getCompiler();
 
-	NS::Error* pError = nullptr;
-	mRenderPipelineState = NS::TransferPtr(compiler->newRenderPipelineState(psoDesc.get(), nullptr, &pError));
+	NS::Error* error = nullptr;
+	mRenderPipelineState = NS::TransferPtr(compiler->newRenderPipelineState(psoDesc.get(), nullptr, &error));
 
+	MTLUtils::printIfNSError(error);
 	return true;
 }
 

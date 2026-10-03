@@ -2,6 +2,7 @@
 #pragma once
 #include <memory>
 
+#include "KrienGraphiX/Core/KGXDefinitions.h"
 #include "KrienGraphiX/Math/MathDefines.h"
 #include "Private/RHI/RHIBuffer.h"
 
@@ -12,21 +13,9 @@ struct MeshInstanceData
 	math::Matrix4X4 modelMatrix;
 };
 
-struct Vertex
-{
-	math::Vector3 Pos;
-	math::Vector4 Color;
-};
-
 class KGXMeshRenderObject
 {
 public:
-	struct RawMeshData
-	{
-		std::vector<Vertex> vertices;
-		std::vector<std::uint16_t> indices;
-	};
-
 	KGXMeshRenderObject(const RawMeshData& rawMeshData);
 	~KGXMeshRenderObject() = default;
 

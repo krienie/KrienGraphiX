@@ -42,17 +42,17 @@ rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInter
 {
 	using namespace kgx::rendering;
 
-	KGXMeshRenderObject::RawMeshData meshData;
+	RawMeshData meshData;
 	meshData.vertices = 
 	{
-		Vertex({.Pos = math::Vector3(-1.0f, -1.0f, -1.0f), .Color = math::Vector4(1, 1, 1, 1) }),
-		Vertex({.Pos = math::Vector3(-1.0f, +1.0f, -1.0f), .Color = math::Vector4(0, 0, 0, 1) }),
-		Vertex({.Pos = math::Vector3(+1.0f, +1.0f, -1.0f), .Color = math::Vector4(1, 0, 0, 1) }),
-		Vertex({.Pos = math::Vector3(+1.0f, -1.0f, -1.0f), .Color = math::Vector4(0, 1, 0, 1) }),
-		Vertex({.Pos = math::Vector3(-1.0f, -1.0f, +1.0f), .Color = math::Vector4(0, 0, 1, 1) }),
-		Vertex({.Pos = math::Vector3(-1.0f, +1.0f, +1.0f), .Color = math::Vector4(1, 1, 0, 1) }),
-		Vertex({.Pos = math::Vector3(+1.0f, +1.0f, +1.0f), .Color = math::Vector4(0, 1, 1, 1) }),
-		Vertex({.Pos = math::Vector3(+1.0f, -1.0f, +1.0f), .Color = math::Vector4(1, 0, 1, 1) })
+		Vertex({.Position = math::Vector3(-1.0f, -1.0f, -1.0f), .Color = math::Vector4(1, 1, 1, 1) }),
+		Vertex({.Position = math::Vector3(-1.0f, +1.0f, -1.0f), .Color = math::Vector4(0, 0, 0, 1) }),
+		Vertex({.Position = math::Vector3(+1.0f, +1.0f, -1.0f), .Color = math::Vector4(1, 0, 0, 1) }),
+		Vertex({.Position = math::Vector3(+1.0f, -1.0f, -1.0f), .Color = math::Vector4(0, 1, 0, 1) }),
+		Vertex({.Position = math::Vector3(-1.0f, -1.0f, +1.0f), .Color = math::Vector4(0, 0, 1, 1) }),
+		Vertex({.Position = math::Vector3(-1.0f, +1.0f, +1.0f), .Color = math::Vector4(1, 1, 0, 1) }),
+		Vertex({.Position = math::Vector3(+1.0f, +1.0f, +1.0f), .Color = math::Vector4(0, 1, 1, 1) }),
+		Vertex({.Position = math::Vector3(+1.0f, -1.0f, +1.0f), .Color = math::Vector4(1, 0, 1, 1) })
 	};
 
 	meshData.indices =
@@ -83,5 +83,20 @@ rendering::KGXMeshRenderObject* KGXBoxMeshComponent::createMeshRenderObjectInter
 	};
 
 	return new KGXMeshRenderObject(meshData);
+}
+
+KGXCustomMeshComponent::KGXCustomMeshComponent(KGXSceneObject* owner, const RawMeshData& meshData)
+	: KGXMeshComponent(owner), mMeshData(meshData)
+{
+}
+
+rendering::KGXMeshRenderObject* KGXCustomMeshComponent::createMeshRenderObjectInternal()
+{
+	if (mMeshData.vertices.empty() || mMeshData.indices.empty())
+	{
+		return nullptr;
+	}
+
+	return new rendering::KGXMeshRenderObject(mMeshData);
 }
 }

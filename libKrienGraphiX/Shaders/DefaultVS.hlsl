@@ -16,6 +16,8 @@ StructuredBuffer<MeshInstanceData> meshInstances : register(t0);
 struct VertexInput
 {
 	float3 position : POSITION;
+	float3 normal : NORMAL;
+	float2 uvcoord : TEXCOORD;
 	float4 color : COLOR;
 	uint objectID : OBJECT_ID;
 };

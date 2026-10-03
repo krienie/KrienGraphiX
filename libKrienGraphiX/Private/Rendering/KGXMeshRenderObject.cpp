@@ -28,7 +28,7 @@ void KGXMeshRenderObject::createRenderResources()
 	KGXLOG_INFO("Creating KGXMeshRenderObject");
 
 	const unsigned int vbByteSize = static_cast<unsigned int>(mRawMeshData.vertices.size()) * sizeof(Vertex);
-	const unsigned int ibByteSize = static_cast<unsigned int>(mRawMeshData.indices.size()) * sizeof(std::uint16_t);
+	const unsigned int ibByteSize = static_cast<unsigned int>(mRawMeshData.indices.size()) * sizeof(std::uint32_t);
 
 	core::ImmediateCommandContext immediateCommandContext;
 
@@ -50,7 +50,6 @@ void KGXMeshRenderObject::createRenderResources()
 		.bufferSize = ibByteSize,
 		.isBufferAligned = false,
 		.isDynamic = false,
-		
 		.initialData = mRawMeshData.indices.data(),
 		.flags = RHI::RHIResource::CreationFlags::IndexBuffer
 	};

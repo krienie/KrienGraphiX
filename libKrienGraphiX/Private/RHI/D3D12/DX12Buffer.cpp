@@ -141,7 +141,7 @@ DX12Buffer::DX12Buffer(DX12GraphicsCommandList* commandList, const RHIBufferDesc
 	{
 		mIndexBufferView.BufferLocation = mBufferDXResource->getResource()->GetGPUVirtualAddress();
 		mIndexBufferView.SizeInBytes = static_cast<UINT>(bufferSize());
-		mIndexBufferView.Format = DXGI_FORMAT_R16_UINT;
+		mIndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	}
 	else if (hasFlag(descriptor.flags, RHIResource::VertexBuffer))
 	{

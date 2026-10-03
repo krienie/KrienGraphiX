@@ -157,7 +157,7 @@ void MTLRenderContext::drawMeshRenderObject(const rendering::KGXMeshRenderObject
 	mEncoder->drawIndexedPrimitives(
 		MTL::PrimitiveTypeTriangle,
 		renderObject->getNumIndices(),
-		MTL::IndexTypeUInt16,
+		MTL::IndexTypeUInt32,
 		indexBuffer->getGPUAddress(),
 		indexBuffer->bufferSize(),
 		1,

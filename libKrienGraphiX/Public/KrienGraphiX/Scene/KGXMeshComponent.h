@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "KGXSceneObjectComponent.h"
+#include "KrienGraphiX/Core/KGXDefinitions.h"
 
 namespace kgx
 {
@@ -45,5 +46,17 @@ public:
 
 private:
 	rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
+};
+
+class KGXCustomMeshComponent : public KGXMeshComponent
+{
+public:
+	KGXCustomMeshComponent(KGXSceneObject *owner, const RawMeshData& meshData);
+	~KGXCustomMeshComponent() override = default;
+
+private:
+	rendering::KGXMeshRenderObject* createMeshRenderObjectInternal() override;
+
+	RawMeshData mMeshData;
 };
 }
