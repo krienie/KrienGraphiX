@@ -37,21 +37,21 @@ void KGXSceneObjectComponent::update(float deltaTime)
 	mHasTransformChanged = false;
 }
 
-void KGXSceneObjectComponent::setPosition(float xPos, float yPos, float zPos)
+void KGXSceneObjectComponent::setPosition(const math::Vector3& position)
 {
-	mTransform.setTranslation(xPos, yPos, zPos);
+	mTransform.setTranslation(position);
 	mHasTransformChanged = true;
 }
 
-void KGXSceneObjectComponent::setRotation(float pitch, float yaw, float roll)
+void KGXSceneObjectComponent::setRotation(const math::Quaternion& rotation)
 {
-	mTransform.setRotation(pitch, yaw, roll);
+	mTransform.setRotation(rotation);
 	mHasTransformChanged = true;
 }
 
-void KGXSceneObjectComponent::setScale(float xScale, float yScale, float zScale)
+void KGXSceneObjectComponent::setScale(const math::Vector3& scale)
 {
-	mTransform.setScale(xScale, yScale, zScale);
+	mTransform.setScale(scale);
 	mHasTransformChanged = true;
 }
 

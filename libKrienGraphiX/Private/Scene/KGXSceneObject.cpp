@@ -25,21 +25,21 @@ core::KGXScene* KGXSceneObject::getParentScene() const
 	return mParentScene;
 }
 
-void KGXSceneObject::setPosition(float xPos, float yPos, float zPos)
+void KGXSceneObject::setPosition(const math::Vector3& position)
 {
-	mTransform.setTranslation(xPos, yPos, zPos);
+	mTransform.setTranslation(position);
 	mHasTransformChanged = true;
 }
 
-void KGXSceneObject::setRotation(float pitch, float yaw, float roll)
+void KGXSceneObject::setRotation(const math::Quaternion& rotation)
 {
-	mTransform.setRotation(pitch, yaw, roll);
+	mTransform.setRotation(rotation);
 	mHasTransformChanged = true;
 }
 
-void KGXSceneObject::setScale(float xScale, float yScale, float zScale)
+void KGXSceneObject::setScale(const math::Vector3& scale)
 {
-	mTransform.setScale(xScale, yScale, zScale);
+	mTransform.setScale(scale);
 	mHasTransformChanged = true;
 }
 
@@ -97,7 +97,7 @@ KGXCameraObject::KGXCameraObject(const std::string& name)
 	constexpr float aspectRatio = 1024.0f / 768.0f;
 	constexpr float near = 0.001f;
 	constexpr float far = 5000.0f;
-	constexpr math::Vector3 eye(5, 5, 5);
+	constexpr math::Vector3 eye(0, -10, 2);
 	constexpr math::Vector3 target(0, 0, 0);
 	constexpr math::Vector3 up(0, 0, 1);
 	mCameraComponent = addNewComponent<KGXCameraComponent>(fov, aspectRatio, near, far, eye, target, up);

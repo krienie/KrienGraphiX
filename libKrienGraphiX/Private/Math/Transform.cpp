@@ -19,32 +19,8 @@ kgx::math::Matrix4X4 makeTransformMatrix(const kgx::math::Quaternion& rotQuat, c
 namespace kgx::math
 {
 Transform::Transform()
-	: mRotation(1.0f, 0, 0, 0), mTranslation(0, 0, 0), mScale(1, 1, 1),
-	mPitch(0), mYaw(0), mRoll(0)
+	: mRotation(1.0f, 0, 0, 0), mTranslation(0, 0, 0), mScale(1, 1, 1)
 {
-}
-
-void Transform::setTranslation(float xPos, float yPos, float zPos)
-{
-	mTranslation.x = xPos;
-	mTranslation.y = yPos;
-	mTranslation.z = zPos;
-}
-
-void Transform::setRotation(float pitch, float yaw, float roll)
-{
-	mRotation = Quaternion(Vector3(pitch, yaw, roll));
-
-	mPitch = pitch;
-	mYaw = yaw;
-	mRoll = roll;
-}
-
-void Transform::setScale(float xScale, float yScale, float zScale)
-{
-	mScale.x = xScale;
-	mScale.y = yScale;
-	mScale.z = zScale;
 }
 
 Matrix4X4 Transform::getMatrix() const
@@ -58,18 +34,48 @@ Matrix4X4 Transform::getInverseTransposeMatrix() const
 	return glm::transpose(glm::inverse(transMat));
 }
 
+void Transform::setTranslation(const Vector3& translation)
+{
+	mTranslation = translation;
+}
+
+void Transform::setRotation(const Quaternion& rotation)
+{
+	mRotation = rotation;
+}
+
+void Transform::setScale(const Vector3& scale)
+{
+	mScale = scale;
+}
+
+Vector3 Transform::getTranslation() const
+{
+	return mTranslation;
+}
+
+Quaternion Transform::getRotation() const
+{
+	return mRotation;
+}
+
+Vector3 Transform::getScale() const
+{
+	return mScale;
+}
+
 float Transform::getPitch() const
 {
-	return mPitch;
+	return pitch(mRotation);
 }
 
 float Transform::getYaw() const
 {
-	return mYaw;
+	return yaw(mRotation);
 }
 
 float Transform::getRoll() const
 {
-	return mRoll;
+	return roll(mRotation);
 }
 }

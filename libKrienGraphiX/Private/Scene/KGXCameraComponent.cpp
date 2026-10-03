@@ -100,7 +100,7 @@ void KGXCameraComponent::moveLeft(float dist)
 void KGXCameraComponent::moveRight(float dist)
 {
 	const math::Vector3 dirVect = mTarget - mEye;
-	const math::Vector3 rightVect = glm::normalize(glm::cross(dirVect, mCamUp));
+	const math::Vector3 rightVect = glm::normalize(glm::cross(mCamUp, dirVect));
 	translate(rightVect * dist);
 }
 

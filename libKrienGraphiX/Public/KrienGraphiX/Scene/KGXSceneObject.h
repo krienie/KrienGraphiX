@@ -28,19 +28,15 @@ public:
 	virtual ~KGXSceneObject() = default;
 
 	[[nodiscard]] core::KGXScene* getParentScene() const;
-	void setPosition(float xPos, float yPos, float zPos);
-	void setRotation(float pitch, float yaw, float roll);
-	void setScale(float xScale, float yScale, float zScale);
+	void setPosition(const math::Vector3& position);
+	void setRotation(const math::Quaternion& rotation);
+	void setScale(const math::Vector3& scale);
 
 	[[nodiscard]] bool hasTransformChangedThisFrame() const { return mHasTransformChanged; }
 
-	[[nodiscard]]
-	std::string getName() const;
-
-	const math::Transform& getTransform() const;
-
-	[[nodiscard]]
-	math::Matrix4X4 getWorldTransform() const;
+	[[nodiscard]] std::string getName() const;
+	[[nodiscard]] const math::Transform& getTransform() const;
+	[[nodiscard]] math::Matrix4X4 getWorldTransform() const;
 
 	template<class Comp,
 				std::enable_if_t<std::is_base_of_v<KGXSceneObjectComponent, Comp>, int> = 0,
@@ -55,8 +51,7 @@ public:
 
 	void update(float deltaTime);
 
-	[[nodiscard]]
-	std::vector<std::shared_ptr<KGXSceneObjectComponent>> getComponents() const;
+	[[nodiscard]] std::vector<std::shared_ptr<KGXSceneObjectComponent>> getComponents() const;
 
 private:
 	virtual void updateImpl([[maybe_unused]] float deltaTime) {}

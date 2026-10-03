@@ -20,9 +20,9 @@ public:
 	void initialize();
 	void update([[maybe_unused]] float deltaTime);
 
-	void setPosition(float xPos, float yPos, float zPos);
-	void setRotation(float pitch, float yaw, float roll);
-	void setScale(float xScale, float yScale, float zScale);
+	void setPosition(const math::Vector3& position);
+	void setRotation(const math::Quaternion& rotation);
+	void setScale(const math::Vector3& scale);
 
 	[[nodiscard]] math::Matrix4X4 getRelativeTransform() const;
 	[[nodiscard]] math::Matrix4X4 getWorldTransform() const;

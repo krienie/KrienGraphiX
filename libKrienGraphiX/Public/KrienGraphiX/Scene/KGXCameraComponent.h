@@ -17,16 +17,16 @@ public:
 			const math::Vector3 &up = math::Vector3(0.0f, 1.0f, 0.0f));
 	~KGXCameraComponent() override = default;
 
-	const math::Matrix4X4& getProjMatrix() const;
-	const math::Matrix4X4& getViewMatrix() const;
-	const math::Matrix4X4& getViewProjMatrix() const;
-	const math::Vector3& getEye() const;
-	const math::Vector3& getTarget() const;
-	const math::Vector3& getUp() const;
-	float getFOV() const;
-	float getAspectRatio() const;
-	float getNearZ() const;
-	float getFarZ() const;
+	[[nodiscard]] const math::Matrix4X4& getProjMatrix() const;
+	[[nodiscard]] const math::Matrix4X4& getViewMatrix() const;
+	[[nodiscard]] const math::Matrix4X4& getViewProjMatrix() const;
+	[[nodiscard]] const math::Vector3& getEye() const;
+	[[nodiscard]] const math::Vector3& getTarget() const;
+	[[nodiscard]] const math::Vector3& getUp() const;
+	[[nodiscard]] float getFOV() const;
+	[[nodiscard]] float getAspectRatio() const;
+	[[nodiscard]] float getNearZ() const;
+	[[nodiscard]] float getFarZ() const;
 
 	//TODO(KL): Al deze bewegings dingen kunnen in een MovementComponent worden gezet.
 	void lookAt(const math::Vector3 &eye, const math::Vector3 &target, const math::Vector3 &up);

@@ -29,6 +29,8 @@ private:
 	std::unique_ptr<KrienGraphiXEngine> mKgxEngine;
 	std::unique_ptr<kgx::KGXBoxObject> mBoxObject;
 	std::unique_ptr<kgx::KGXBoxObject> mBoxObject2;
+	std::shared_ptr<kgx::KGXSceneObject> mFBXSceneObject;
+
 	std::unique_ptr<kgx::KGXCameraObject> mCameraObject;
 };
 }

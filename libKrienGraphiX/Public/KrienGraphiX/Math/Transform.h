@@ -11,27 +11,26 @@ public:
 	Transform();
 	~Transform() = default;
 
-	void setTranslation(float xPos, float yPos, float zPos);
-	void setRotation(float pitch, float yaw, float roll);
-	void setScale(float xScale, float yScale, float zScale);
-
 	[[nodiscard]]
 	Matrix4X4 getMatrix() const;
 
 	[[nodiscard]]
 	Matrix4X4 getInverseTransposeMatrix() const;
 
-	float getPitch() const;
-	float getYaw() const;
-	float getRoll() const;
+	void setTranslation(const Vector3& translation);
+	void setRotation(const Quaternion& rotation);
+	void setScale(const Vector3& scale);
+	[[nodiscard]] Vector3 getTranslation() const;
+	[[nodiscard]] Quaternion getRotation() const;
+	[[nodiscard]] Vector3 getScale() const;
+
+	[[nodiscard]] float getPitch() const;
+	[[nodiscard]] float getYaw() const;
+	[[nodiscard]] float getRoll() const;
 
 private:
 	Quaternion mRotation;
 	Vector3 mTranslation;
 	Vector3 mScale;
-
-	float mPitch;
-	float mYaw;
-	float mRoll;
 };
 }

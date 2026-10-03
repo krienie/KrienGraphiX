@@ -1,6 +1,9 @@
 
 #include "KGToolbox.h"
 
+#include "KrienGraphiX/Core/Logging.h"
+#include "KrienGraphiX/Scene/KGXAssetLoader.h"
+
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -9,7 +12,6 @@
 #include <iostream>
 #include <string>
 
-#include "KrienGraphiX/Core/Logging.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
@@ -33,7 +35,6 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 		KGXLOG_CRITICAL("SDL_Init failed: {}", SDL_GetError());
 		return;
 	}
-
 	SDL_WindowFlags windowFlags = SDL_WINDOW_RESIZABLE;
 #ifdef __APPLE__
 	windowFlags |= SDL_WINDOW_METAL;
@@ -48,20 +49,45 @@ KGToolboxApp::KGToolboxApp(int initialWindowWidth, int initialWindowHeight)
 	mBoxObject = std::make_unique<kgx::KGXBoxObject>("BoxObject");
 
 	mBoxObject2 = std::make_unique<kgx::KGXBoxObject>("BoxObject2");
-	mBoxObject2->setPosition(4.0, 0, 0);
-	
+	mBoxObject2->setPosition(kgx::math::Vector3(4.0, 10, 0));
+
+	//TODO(KL): Provide a standard directory or some other way to register where to find models
+	mFBXSceneObject = kgx::core::KGXAssetLoader::loadFromFile("/Users/krien/Projects/Models/jerrycan_ucuwaddfa_low/Jerrycan_ucuwaddfa_Low.fbx");
+
+	mFBXSceneObject->setPosition(kgx::math::Vector3(0, 20, 5));
+	mFBXSceneObject->setRotation(glm::quat(glm::vec3(glm::radians(90.0f), 0, 0)));
+	mFBXSceneObject->setScale(glm::vec3(0.25f));
+
 	mKgxEngine->setSceneUpdateDelegate([this]([[maybe_unused]] float deltaTime)
 	{
-		const float newRoll = std::fmodf(mBoxObject->getTransform().getRoll() + (deltaTime / 40.0f), glm::two_pi<float>());
-		mBoxObject->setRotation(0, 0, newRoll);
+		{
+			const glm::quat quatRotation = mBoxObject->getTransform().getRotation();
+			constexpr float rotationSpeed = glm::radians(45.0f);
+			glm::quat newRotation = glm::rotate(quatRotation, rotationSpeed * deltaTime, glm::vec3(0.0f, 0.0f, 1.0f));
+			mBoxObject->setRotation(glm::normalize(newRotation));
+		}
 
-		const float newYaw2 = std::fmodf(mBoxObject2->getTransform().getYaw() + (deltaTime / 20.0f), glm::two_pi<float>());
-		mBoxObject2->setRotation(0, newYaw2, 0);
+		{
+			const glm::quat quatRotation = mBoxObject2->getTransform().getRotation();
+			constexpr float rotationSpeed = glm::radians(22.5f);
+			glm::quat newRotation = glm::rotate(quatRotation, rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 1.0f));
+			mBoxObject2->setRotation(glm::normalize(newRotation));
+		}
+
+		if (mFBXSceneObject)
+		{
+			const glm::quat quatRotation = mFBXSceneObject->getTransform().getRotation();
+			constexpr float rotationSpeed = glm::radians(22.5f);
+			glm::quat newRotation = glm::rotate(quatRotation, rotationSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+			mFBXSceneObject->setRotation(glm::normalize(newRotation));
+		}
 	});
 }
 
 int KGToolboxApp::run()
 {
+	constexpr float cameraMovementSpeed = 1.0f;
+
 	bool running = true;
 	while (running)
 	{
@@ -77,6 +103,22 @@ int KGToolboxApp::run()
 				if (event.key.scancode == SDL_SCANCODE_ESCAPE)
 				{
 					running = false;
+				}
+				else if (event.key.scancode == SDL_SCANCODE_W)
+				{
+					mCameraObject->getCamera()->moveForward(cameraMovementSpeed);
+				}
+				else if (event.key.scancode == SDL_SCANCODE_S)
+				{
+					mCameraObject->getCamera()->moveBackward(cameraMovementSpeed);
+				}
+				else if (event.key.scancode == SDL_SCANCODE_A)
+				{
+					mCameraObject->getCamera()->moveLeft(cameraMovementSpeed);
+				}
+				else if (event.key.scancode == SDL_SCANCODE_D)
+				{
+					mCameraObject->getCamera()->moveRight(cameraMovementSpeed);
 				}
 			}
 		}
@@ -97,6 +139,7 @@ void KGToolboxApp::shutdown()
 {
 	mBoxObject.reset();
 	mBoxObject2.reset();
+	mFBXSceneObject.reset();
 	mKgxEngine.reset();
 }
 }
