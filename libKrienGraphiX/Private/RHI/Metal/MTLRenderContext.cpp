@@ -113,6 +113,7 @@ void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParamete
 
 	mEncoder->setFrontFacingWinding(MTL::WindingClockwise);
 	mEncoder->setCullMode(MTL::CullModeBack);
+	mEncoder->setTriangleFillMode(MTL::TriangleFillMode::TriangleFillModeLines);
 
 	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
 	mEncoder->setRenderPipelineState(activePSO->getPSO());
