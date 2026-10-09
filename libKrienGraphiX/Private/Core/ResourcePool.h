@@ -62,7 +62,9 @@ public:
 			return static_cast<ResourceType*>(resource);
 		}
 
-		return addNewResource();
+		auto newResource = addNewResource();
+		mAvailable.pop_back();
+		return newResource;
 	}
 
 	void returnResource(PooledType<ResourceType>* resource)
