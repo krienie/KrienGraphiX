@@ -147,11 +147,6 @@ void RenderThread::shutdown()
 			mFrameResources.swap(emptyQueue);
 		}
 
-		for (int i = 0; i < mFrameResources.size(); ++i)
-		{
-			mFrameResources.pop();
-		}
-
 		mRHIPlatform.reset();
 		mFrameFence.reset();
 		RHI::gPlatformRHI.reset();
