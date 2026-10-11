@@ -8,16 +8,16 @@ namespace kgx::rendering
 {
 class KGXRenderScene;
 
-class KGXRenderCommandContext
+class KGXRenderCommandContext final
 {
 public:
 	KGXRenderCommandContext(core::FrameCommandContext& frameContext);
 
 	void addRenderPass(const KGXRenderPassParameters& renderPassParameters);
-	void runPasses();
+	void runPasses() const;
 
 private:
-	void executeRenderPass(const KGXRenderPassParameters& renderPassParameters);
+	void executeRenderPass(const KGXRenderPassParameters& renderPassParameters) const;
 
 	std::vector<KGXRenderPassParameters> mRenderPasses;
 

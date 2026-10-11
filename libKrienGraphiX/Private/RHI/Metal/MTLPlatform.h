@@ -8,7 +8,7 @@
 
 namespace kgx::RHI
 {
-class MTLPlatform : public RHIPlatform
+class MTLPlatform final : public RHIPlatform
 {
 public:
 	MTLPlatform(const class MTLGraphicsDevice* mtlDevice);

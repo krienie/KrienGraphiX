@@ -6,7 +6,7 @@
 
 namespace kgx::rendering
 {
-class KGXRenderer
+class KGXRenderer final
 {
 public:
 	KGXRenderer(
@@ -15,7 +15,7 @@ public:
 		const RHI::RHITextureHandle& DepthStencil);
 	~KGXRenderer() = default;
 
-	void RenderFrame();
+	void RenderFrame() const;
 
 private:
 	core::KGXViewport mViewport;

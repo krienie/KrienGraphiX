@@ -14,7 +14,7 @@ struct MeshTransformUpdateParams
 	math::Matrix4X4 transform;
 };
 
-class KGXRenderScene
+class KGXRenderScene final
 {
 public:
 	KGXRenderScene() = default;

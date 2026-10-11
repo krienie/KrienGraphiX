@@ -8,7 +8,7 @@
 
 namespace kgx::RHI
 {
-class MTLGraphicsDevice
+class MTLGraphicsDevice final
 {
 public:
 	MTLGraphicsDevice();

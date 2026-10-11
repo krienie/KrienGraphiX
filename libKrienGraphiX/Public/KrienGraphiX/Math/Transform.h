@@ -5,7 +5,7 @@
 
 namespace kgx::math
 {
-class Transform
+class Transform final
 {
 public:
 	Transform();

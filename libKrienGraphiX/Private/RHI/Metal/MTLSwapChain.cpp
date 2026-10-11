@@ -52,13 +52,13 @@ bool MTLSwapChain::create(SDL_Window* window, unsigned int bufferCount, RHIPixel
 	const MTLTexture2DDescriptor textureDesc =
 	{
 		{
-			{0, 0, 0, 0},
-			pixelFormat,
-			mWidth,
-			mHeight,
-			1,
-			mtlPlatform->getMultisampleCount(),
-			flags
+			.clearValue = {0, 0, 0, 0},
+			.pixelFormat = pixelFormat,
+			.width = mWidth,
+			.height = mHeight,
+			.numMips = 1,
+			.numSamples = mtlPlatform->getMultisampleCount(),
+			.flags = flags
 		}
 	};
 

@@ -7,7 +7,7 @@
 
 namespace kgx
 {
-class KGXCameraComponent : public KGXSceneObjectComponent
+class KGXCameraComponent final : public KGXSceneObjectComponent
 {
 public:
 	KGXCameraComponent(KGXSceneObject *owner, const math::Vector3 &eye, const math::Vector3 &target, const math::Vector3 &up);

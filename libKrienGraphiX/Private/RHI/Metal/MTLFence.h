@@ -12,7 +12,7 @@ namespace kgx::RHI
 class MTLPlatform;
 class MTLCommandQueue;
 
-class MTLFence : public RHIFence
+class MTLFence final : public RHIFence
 {
 public:
 	MTLFence(MTLPlatform& platform);

@@ -1,7 +1,6 @@
 
 #include "KGXRenderCommandContext.h"
 
-#include "KGXDrawPackage.h"
 #include "KGXRenderPass.h"
 #include "KGXRenderScene.h"
 #include "Private/Core/RenderCore.h"
@@ -19,7 +18,7 @@ void KGXRenderCommandContext::addRenderPass(const KGXRenderPassParameters& rende
 	mRenderPasses.push_back(renderPassParameters);
 }
 
-void KGXRenderCommandContext::runPasses()
+void KGXRenderCommandContext::runPasses() const
 {
 	if (mRenderPasses.empty())
 	{
@@ -38,7 +37,7 @@ void KGXRenderCommandContext::runPasses()
 	}
 }
 
-void KGXRenderCommandContext::executeRenderPass(const KGXRenderPassParameters& renderPassParameters)
+void KGXRenderCommandContext::executeRenderPass(const KGXRenderPassParameters& renderPassParameters) const
 {
 	mFrameContext.getRenderContext()->activateRenderPass(renderPassParameters);
 

@@ -12,7 +12,7 @@
 
 namespace kgx::RHI
 {
-class MTLTexture2D : public RHITexture2D
+class MTLTexture2D final : public RHITexture2D
 {
 public:
 	MTLTexture2D(const MTLTexture2DDescriptor& descriptor);

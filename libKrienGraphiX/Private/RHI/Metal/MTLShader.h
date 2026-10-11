@@ -12,7 +12,7 @@
 
 namespace kgx::RHI
 {
-class MTLShader : public RHIShader
+class MTLShader final : public RHIShader
 {
 public:
 	MTLShader() = default;

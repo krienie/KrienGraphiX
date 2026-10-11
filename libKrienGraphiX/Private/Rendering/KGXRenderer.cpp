@@ -4,11 +4,9 @@
 #include <array>
 #include <filesystem>
 
-#include "KGXDrawPackage.h"
 #include "KGXRenderCommandContext.h"
 #include "KGXRenderPass.h"
 #include "KrienGraphiX/Core/Logging.h"
-#include "Private/Core/RenderCore.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "Private/RHI/RHIDefinitions.h"
 #include "Private/RHI/RHIGraphicsPipelineState.h"
@@ -123,7 +121,7 @@ KGXRenderer::KGXRenderer(
 {
 }
 
-void KGXRenderer::RenderFrame()
+void KGXRenderer::RenderFrame() const
 {
 	KGXLOG_TRACE("Starting RenderFrame");
 

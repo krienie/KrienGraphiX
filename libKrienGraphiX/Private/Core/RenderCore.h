@@ -5,8 +5,6 @@
 
 #include <SDL3/SDL.h>
 
-#include "CommandThread.h"
-#include "RenderThread.h"
 #include "FrameTimer.h"
 #include "Logger.h"
 #include "Private/Scene/KGXScene.h"

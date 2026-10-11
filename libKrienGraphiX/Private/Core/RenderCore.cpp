@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+#include "RenderThread.h"
 #include "RenderWindow.h"
 
 #include "KrienGraphiX/Core/Logging.h"

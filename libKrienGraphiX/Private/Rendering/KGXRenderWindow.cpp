@@ -4,8 +4,7 @@
 #include "KGXRenderer.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 #include "Private/Core/RenderCore.h"
-
-using namespace kgx::core;
+#include "Private/Core/RenderThread.h"
 
 namespace kgx::rendering
 {

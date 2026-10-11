@@ -26,7 +26,7 @@ namespace kgx::RHI
 {
 class MTLCommandAllocator;
 
-class MTLRenderContext : public RHIRenderContext
+class MTLRenderContext final : public RHIRenderContext
 {
 public:
 	MTLRenderContext(core::ResourcePool<RHIRenderContext>& parentPool, MTLPlatform& platform);

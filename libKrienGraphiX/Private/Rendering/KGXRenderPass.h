@@ -45,7 +45,7 @@ enum class DepthComparisonFunction : uint8_t
 	Always
 };
 
-struct DepthStencilBinding
+struct DepthStencilBinding final
 {
 	TextureBinding textureBinding;
 	bool depthEnable = false;
@@ -56,7 +56,7 @@ struct DepthStencilBinding
 	uint8_t stencilWriteMask = 0xFF;
 };
 
-struct KGXRenderPassParameters
+struct KGXRenderPassParameters final
 {
 	std::string name;
 	core::KGXViewport viewport{};

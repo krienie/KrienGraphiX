@@ -10,7 +10,7 @@
 
 namespace kgx::RHI
 {
-class MTLVertexLayout : public RHIVertexLayout
+class MTLVertexLayout final : public RHIVertexLayout
 {
 public:
 	MTLVertexLayout() = default;

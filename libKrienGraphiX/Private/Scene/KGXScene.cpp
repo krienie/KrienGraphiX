@@ -6,6 +6,7 @@
 #include "KrienGraphiX/Scene/KGXMeshComponent.h"
 #include "KrienGraphiX/Scene/KGXSceneObject.h"
 #include "Private/Core/RenderCore.h"
+#include "Private/Core/RenderThread.h"
 
 namespace kgx::core
 {

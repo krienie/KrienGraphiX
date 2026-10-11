@@ -3,7 +3,7 @@
 
 namespace kgx::core
 {
-struct KGXViewport
+struct KGXViewport final
 {
 	int topLeftX;
 	int topLeftY;

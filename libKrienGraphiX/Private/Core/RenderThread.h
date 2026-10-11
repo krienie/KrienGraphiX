@@ -51,7 +51,7 @@ private:
 	RHI::RHIRenderContext* mRenderContext;
 };
 
-class DeferredRenderCommand
+class DeferredRenderCommand final
 {
 public:
 	DeferredRenderCommand(unsigned int numFramesToExecute, CommandThread::ThreadCommand&& deferredCommand);

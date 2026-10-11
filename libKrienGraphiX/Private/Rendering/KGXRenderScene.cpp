@@ -1,7 +1,6 @@
 
 #include "KGXRenderScene.h"
 
-#include "KGXDrawPackage.h"
 #include "Private/Core/RenderThread.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 

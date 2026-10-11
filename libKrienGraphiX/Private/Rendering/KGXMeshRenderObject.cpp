@@ -3,6 +3,7 @@
 
 #include "KrienGraphiX/Core/Logging.h"
 #include "Private/Core/RenderCore.h"
+#include "Private/Core/RenderThread.h"
 #include "Private/RHI/RenderHardwareInterface.h"
 
 namespace kgx::rendering

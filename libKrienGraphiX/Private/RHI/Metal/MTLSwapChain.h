@@ -12,13 +12,12 @@
 
 #include "MTLCommandQueue.h"
 #include "MTLTexture2D.h"
-#include "MTLTextureView.h"
 #include "Private/RHI/RHISwapChain.h"
 #include "Private/RHI/RHIUtils.h"
 
 namespace kgx::RHI
 {
-class MTLSwapChain : public RHISwapChain
+class MTLSwapChain final : public RHISwapChain
 {
 public:
 	MTLSwapChain(uint32_t width, uint32_t height);

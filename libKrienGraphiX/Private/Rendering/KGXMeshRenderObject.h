@@ -13,7 +13,7 @@ struct MeshInstanceData
 	math::Matrix4X4 modelMatrix;
 };
 
-class KGXMeshRenderObject
+class KGXMeshRenderObject final
 {
 public:
 	KGXMeshRenderObject(const RawMeshData& rawMeshData);

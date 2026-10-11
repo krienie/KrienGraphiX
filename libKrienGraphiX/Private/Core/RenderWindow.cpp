@@ -2,6 +2,7 @@
 #include "RenderWindow.h"
 
 #include "RenderCore.h"
+#include "RenderThread.h"
 #include "Private/Rendering/KGXRenderWindow.h"
 
 using namespace kgx::rendering;

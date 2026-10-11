@@ -12,7 +12,7 @@
 
 namespace kgx::RHI
 {
-class MTLRenderHardwareInterface : public RenderHardwareInterface
+class MTLRenderHardwareInterface final : public RenderHardwareInterface
 {
 public:
 	MTLRenderHardwareInterface();

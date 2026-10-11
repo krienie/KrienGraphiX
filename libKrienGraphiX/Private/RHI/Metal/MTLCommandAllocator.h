@@ -10,11 +10,11 @@
 
 namespace kgx::RHI
 {
-class MTLCommandAllocator : public core::PooledType<MTLCommandAllocator>
+class MTLCommandAllocator final : public core::PooledType<MTLCommandAllocator>
 {
 public:
 	MTLCommandAllocator(core::ResourcePool<MTLCommandAllocator>& parentPool);
-	~MTLCommandAllocator() = default;
+	~MTLCommandAllocator() override = default;
 
 	[[nodiscard]]
 	MTL4::CommandAllocator* getNativeAllocator() const;

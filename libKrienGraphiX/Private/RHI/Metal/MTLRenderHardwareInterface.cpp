@@ -12,9 +12,11 @@
 #include "MTLShader.h"
 #include "MTLSwapChain.h"
 #include "MTLTexture2D.h"
+
 #include "KrienGraphiX/Core/Logging.h"
 
 #include "Private/Core/RenderCore.h"
+#include "Private/Core/RenderThread.h"
 
 namespace kgx::RHI
 {
@@ -78,9 +80,9 @@ RHITextureHandle MTLRenderHardwareInterface::createTexture2D(const RHITexture2DD
 
 std::shared_ptr<RHIResourceView> MTLRenderHardwareInterface::createResourceView(RHIResourceView::Type type, const std::shared_ptr<RHIViewableResource>& viewedResource, bool isShaderVisible) const
 {
-	//TODO(KL): DSV only for now
-	assert(type == RHIResourceView::Type::DSV);
-	return std::make_shared<MTLTextureView>(type, viewedResource);
+	// Resource views are not used by the Metal RHI
+	assert(false);
+	return nullptr;
 }
 
 std::unique_ptr<RHIGraphicsPipelineState> MTLRenderHardwareInterface::createGraphicsPipelineState(const RHIGraphicsPipelineStateDescriptor& desc) const
