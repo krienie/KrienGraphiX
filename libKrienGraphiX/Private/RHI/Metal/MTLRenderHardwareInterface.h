@@ -40,9 +40,6 @@ public:
 	std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const override;
 
 	[[nodiscard]]
-	std::unique_ptr<RHITexture2D> createDepthStencilBuffer(const RHITexture2DDescriptor& descriptor) const override;
-
-	[[nodiscard]]
 	RHITextureHandle createTexture2D(const RHITexture2DDescriptor& descriptor) const override;
 
 	[[nodiscard]]

@@ -2,7 +2,9 @@
 #include "MTLTexture2D.h"
 
 #include "MTLPixelFormat.h"
+#include "MTLPlatform.h"
 #include "MTLRenderHardwareInterface.h"
+#include "Private/Core/RenderThread.h"
 
 namespace
 {
@@ -14,6 +16,22 @@ MTL::TextureUsage toMTLTextureUsage(const kgx::RHI::RHIResource::CreationFlags& 
 	outFlags |= flags & CreationFlags::RenderTargetable ? MTL::TextureUsageRenderTarget : MTL::TextureUsageUnknown;
 	outFlags |= flags & CreationFlags::UnorderedAccess ? MTL::TextureUsageShaderRead | MTL::TextureUsageShaderWrite : MTL::TextureUsageUnknown;
 	outFlags |= flags & CreationFlags::ShaderResource ? MTL::TextureUsageShaderRead : MTL::TextureUsageUnknown;
+
+	return outFlags;
+}
+
+MTL::StorageMode toMTLStorageMode(const kgx::RHI::RHIResource::CreationFlags& flags)
+{
+	using CreationFlags = kgx::RHI::RHIResource::CreationFlags;
+
+	MTL::StorageMode outFlags = MTL::StorageModePrivate;
+
+	if ((flags & CreationFlags::DepthStencil) == CreationFlags::DepthStencil)
+	{
+		const bool isMemoryless = (flags & CreationFlags::ShaderResource) == CreationFlags::ShaderResource
+			|| (flags & CreationFlags::UnorderedAccess) == CreationFlags::UnorderedAccess;
+		outFlags = isMemoryless ? MTL::StorageModeMemoryless : MTL::StorageModePrivate;
+	}
 
 	return outFlags;
 }
@@ -33,7 +51,7 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 	);
 
 	desc->setUsage(toMTLTextureUsage(descriptor.flags));
-	desc->setStorageMode(MTL::StorageModePrivate);
+	desc->setStorageMode(toMTLStorageMode(descriptor.flags));
 	//TODO(KL): Implement other texture types
 	desc->setTextureType(MTL::TextureType2D);
 	desc->setSampleCount(1);
@@ -41,7 +59,16 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 	MTL::Device* mtlDevice = getMTLRHI()->getMTLDevice()->getNativeDevice();
 	mTextureResource = NS::TransferPtr(mtlDevice->newTexture(desc));
 
-	mIsMultisampled = descriptor.numSamples > 1;
+	unsigned int numSamples = descriptor.numSamples;
+
+	//TODO(KL): Move MSAA support up to the renderer level
+	auto mtlPlatform = static_cast<MTLPlatform*>(core::gRenderThread->getRHIPlatformPtr());
+	if ((descriptor.flags & CreationFlags::DepthStencil) == CreationFlags::DepthStencil)
+	{
+		numSamples = mtlPlatform->getMultisampleCount();
+	}
+
+	mIsMultisampled = numSamples > 1;
 	if (mIsMultisampled)
 	{
 		MTL::TextureDescriptor* multisampleDesc = MTL::TextureDescriptor::texture2DDescriptor(
@@ -54,7 +81,7 @@ MTLTexture2D::MTLTexture2D(const MTLTexture2DDescriptor& descriptor)
 		multisampleDesc->setUsage(toMTLTextureUsage(descriptor.flags));
 		multisampleDesc->setStorageMode(MTL::StorageModeMemoryless);
 		multisampleDesc->setTextureType(MTL::TextureType2DMultisample);
-		multisampleDesc->setSampleCount(descriptor.numSamples);
+		multisampleDesc->setSampleCount(numSamples);
 
 		mMultisampledTextureResource = NS::TransferPtr(mtlDevice->newTexture(multisampleDesc));
 	}

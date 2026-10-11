@@ -68,28 +68,6 @@ std::unique_ptr<RHIShader> MTLRenderHardwareInterface::createShader(const Compil
 	return newShader;
 }
 
-std::unique_ptr<RHITexture2D> MTLRenderHardwareInterface::createDepthStencilBuffer(const RHITexture2DDescriptor& descriptor) const
-{
-	//TODO(KL): Implement
-	assert(false);
-	return nullptr;
-
-	//TODO(KL): Validate pixel format
-
-	/*DX12Texture2DDescriptor dx12Desc =
-	{
-		descriptor,
-		nullptr,
-		nullptr,
-		0,
-		D3D12_RESOURCE_STATE_DEPTH_WRITE
-	};
-
-	auto depthStencilBuffer = std::make_unique<DX12Texture2D>(dx12Desc);
-
-	return depthStencilBuffer;*/
-}
-
 RHITextureHandle MTLRenderHardwareInterface::createTexture2D(const RHITexture2DDescriptor& descriptor) const
 {
 	auto newTexture = std::make_unique<MTLTexture2D>(MTLTexture2DDescriptor{descriptor});

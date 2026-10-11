@@ -101,7 +101,7 @@ kgx::RHI::RHIGraphicsPipelineState* getStaticPSO()
 		.ps = pixelShader,
 		.primitiveTopology = RHI::Triangle,
 		.numRenderTargets = 1,
-		.depthStencilFormat = RHI::RHIPixelFormat::D24_unorm_S8_uint
+		.depthStencilFormat = RHI::RHIPixelFormat::R24_unorm_X8_typeless
 	};
 
 	//TODO(KL): Get these pixelformats from the buffers themselves
@@ -139,7 +139,7 @@ void KGXRenderer::RenderFrame()
 	// Main pass
 	{
 		static std::array<float, 4> lightSteelBlue = { 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
-		TextureBinding outTargetBinding
+		const TextureBinding outTargetBinding
 		{
 			.texture = mOutputRTV,
 			.loadAction = TextureLoadAction::Clear,
@@ -147,11 +147,28 @@ void KGXRenderer::RenderFrame()
 			.clearValue = { lightSteelBlue }
 		};
 
-		KGXRenderPassParameters mainPassParameters
+		const TextureBinding dsTextureBinding
+		{
+			.texture = mDSV,
+			.loadAction = TextureLoadAction::Clear,
+			.storeAction = TextureStoreAction::DoNothing,
+			.clearValue = { .depthClear = {.depth = 0.0f, .stencil = 0} },
+		};
+
+		const DepthStencilBinding depthStencilBinding
+		{
+			.textureBinding = dsTextureBinding,
+			.depthEnable = true,
+			.depthWriteEnable = true,
+			.depthFunction = DepthComparisonFunction::Greater,
+			.stencilEnable = false
+		};
+
+		const KGXRenderPassParameters mainPassParameters
 		{
 			.name = "mainPass",
 			.viewport = mViewport,
-			.depthStencilView = mDSV,
+			.depthStencilBinding = depthStencilBinding,
 			.inputTextures = {},
 			.outputTextures = {outTargetBinding},
 			.pso = getStaticPSO()

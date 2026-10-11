@@ -25,29 +25,22 @@ KGXRenderWindow::KGXRenderWindow(SDL_Window* window, unsigned int width, unsigne
 		.topLeftY = 0,
 		.width = width,
 		.height = height,
-		.minDepth = 0.0f,
-		.maxDepth = 1.0f
+		.minDepth = 1.0f,
+		.maxDepth = 0.0f
 	};
 
 	const RHITexture2DDescriptor texDesc =
 	{
-		// depth clear = 1.0f, stencil clear = 0
-		.clearValue = RHIClearValue{.depthClear = RHIClearValue::DepthClear{1.0f, 0}},
-		.pixelFormat = RHIPixelFormat::D24_unorm_S8_uint,
+		.clearValue = RHIClearValue{.depthClear = RHIClearValue::DepthClear{.depth = 0.0f, .stencil = 0}},
+		.pixelFormat = RHIPixelFormat::R24_unorm_X8_typeless,
 		.width = width,
 		.height = height,
 		.numMips = 1,
 		.numSamples = 1,
-		.flags = RHIResource::DepthStencil
+		.flags = static_cast<RHIResource::CreationFlags>(RHIResource::DepthStencil | RHIResource::RenderTargetable)
 	};
 
-#ifndef __APPLE__
-	//TODO(KL): Create a global rendertarget pool where this one comes out of and move it into KGXRenderer.
-	mDepthStencil = gPlatformRHI->createDepthStencilBuffer(texDesc);
-
-	constexpr bool isShaderVisible = false;
-	mDSV = gPlatformRHI->createResourceView(RHIResourceView::Type::DSV, mDepthStencil, isShaderVisible);
-#endif
+	mDepthStencil = gPlatformRHI->createTexture2D(texDesc);
 }
 
 void KGXRenderWindow::draw() const

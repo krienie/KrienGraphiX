@@ -113,7 +113,7 @@ void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParamete
 
 	mEncoder->setFrontFacingWinding(MTL::WindingClockwise);
 	mEncoder->setCullMode(MTL::CullModeBack);
-	mEncoder->setTriangleFillMode(MTL::TriangleFillMode::TriangleFillModeLines);
+	//mEncoder->setTriangleFillMode(MTL::TriangleFillMode::TriangleFillModeLines);
 
 	auto activePSO = static_cast<MTLGraphicsPipelineState*>(mCurrentRenderPassParameters.pso);
 	mEncoder->setRenderPipelineState(activePSO->getPSO());
@@ -143,6 +143,12 @@ void MTLRenderContext::activateRenderPass(const rendering::KGXRenderPassParamete
 	if (psoDescriptor.ps)
 	{
 		mEncoder->setArgumentTable(argumentTable, MTL::RenderStageFragment);
+	}
+
+	if (renderPassParameters.depthStencilBinding.depthEnable || renderPassParameters.depthStencilBinding.stencilEnable)
+	{
+		auto depthStencilState = mPlatform.getMTLDepthStencilState(renderPassParameters.depthStencilBinding);
+		mEncoder->setDepthStencilState(depthStencilState);
 	}
 }
 
@@ -230,40 +236,30 @@ NS::SharedPtr<MTL4::RenderPassDescriptor> MTLRenderContext::toMTLRenderPassDescr
 		colorAttach->setClearColor(toMTLClearColor(textureBinding.clearValue));
 	}
 
-	//TODO(KL): Depthstencil buffer
-
-	/*if (mPassContext.depthStencilTexture.texture)
+	if (renderPassParameters.depthStencilBinding.depthEnable)
 	{
-		const MTLPassTextureDescriptor& dsContext = mPassContext.depthStencilTexture;
+		const auto& depthStencilBinding = renderPassParameters.depthStencilBinding;
+		const auto& textureBinding = depthStencilBinding.textureBinding;
+		auto* depthStencil = static_cast<MTLTexture2D*>(mPlatform.getTexture2D(textureBinding.texture));
+		assert(depthStencil);
 
-		if (dsContext.dsClearFlags == (dsContext.dsClearFlags & DepthStencilFlags::DepthClear))
-		{
-			MTL::RenderPassDepthAttachmentDescriptor* depthAttach = renderPassDescriptor->depthAttachment();
-			depthAttach->setClearDepth(dsContext.clearValue.depthClear.depth);
-			depthAttach->setLoadAction(MTL::LoadActionClear);
-			depthAttach->setStoreAction(MTL::StoreActionStore);
-		}
-		else
-		{
-			//TODO(KL): This isn't correct, but it will have to do for now
-			renderPassDescriptor->depthAttachment()->setLoadAction(MTL::LoadActionLoad);
-			renderPassDescriptor->depthAttachment()->setStoreAction(MTL::StoreActionDontCare);
-		}
+		MTL::RenderPassDepthAttachmentDescriptor* depthAttach = renderPassDescriptor->depthAttachment();
+		depthAttach->setTexture(depthStencil->isMultisampled() ? depthStencil->getMultisampledTextureResource() : depthStencil->getTextureResource());
+		depthAttach->setClearDepth(textureBinding.clearValue.depthClear.depth);
+		depthAttach->setLoadAction(toMTLLoadAction(textureBinding.loadAction));
+		depthAttach->setStoreAction(toMTLStoreAction(textureBinding.storeAction));
+	}
 
-		if (dsContext.dsClearFlags == (dsContext.dsClearFlags & DepthStencilFlags::StencilClear))
-		{
-			MTL::RenderPassStencilAttachmentDescriptor* stencilAttach = renderPassDescriptor->stencilAttachment();
-			stencilAttach->setClearStencil(dsContext.clearValue.depthClear.stencil);
-			stencilAttach->setLoadAction(MTL::LoadActionClear);
-			stencilAttach->setStoreAction(MTL::StoreActionStore);
-		}
-		else
-		{
-			//TODO(KL): This isn't correct, but it will have to do for now
-			renderPassDescriptor->stencilAttachment()->setLoadAction(MTL::LoadActionLoad);
-			renderPassDescriptor->stencilAttachment()->setStoreAction(MTL::StoreActionDontCare);
-		}
-	}*/
+	if (renderPassParameters.depthStencilBinding.stencilEnable)
+	{
+		const auto& depthStencilBinding = renderPassParameters.depthStencilBinding;
+		const auto& textureBinding = depthStencilBinding.textureBinding;
+
+		MTL::RenderPassStencilAttachmentDescriptor* stencilAttach = renderPassDescriptor->stencilAttachment();
+		stencilAttach->setClearStencil(textureBinding.clearValue.depthClear.stencil);
+		stencilAttach->setLoadAction(toMTLLoadAction(textureBinding.loadAction));
+		stencilAttach->setStoreAction(toMTLStoreAction(textureBinding.storeAction));
+	}
 
 	return renderPassDescriptor;
 }

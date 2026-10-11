@@ -42,10 +42,6 @@ public:
 	[[nodiscard]]
 	virtual std::unique_ptr<RHIShader> createShader(const CompiledShader& compiledShader, RHIShader::ShaderType type) const = 0;
 
-	//TODO(KL): Replace with createTexture()
-	[[nodiscard]]
-	virtual std::unique_ptr<RHITexture2D> createDepthStencilBuffer(const RHITexture2DDescriptor& descriptor) const = 0;
-
 	[[nodiscard]]
 	virtual RHITextureHandle createTexture2D(const RHITexture2DDescriptor& descriptor) const = 0;
 

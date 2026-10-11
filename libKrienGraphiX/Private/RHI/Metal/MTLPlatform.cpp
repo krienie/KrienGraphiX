@@ -29,11 +29,15 @@ MTLPlatform::MTLPlatform(const MTLGraphicsDevice* mtlDevice)
 	});
 
 	mCommandQueue.create();
+
+	mDepthStencilManager = std::make_unique<MTLDepthStencilManager>();
 }
 
 MTLPlatform::~MTLPlatform()
 {
 	mCommandQueue.waitForCompletion();
+
+	mDepthStencilManager.reset();
 
 	if (mAutoReleasePool)
 	{
@@ -64,6 +68,11 @@ MTLCommandQueue& MTLPlatform::getCommandQueue()
 MTLCommandAllocator* MTLPlatform::getCommandAllocator() const
 {
 	return mCommandAllocatorPool->getResource();
+}
+
+MTL::DepthStencilState* MTLPlatform::getMTLDepthStencilState(const rendering::DepthStencilBinding& depthStencilBinding) const
+{
+	return mDepthStencilManager->getMTLDepthStencilState(depthStencilBinding);
 }
 
 unsigned int MTLPlatform::getMultisampleCount() const
