@@ -74,10 +74,10 @@ bool MTLRenderContext::create()
 	return createArgumentTables();
 }
 
-	void MTLRenderContext::setConstantBuffers(
-		const RHIBuffer* sceneConstantBuffer,
-		const RHIBuffer* meshInstanceConstantBuffer,
-		const RHIBuffer* objectIdsBuffer)
+void MTLRenderContext::setConstantBuffers(
+	const RHIBuffer* sceneConstantBuffer,
+	const RHIBuffer* meshInstanceConstantBuffer,
+	const RHIBuffer* objectIdsBuffer)
 {
 	mSceneConstantBuffer = static_cast<const MTLBuffer*>(sceneConstantBuffer);
 	mMeshInstanceConstantBuffer = static_cast<const MTLBuffer*>(meshInstanceConstantBuffer);
