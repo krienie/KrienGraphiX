@@ -38,7 +38,15 @@ target_link_libraries(${LIB_NAME} PRIVATE shadercompiler SDL3::SDL3 ufbx xxHash:
 target_link_libraries(${LIB_NAME} PUBLIC glm spdlog::spdlog)
 
 if (WIN32)
-    target_link_libraries(${LIB_NAME} PUBLIC d3d12.lib dxguid.lib dxgi.lib D3DCompiler.lib)
+    find_package(D3D12MemoryAllocator REQUIRED)
+
+    target_link_libraries(${LIB_NAME}
+            PUBLIC
+        d3d12.lib
+        dxguid.lib
+        dxgi.lib
+        D3DCompiler.lib
+        GPUOpen::D3D12MemoryAllocator)
 elseif (APPLE)
     target_link_libraries(${LIB_NAME} PUBLIC metalcpp)
 
